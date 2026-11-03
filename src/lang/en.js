@@ -67,6 +67,10 @@ export default {
   tawarruk: 'Tawarruk: sit on the floor, the left foot comes out under the right shin, the right foot stays upright.',
 
   mean: {
+    asr: ['By time!', 'Indeed, mankind is in loss,', 'except those who believe and do good deeds, and urge one another to truth and urge one another to patience.'],
+    kawthar: ['Indeed, We have given you al-Kawthar (abundant good).', 'So pray to your Lord and sacrifice.', 'Indeed, it is your enemy who is cut off.'],
+    falaq: ['Say: I seek refuge in the Lord of daybreak', 'from the evil of what He has created,', 'from the evil of darkness when it settles,', 'from the evil of those who blow on knots,', 'and from the evil of an envier when he envies.'],
+    nas: ['Say: I seek refuge in the Lord of mankind,', 'the King of mankind,', 'the God of mankind,', 'from the evil of the whisperer who withdraws,', 'who whispers into the hearts of mankind,', 'from among the jinn and mankind.'],
     takbir: ['Allah is greater (than everything).'],
     thana: ['Glory be to You, O Allah, and praise. Blessed is Your name, exalted is Your majesty, and there is no god but You.'],
     fatiha1: ['In the name of Allah, the Most Gracious, the Most Merciful.', 'All praise is for Allah, Lord of the worlds,', 'the Most Gracious, the Most Merciful,', 'Master of the Day of Judgement.'],
@@ -237,7 +241,7 @@ export default {
     ],
     rakat: (name) => `How many obligatory rakʿahs does the ${name} prayer have?`,
   },
-  badges: ['First prayer', 'All 5 daily prayers', 'Wuḍūʾ learned', 'Quiz pro (10/10)', '7 days in a row', 'Sunnah & Witr'],
+  badges: ['First prayer', 'All 5 daily prayers', 'Wuḍūʾ learned', 'Quiz pro (10/10)', '7 days in a row', 'Sunnah & Witr', 'First sura learned', 'All 6 suras', '10 stars'],
 
   styles: {
     klassisch: ['Classic', 'Wide hall with rows of columns, two domes, lanterns and a minbar'],
@@ -299,7 +303,19 @@ export default {
     shahada: 'Done! Now you are clean and ready to pray.',
     wudu: 'With water you make yourself clean – on the outside, and your heart becomes calm too.',
   },
+  suras: {
+    names: { fatiha: 'Al-Fātiḥa', ikhlas: 'Al-Ikhlāṣ', kawthar: 'Al-Kawthar', asr: 'Al-ʿAṣr', falaq: 'Al-Falaq', nas: 'An-Nās' },
+    about: {
+      fatiha: 'The Opening – you recite it in every rakʿa.',
+      ikhlas: 'Sincerity – Allah is the One.',
+      kawthar: 'The shortest sura – Allah gives abundance.',
+      asr: 'Time – faith, good deeds, truth and patience.',
+      falaq: 'Daybreak – protection from all evil.',
+      nas: 'Mankind – protection from evil whispers.',
+    },
+  },
   ui: {
+    menuSuras: 'Learn suras', surasTitle: 'Learn suras', surasSub: 'Short suras for the prayer – memorise them step by step', verses: (n) => `${n} verses`, learned: '✓ learned', modeRead: 'Read', modeVerse: 'Verse by verse', modeTest: 'Test yourself', verseOf: (i, n) => `Verse ${i} / ${n}`, reveal: 'Reveal', hide: 'Hide', speak: '🔊 Listen', markLearned: '✓ Learned', isLearned: '✓ Learned!', usePrayer: 'Use in prayer', inPrayer: '★ In prayer', testHint: 'Recite the verse from memory – then reveal it.', noVoice: 'There is no Arabic voice on this device.',
     menuPeace: 'Peace & heart', kidsBtn: (on) => (on ? 'Kids mode: on' : 'Kids mode'), kidsStars: (n) => `⭐ ${n} ${n === 1 ? "star" : "stars"} collected – Māshāʾallāh, well done!`, peaceTitle: 'Peace & a good heart', calm: 'Calm down', breathCount: (n, total) => `Breath ${n} / ${total}`, calmOut: 'Breathe out slowly …',
     sub: 'Prayer guide',
     choose: 'Choose a prayer – I will guide you through it step by step.',

@@ -68,6 +68,10 @@ export default {
 
   // Türkçe okunuşlar
   translit: {
+    asr: ['Vel-asr', 'İnnel-insâne lefî husr', 'İllellezîne âmenû ve amilüs-sâlihâti ve tevâsav bil-hakkı ve tevâsav bis-sabr'],
+    kawthar: ['İnnâ a\'taynâkel-kevser', 'Fesalli li-rabbike venhar', 'İnne şânieke hüvel-ebter'],
+    falaq: ['Kul eûzü bi-rabbil-felak', 'Min şerri mâ halak', 'Ve min şerri ğâsikın izâ vekab', 'Ve min şerrin-neffâsâti fil-ukad', 'Ve min şerri hâsidin izâ hased'],
+    nas: ['Kul eûzü bi-rabbin-nâs', 'Melikin-nâs', 'İlâhin-nâs', 'Min şerril-vesvâsil-hannâs', 'Ellezî yüvesvisü fî sudûrin-nâs', 'Minel-cinneti ven-nâs'],
     takbir: ['Allâhü ekber'],
     thana: ['Sübhânekellâhümme ve bi hamdik, ve tebârekesmük, ve teâlâ ceddük, ve lâ ilâhe ğayrük.'],
     fatiha1: ['Bismillâhirrahmânirrahîm', 'Elhamdü lillâhi rabbil-âlemîn', 'Errahmânirrahîm', 'Mâliki yevmiddîn'],
@@ -94,6 +98,10 @@ export default {
     tasbih: ['Sübhânallâh', 'Elhamdülillâh', 'Allâhü ekber'],
   },
   mean: {
+    asr: ['Asra yemin olsun ki,', 'insan gerçekten ziyan içindedir.', 'Ancak iman edip salih ameller işleyenler, birbirlerine hakkı ve sabrı tavsiye edenler bunun dışındadır.'],
+    kawthar: ['Şüphesiz biz sana Kevser\'i verdik.', 'Öyleyse Rabbin için namaz kıl ve kurban kes.', 'Asıl soyu kesik olan, sana kin besleyendir.'],
+    falaq: ['De ki: Sabahın Rabbine sığınırım,', 'yarattığı şeylerin şerrinden,', 'karanlığı çöktüğü zaman gecenin şerrinden,', 'düğümlere üfleyenlerin şerrinden,', 've haset ettiği zaman hasetçinin şerrinden.'],
+    nas: ['De ki: İnsanların Rabbine sığınırım,', 'insanların Melik\'ine,', 'insanların İlâh\'ına;', 'o sinsi vesvesecinin şerrinden,', 'ki o, insanların göğüslerine vesvese verir,', 'cinlerden ve insanlardan.'],
     takbir: ['Allah en büyüktür.'],
     thana: ['Allah\'ım! Sen her türlü eksiklikten uzaksın; seni hamd ile överim. Senin adın mübarektir, şanın yücedir. Senden başka ilah yoktur.'],
     fatiha1: ['Rahmân ve Rahîm olan Allah\'ın adıyla.', 'Hamd, âlemlerin Rabbi Allah\'a mahsustur.', 'O, Rahmân\'dır, Rahîm\'dir.', 'Din gününün sahibidir.'],
@@ -264,7 +272,7 @@ export default {
     ],
     rakat: (name) => `${name} namazının farzı kaç rekâttır?`,
   },
-  badges: ['İlk namaz', '5 vakit namazın hepsi', 'Abdest öğrenildi', 'Quiz ustası (10/10)', '7 gün üst üste', 'Sünnet ve Vitir'],
+  badges: ['İlk namaz', '5 vakit namazın hepsi', 'Abdest öğrenildi', 'Quiz ustası (10/10)', '7 gün üst üste', 'Sünnet ve Vitir', 'İlk sure ezberlendi', '6 surenin hepsi', '10 yıldız'],
 
   styles: {
     klassisch: ['Klasik', 'Sütun sıralı geniş salon, iki kubbe, kandiller ve minber'],
@@ -326,7 +334,19 @@ export default {
     shahada: 'Bitti! Artık temizsin ve namaza hazırsın.',
     wudu: 'Suyla temizleniyorsun – dışın temizlenir, kalbin de sakinleşir.',
   },
+  suras: {
+    names: { fatiha: 'Fâtiha', ikhlas: 'İhlâs', kawthar: 'Kevser', asr: 'Asr', falaq: 'Felak', nas: 'Nâs' },
+    about: {
+      fatiha: 'Açılış suresi – her rekâtta okunur.',
+      ikhlas: 'Samimiyet – Allah birdir.',
+      kawthar: 'En kısa sure – Allah bolluk verir.',
+      asr: 'Zaman – iman, salih amel, hak ve sabır.',
+      falaq: 'Sabah aydınlığı – her kötülükten korunma.',
+      nas: 'İnsanlar – kötü vesveselerden korunma.',
+    },
+  },
   ui: {
+    menuSuras: 'Sure öğren', surasTitle: 'Sure öğren', surasSub: 'Namaz için kısa sureler – adım adım ezberle', verses: (n) => `${n} âyet`, learned: '✓ ezberlendi', modeRead: 'Oku', modeVerse: 'Âyet âyet', modeTest: 'Kendini dene', verseOf: (i, n) => `Âyet ${i} / ${n}`, reveal: 'Göster', hide: 'Gizle', speak: '🔊 Dinle', markLearned: '✓ Ezberledim', isLearned: '✓ Ezberlendi!', usePrayer: 'Namazda oku', inPrayer: '★ Namazda', testHint: 'Âyeti ezberden oku – sonra göster.', noVoice: 'Bu cihazda Arapça ses yok.',
     menuPeace: 'Barış & Kalp', kidsBtn: (on) => (on ? 'Çocuk modu: açık' : 'Çocuk modu'), kidsStars: (n) => `⭐ ${n} yıldız topladın – Maşallah, aferin!`, peaceTitle: 'Barış ve güzel kalp', calm: 'Sakinleş', breathCount: (n, total) => `Nefes ${n} / ${total}`, calmOut: 'Yavaşça nefes ver …',
     sub: 'Namaz rehberi',
     choose: 'Bir namaz seç – sana adım adım yol göstereyim.',

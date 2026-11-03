@@ -60,7 +60,8 @@ export class MobileUI {
         ${btn(t('ui.menuWudu'), 'wudu', { cls: v.wuduDone ? '' : 'primary' })}${btn(t('ui.menuLearn'), 'learn')}
         ${btn(t('ui.menuQiblaMobile'), 'qibla')}${btn(t('ui.menuTasbih'), 'tasbih')}
         ${btn(t('ui.menuMosque'), 'mosque')}${btn(t('ui.menuSettings'), 'settings')}
-        ${btn(t('ui.menuPeace'), 'peace')}${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: v.kids ? 'active' : '' })}
+        ${btn(t('ui.menuSuras'), 'suras', { cls: 'primary' })}${btn(t('ui.menuPeace'), 'peace')}
+        ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: `wide ${v.kids ? 'active' : ''}` })}
       </div>`;
   }
 
@@ -176,6 +177,32 @@ export class MobileUI {
       <p class="muted">${esc(t('ui.afterPrayer'))}</p>
       ${v.kids ? `<p class="gold center">${esc(t('ui.kidsStars', v.stars))}</p>` : ''}
       <div class="grid3">${btn(t('ui.tasbih'), 'tasbih', { cls: 'primary' })}${btn(t('ui.again'), 'again')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_suras(v) {
+    return `${head(t('ui.surasTitle'))}
+      <p class="muted small">${esc(t('ui.surasSub'))}</p>
+      <div class="list">${v.suras.map((s) => btn(`${s.name}${s.learned ? ' ✓' : ''}${s.inPrayer ? ' ★' : ''}`, `sura:${s.id}`, { cls: s.learned ? 'active' : '', sub: `${s.about} · ${t('ui.verses', s.count)}` })).join('')}</div>
+      ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_sura(v) {
+    const n = v.verses.length, cur = v.verses[v.v];
+    const verse = (x) => `<p class="ar big center" dir="rtl">${esc(x.ar)}</p>${x.tr ? `<p class="tr center">${esc(x.tr)}</p>` : ''}${x.de ? `<p class="center">${esc(x.de)}</p>` : ''}`;
+    let body;
+    if (v.mode === 'read') body = v.verses.map(verse).join('<hr>');
+    else if (v.mode === 'test' && !v.reveal) {
+      body = `<p class="ar big center gold" dir="rtl">${esc(cur.ar.split(' ')[0])} …</p>${cur.de ? `<p class="center">${esc(cur.de)}</p>` : ''}<p class="muted small center">${esc(t('ui.testHint'))}</p>`;
+    } else body = verse(cur);
+    const nav = v.mode === 'read' ? '' : `<div class="grid2">${btn('←', 'sprev')}${v.mode === 'test' && !v.reveal ? btn(t('ui.reveal'), 'sreveal', { cls: 'primary' }) : btn('→', 'snext', { cls: 'primary' })}</div>`;
+    return `${head(v.name, v.mode === 'read' ? `${v.n} · ${t('ui.verses', n)}` : t('ui.verseOf', v.v + 1, n))}
+      <div class="grid3">${[['read', t('ui.modeRead')], ['verse', t('ui.modeVerse')], ['test', t('ui.modeTest')]].map(([m, label]) => btn(label, `smode:${m}`, { cls: v.mode === m ? 'active' : '' })).join('')}</div>
+      ${body}
+      ${v.msg ? `<p class="gold small center">${esc(v.msg)}</p>` : ''}
+      ${nav}
+      <div class="grid2">${btn(t('ui.speak'), 'sspeak')}${btn(v.learned ? t('ui.isLearned') : t('ui.markLearned'), 'slearned', { cls: v.learned ? 'active' : '' })}</div>
+      ${v.id !== 'fatiha' ? btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), 'sprayer', { cls: `wide ${v.inPrayer ? 'active' : ''}` }) : ''}
+      ${btn(t('ui.back'), 'suras', { cls: 'wide' })}`;
   }
 
   v_peace(v) {

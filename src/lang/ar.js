@@ -71,7 +71,7 @@ export default {
   mean: {
     takbir: none, thana: none, fatiha1: none, fatiha2: none, ikhlas: none, ruku: none, itidal: none, sujud: none,
     jalsa: none, tashahhud: none, salawat: none, dua: none, dua2: none, wajjahtu: none, qunut: none, qunutHanafi: none,
-    salam: none, taqabbal: none, basmala: none, shahada: none, tasbih: ['', '', ''],
+    salam: none, taqabbal: none, basmala: none, shahada: none, asr: none, kawthar: none, falaq: none, nas: none, tasbih: ['', '', ''],
   },
 
   title: {
@@ -221,7 +221,7 @@ export default {
     ],
     rakat: (name) => `كم ركعة في فريضة ${name}؟`,
   },
-  badges: ['أول صلاة', 'الصلوات الخمس كلها', 'تعلّم الوضوء', 'محترف الاختبار (١٠/١٠)', '٧ أيام متتالية', 'السنن والوتر'],
+  badges: ['أول صلاة', 'الصلوات الخمس كلها', 'تعلّم الوضوء', 'محترف الاختبار (١٠/١٠)', '٧ أيام متتالية', 'السنن والوتر', 'أول سورة محفوظة', 'السور الست كلها', '١٠ نجوم'],
 
   styles: {
     klassisch: ['كلاسيكي', 'قاعة واسعة بصفوف أعمدة وقبتين وفوانيس ومنبر'],
@@ -267,7 +267,19 @@ export default {
     shahada: 'انتهيت! أنت الآن طاهر ومستعد للصلاة.',
     wudu: 'بالماء تتطهّر – من الخارج، ويهدأ قلبك أيضًا.',
   },
+  suras: {
+    names: { fatiha: 'الفاتحة', ikhlas: 'الإخلاص', kawthar: 'الكوثر', asr: 'العصر', falaq: 'الفلق', nas: 'الناس' },
+    about: {
+      fatiha: 'فاتحة الكتاب – تُقرأ في كل ركعة.',
+      ikhlas: 'الله أحد.',
+      kawthar: 'أقصر سورة – الله يعطي الخير الكثير.',
+      asr: 'الإيمان والعمل الصالح والتواصي بالحق والصبر.',
+      falaq: 'الاستعاذة من كل شر.',
+      nas: 'الاستعاذة من الوسواس.',
+    },
+  },
   ui: {
+    menuSuras: 'حفظ السور', surasTitle: 'حفظ السور', surasSub: 'سور قصيرة للصلاة – احفظها خطوة بخطوة', verses: (n) => `${n} آيات`, learned: '✓ محفوظة', modeRead: 'قراءة', modeVerse: 'آية آية', modeTest: 'اختبر نفسك', verseOf: (i, n) => `الآية ${i} / ${n}`, reveal: 'إظهار', hide: 'إخفاء', speak: '🔊 استمع', markLearned: '✓ حفظتها', isLearned: '✓ محفوظة!', usePrayer: 'اقرأها في الصلاة', inPrayer: '★ في الصلاة', testHint: 'اقرأ الآية من حفظك – ثم أظهرها.', noVoice: 'لا يوجد صوت عربي على هذا الجهاز.',
     menuPeace: 'السلام والقلب', kidsBtn: (on) => (on ? 'وضع الأطفال: مفعّل' : 'وضع الأطفال'), kidsStars: (n) => `⭐ جمعت ${n} ${n === 1 ? "نجمة" : "نجوم"} – ما شاء الله، أحسنت!`, peaceTitle: 'السلام والقلب الطيب', calm: 'اهدأ', breathCount: (n, total) => `النفَس ${n} / ${total}`, calmOut: 'ازفر ببطء …',
     sub: 'مساعد الصلاة',
     choose: 'اختر صلاة – وسأرشدك خطوة بخطوة.',

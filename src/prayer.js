@@ -156,6 +156,47 @@ const TXT = {
   },
 };
 
+// Kurze Suren zum Lernen (und als Zusatzsure im Gebet)
+Object.assign(TXT, {
+  asr: {
+    ar: [
+      'وَالْعَصْرِ',
+      'إِنَّ الْإِنسَانَ لَفِي خُسْرٍ',
+      'إِلَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ وَتَوَاصَوْا بِالْحَقِّ وَتَوَاصَوْا بِالصَّبْرِ',
+    ],
+    tr: ['Wa l-ʿaṣr', 'Inna l-insāna la-fī khusr', 'Illa lladhīna āmanū wa ʿamilu ṣ-ṣāliḥāti wa tawāṣaw bi-l-ḥaqqi wa tawāṣaw bi-ṣ-ṣabr'],
+  },
+  kawthar: {
+    ar: [
+      'إِنَّا أَعْطَيْنَاكَ الْكَوْثَرَ',
+      'فَصَلِّ لِرَبِّكَ وَانْحَرْ',
+      'إِنَّ شَانِئَكَ هُوَ الْأَبْتَرُ',
+    ],
+    tr: ['Innā aʿṭaynāka l-kawthar', 'Fa-ṣalli li-rabbika wa-nḥar', 'Inna shāniʾaka huwa l-abtar'],
+  },
+  falaq: {
+    ar: [
+      'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ',
+      'مِن شَرِّ مَا خَلَقَ',
+      'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ',
+      'وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ',
+      'وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ',
+    ],
+    tr: ['Qul aʿūdhu bi-rabbi l-falaq', 'Min sharri mā khalaq', 'Wa min sharri ghāsiqin idhā waqab', 'Wa min sharri n-naffāthāti fi l-ʿuqad', 'Wa min sharri ḥāsidin idhā ḥasad'],
+  },
+  nas: {
+    ar: [
+      'قُلْ أَعُوذُ بِرَبِّ النَّاسِ',
+      'مَلِكِ النَّاسِ',
+      'إِلَٰهِ النَّاسِ',
+      'مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ',
+      'الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ',
+      'مِنَ الْجِنَّةِ وَالنَّاسِ',
+    ],
+    tr: ['Qul aʿūdhu bi-rabbi n-nās', 'Maliki n-nās', 'Ilāhi n-nās', 'Min sharri l-waswāsi l-khannās', 'Alladhī yuwaswisu fī ṣudūri n-nās', 'Mina l-jinnati wa n-nās'],
+  },
+});
+
 Object.assign(TXT, {
   dua2: {
     ar: ['رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ'],
@@ -201,7 +242,8 @@ export const TASBIH = TASBIH_AR.map(([ar, tr, target], i) => ({
 
 // Erzeugt die Schrittfolge für ein Gebet nach der gewählten Rechtsschule, in der aktuellen Sprache.
 // key benennt die Art des Schritts (für den spirituellen Modus).
-export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm') {
+// suraKey: Zusatzsure nach der Fātiḥa (in der Suren-Ansicht wählbar)
+export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 'ikhlas') {
   const m = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
   const f = gender === 'f';
   const pick = (table) => (table && (table[m.id] ?? table.default)) || '';
@@ -255,7 +297,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm') {
       });
       add({ ...base, ...qiyam, key: 'fatiha', title: t('title.fatiha2'), rakah: r, dur: 16, instr: t('instr.fatiha2'), ...text('fatiha2') });
       if (r <= 2 || kind !== 'fard') {
-        add({ ...base, ...qiyam, key: 'sura', title: t('title.sura'), rakah: r, dur: 14, instr: kind === 'fard' ? t('instr.suraFard') : t('instr.suraNafl'), ...text('ikhlas') });
+        add({ ...base, ...qiyam, key: 'sura', title: t('title.sura'), rakah: r, dur: 14, instr: kind === 'fard' ? t('instr.suraFard') : t('instr.suraNafl'), ...text(suraKey) });
       }
       // Qunūt vor dem Rukūʿ: Ḥanafī im Witr, Mālikī leise im Fajr
       const qunutBefore = (witrUnit && last && m.qunutWitr === 'before') || (prayer.id === 'fajr' && r === 2 && m.qunutFajr === 'before');

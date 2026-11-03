@@ -14,6 +14,7 @@ import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
 import { CALM_BREATHS, PEACE, kidLine } from './peace.js';
+import { SURAS, findSura, verses } from './suras.js';
 import { MobileUI } from './mobile.js';
 import { checkHands, indexRaised, readHand } from './hands.js';
 import { CITIES, qiblaBearing } from './qibla.js';
@@ -119,6 +120,9 @@ const state = {
   // Kinder-Modus: einfache Erklärung je Schritt, langsamer, Sterne als Belohnung
   kids: store.get('kids', false),
   peace: 0,
+  // Suren lernen: gewählte Sure, Modus (read | verse | test), aktueller Vers, aufgedeckt?
+  sura: { id: 'fatiha', mode: 'read', v: 0, reveal: false, msg: '' },
+  prayerSura: store.get('prayerSura', 'ikhlas'),
   calm: { count: 0 },
   style: store.get('style', 'klassisch'),
   night: false,
@@ -236,6 +240,15 @@ function view() {
       return { type: 'quiz', quiz: state.quiz, progress: state.progress };
     case 'done':
       return { type: 'done', prayer: state.prayer, kids: state.kids, stars: state.progress.stars || 0 };
+    case 'suras':
+      return {
+        type: 'suras',
+        suras: SURAS.map((s) => ({ id: s.id, n: s.n, name: s.name, about: s.about, count: verses(s.id).length, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura })),
+      };
+    case 'sura': {
+      const s = state.sura;
+      return { type: 'sura', id: s.id, name: findSura(s.id).name, n: findSura(s.id).n, verses: verses(s.id), mode: s.mode, v: s.v, reveal: s.reveal, msg: s.msg, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura };
+    }
     case 'peace':
       return { type: 'peace', item: PEACE[state.peace], index: state.peace, total: PEACE.length };
     case 'calm':
@@ -291,7 +304,7 @@ function onStep() {
   }
 }
 
-const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab) : buildSteps(prayer, state.madhab, state.gender));
+const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab) : buildSteps(prayer, state.madhab, state.gender, state.prayerSura));
 
 function start(prayer) {
   state.prayer = prayer;
@@ -307,23 +320,30 @@ function start(prayer) {
   onStep();
 }
 
+// Arabisch vorlesen, falls das Gerät eine arabische Stimme hat; sonst false.
+function sayArabic(line, { rate = 0.8, pitch = 1 } = {}) {
+  if (!('speechSynthesis' in window)) return false;
+  const voice = window.speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith('ar'));
+  if (!voice) return false;
+  const u = new SpeechSynthesisUtterance(line);
+  u.voice = voice;
+  u.lang = voice.lang;
+  u.rate = rate;
+  u.pitch = pitch;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+  return true;
+}
+
 // Imam spricht die Übergänge laut (arabische Stimme, falls das Gerät eine hat).
 const IMAM = { takbir: 'اللَّهُ أَكْبَرُ', sami: 'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ', salam: 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ' };
 function imamCall(step, prev) {
-  if (!state.cemaat || step.wudu || !('speechSynthesis' in window)) return;
+  if (!state.cemaat || step.wudu) return;
   let line = null;
   if (step.key === 'itidal') line = IMAM.sami;
   else if (step.key === 'salam') line = IMAM.salam;
   else if (step.key === 'takbir' || (prev && step.pose !== prev.pose && prev.pose !== 'takbir' && step.pose !== 'dua')) line = IMAM.takbir;
-  const voice = window.speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith('ar'));
-  if (!line || !voice) return;
-  const u = new SpeechSynthesisUtterance(line);
-  u.voice = voice;
-  u.lang = voice.lang;
-  u.rate = 0.75;
-  u.pitch = 0.8;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
+  if (line) sayArabic(line, { rate: 0.75, pitch: 0.8 });
 }
 
 function speak() {
@@ -406,6 +426,31 @@ function act(action) {
     case 'beginner': state.beginner = !state.beginner; store.set('beginner', state.beginner); break;
     case 'kids': state.kids = !state.kids; store.set('kids', state.kids); break;
     case 'peace': state.view = 'peace'; break;
+    case 'suras': state.view = 'suras'; break;
+    case 'sura': state.sura = { id: arg, mode: 'read', v: 0, reveal: false, msg: '' }; state.view = 'sura'; break;
+    case 'smode': Object.assign(state.sura, { mode: arg, v: 0, reveal: false }); break;
+    case 'snext': case 'sprev': {
+      const s = state.sura, n = verses(s.id).length;
+      s.v = Math.max(0, Math.min(n - 1, s.v + (key === 'snext' ? 1 : -1)));
+      s.reveal = false;
+      break;
+    }
+    case 'sreveal': state.sura.reveal = !state.sura.reveal; break;
+    case 'sspeak': {
+      const s = state.sura, vs = verses(s.id);
+      const line = s.mode === 'read' ? vs.map((x) => x.ar).join(' ۝ ') : vs[s.v].ar;
+      s.msg = sayArabic(line, { rate: 0.7 }) ? '' : t('ui.noVoice');
+      break;
+    }
+    case 'slearned': {
+      const p = state.progress, id = state.sura.id;
+      p.suras = { ...(p.suras || {}), [id]: !p.suras?.[id] };
+      // Kinder bekommen einen Stern für jede gelernte Sure
+      if (p.suras[id] && state.kids) p.stars = (p.stars || 0) + 1;
+      store.set('progress', p);
+      break;
+    }
+    case 'sprayer': state.prayerSura = state.sura.id; store.set('prayerSura', state.prayerSura); break;
     case 'peacenext': state.peace = (state.peace + 1) % PEACE.length; break;
     case 'peaceprev': state.peace = (state.peace + PEACE.length - 1) % PEACE.length; break;
     case 'calm': state.view = 'calm'; state.calm = { count: 0 }; state.breath = { on: true, t: 0, phase: 'in' }; break;

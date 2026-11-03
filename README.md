@@ -21,6 +21,7 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Weitere Gebete: Sunnah vor/nach den Pflichtgebeten, Witr, Jumuʿa, Taḥiyyat al-Masjid
 - Wuḍūʾ-Trainer: 12 Schritte mit Körper-Piktogramm, Pflicht/Sunnah je Rechtsschule
 - Lernen & Quiz: 24 Fragen (zufällig 10), Fortschritt, Tage in Folge, Abzeichen
+- Suren lernen: Fātiḥa, Ikhlāṣ, Kauṯar, ʿAṣr, Falaq, Nās – lesen, Vers für Vers üben, sich abfragen (nur das erste Wort als Hilfe), anhören, als gelernt markieren; die gewählte Sure wird im Gebet als Zusatzsure gebetet
 - Kinder-Modus: zu jedem Schritt ein einfacher, liebevoller Satz, langsameres Tempo, ein Stern für jedes geschaffte Gebet
 - Frieden & gutes Herz: 15 Quran-Verse und Hadithe über Frieden, Barmherzigkeit und Selbstbeherrschung, jeweils mit arabischem Original, Übersetzung und Quelle; dazu „Ruhig werden“ – Schritte gegen die Wut nach der Sunnah und 5 Atemzüge mit der Atem-Kugel
 - Anfänger-Modus (langsamer, liest jeden Schritt vor) und Spiritueller Modus (innere Bedeutung jedes Schritts, Atem-Dhikr im Tasbīḥ)
@@ -61,6 +62,7 @@ WebXR braucht HTTPS. Am einfachsten:
 - `src/panel.js` – Bedienpanel, Bodentafel und Bewegungs-Einblendung
 - `src/movement.js` – Bewegungsansagen, Piktogramme, Haltungserkennung
 - `src/environment.js` – Gebetsräume in vier Stilen
+- `src/suras.js` – Suren zum Auswendiglernen
 - `src/peace.js` – Verse und Hadithe zum Frieden, Ruhig-werden-Übung, Kinder-Sätze
 - `src/congregation.js` – Imam und Gemeinde für das Gemeinschaftsgebet
 - `src/qibla.js` – Qibla-Berechnung und Städte

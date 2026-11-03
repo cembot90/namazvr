@@ -70,6 +70,10 @@ export default {
 
   // Bedeutung der arabischen Texte, Zeile für Zeile
   mean: {
+    asr: ['Bei der Zeit!', 'Der Mensch ist wahrlich im Verlust,', 'außer denen, die glauben und Gutes tun, einander zur Wahrheit raten und einander zur Geduld raten.'],
+    kawthar: ['Wir haben dir den Kauṯar (die Fülle des Guten) gegeben.', 'So bete zu deinem Herrn und opfere.', 'Wer dich hasst, der ist es, der von allem Guten abgeschnitten ist.'],
+    falaq: ['Sprich: Ich suche Zuflucht beim Herrn des Morgengrauens', 'vor dem Übel dessen, was Er erschaffen hat,', 'vor dem Übel der Dunkelheit, wenn sie hereinbricht,', 'vor dem Übel derer, die auf Knoten blasen,', 'und vor dem Übel eines Neiders, wenn er neidet.'],
+    nas: ['Sprich: Ich suche Zuflucht beim Herrn der Menschen,', 'dem König der Menschen,', 'dem Gott der Menschen,', 'vor dem Übel des Einflüsterers, der sich zurückzieht,', 'der in die Herzen der Menschen einflüstert,', 'unter den Dschinn und den Menschen.'],
     takbir: ['Allah ist größer (als alles).'],
     thana: ['Gepriesen seist Du, o Allah, und Dir gebührt das Lob. Gesegnet ist Dein Name, erhaben Deine Majestät, und es gibt keinen Gott außer Dir.'],
     fatiha1: ['Im Namen Allahs, des Allerbarmers, des Barmherzigen.', 'Alles Lob gebührt Allah, dem Herrn der Welten,', 'dem Allerbarmer, dem Barmherzigen,', 'dem Herrscher am Tag des Gerichts.'],
@@ -245,7 +249,7 @@ export default {
     ],
     rakat: (name) => `Wie viele Pflicht-Rakʿāt hat das ${name}-Gebet?`,
   },
-  badges: ['Erstes Gebet', 'Alle 5 Pflichtgebete', 'Wuḍūʾ gelernt', 'Quiz-Profi (10/10)', '7 Tage in Folge', 'Sunnah & Witr'],
+  badges: ['Erstes Gebet', 'Alle 5 Pflichtgebete', 'Wuḍūʾ gelernt', 'Quiz-Profi (10/10)', '7 Tage in Folge', 'Sunnah & Witr', 'Erste Sure gelernt', 'Alle 6 Suren', '10 Sterne'],
 
   styles: {
     klassisch: ['Klassisch', 'Weite Halle mit Säulenreihen, zwei Kuppeln, Laternen und Minbar'],
@@ -308,7 +312,19 @@ export default {
     shahada: 'Fertig! Jetzt bist du sauber und bereit zum Beten.',
     wudu: 'Mit Wasser machst du dich sauber – außen, und auch dein Herz wird ruhig.',
   },
+  suras: {
+    names: { fatiha: 'Al-Fātiḥa', ikhlas: 'Al-Ikhlāṣ', kawthar: 'Al-Kauṯar', asr: 'Al-ʿAṣr', falaq: 'Al-Falaq', nas: 'An-Nās' },
+    about: {
+      fatiha: 'Die Eröffnende – du sprichst sie in jeder Rakʿa.',
+      ikhlas: 'Die Aufrichtigkeit – Allah ist der Eine.',
+      kawthar: 'Die kürzeste Sure – Allah schenkt Fülle.',
+      asr: 'Die Zeit – Glaube, Gutes tun, Wahrheit und Geduld.',
+      falaq: 'Das Morgengrauen – Schutz vor allem Schlechten.',
+      nas: 'Die Menschen – Schutz vor bösen Einflüsterungen.',
+    },
+  },
   ui: {
+    menuSuras: 'Suren lernen', surasTitle: 'Suren lernen', surasSub: 'Kurze Suren für das Gebet – Schritt für Schritt auswendig lernen', verses: (n) => `${n} Verse`, learned: '✓ gelernt', modeRead: 'Lesen', modeVerse: 'Vers für Vers', modeTest: 'Abfragen', verseOf: (i, n) => `Vers ${i} / ${n}`, reveal: 'Aufdecken', hide: 'Verdecken', speak: '🔊 Hören', markLearned: '✓ Gelernt', isLearned: '✓ Gelernt!', usePrayer: 'Im Gebet beten', inPrayer: '★ Im Gebet', testHint: 'Sprich den Vers aus dem Gedächtnis – dann aufdecken.', noVoice: 'Auf diesem Gerät gibt es keine arabische Stimme.',
     menuPeace: 'Frieden & Herz', kidsBtn: (on) => (on ? 'Kinder-Modus: an' : 'Kinder-Modus'), kidsStars: (n) => `⭐ ${n} ${n === 1 ? "Stern" : "Sterne"} gesammelt – Maşallah, toll gemacht!`, peaceTitle: 'Frieden & gutes Herz', calm: 'Ruhig werden', breathCount: (n, total) => `Atemzug ${n} / ${total}`, calmOut: 'Langsam ausatmen …',
     sub: 'Gebetsassistent',
     choose: 'Wähle ein Gebet – ich führe dich Schritt für Schritt hindurch.',

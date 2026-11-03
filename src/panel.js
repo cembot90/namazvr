@@ -184,7 +184,7 @@ export class Panel extends CanvasPlane {
     [
       [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
-      [[t('ui.menuPeace'), 'peace'], [t('ui.kidsBtn', v.kids), 'kids']],
+      [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('ui.kidsBtn', v.kids), 'kids']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
       this.btn(label, 60 + i * (bw + gap), 612 + ri * 90, bw, 78, action, { primary: action === 'wudu' && !v.wuduDone, active: action === 'kids' && v.kids, size: 30 });
     }));
@@ -328,6 +328,83 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.menu'), 60 + 2 * (w + gap), by, w, 96, 'menu');
   }
 
+  // Suren lernen: Auswahl
+  v_suras(v) {
+    const { W, H } = this;
+    this.heading(t('ui.surasTitle'));
+    this.text(t('ui.surasSub'), 60, 160, { size: 28, color: C.muted });
+    const gap = 20, w = (W - 120 - gap) / 2;
+    v.suras.forEach((s, i) => {
+      const x = 60 + (i % 2) * (w + gap), y = 200 + Math.floor(i / 2) * 165;
+      const name = `${s.name}${s.learned ? '  ✓' : ''}${s.inPrayer ? '  ★' : ''}`;
+      this.btn(name, x, y, w, 145, `sura:${s.id}`, { size: 38, sub: s.about, subSize: 23, active: s.learned });
+    });
+    this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
+  }
+
+  // Eine Zeile je Vers: Arabisch rechts, nummerierte Umschrift links; Schrift schrumpft, bis die Zeile passt.
+  verseRows(verses, top, bottom) {
+    const { ctx, W } = this;
+    const rowH = Math.min(110, (bottom - top) / verses.length);
+    const fit = (str, font, size, maxW, min) => {
+      ctx.font = `${size}px ${font}`;
+      while (size > min && ctx.measureText(str).width > maxW) { size -= 2; ctx.font = `${size}px ${font}`; }
+      return size;
+    };
+    verses.forEach((x, i) => {
+      const y = top + i * rowH + rowH / 2, hasTr = !!x.tr;
+      ctx.direction = 'rtl';
+      const as = fit(x.ar, AR, Math.min(48, rowH * 0.55), hasTr ? W / 2 - 40 : W - 120, 20);
+      ctx.direction = 'ltr';
+      this.text(x.ar, hasTr ? W - 60 : W / 2, y + as * 0.3, { size: as, font: AR, rtl: true, align: hasTr ? 'right' : 'center' });
+      if (hasTr) {
+        const label = `${i + 1}.  ${x.tr}`, maxW = W / 2 - 100;
+        const ts = fit(label, UI, Math.min(27, rowH * 0.3), maxW, 22);
+        // Zu lang für eine Zeile: auf zwei Zeilen umbrechen
+        const lines = ctx.measureText(label).width > maxW ? wrap(ctx, label, maxW).slice(0, 2) : [label];
+        lines.forEach((l, k) => this.text(l, 60, y + ts * 0.35 + (k - (lines.length - 1) / 2) * ts * 1.2, { size: ts, color: C.gold, weight: 'italic' }));
+      }
+      if (i < verses.length - 1) {
+        ctx.fillStyle = 'rgba(201,168,92,0.18)';
+        ctx.fillRect(60, top + (i + 1) * rowH, W - 120, 2);
+      }
+    });
+  }
+
+  // Suren lernen: eine Sure lesen, Vers für Vers üben oder sich abfragen
+  v_sura(v) {
+    const { W, H } = this;
+    const n = v.verses.length, cur = v.verses[v.v];
+    this.heading(v.name, v.mode === 'read' ? `${v.n} · ${t('ui.verses', n)}` : t('ui.verseOf', v.v + 1, n));
+    [['read', t('ui.modeRead')], ['verse', t('ui.modeVerse')], ['test', t('ui.modeTest')]].forEach(([m, label], i) => {
+      this.btn(label, 60 + i * 250, 125, 240, 64, `smode:${m}`, { size: 26, active: v.mode === m });
+    });
+    if (v.id !== 'fatiha') this.btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), W - 60 - 320, 125, 320, 64, 'sprayer', { size: 26, active: v.inPrayer });
+    const top = 225, bottom = H - 175;
+    if (v.mode === 'read') {
+      this.verseRows(v.verses, top, bottom);
+    } else if (v.mode === 'test' && !v.reveal) {
+      // Nur das erste Wort als Hilfe, dazu die Bedeutung
+      const first = cur.ar.split(' ')[0];
+      this.text(`${first} …`, W / 2, top + 110, { size: 72, font: AR, align: 'center', rtl: true, color: C.gold });
+      this.paragraphs([cur.de, t('ui.testHint')].filter(Boolean), top + 200, { size: 30, color: C.muted });
+    } else {
+      this.recitation({ ar: [cur.ar], tr: [cur.tr].filter(Boolean), de: [cur.de].filter(Boolean) }, top + 30, bottom, true);
+    }
+    if (v.msg) this.text(v.msg, W / 2, H - 160, { size: 22, color: C.gold, align: 'center' });
+    const by = H - 140, gap = 16, w = (W - 120 - 4 * gap) / 5;
+    const x = (i) => 60 + i * (w + gap);
+    if (v.mode !== 'read') {
+      this.btn('←', x(0), by, w, 96, 'sprev', { size: 44 });
+      // Abfragen: erst aufdecken, dann weiter zum nächsten Vers
+      if (v.mode === 'test' && !v.reveal) this.btn(t('ui.reveal'), x(1), by, w, 96, 'sreveal', { primary: true, size: 28 });
+      else this.btn('→', x(1), by, w, 96, 'snext', { size: 44, primary: true });
+    }
+    this.btn(t('ui.speak'), x(2), by, w, 96, 'sspeak', { size: 28 });
+    this.btn(v.learned ? t('ui.isLearned') : t('ui.markLearned'), x(3), by, w, 96, 'slearned', { size: 26, active: v.learned });
+    this.btn(t('ui.back'), x(4), by, w, 96, 'suras', { size: 28 });
+  }
+
   // Frieden & gutes Herz: ein Vers bzw. Hadith mit arabischem Original, Übersetzung und Quelle
   v_peace(v) {
     const { W, H } = this;
@@ -468,7 +545,7 @@ export class Panel extends CanvasPlane {
       ctx.fillStyle = b.ok ? C.active : 'rgba(29,43,69,0.5)'; ctx.fill();
       this.text(`${b.ok ? '★' : '☆'}  ${b.name}`, isRTL() ? x + bw - 24 : x + 24, y + 38, { size: 26, color: b.ok ? C.text : C.muted, base: 'middle', weight: b.ok ? 600 : '', align: isRTL() ? 'right' : 'left', fixed: true, rtl: isRTL() });
     });
-    this.text(t('ui.quizTeaser'), 60, 600, { size: 28, color: C.muted });
+    this.text(t('ui.quizTeaser'), 60, 690, { size: 28, color: C.muted });
     const by = H - 140, bw2 = (W - 120 - gap) / 2;
     this.btn(t('ui.quizStart'), 60, by - 120, W - 120, 100, 'quiz', { primary: true, size: 38 });
     this.btn(t('ui.resetProgress'), 60, by, bw2, 96, 'resetprogress', { size: 28 });

@@ -36,7 +36,7 @@ export function newQuiz(count = 10) {
 }
 
 // --- Fortschritt ---
-export const emptyProgress = () => ({ done: {}, wudu: 0, quizBest: 0, quizRuns: 0, days: [] });
+export const emptyProgress = () => ({ done: {}, wudu: 0, quizBest: 0, quizRuns: 0, days: [], suras: {}, stars: 0 });
 
 const dayKey = (d = new Date()) => {
   const p = (n) => String(n).padStart(2, '0');
@@ -67,5 +67,8 @@ const BADGE_TESTS = [
   (p) => p.quizBest >= 10,
   (p) => streak(p) >= 7,
   (p) => ['witr', 'sfajr'].every((id) => p.done[id]),
+  (p) => Object.values(p.suras || {}).some(Boolean),
+  (p) => ['fatiha', 'ikhlas', 'kawthar', 'asr', 'falaq', 'nas'].every((id) => p.suras?.[id]),
+  (p) => (p.stars || 0) >= 10,
 ];
 export const BADGES = BADGE_TESTS.map((test, i) => ({ test, get name() { return t('badges')[i]; } }));
