@@ -159,7 +159,7 @@ export class Panel extends CanvasPlane {
 
   v_menu(v) {
     const { W } = this;
-    this.heading('Salah VR', 'Gebetsassistent');
+    this.heading('NamazVR', 'Gebetsassistent');
     this.text('Wähle ein Gebet – ich führe dich Schritt für Schritt hindurch.', 60, 160, { size: 32, color: C.muted });
     const gap = 20, w = (W - 120 - gap * 4) / 5;
     v.prayers.forEach((p, i) => {
@@ -509,7 +509,7 @@ export class FloorCard extends CanvasPlane {
       this.ctx.font = `italic 30px ${UI}`;
       this.text(wrap(this.ctx, s.tr[0] || s.de[0] || '', W - x0 - 40)[0] || '', cx, 330, { size: 30, color: C.muted, align: 'center', weight: 'italic' });
     } else {
-      this.text('Salah VR', W / 2, 150, { size: 64, weight: 700, color: C.gold, align: 'center' });
+      this.text('NamazVR', W / 2, 150, { size: 64, weight: 700, color: C.gold, align: 'center' });
       this.text('Wähle am Panel ein Gebet', W / 2, 250, { size: 36, color: C.muted, align: 'center' });
     }
     this.tex.needsUpdate = true;

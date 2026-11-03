@@ -1,6 +1,6 @@
 {
-  "name": "Salah – Gebetsassistent",
-  "short_name": "Salah",
+  "name": "NamazVR – Gebetsassistent",
+  "short_name": "NamazVR",
   "description": "Lerne das islamische Gebet Schritt für Schritt – auf dem Handy und in VR.",
   "start_url": "./",
   "scope": "./",

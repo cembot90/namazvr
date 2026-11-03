@@ -47,7 +47,7 @@ export class MobileUI {
 
   v_menu(v) {
     return `
-      ${head('Salah', 'Gebetsassistent')}
+      ${head('NamazVR', 'Gebetsassistent')}
       <div class="grid5">${v.prayers.map((p) => {
         const row = v.times.rows.find((t) => t.id === p.id);
         return btn(p.name, `prayer:${p.id}`, { cls: p.id === v.times.current ? 'active' : '', sub: `${row.time} · ${p.rakat}` });

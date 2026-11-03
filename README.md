@@ -1,4 +1,4 @@
-# Salah – Gebetsassistent für Meta Quest und Handy
+# NamazVR – Gebetsassistent für Meta Quest und Handy
 
 Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (Meta Quest, WebXR) in einem virtuellen Gebetsraum, auf dem Handy als installierbare App (PWA) und am Computer im Browser.
 
