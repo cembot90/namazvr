@@ -1,14 +1,13 @@
 import * as THREE from 'three';
+import { t } from './i18n.js';
 
 // Gebetsraum. Alles hängt an `group`; dessen -Z-Achse ist die Qibla (Mihrab bei z = -8).
 const ROOM = 16, HEIGHT = 7, HALF = ROOM / 2;
 
 // Freie Stile, inspiriert von Bautraditionen – keine Nachbauten bestimmter Moscheen.
-export const STYLES = [
-  { id: 'klassisch', name: 'Klassisch', de: 'Heller Gebetsraum mit Spitzbögen, Kuppel und Laternen' },
-  { id: 'osmanisch', name: 'Osmanisch', de: 'Große Zentralkuppel, blaue Fliesen, Lichterkranz und Kuppelfenster' },
-  { id: 'andalusisch', name: 'Andalusisch', de: 'Säulenwald mit rot-weißen Hufeisenbögen und Holzdecke' },
-];
+export const STYLES = ['klassisch', 'osmanisch', 'andalusisch'].map((id) => ({
+  id, get name() { return t(`styles.${id}`)[0]; }, get de() { return t(`styles.${id}`)[1]; },
+}));
 
 const PALETTE = {
   klassisch: { carpet: ['#5e1a24', '#6f2330', '#c9a85c', '#2f6b5a'], wall: ['#efe4cf', '#e2d3b6'], tile: ['#1d5a63', '#e8dcc0', '#2b7c86'], band: 1.3 },

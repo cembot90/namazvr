@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     html, body { margin: 0; height: 100%; background: #0b1220; overflow: hidden; font-family: Inter, system-ui, sans-serif; }
     #hint {
@@ -106,6 +106,13 @@
     #ui .breath { width: 70px; height: 70px; margin: 16px auto 4px; border-radius: 50%; background: radial-gradient(#bff0dc, #2f9670); }
     #ui .breath.in { animation: grow 3s ease-in-out forwards; }
     #ui .breath.out { animation: shrink 3s ease-in-out forwards; }
+    /* Arabisch: von rechts nach links */
+    html[dir="rtl"] #ui, html[dir="rtl"] #hint { font-family: "Noto Sans Arabic", "Geeza Pro", Inter, sans-serif; }
+    html[dir="rtl"] #ui header span { text-align: left; }
+    html[dir="rtl"] #ui .list button { align-items: flex-start; text-align: right; }
+    html[dir="rtl"] #ui .row { text-align: right; }
+    html[dir="rtl"] #ui .notes { padding-left: 0; padding-right: 18px; }
+    html[dir="rtl"] #hint { left: auto; right: 16px; }
     @keyframes grow { from { transform: scale(.6); } to { transform: scale(1.4); } }
     @keyframes shrink { from { transform: scale(1.4); } to { transform: scale(.6); } }
   </style>

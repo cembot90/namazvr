@@ -1,19 +1,9 @@
 // Körperbewegungen zwischen den Haltungen: Ansage, Piktogramm und Erkennung über die Kopfhöhe in VR.
+// Ansagen (cue.*) und Ausführung (how.*) stehen in der Sprachdatei.
+import { t } from './i18n.js';
 
 // Haltung → Körperlage, die in VR erkannt werden kann.
 const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit' };
-
-const HOW = {
-  stand: 'Steh aufrecht, Füße etwa schulterbreit, Blick auf den Platz der Niederwerfung.',
-  takbir: 'Hebe beide Hände mit offenen Handflächen bis auf Ohren- bzw. Schulterhöhe.',
-  qiyam: 'Steh aufrecht und lege die rechte Hand über die linke auf Brust oder Bauch.',
-  ruku: 'Beuge den Oberkörper nach vorn, bis der Rücken waagerecht ist. Hände auf die Knie, Blick nach unten.',
-  sujud: 'Knie auf den Boden, dann Hände; Stirn und Nase auf den Boden. Zehen bleiben aufgestellt.',
-  sit: 'Setz dich auf den linken Fuß, der rechte Fuß bleibt aufgestellt. Hände auf die Oberschenkel.',
-  dua: 'Hebe beide Hände vor die Brust, die Handflächen zeigen nach oben.',
-  taslimR: 'Bleib sitzen und dreh den Kopf nach rechts, bis du über die Schulter schaust.',
-  taslimL: 'Bleib sitzen und dreh den Kopf nach links, bis du über die Schulter schaust.',
-};
 
 /**
  * Bewegung von der vorherigen zur aktuellen Haltung.
@@ -22,26 +12,27 @@ const HOW = {
 export function moveFor(prev, pose) {
   const body = BODY[pose];
   const from = prev ? BODY[prev] : null;
-  const how = HOW[pose];
-  if (pose === 'taslimR') return { arrow: 'right', cue: 'Kopf nach rechts drehen', how, body };
-  if (pose === 'taslimL') return { arrow: 'left', cue: 'Kopf nach links drehen', how, body };
-  if (!prev) return { arrow: null, cue: 'Aufrecht hinstellen', how, body };
-  if (pose === 'dua') return { arrow: 'up', cue: 'Hände zum Bittgebet heben', how, body };
-  if (pose === 'takbir') return { arrow: 'up', cue: 'Hände heben', how, body };
+  const how = t(`how.${pose}`);
+  const r = (arrow, cue) => ({ arrow, cue: t(`cue.${cue}`), how, body });
+  if (pose === 'taslimR') return r('right', 'taslimR');
+  if (pose === 'taslimL') return r('left', 'taslimL');
+  if (!prev) return r(null, 'start');
+  if (pose === 'dua') return r('up', 'dua');
+  if (pose === 'takbir') return r('up', 'takbir');
   if (from === body) {
-    if (pose === 'qiyam' && prev === 'takbir') return { arrow: null, cue: 'Hände übereinanderlegen', how, body };
-    if (pose === 'stand' && prev === 'takbir') return { arrow: null, cue: 'Arme sinken lassen', how, body };
-    const hold = { stand: 'Stehen bleiben', ruku: 'In der Verbeugung bleiben', sujud: 'In der Niederwerfung bleiben', sit: 'Sitzen bleiben' };
-    return { arrow: null, cue: hold[body], how, body };
+    if (pose === 'qiyam' && prev === 'takbir') return r(null, 'fold');
+    if (pose === 'stand' && prev === 'takbir') return r(null, 'lower');
+    const hold = { stand: 'holdStand', ruku: 'holdRuku', sujud: 'holdSujud', sit: 'holdSit' };
+    return r(null, hold[body]);
   }
   const cues = {
-    stand: from === 'ruku' ? 'Aufrichten' : 'Aufstehen',
-    ruku: 'Verbeugen',
-    sujud: from === 'sit' ? 'Wieder niederwerfen' : 'Niederwerfen – auf den Boden',
-    sit: 'Aufsetzen',
+    stand: from === 'ruku' ? 'straighten' : 'standUp',
+    ruku: 'bow',
+    sujud: from === 'sit' ? 'prostrateAgain' : 'prostrate',
+    sit: 'sitUp',
   };
   const arrow = { stand: 'up', ruku: 'down', sujud: 'down', sit: from === 'sujud' ? 'up' : 'down' }[body];
-  return { arrow, cue: cues[body], how, body };
+  return r(arrow, cues[body]);
 }
 
 /**

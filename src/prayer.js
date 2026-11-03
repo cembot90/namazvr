@@ -1,92 +1,56 @@
 // Gebetsablauf nach verbreiteter sunnitischer Praxis.
-// Jede Textgruppe: ar = arabische Zeilen, tr = Umschrift, de = deutsche Bedeutung.
+// Jede Textgruppe: ar = arabische Zeilen, tr = Umschrift, de = Bedeutung in der gewählten Sprache.
+import { t } from './i18n.js';
+
+// Name und Untertitel kommen aus der Sprachdatei, als Getter, damit ein Sprachwechsel sofort wirkt.
+const named = (p) => ({ ...p, get name() { return t(`pn.${p.id}`); }, get de() { return t(`pd.${p.id}`); } });
 
 export const PRAYERS = [
-  { id: 'fajr', name: 'Fajr', ar: 'الفجر', rakat: 2, de: 'Morgengebet' },
-  { id: 'dhuhr', name: 'Dhuhr', ar: 'الظهر', rakat: 4, de: 'Mittagsgebet' },
-  { id: 'asr', name: 'Asr', ar: 'العصر', rakat: 4, de: 'Nachmittag' },
-  { id: 'maghrib', name: 'Maghrib', ar: 'المغرب', rakat: 3, de: 'Abendgebet' },
-  { id: 'isha', name: 'Isha', ar: 'العشاء', rakat: 4, de: 'Nachtgebet' },
-];
+  { id: 'fajr', ar: 'الفجر', rakat: 2 },
+  { id: 'dhuhr', ar: 'الظهر', rakat: 4 },
+  { id: 'asr', ar: 'العصر', rakat: 4 },
+  { id: 'maghrib', ar: 'المغرب', rakat: 3 },
+  { id: 'isha', ar: 'العشاء', rakat: 4 },
+].map(named);
 
 // Freiwillige und besondere Gebete. kind: sunnah = Sure in jeder Rakʿa, witr = mit Qunūt.
 export const EXTRA_PRAYERS = [
-  { id: 'sfajr', name: 'Sunnah vor Fajr', rakat: 2, kind: 'sunnah', de: 'stark betonte Sunnah', niyya: 'die 2 Rakʿāt Sunnah vor dem Fajr-Gebet' },
-  { id: 'sdhuhr1', name: 'Sunnah vor Dhuhr', rakat: 4, kind: 'sunnah', de: 'vor dem Pflichtgebet', niyya: 'die 4 Rakʿāt Sunnah vor dem Dhuhr-Gebet' },
-  { id: 'sdhuhr2', name: 'Sunnah nach Dhuhr', rakat: 2, kind: 'sunnah', de: 'nach dem Pflichtgebet', niyya: 'die 2 Rakʿāt Sunnah nach dem Dhuhr-Gebet' },
-  { id: 'smaghrib', name: 'Sunnah nach Maghrib', rakat: 2, kind: 'sunnah', de: 'nach dem Pflichtgebet', niyya: 'die 2 Rakʿāt Sunnah nach dem Maghrib-Gebet' },
-  { id: 'sisha', name: 'Sunnah nach Isha', rakat: 2, kind: 'sunnah', de: 'nach dem Pflichtgebet', niyya: 'die 2 Rakʿāt Sunnah nach dem Isha-Gebet' },
-  { id: 'witr', name: 'Witr', rakat: 3, kind: 'witr', de: 'nach Isha bis vor Fajr', niyya: 'das Witr-Gebet' },
-  { id: 'jumua', name: 'Jumuʿa', rakat: 2, kind: 'jumua', de: 'Freitag, statt Dhuhr', niyya: 'die 2 Rakʿāt des Freitagsgebets hinter dem Imam' },
-  { id: 'tahiyya', name: 'Taḥiyyat al-Masjid', rakat: 2, kind: 'sunnah', de: 'beim Betreten der Moschee', niyya: '2 Rakʿāt zur Begrüßung der Moschee' },
-];
+  { id: 'sfajr', rakat: 2, kind: 'sunnah' },
+  { id: 'sdhuhr1', rakat: 4, kind: 'sunnah' },
+  { id: 'sdhuhr2', rakat: 2, kind: 'sunnah' },
+  { id: 'smaghrib', rakat: 2, kind: 'sunnah' },
+  { id: 'sisha', rakat: 2, kind: 'sunnah' },
+  { id: 'witr', rakat: 3, kind: 'witr' },
+  { id: 'jumua', rakat: 2, kind: 'jumua' },
+  { id: 'tahiyya', rakat: 2, kind: 'sunnah' },
+].map(named);
 
 export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS].find((p) => p.id === id);
 
 // Vereinfachte Unterschiede der vier sunnitischen Rechtsschulen (für Männer; Details bei Gelehrten erfragen).
+// Texte (hands, takbir, notes) stehen in der Sprachdatei unter madhab.<id>.
 export const MADHABS = [
-  {
-    id: 'hanafi', name: 'Ḥanafī', qiyam: 'qiyam', opening: 'thana', raise: false, raiseStand: false, asr: 'hanafi',
-    hands: 'Lege die rechte Hand über die linke, unterhalb des Bauchnabels.',
-    takbir: 'bis auf Ohrhöhe – die Daumen berühren fast die Ohrläppchen',
-    tawarruk: () => false, qunutFajr: null, qunutWitr: 'before', splitNafl: false,
-    notes: ['Hände unterhalb des Bauchnabels', 'Eröffnung mit „Subḥānaka llāhumma“', 'Hände nur beim Eröffnungs-Takbīr heben', 'Sitzen immer auf dem linken Fuß (Iftirāsh)', 'Witr: 3 Rakʿāt am Stück, Qunūt vor dem Rukūʿ', 'Asr nach Ḥanafī-Berechnung'],
-  },
-  {
-    id: 'shafii', name: 'Shāfiʿī', qiyam: 'qiyam', opening: 'wajjahtu', raise: true, raiseStand: true, asr: 'standard',
-    hands: 'Lege die rechte Hand über die linke, unterhalb der Brust und oberhalb des Bauchnabels.',
-    takbir: 'bis auf Schulterhöhe',
-    tawarruk: (final) => final, qunutFajr: 'after', qunutWitr: 'after', splitNafl: true,
-    notes: ['Hände zwischen Brust und Bauchnabel', 'Eröffnung mit „Wajjahtu wajhiya“', 'Hände heben auch beim Rukūʿ, beim Aufrichten und nach dem 1. Tashahhud', 'Letztes Sitzen im Tawarruk', 'Qunūt im Fajr nach dem Rukūʿ der 2. Rakʿa', 'Witr: 2 + 1 Rakʿa getrennt'],
-  },
-  {
-    id: 'maliki', name: 'Mālikī', qiyam: 'stand', opening: null, raise: false, raiseStand: false, asr: 'standard',
-    hands: 'Lass die Arme locker seitlich hängen (Sadl).',
-    takbir: 'bis auf Schulterhöhe',
-    tawarruk: () => true, qunutFajr: 'before', qunutWitr: null, splitNafl: true,
-    notes: ['Arme seitlich hängen lassen (Sadl)', 'Kein Eröffnungs-Bittgebet im Pflichtgebet', 'Hände nur beim Eröffnungs-Takbīr heben', 'Alle Sitzhaltungen im Tawarruk', 'Qunūt im Fajr leise vor dem Rukūʿ der 2. Rakʿa', 'Witr: 2 + 1 Rakʿa getrennt'],
-  },
-  {
-    id: 'hanbali', name: 'Ḥanbalī', qiyam: 'qiyam', opening: 'thana', raise: true, raiseStand: false, asr: 'standard',
-    hands: 'Lege die rechte Hand über die linke, unterhalb des Bauchnabels.',
-    takbir: 'bis auf Schulterhöhe',
-    tawarruk: (final, rakat) => final && rakat > 2, qunutFajr: null, qunutWitr: 'after', splitNafl: true,
-    notes: ['Hände unterhalb des Bauchnabels', 'Eröffnung mit „Subḥānaka llāhumma“', 'Hände heben auch beim Rukūʿ und beim Aufrichten', 'Tawarruk nur im letzten Sitzen von 3- und 4-Rakʿa-Gebeten', 'Witr: 2 + 1, Qunūt nach dem Rukūʿ'],
-  },
-];
+  { id: 'hanafi', qiyam: 'qiyam', opening: 'thana', raise: false, raiseStand: false, asr: 'hanafi', tawarruk: () => false, qunutFajr: null, qunutWitr: 'before', splitNafl: false },
+  { id: 'shafii', qiyam: 'qiyam', opening: 'wajjahtu', raise: true, raiseStand: true, asr: 'standard', tawarruk: (final) => final, qunutFajr: 'after', qunutWitr: 'after', splitNafl: true },
+  { id: 'maliki', qiyam: 'stand', opening: null, raise: false, raiseStand: false, asr: 'standard', tawarruk: () => true, qunutFajr: 'before', qunutWitr: null, splitNafl: true },
+  { id: 'hanbali', qiyam: 'qiyam', opening: 'thana', raise: true, raiseStand: false, asr: 'standard', tawarruk: (final, rakat) => final && rakat > 2, qunutFajr: null, qunutWitr: 'after', splitNafl: true },
+].map((m) => ({
+  ...m,
+  get name() { return t(`mname.${m.id}`); },
+  get hands() { return t(`madhab.${m.id}.hands`); },
+  get takbir() { return t(`madhab.${m.id}.takbir`); },
+  get notes() { return t(`madhab.${m.id}.notes`); },
+}));
 
-// Unterschiede für Frauen (vereinfacht, nach verbreiteter Lehre der jeweiligen Schule).
-const WOMEN = {
-  hands: { hanafi: 'Lege die rechte Hand über die linke auf die Brust.' },
-  takbir: { hanafi: 'bis auf Schulterhöhe, die Hände bleiben unter dem Tuch' },
-  ruku: {
-    hanafi: ' Verbeuge dich etwas weniger tief, die Finger geschlossen auf den Knien, die Arme nah am Körper.',
-    default: ' Halte die Arme dabei nah am Körper.',
-  },
-  sujud: {
-    hanafi: ' Halte dich kompakt: Bauch nah an den Oberschenkeln, Arme am Körper, die Unterarme liegen auf dem Boden.',
-    default: ' Halte dich kompakt: Bauch nah an den Oberschenkeln, die Arme nah am Körper.',
-  },
-  sit: 'Sitz auf dem Boden, beide Füße zeigen nach rechts heraus. Hände auf die Oberschenkel.',
-};
-const AWRA = {
-  m: 'Für Männer: Bedeckt sein muss mindestens der Bereich vom Bauchnabel bis zu den Knien, besser auch die Schultern.',
-  f: 'Für Frauen: Bedeckt ist der ganze Körper außer Gesicht und Händen (Ḥanafī: auch die Füße dürfen frei sein). Während der Menstruation und der Wochenbettblutung wird nicht gebetet; diese Gebete werden nicht nachgeholt.',
-};
-
-const IFTIRASH = 'Sitz auf dem linken Fuß, der rechte Fuß bleibt aufgestellt, die Zehen zeigen zur Qibla. Hände auf die Oberschenkel.';
-const TAWARRUK = 'Tawarruk: Gesäß auf den Boden, der linke Fuß kommt unter dem rechten Unterschenkel heraus, der rechte Fuß bleibt aufgestellt.';
-
+// Arabischer Text und Umschrift; die Bedeutung kommt aus der Sprachdatei (mean.*).
 const TXT = {
   takbir: {
     ar: ['اللهُ أَكْبَرُ'],
     tr: ['Allāhu akbar'],
-    de: ['Allah ist größer (als alles).'],
   },
   thana: {
     ar: ['سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَىٰ جَدُّكَ، وَلَا إِلَٰهَ غَيْرُكَ'],
     tr: ['Subḥānaka llāhumma wa bi-ḥamdika, wa tabāraka smuka, wa taʿālā jadduka, wa lā ilāha ghayruk.'],
-    de: ['Gepriesen seist Du, o Allah, und Dir gebührt das Lob. Gesegnet ist Dein Name, erhaben Deine Majestät, und es gibt keinen Gott außer Dir.'],
   },
   fatiha1: {
     ar: [
@@ -100,12 +64,6 @@ const TXT = {
       'Al-ḥamdu li-llāhi rabbi l-ʿālamīn',
       'Ar-raḥmāni r-raḥīm',
       'Māliki yawmi d-dīn',
-    ],
-    de: [
-      'Im Namen Allahs, des Allerbarmers, des Barmherzigen.',
-      'Alles Lob gebührt Allah, dem Herrn der Welten,',
-      'dem Allerbarmer, dem Barmherzigen,',
-      'dem Herrscher am Tag des Gerichts.',
     ],
   },
   fatiha2: {
@@ -121,12 +79,6 @@ const TXT = {
       'Ṣirāṭa lladhīna anʿamta ʿalayhim, ghayri l-maghḍūbi ʿalayhim wa la ḍ-ḍāllīn',
       'Āmīn',
     ],
-    de: [
-      'Dir allein dienen wir, und Dich allein bitten wir um Hilfe.',
-      'Leite uns den geraden Weg,',
-      'den Weg derer, denen Du Gnade erwiesen hast, nicht derer, die Deinem Zorn verfallen sind, und nicht der Irregehenden.',
-      'Amen – o Allah, erhöre uns.',
-    ],
   },
   ikhlas: {
     ar: [
@@ -141,32 +93,22 @@ const TXT = {
       'Lam yalid wa lam yūlad',
       'Wa lam yakun lahū kufuwan aḥad',
     ],
-    de: [
-      'Sprich: Er ist Allah, der Eine,',
-      'Allah, der Absolute, auf den alle angewiesen sind.',
-      'Er zeugt nicht und wurde nicht gezeugt,',
-      'und niemand ist Ihm gleich.',
-    ],
   },
   ruku: {
     ar: ['سُبْحَانَ رَبِّيَ الْعَظِيمِ'],
     tr: ['Subḥāna rabbiya l-ʿaẓīm  (3×)'],
-    de: ['Gepriesen sei mein Herr, der Gewaltige.'],
   },
   itidal: {
     ar: ['سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ', 'رَبَّنَا وَلَكَ الْحَمْدُ'],
     tr: ['Samiʿa llāhu li-man ḥamidah', 'Rabbanā wa laka l-ḥamd'],
-    de: ['Allah hört den, der Ihn lobt.', 'Unser Herr, Dir gebührt alles Lob.'],
   },
   sujud: {
     ar: ['سُبْحَانَ رَبِّيَ الْأَعْلَىٰ'],
     tr: ['Subḥāna rabbiya l-aʿlā  (3×)'],
-    de: ['Gepriesen sei mein Herr, der Höchste.'],
   },
   jalsa: {
     ar: ['رَبِّ اغْفِرْ لِي'],
     tr: ['Rabbi ghfir lī'],
-    de: ['Mein Herr, vergib mir.'],
   },
   tashahhud: {
     ar: [
@@ -181,12 +123,6 @@ const TXT = {
       'As-salāmu ʿalaynā wa ʿalā ʿibādi llāhi ṣ-ṣāliḥīn',
       'Ashhadu an lā ilāha illa llāh, wa ashhadu anna Muḥammadan ʿabduhū wa rasūluh',
     ],
-    de: [
-      'Alle Grüße, Gebete und guten Dinge gebühren Allah.',
-      'Friede sei mit dir, o Prophet, und die Barmherzigkeit Allahs und Sein Segen.',
-      'Friede sei mit uns und mit den rechtschaffenen Dienern Allahs.',
-      'Ich bezeuge, dass es keinen Gott gibt außer Allah, und dass Muhammad Sein Diener und Gesandter ist.',
-    ],
   },
   salawat: {
     ar: [
@@ -197,185 +133,162 @@ const TXT = {
       'Allāhumma ṣalli ʿalā Muḥammadin wa ʿalā āli Muḥammad, kamā ṣallayta ʿalā Ibrāhīma wa ʿalā āli Ibrāhīm, innaka ḥamīdun majīd.',
       'Allāhumma bārik ʿalā Muḥammadin wa ʿalā āli Muḥammad, kamā bārakta ʿalā Ibrāhīma wa ʿalā āli Ibrāhīm, innaka ḥamīdun majīd.',
     ],
-    de: [
-      'O Allah, lass Deine Gnade auf Muhammad und seine Familie herabkommen, wie Du sie auf Ibrahim und seine Familie herabkommen ließest. Du bist der Preiswürdige, der Ruhmreiche.',
-      'O Allah, segne Muhammad und seine Familie, wie Du Ibrahim und seine Familie gesegnet hast. Du bist der Preiswürdige, der Ruhmreiche.',
-    ],
   },
   dua: {
     ar: ['رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ'],
     tr: ['Rabbanā ātinā fi d-dunyā ḥasanatan wa fi l-ākhirati ḥasanatan wa qinā ʿadhāba n-nār.'],
-    de: ['Unser Herr, gib uns im Diesseits Gutes und im Jenseits Gutes, und bewahre uns vor der Strafe des Feuers.'],
   },
   wajjahtu: {
     ar: ['وَجَّهْتُ وَجْهِيَ لِلَّذِي فَطَرَ السَّمَاوَاتِ وَالْأَرْضَ حَنِيفًا وَمَا أَنَا مِنَ الْمُشْرِكِينَ'],
     tr: ['Wajjahtu wajhiya li-lladhī faṭara s-samāwāti wa l-arḍa ḥanīfan wa mā ana mina l-mushrikīn.'],
-    de: ['Ich wende mein Gesicht aufrichtig Dem zu, der die Himmel und die Erde erschaffen hat, und ich gehöre nicht zu denen, die Ihm etwas beigesellen. (Anfang des Bittgebets)'],
   },
   qunut: {
     ar: ['اللَّهُمَّ اهْدِنِي فِيمَنْ هَدَيْتَ، وَعَافِنِي فِيمَنْ عَافَيْتَ، وَتَوَلَّنِي فِيمَنْ تَوَلَّيْتَ'],
     tr: ['Allāhumma hdinī fīman hadayt, wa ʿāfinī fīman ʿāfayt, wa tawallanī fīman tawallayt …'],
-    de: ['O Allah, leite mich unter denen, die Du geleitet hast, gewähre mir Wohlergehen unter denen, denen Du es gewährt hast, und nimm Dich meiner an unter denen, deren Du Dich angenommen hast … (Anfang des Qunūt)'],
   },
   qunutHanafi: {
     ar: ['اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنُؤْمِنُ بِكَ وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ'],
     tr: ['Allāhumma innā nastaʿīnuka wa nastaghfiruka wa nuʾminu bika wa natawakkalu ʿalayka wa nuthnī ʿalayka l-khayr …'],
-    de: ['O Allah, wir bitten Dich um Hilfe und um Vergebung, wir glauben an Dich, vertrauen auf Dich und loben Dich mit allem Guten … (Anfang des Qunūt)'],
   },
   salam: {
     ar: ['السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ'],
     tr: ['As-salāmu ʿalaykum wa raḥmatu llāh'],
-    de: ['Friede sei mit euch und die Barmherzigkeit Allahs.'],
   },
 };
 
-export const TAQABBAL = {
-  ar: ['تَقَبَّلَ اللَّهُ مِنَّا وَمِنكُم'],
-  tr: ['Taqabbala llāhu minnā wa minkum'],
-  de: ['Möge Allah es von uns und von euch annehmen.'],
-};
+Object.assign(TXT, {
+  dua2: {
+    ar: ['رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ'],
+    tr: ['Rabbana ghfir lī wa li-wālidayya wa li-l-muʾminīna yawma yaqūmu l-ḥisāb.'],
+  },
+  taqabbal: {
+    ar: ['تَقَبَّلَ اللَّهُ مِنَّا وَمِنكُم'],
+    tr: ['Taqabbala llāhu minnā wa minkum'],
+  },
+  basmala: {
+    ar: ['بِسْمِ اللَّهِ'],
+    tr: ['Bismi llāh'],
+  },
+  shahada: {
+    ar: ['أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ'],
+    tr: ['Ashhadu an lā ilāha illa llāhu waḥdahū lā sharīka lah, wa ashhadu anna Muḥammadan ʿabduhū wa rasūluh.'],
+  },
+});
 
-export const TASBIH = [
-  { ar: 'سُبْحَانَ اللَّهِ', tr: 'Subḥāna llāh', de: 'Gepriesen sei Allah', target: 33 },
-  { ar: 'الْحَمْدُ لِلَّهِ', tr: 'Al-ḥamdu li-llāh', de: 'Alles Lob gebührt Allah', target: 33 },
-  { ar: 'اللهُ أَكْبَرُ', tr: 'Allāhu akbar', de: 'Allah ist größer', target: 34 },
-];
+// Textgruppe in der gewählten Sprache; mehrere Schlüssel werden aneinandergehängt.
+// Umschrift: eigene Fassung der Sprache (z. B. türkisch), sonst die wissenschaftliche; Arabisch zeigt keine.
+export function text(...keys) {
+  const out = { ar: [], tr: [], de: [] };
+  for (const k of keys) {
+    out.ar.push(...TXT[k].ar);
+    if (t('showTranslit')) {
+      const own = t(`translit.${k}`);
+      out.tr.push(...(Array.isArray(own) ? own : TXT[k].tr));
+    }
+    out.de.push(...t(`mean.${k}`));
+  }
+  return out;
+}
 
-// Erzeugt die Schrittfolge für ein Gebet nach der gewählten Rechtsschule.
+export const taqabbal = () => text('taqabbal');
+
+const TASBIH_AR = [['سُبْحَانَ اللَّهِ', 'Subḥāna llāh', 33], ['الْحَمْدُ لِلَّهِ', 'Al-ḥamdu li-llāh', 33], ['اللهُ أَكْبَرُ', 'Allāhu akbar', 34]];
+export const TASBIH = TASBIH_AR.map(([ar, tr, target], i) => ({
+  ar, target,
+  get tr() { const own = t('translit.tasbih'); return Array.isArray(own) ? own[i] : tr; },
+  get de() { return t('mean.tasbih')[i]; },
+}));
+
+// Erzeugt die Schrittfolge für ein Gebet nach der gewählten Rechtsschule, in der aktuellen Sprache.
+// key benennt die Art des Schritts (für den spirituellen Modus).
 export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm') {
-  const base0 = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
+  const m = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
   const f = gender === 'f';
-  const pick = (table) => table[base0.id] ?? table.default ?? '';
+  const pick = (table) => (table && (table[m.id] ?? table.default)) || '';
   // Für Frauen: Hände, Takbīr und Sitzen je nach Schule anpassen.
-  const m = !f ? base0 : {
-    ...base0,
-    hands: WOMEN.hands[base0.id] || base0.hands,
-    takbir: WOMEN.takbir[base0.id] || base0.takbir,
-  };
+  const hands = (f && pick(t('women.hands'))) || m.hands;
+  const takbirHow = (f && pick(t('women.takbir'))) || m.takbir;
   const womenSit = f && (m.id === 'hanafi' || m.id === 'hanbali');
-  const extraRuku = f ? pick(WOMEN.ruku) : '';
-  const extraSujud = f ? pick(WOMEN.sujud) : '';
+  const extraRuku = f ? pick(t('women.ruku')) : '';
+  const extraSujud = f ? pick(t('women.sujud')) : '';
   const kind = prayer.kind || 'fard';
   const steps = [];
   const add = (step) => steps.push({ ar: [], tr: [], de: [], ...step });
+  const niyyaOf = (p) => (p.kind ? t(`niyya.${p.id}`) : t('niyya.fard', p.rakat, p.name));
 
   // Witr und 4 Rakʿāt Sunnah betet man je nach Schule am Stück oder als 2 + 1 bzw. 2 + 2.
-  let units = [{ n: prayer.rakat, niyya: prayer.niyya || `die ${prayer.rakat} Rakʿāt des ${prayer.name}-Gebets`, label: '' }];
+  let units = [{ n: prayer.rakat, niyya: niyyaOf(prayer), label: '' }];
   if (m.splitNafl && kind === 'witr') {
-    units = [{ n: 2, niyya: 'die 2 Rakʿāt Shafʿ vor dem Witr', label: 'Shafʿ' }, { n: 1, niyya: 'die 1 Rakʿa Witr', label: 'Witr' }];
+    units = [{ n: 2, niyya: t('niyya.shaf'), label: t('unit.shaf') }, { n: 1, niyya: t('niyya.witr1'), label: t('unit.witr') }];
   } else if (m.splitNafl && prayer.rakat === 4 && kind === 'sunnah') {
-    units = [1, 2].map((k) => ({ n: 2, niyya: `die ${k === 1 ? 'ersten' : 'zweiten'} 2 Rakʿāt ${prayer.name}`, label: `Teil ${k}` }));
+    units = [1, 2].map((k) => ({ n: 2, niyya: t('niyya.part', k, prayer.name), label: t('unit.part', k) }));
   }
 
-  const raiseNote = ' Hebe dabei die Hände wie beim Eröffnungs-Takbīr (Rafʿ al-Yadayn).';
+  const raiseNote = t('instr.raise');
+  const sitText = (final, n) => (womenSit ? t('women.sit') : m.tawarruk(final, n) ? t('tawarruk') : t('iftirash'));
   for (const [ui, unit] of units.entries()) {
     const { n, label } = unit;
     const witrUnit = kind === 'witr' && (units.length === 1 || ui === 1);
     const base = { unit: label, of: n };
     add({
-      ...base, title: 'Niyya – Absicht', pose: 'stand', rakah: 0, dur: 10,
-      instr: `Stell dich aufrecht in Richtung Qibla, den Blick auf den Platz der Niederwerfung. Fasse im Herzen die Absicht: „Ich bete ${unit.niyya} für Allah.“`,
+      ...base, key: 'niyya', title: t('title.niyya'), pose: 'stand', rakah: 0, dur: 10,
+      instr: t('instr.niyya', unit.niyya),
       de: [
-        kind === 'jumua'
-          ? `Das Freitagsgebet betest du in der Gemeinschaft hinter dem Imam, direkt nach der Khuṭba. Der Imam rezitiert laut – ob du die Fātiḥa leise mitsprichst, hängt von der Rechtsschule ab.${f ? ' Für Frauen ist es keine Pflicht: Sie dürfen teilnehmen oder beten stattdessen Dhuhr.' : ''}`
-          : 'Die Absicht wird im Herzen gefasst – sie muss nicht laut ausgesprochen werden.',
-        ...(ui === 0 ? [AWRA[gender] || AWRA.m] : []),
+        kind === 'jumua' ? t('instr.jumua', f) : t('instr.heart'),
+        ...(ui === 0 ? [t(`awra.${gender}`) || t('awra.m')] : []),
       ],
     });
 
     for (let r = 1; r <= n; r++) {
       const last = r === n;
-      const qiyam = { pose: m.qiyam, how: m.hands };
+      const qiyam = { pose: m.qiyam, how: hands };
       if (r === 1) {
-        add({
-          ...base, title: 'Takbīrat al-Iḥrām', pose: 'takbir', rakah: r, dur: 6,
-          instr: `Hebe die Hände ${m.takbir} und sprich den Eröffnungs-Takbīr. Ab jetzt bist du im Gebet.`,
-          ...TXT.takbir,
-        });
+        add({ ...base, key: 'takbir', title: t('title.takbir'), pose: 'takbir', rakah: r, dur: 6, instr: t('instr.takbir', takbirHow), ...text('takbir') });
         if (m.opening) {
-          add({
-            ...base, ...qiyam, title: 'Eröffnungs-Bittgebet', rakah: r, dur: 12,
-            instr: `${m.hands} Sprich leise (Sunnah):`,
-            ...TXT[m.opening],
-          });
+          add({ ...base, ...qiyam, key: 'opening', title: t('title.opening'), rakah: r, dur: 12, instr: t('instr.opening', hands), ...text(m.opening) });
         }
       }
       add({
-        ...base, ...qiyam, title: 'Al-Fātiḥa (1/2)', rakah: r, dur: 16,
-        instr: (r === 1 && !m.opening ? `${m.hands} ` : '') + (r === 1
-          ? 'Sprich leise „Aʿūdhu billāhi mina sh-shayṭāni r-rajīm“, dann rezitiere die Fātiḥa – sie ist in jeder Rakʿa Pflicht:'
-          : 'Rezitiere die Fātiḥa – sie ist in jeder Rakʿa Pflicht:'),
-        ...TXT.fatiha1,
+        ...base, ...qiyam, key: 'fatiha', title: t('title.fatiha1'), rakah: r, dur: 16,
+        instr: (r === 1 && !m.opening ? `${hands} ` : '') + (r === 1 ? t('instr.fatiha1First') : t('instr.fatiha1')),
+        ...text('fatiha1'),
       });
-      add({ ...base, ...qiyam, title: 'Al-Fātiḥa (2/2)', rakah: r, dur: 16, instr: '… und schließe mit „Āmīn“ ab:', ...TXT.fatiha2 });
+      add({ ...base, ...qiyam, key: 'fatiha', title: t('title.fatiha2'), rakah: r, dur: 16, instr: t('instr.fatiha2'), ...text('fatiha2') });
       if (r <= 2 || kind !== 'fard') {
-        add({
-          ...base, ...qiyam, title: 'Zusätzliche Sure', rakah: r, dur: 14,
-          instr: kind === 'fard'
-            ? 'In den ersten beiden Rakʿāt folgt eine weitere Sure – z. B. Al-Ikhlāṣ (112) oder jede andere, die du kannst:'
-            : 'In freiwilligen Gebeten folgt in jeder Rakʿa eine weitere Sure – z. B. Al-Ikhlāṣ (112):',
-          ...TXT.ikhlas,
-        });
+        add({ ...base, ...qiyam, key: 'sura', title: t('title.sura'), rakah: r, dur: 14, instr: kind === 'fard' ? t('instr.suraFard') : t('instr.suraNafl'), ...text('ikhlas') });
       }
       // Qunūt vor dem Rukūʿ: Ḥanafī im Witr, Mālikī leise im Fajr
       const qunutBefore = (witrUnit && last && m.qunutWitr === 'before') || (prayer.id === 'fajr' && r === 2 && m.qunutFajr === 'before');
       if (qunutBefore && m.id === 'hanafi') {
-        add({ ...base, title: 'Takbīr für das Qunūt', pose: 'takbir', rakah: r, dur: 5, instr: 'Sprich „Allāhu akbar“ und hebe die Hände wie beim Eröffnungs-Takbīr, dann lege sie wieder übereinander.', ...TXT.takbir });
-        add({ ...base, ...qiyam, title: 'Qunūt', rakah: r, dur: 16, instr: 'Sprich das Qunūt-Bittgebet:', ...TXT.qunutHanafi });
+        add({ ...base, key: 'takbir', title: t('title.qunutTakbir'), pose: 'takbir', rakah: r, dur: 5, instr: t('instr.qunutTakbir'), ...text('takbir') });
+        add({ ...base, ...qiyam, key: 'qunut', title: t('title.qunut'), rakah: r, dur: 16, instr: t('instr.qunutHanafi'), ...text('qunutHanafi') });
       } else if (qunutBefore) {
-        add({ ...base, ...qiyam, title: 'Qunūt (leise)', rakah: r, dur: 14, instr: 'Sprich vor dem Rukūʿ leise das Qunūt-Bittgebet:', ...TXT.qunut });
+        add({ ...base, ...qiyam, key: 'qunut', title: t('title.qunutQuiet'), rakah: r, dur: 14, instr: t('instr.qunutQuiet'), ...text('qunut') });
       }
-      add({
-        ...base, title: 'Rukūʿ – Verbeugung', pose: 'ruku', rakah: r, dur: 9,
-        instr: `Sprich „Allāhu akbar“ und verbeuge dich: Rücken gerade, Hände auf den Knien.${extraRuku}${m.raise ? raiseNote : ''} Sprich dreimal:`,
-        ...TXT.ruku,
-      });
-      add({ ...base, title: 'Iʿtidāl – Aufrichten', pose: 'stand', rakah: r, dur: 8, instr: `Richte dich wieder auf, bis du gerade stehst.${m.raise ? raiseNote : ''} Sprich:`, ...TXT.itidal });
+      add({ ...base, key: 'ruku', title: t('title.ruku'), pose: 'ruku', rakah: r, dur: 9, instr: t('instr.ruku', extraRuku + (m.raise ? raiseNote : '')), ...text('ruku') });
+      add({ ...base, key: 'itidal', title: t('title.itidal'), pose: 'stand', rakah: r, dur: 8, instr: t('instr.itidal', m.raise ? raiseNote : ''), ...text('itidal') });
       const qunutAfter = (witrUnit && last && m.qunutWitr === 'after') || (prayer.id === 'fajr' && r === 2 && m.qunutFajr === 'after');
       if (qunutAfter) {
-        add({
-          ...base, title: 'Qunūt', pose: 'dua', rakah: r, dur: 14,
-          instr: `Hebe die Hände zum Bittgebet, Handflächen nach oben, und sprich das Qunūt${kind === 'witr' && m.id === 'shafii' ? ' (im Witr empfohlen in der zweiten Hälfte des Ramadan)' : ''}:`,
-          ...TXT.qunut,
-        });
+        add({ ...base, key: 'qunut', title: t('title.qunut'), pose: 'dua', rakah: r, dur: 14, instr: t('instr.qunutAfter', kind === 'witr' && m.id === 'shafii'), ...text('qunut') });
       }
-      const sitShort = womenSit ? WOMEN.sit : m.tawarruk(false, n) ? TAWARRUK : IFTIRASH;
-      add({
-        ...base, title: 'Sujūd – 1. Niederwerfung', pose: 'sujud', rakah: r, dur: 9,
-        instr: `Sprich „Allāhu akbar“ und wirf dich nieder: Stirn und Nase, beide Handflächen, beide Knie und die Zehen berühren den Boden.${extraSujud} Sprich dreimal:`,
-        ...TXT.sujud,
-      });
-      add({ ...base, title: 'Julūs – kurzes Sitzen', pose: 'sit', how: sitShort, rakah: r, dur: 6, instr: 'Sprich „Allāhu akbar“ und setz dich kurz aufrecht hin:', ...TXT.jalsa });
-      add({ ...base, title: 'Sujūd – 2. Niederwerfung', pose: 'sujud', rakah: r, dur: 9, instr: `Sprich „Allāhu akbar“ und wirf dich ein zweites Mal nieder.${f ? ' Wieder kompakt bleiben.' : ''} Sprich dreimal:`, ...TXT.sujud });
+      add({ ...base, key: 'sujud', title: t('title.sujud1'), pose: 'sujud', rakah: r, dur: 9, instr: t('instr.sujud1', extraSujud), ...text('sujud') });
+      add({ ...base, key: 'jalsa', title: t('title.jalsa'), pose: 'sit', how: sitText(false, n), rakah: r, dur: 6, instr: t('instr.jalsa'), ...text('jalsa') });
+      add({ ...base, key: 'sujud', title: t('title.sujud2'), pose: 'sujud', rakah: r, dur: 9, instr: t('instr.sujud2', f), ...text('sujud') });
 
       if (r === 2 && !last) {
-        add({
-          ...base, title: 'Erster Tashahhud', pose: 'sit', how: sitShort, rakah: r, dur: 20,
-          instr: 'Sprich „Allāhu akbar“ und setz dich. Sprich den Tashahhud – beim Glaubensbekenntnis hebst du den rechten Zeigefinger:',
-          ...TXT.tashahhud,
-        });
+        add({ ...base, key: 'tashahhud', title: t('title.tash1'), pose: 'sit', how: sitText(false, n), rakah: r, dur: 20, instr: t('instr.tash1'), ...text('tashahhud') });
       }
       if (!last) {
-        add({
-          ...base, ...qiyam, title: `Aufstehen zur ${r + 1}. Rakʿa`, rakah: r + 1, dur: 5,
-          instr: `Steh auf und sprich dabei den Takbīr.${m.raiseStand && r === 2 ? raiseNote : ''}`,
-          ...TXT.takbir,
-        });
+        add({ ...base, ...qiyam, key: 'rise', title: t('title.rise', r + 1), rakah: r + 1, dur: 5, instr: t('instr.rise', m.raiseStand && r === 2 ? raiseNote : ''), ...text('takbir') });
       } else {
-        const finalSit = womenSit ? WOMEN.sit : m.tawarruk(true, n) ? TAWARRUK : IFTIRASH;
-        add({
-          ...base, title: 'Letzter Tashahhud', pose: 'sit', how: finalSit, rakah: r, dur: 20,
-          instr: 'Sprich „Allāhu akbar“ und setz dich zum letzten Sitzen. Sprich den Tashahhud:',
-          ...TXT.tashahhud,
-        });
-        add({ ...base, title: 'Ṣalawāt Ibrāhīmiyya', pose: 'sit', how: finalSit, rakah: r, dur: 24, instr: 'Bleib sitzen und sprich den Segenswunsch für den Propheten ﷺ:', ...TXT.salawat });
-        add({ ...base, title: 'Bittgebet (Duʿāʾ)', pose: 'sit', how: finalSit, rakah: r, dur: 10, instr: 'Empfohlen: ein kurzes Bittgebet vor dem Friedensgruß, z. B.:', ...TXT.dua });
-        add({ ...base, title: 'Taslīm – rechts', pose: 'taslimR', rakah: r, dur: 5, instr: 'Dreh den Kopf nach rechts und sprich den Friedensgruß:', ...TXT.salam });
-        add({
-          ...base, title: 'Taslīm – links', pose: 'taslimL', rakah: r, dur: 5,
-          instr: ui < units.length - 1 ? 'Dreh den Kopf nach links und sprich ihn noch einmal. Danach stehst du für den nächsten Teil auf.' : 'Dreh den Kopf nach links und sprich ihn noch einmal. Damit ist das Gebet beendet.',
-          ...TXT.salam,
-        });
+        const finalSit = sitText(true, n);
+        add({ ...base, key: 'tashahhud', title: t('title.tashLast'), pose: 'sit', how: finalSit, rakah: r, dur: 20, instr: t('instr.tashLast'), ...text('tashahhud') });
+        add({ ...base, key: 'salawat', title: t('title.salawat'), pose: 'sit', how: finalSit, rakah: r, dur: 24, instr: t('instr.salawat'), ...text('salawat') });
+        // Ḥanafī (z. B. in der Türkei): nach „Rabbanā ātinā“ auch „Rabbana ghfir lī“
+        const duas = m.id === 'hanafi' ? text('dua', 'dua2') : text('dua');
+        add({ ...base, key: 'dua', title: t('title.dua'), pose: 'sit', how: finalSit, rakah: r, dur: m.id === 'hanafi' ? 16 : 10, instr: t('instr.dua'), ...duas });
+        add({ ...base, key: 'salam', title: t('title.salamR'), pose: 'taslimR', rakah: r, dur: 5, instr: t('instr.salamR'), ...text('salam') });
+        add({ ...base, key: 'salam', title: t('title.salamL'), pose: 'taslimL', rakah: r, dur: 5, instr: ui < units.length - 1 ? t('instr.salamLNext') : t('instr.salamL'), ...text('salam') });
       }
     }
   }

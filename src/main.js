@@ -6,6 +6,7 @@ import { Guide } from './figure.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
 import { EXTRA_PRAYERS, MADHABS, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
+import { LANGS, deviceLang, getLang, isRTL, langInfo, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
@@ -74,6 +75,9 @@ const banner = new CueBanner();
 scene.add(banner.mesh);
 
 // --- Zustand ---
+// Sprache vor allem anderen setzen, damit alle Texte schon passen.
+setLang(store.get('lang', deviceLang()));
+
 const state = {
   view: 'menu',
   prayer: null,
@@ -101,6 +105,9 @@ const state = {
 
 const madhab = () => MADHABS.find((m) => m.id === state.madhab) || MADHABS[0];
 const bearing = () => qiblaBearing(state.location.lat, state.location.lon);
+// Der eigene Standort heißt in jeder Sprache anders (ältere Speicherstände kennen nur den deutschen Namen).
+const isGps = () => !!state.location.gps || state.location.name === 'Mein Standort';
+const locationName = () => (isGps() ? t('ui.myLocation') : state.location.name);
 const deviceZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 // Gebetszeiten für heute am gewählten Ort, als fertige Anzeigewerte.
@@ -116,7 +123,7 @@ function timesInfo() {
     highLatitude: s.highLatitude,
     method: METHODS.find((m) => m.id === state.method).name,
     asr: ASR.find((a) => a.id === state.asr).name,
-    location: loc.name,
+    location: locationName(),
   };
 }
 
@@ -138,7 +145,7 @@ function currentYaw() {
 function view() {
   switch (state.view) {
     case 'qibla':
-      return { type: 'qibla', cities: CITIES, location: state.location, bearing: bearing(), calibrated: state.northYaw != null, msg: state.msg };
+      return { type: 'qibla', cities: CITIES, location: { ...state.location, gps: isGps() }, locationName: locationName(), bearing: bearing(), calibrated: state.northYaw != null, msg: state.msg };
     case 'step':
       return {
         type: 'step', prayer: state.prayer, step: state.steps[state.i], index: state.i, total: state.steps.length, auto: state.auto,
@@ -151,7 +158,7 @@ function view() {
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'settings':
-      return { type: 'settings', madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
+      return { type: 'settings', langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
     case 'learn': {
       const p = state.progress;
       return {
@@ -177,7 +184,7 @@ function view() {
       return {
         type: 'menu',
         prayers: PRAYERS,
-        qibla: `Ort: ${state.location.name} · Qibla ${Math.round(bearing())}° von Norden`,
+        qibla: t('ui.qiblaLine', locationName(), Math.round(bearing())),
         calibrated: state.northYaw != null,
         times: timesInfo(),
         madhab: madhab().name,
@@ -211,9 +218,11 @@ function onStep() {
   }
 }
 
+const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab) : buildSteps(prayer, state.madhab, state.gender));
+
 function start(prayer) {
   state.prayer = prayer;
-  state.steps = prayer.kind === 'wudu' ? buildWuduSteps(state.madhab) : buildSteps(prayer, state.madhab, state.gender);
+  state.steps = stepsFor(prayer);
   state.i = 0;
   state.autoT = 0;
   state.view = 'step';
@@ -237,22 +246,25 @@ function speak() {
     return !!voice;
   };
   const m = step.wudu ? { cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
-  say([`${m.cue}.`, step.instr, ...step.de].join(' '), 'de');
+  // Arabisch: Anleitung und Rezitation in einem Zug mit derselben Stimme
+  const lang = langInfo().speech;
+  if (lang === 'ar') { say([`${m.cue}.`, step.instr, ...step.ar].join(' '), 'ar', 0.9); return; }
+  say([`${m.cue}.`, step.instr, ...step.de].join(' '), lang);
   if (step.ar.length && voices.some((v) => v.lang?.toLowerCase().startsWith('ar'))) say(step.ar.join('، '), 'ar', 0.8);
 }
 
 function locate() {
-  if (!navigator.geolocation) { state.msg = 'GPS wird nicht unterstützt – bitte Stadt wählen.'; return; }
-  state.msg = 'Standort wird ermittelt …';
+  if (!navigator.geolocation) { state.msg = t('ui.gpsNo'); return; }
+  state.msg = t('ui.gpsWait');
   navigator.geolocation.getCurrentPosition(
     (pos) => {
-      state.location = { name: 'Mein Standort', lat: pos.coords.latitude, lon: pos.coords.longitude, timeZone: deviceZone };
+      state.location = { name: 'GPS', gps: true, lat: pos.coords.latitude, lon: pos.coords.longitude, timeZone: deviceZone };
       store.set('location', state.location);
-      state.msg = 'Standort übernommen.';
+      state.msg = t('ui.gpsOk');
       applyQibla();
       refresh();
     },
-    () => { state.msg = 'Standort nicht verfügbar – bitte Stadt wählen.'; refresh(); },
+    () => { state.msg = t('ui.gpsFail'); refresh(); },
     { timeout: 10000 },
   );
 }
@@ -271,6 +283,14 @@ function act(action) {
       store.set('asr', state.asr);
       break;
     case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); break;
+    case 'lang':
+      setLang(arg);
+      store.set('lang', arg);
+      applyLang();
+      // Laufendes Gebet in der neuen Sprache neu aufbauen, an derselben Stelle
+      if (state.prayer && (state.view === 'step' || state.view === 'done')) state.steps = stepsFor(state.prayer);
+      if (state.quiz) state.quiz = newQuiz();
+      break;
     case 'mosque': state.view = 'mosque'; break;
     case 'style':
       if (arg !== state.style) {
@@ -338,20 +358,20 @@ function act(action) {
     case 'city':
       state.location = CITIES[Number(arg)];
       store.set('location', state.location);
-      state.msg = `Ort gesetzt: ${state.location.name}`;
+      state.msg = t('ui.citySet', state.location.name);
       applyQibla();
       break;
     case 'gps': locate(); break;
     case 'calibrate':
       state.northYaw = currentYaw();
       store.set('northYaw', state.northYaw);
-      state.msg = 'Kalibriert – dreh dich jetzt zum Mihrab, dort ist die Qibla.';
+      state.msg = t('ui.calDone');
       applyQibla();
       break;
     case 'resetcal':
       state.northYaw = null;
       store.set('northYaw', null);
-      state.msg = 'Kalibrierung zurückgesetzt.';
+      state.msg = t('ui.calReset');
       applyQibla();
       break;
     case 'tasbih': state.view = 'tasbih'; state.tasbih = { phase: 0, count: 0 }; state.breath = { on: state.spiritual, t: 0, phase: 'in' }; break;
@@ -474,6 +494,14 @@ function layout() {
   renderer.setSize(window.innerWidth, h);
   if (mobileUI) aimAtGuide();
 }
+// Schreibrichtung und Hilfetext der Seite zur gewählten Sprache
+function applyLang() {
+  document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
+  const hint = document.getElementById('hint');
+  if (hint) hint.innerHTML = t('ui.hint');
+}
+applyLang();
+
 if (mobileUI) {
   document.body.classList.add('mobile');
   panel.mesh.visible = false;

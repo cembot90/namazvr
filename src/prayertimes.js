@@ -1,27 +1,28 @@
 // Gebetszeiten aus dem Sonnenstand (Verfahren wie praytimes.org), komplett offline.
 // Alle Zeiten werden zuerst in UTC-Stunden berechnet und dann in der Zeitzone des Ortes angezeigt.
+import { t } from './i18n.js';
 
 export const METHODS = [
-  { id: 'mwl', name: 'Muslim World League', fajr: 18, isha: 17 },
-  { id: 'diyanet', name: 'Diyanet (Näherung)', fajr: 18, isha: 17, maghribOffset: 7, sunriseOffset: -7, dhuhrOffset: 5 },
-  { id: 'isna', name: 'ISNA (Nordamerika)', fajr: 15, isha: 15 },
-  { id: 'egypt', name: 'Ägypten', fajr: 19.5, isha: 17.5 },
-  { id: 'makkah', name: 'Umm al-Qura (Mekka)', fajr: 18.5, ishaMinutes: 90 },
-];
+  { id: 'mwl', fajr: 18, isha: 17 },
+  { id: 'diyanet', fajr: 18, isha: 17, maghribOffset: 7, sunriseOffset: -7, dhuhrOffset: 5 },
+  { id: 'isna', fajr: 15, isha: 15 },
+  { id: 'egypt', fajr: 19.5, isha: 17.5 },
+  { id: 'makkah', fajr: 18.5, ishaMinutes: 90 },
+].map((m) => ({ ...m, get name() { return t(`methods.${m.id}`); } }));
 
 export const ASR = [
-  { id: 'standard', name: 'Standard (Shāfiʿī, Mālikī, Ḥanbalī)', factor: 1 },
-  { id: 'hanafi', name: 'Ḥanafī', factor: 2 },
-];
+  { id: 'standard', factor: 1 },
+  { id: 'hanafi', factor: 2 },
+].map((a) => ({ ...a, get name() { return t(`asrName.${a.id}`); } }));
 
 export const TIME_NAMES = [
-  { id: 'fajr', name: 'Fajr', prayer: true },
-  { id: 'sunrise', name: 'Sonnenaufgang', prayer: false },
-  { id: 'dhuhr', name: 'Dhuhr', prayer: true },
-  { id: 'asr', name: 'Asr', prayer: true },
-  { id: 'maghrib', name: 'Maghrib', prayer: true },
-  { id: 'isha', name: 'Isha', prayer: true },
-];
+  { id: 'fajr', prayer: true },
+  { id: 'sunrise', prayer: false },
+  { id: 'dhuhr', prayer: true },
+  { id: 'asr', prayer: true },
+  { id: 'maghrib', prayer: true },
+  { id: 'isha', prayer: true },
+].map((n) => ({ ...n, get name() { return t(`pn.${n.id}`); } }));
 
 const rad = (d) => d * Math.PI / 180;
 const deg = (r) => r * 180 / Math.PI;
@@ -116,7 +117,7 @@ export function computeTimes({ lat, lon, timeZone }, date = new Date(), methodId
 }
 
 export function formatTime(date, timeZone) {
-  return new Intl.DateTimeFormat('de-DE', { timeZone, hour: '2-digit', minute: '2-digit' }).format(date);
+  return new Intl.DateTimeFormat('de-DE', { timeZone, hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' }).format(date);
 }
 
 // Laufendes Gebet (seit dessen Beginn) und nächstes Gebet; nach Isha ist Fajr von morgen das nächste.
@@ -140,5 +141,5 @@ export function prayerStatus(loc, now, methodId, asrId) {
 export function formatCountdown(ms) {
   const min = Math.max(0, Math.round(ms / 60000));
   const h = Math.floor(min / 60), m = min % 60;
-  return h ? `${h} Std. ${m} Min.` : `${m} Min.`;
+  return h ? t('ui.hours', h, m) : t('ui.minutes', m);
 }

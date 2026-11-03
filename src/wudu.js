@@ -1,60 +1,37 @@
 // Gebetswaschung (Wuḍūʾ) Schritt für Schritt. Pflichten nach Koran 5:6; Details je Rechtsschule vereinfacht.
+import { t } from './i18n.js';
+import { text } from './prayer.js';
 
-export const WUDU = { id: 'wudu', name: 'Wuḍūʾ', kind: 'wudu' };
+export const WUDU = { id: 'wudu', kind: 'wudu', get name() { return t('pn.wudu'); } };
 
-const SHAHADA = {
-  ar: ['أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ'],
-  tr: ['Ashhadu an lā ilāha illa llāhu waḥdahū lā sharīka lah, wa ashhadu anna Muḥammadan ʿabduhū wa rasūluh.'],
-  de: ['Ich bezeuge, dass es keinen Gott gibt außer Allah, dem Einen ohne Teilhaber, und dass Muhammad Sein Diener und Gesandter ist.'],
-};
-
-const HEAD_RULE = {
-  hanafi: 'Ḥanafī: Pflicht ist mindestens ein Viertel des Kopfes, den ganzen Kopf zu bestreichen ist Sunnah.',
-  shafii: 'Shāfiʿī: Pflicht ist, einen Teil des Kopfes zu bestreichen, den ganzen Kopf zu bestreichen ist Sunnah.',
-  maliki: 'Mālikī: Pflicht ist, den ganzen Kopf zu bestreichen.',
-  hanbali: 'Ḥanbalī: Pflicht ist, den ganzen Kopf einschließlich der Ohren zu bestreichen.',
-};
-
-const GENERAL = {
-  hanafi: 'Ḥanafī: Die Absicht und die Reihenfolge sind Sunnah, aber stark empfohlen.',
-  shafii: 'Shāfiʿī: Die Absicht und die Reihenfolge sind Pflicht.',
-  maliki: 'Mālikī: Die Absicht ist Pflicht, ebenso das Reiben der Glieder (Dalk) und das zügige Waschen ohne lange Pausen.',
-  hanbali: 'Ḥanbalī: Die Absicht, die Reihenfolge und das zügige Waschen sind Pflicht, ebenso Mund und Nase.',
-};
+// [Körperteil, Haltung der Figur, Anzahl, Pflicht?] – Titel, Ansage und Anleitung stehen in der Sprachdatei (wudu.steps).
+const PARTS = [
+  ['heart', 'stand', 1, (m) => m !== 'hanafi'],
+  ['hands', 'wash', 3, () => false],
+  ['mouth', 'face', 3, (m) => m === 'hanbali'],
+  ['nose', 'face', 3, (m) => m === 'hanbali'],
+  ['face', 'face', 3, () => true],
+  ['armR', 'wash', 3, () => true],
+  ['armL', 'wash', 3, () => true],
+  ['head', 'head', 1, () => true],
+  ['ears', 'head', 1, (m) => m === 'hanbali'],
+  ['footR', 'feet', 3, () => true],
+  ['footL', 'feet', 3, () => true],
+  ['heart', 'stand', 1, () => false],
+];
 
 export function buildWuduSteps(madhab = 'hanafi') {
-  const hb = madhab === 'hanbali';
-  const s = (title, cue, pose, part, count, fard, instr, extra = {}) => ({
-    title, cue, pose, wudu: part, count, fard, instr, rakah: 0, dur: count * 4 + 4, ar: [], tr: [], de: [], ...extra,
+  const texts = t('wudu.steps');
+  return PARTS.map(([part, pose, count, fard], i) => {
+    const [title, cue, instr] = texts[i];
+    const step = { title, cue, instr, pose, wudu: part, count, fard: fard(madhab), rakah: 0, dur: count * 4 + 4, ar: [], tr: [], de: [] };
+    if (i === 0) {
+      const b = text('basmala');
+      Object.assign(step, b, { de: [...b.de, t(`wudu.general.${madhab}`)] });
+    } else if (part === 'head') step.de = [t(`wudu.head.${madhab}`)];
+    else if (i === PARTS.length - 1) Object.assign(step, text('shahada'), { key: 'shahada' });
+    return step;
   });
-  return [
-    s('Niyya und Basmala', 'Absicht fassen', 'stand', 'heart', 1, madhab !== 'hanafi',
-      'Fasse im Herzen die Absicht, die Gebetswaschung für Allah zu vollziehen, und sprich „Bismi llāh“.',
-      { ar: ['بِسْمِ اللَّهِ'], tr: ['Bismi llāh'], de: ['Im Namen Allahs.', GENERAL[madhab]] }),
-    s('Hände waschen', 'Hände waschen', 'wash', 'hands', 3, false,
-      'Wasche beide Hände bis zu den Handgelenken, auch zwischen den Fingern. Beginne mit der rechten Hand.'),
-    s('Mund ausspülen', 'Mund ausspülen', 'face', 'mouth', 3, hb,
-      'Nimm mit der rechten Hand Wasser in den Mund, spüle ihn gründlich aus und spucke das Wasser wieder aus.'),
-    s('Nase reinigen', 'Nase reinigen', 'face', 'nose', 3, hb,
-      'Zieh mit der rechten Hand etwas Wasser in die Nase und schnäuze es mit der linken Hand wieder aus.'),
-    s('Gesicht waschen', 'Gesicht waschen', 'face', 'face', 3, true,
-      'Wasche das ganze Gesicht: von der Stirn (Haaransatz) bis unter das Kinn und von Ohr zu Ohr.'),
-    s('Rechter Arm', 'Rechten Arm waschen', 'wash', 'armR', 3, true,
-      'Wasche den rechten Arm von den Fingerspitzen bis einschließlich Ellbogen.'),
-    s('Linker Arm', 'Linken Arm waschen', 'wash', 'armL', 3, true,
-      'Wasche genauso den linken Arm bis einschließlich Ellbogen.'),
-    s('Kopf bestreichen (Masḥ)', 'Über den Kopf streichen', 'head', 'head', 1, true,
-      'Streiche mit den nassen Händen über den Kopf: von der Stirn bis zum Nacken und wieder zurück.',
-      { de: [HEAD_RULE[madhab]] }),
-    s('Ohren bestreichen', 'Ohren bestreichen', 'head', 'ears', 1, hb,
-      'Fahre mit den nassen Zeigefingern innen durch die Ohren und streiche mit den Daumen über die Rückseite.'),
-    s('Rechter Fuß', 'Rechten Fuß waschen', 'feet', 'footR', 3, true,
-      'Wasche den rechten Fuß bis einschließlich der Knöchel, auch zwischen den Zehen (am besten mit dem kleinen Finger).'),
-    s('Linker Fuß', 'Linken Fuß waschen', 'feet', 'footL', 3, true,
-      'Wasche genauso den linken Fuß bis einschließlich der Knöchel.'),
-    s('Bittgebet danach', 'Glaubensbekenntnis sprechen', 'stand', 'heart', 1, false,
-      'Sprich nach der Waschung das Glaubensbekenntnis (Sunnah):', SHAHADA),
-  ];
 }
 
 // Körper von vorn im Spiegelbild: Die rechte Körperseite ist rechts zu sehen.
@@ -127,7 +104,7 @@ export function drawBody(ctx, part, x, y, size, { color = 'rgba(207,216,227,0.55
   ctx.font = `600 ${Math.round(size * 0.07)}px Inter, system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('R', x + 0.86 * size, y + 0.3 * size);
-  ctx.fillText('L', x + 0.14 * size, y + 0.3 * size);
+  ctx.fillText(t('wudu.R'), x + 0.86 * size, y + 0.3 * size);
+  ctx.fillText(t('wudu.L'), x + 0.14 * size, y + 0.3 * size);
   ctx.restore();
 }

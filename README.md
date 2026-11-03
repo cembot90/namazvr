@@ -4,7 +4,8 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 
 ## Funktionen
 - Alle 5 Pflichtgebete (Fajr 2, Dhuhr 4, Asr 4, Maghrib 3, Isha 4 Rakʿāt) mit korrektem Ablauf
-- Jeder Schritt mit Arabisch, Umschrift und deutscher Bedeutung
+- Sprachen: Deutsch, Türkçe, English, العربية (von rechts nach links) – in den Einstellungen wählbar, beim ersten Start nach der Gerätesprache
+- Jeder Schritt mit Arabisch, Umschrift und Bedeutung; auf Türkisch mit türkischer Umschrift und den in der Türkei üblichen Begriffen (Sübhâneke, Tahiyyât, Salli-Bârik, Rabbenâ)
 - Gesichtslose Vorbeter-Figur zeigt die Haltung (Takbīr, Qiyām, Rukūʿ, Sujūd, Sitzen, Taslīm)
 - Bodentafel vor dem Gebetsteppich – lesbar in Rukūʿ und Sujūd
 - Bewegungsanzeige: Piktogramm mit Pfeil und Ansage („Verbeugen“, „Niederwerfen“, „Aufsetzen“ …) im Panel, auf der Bodentafel und als kurze Einblendung vor dem Blick
@@ -42,7 +43,9 @@ WebXR braucht HTTPS. Am einfachsten:
 - **Für App Store / Google Play:** Mit [Capacitor](https://capacitorjs.com) verpacken (`npm i @capacitor/core @capacitor/cli`, `npx cap init`, `npx cap add ios` / `android`). Für iOS braucht man Xcode und ein Apple-Developer-Konto (99 $/Jahr), für Android Android Studio und ein Google-Play-Konto (einmalig 25 $).
 
 ## Dateien
-- `src/prayer.js` – Gebete, Texte, Rechtsschulen, Unterschiede Frauen/Männer, Schrittfolge
+- `src/i18n.js` – Sprachwahl und Textzugriff `t()`
+- `src/lang/de.js`, `tr.js`, `en.js`, `ar.js` – alle Texte je Sprache (Oberfläche, Anleitungen, Bedeutungen, Quiz)
+- `src/prayer.js` – Gebete, arabische Texte, Rechtsschulen, Unterschiede Frauen/Männer, Schrittfolge
 - `src/wudu.js` – Gebetswaschung und Körper-Piktogramm
 - `src/learn.js` – Quiz, Fortschritt, Abzeichen
 - `src/spirit.js` – Spiritueller Modus (innere Bedeutung, Atem-Rhythmus)
