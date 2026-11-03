@@ -365,6 +365,17 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
   }
 
+  // Beschriftung auf der einen, Schalter auf der anderen Seite (in Arabisch gespiegelt)
+  switchRow(y, label, sub, buttons) {
+    const { W } = this;
+    this.text(label, 60, y + 30, { size: 28, weight: 600 });
+    if (sub) this.text(sub, 60, y + 60, { size: 22, color: C.muted });
+    buttons.forEach(([text, action, active], i) => {
+      const x = isRTL() ? 60 + i * 250 : W - 60 - (buttons.length - i) * 250 + 10;
+      this.btn(text, x, y, 240, 70, action, { active });
+    });
+  }
+
   v_settings(v) {
     const { W, H } = this;
     this.heading(t('ui.settings'));
@@ -375,15 +386,7 @@ export class Panel extends CanvasPlane {
     v.madhabs.forEach((m, i) => this.btn(m.name, 60 + i * (w + gap), 295, w, 68, `madhab:${m.id}`, { active: m.id === v.madhab.id }));
     this.text(t('ui.changes', v.madhab.name), 60, 405, { size: 26, color: C.gold, weight: 600 });
     this.paragraphs(v.madhab.notes.map((n) => `•  ${n}`), 440, { size: 23, gap: 0 });
-    // Beschriftung auf der einen, Schalter auf der anderen Seite (in Arabisch gespiegelt)
-    const row = (y, label, sub, buttons) => {
-      this.text(label, 60, y + 30, { size: 28, weight: 600 });
-      if (sub) this.text(sub, 60, y + 60, { size: 22, color: C.muted });
-      buttons.forEach(([text, action, active], i) => {
-        const x = isRTL() ? 60 + i * 250 : W - 60 - (buttons.length - i) * 250 + 10;
-        this.btn(text, x, y, 240, 70, action, { active });
-      });
-    };
+    const row = (...a) => this.switchRow(...a);
     row(645, t('ui.guideFor'), '', [[t('ui.men'), 'gender:m', v.gender !== 'f'], [t('ui.women'), 'gender:f', v.gender === 'f']]);
     row(728, t('ui.beginner'), t('ui.beginnerSub'), [[v.beginner ? t('ui.on') : t('ui.off'), 'beginner', v.beginner]]);
     row(811, t('ui.spiritual'), t('ui.spiritualSub'), [[v.spiritual ? t('ui.on') : t('ui.off'), 'spiritual', v.spiritual]]);
@@ -396,10 +399,15 @@ export class Panel extends CanvasPlane {
     const { W, H } = this;
     this.heading(t('ui.mosqueTitle'), t('ui.mosqueSub'));
     v.styles.forEach((st, i) => {
-      this.btn(st.name, 60, 150 + i * 170, W - 120, 150, `style:${st.id}`, { size: 42, sub: st.de, subSize: 26, active: st.id === v.style });
+      this.btn(st.name, 60, 130 + i * 110, W - 120, 98, `style:${st.id}`, { size: 36, sub: st.de, subSize: 23, active: st.id === v.style });
     });
-    this.paragraphs([t('ui.mosqueNote')], H - 220, { size: 24, color: C.muted });
-    this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
+    this.paragraphs([t('ui.mosqueNote')], 598, { size: 21, color: C.muted, gap: 0 });
+    // Cemaat: Gemeinschaftsgebet mit Imam
+    const row = (...a) => this.switchRow(...a);
+    row(650, t('ui.cemaat'), t('ui.cemaatTip'), [[v.cemaat ? t('ui.on') : t('ui.off'), 'cemaat', v.cemaat]]);
+    row(733, t('ui.cemaatSize'), '', [[t('ui.small'), 'csize:small', v.size !== 'large'], [t('ui.large'), 'csize:large', v.size === 'large']]);
+    row(816, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
+    this.btn(t('ui.back'), 60, H - 98, W - 120, 80, 'menu');
   }
 
   v_learn(v) {

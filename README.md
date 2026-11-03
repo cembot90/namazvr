@@ -22,7 +22,9 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Wuḍūʾ-Trainer: 12 Schritte mit Körper-Piktogramm, Pflicht/Sunnah je Rechtsschule
 - Lernen & Quiz: 24 Fragen (zufällig 10), Fortschritt, Tage in Folge, Abzeichen
 - Anfänger-Modus (langsamer, liest jeden Schritt vor) und Spiritueller Modus (innere Bedeutung jedes Schritts, Atem-Dhikr im Tasbīḥ)
-- Drei Moschee-Stile: Klassisch, Osmanisch, Andalusisch (freie Gestaltungen, keine Nachbauten)
+- Vier große Moscheen (26–60 m): Klassisch, Osmanisch, Andalusisch und Großmoschee mit Nebenkuppeln, Emporen und Buntglas; jede mit Minbar; nachts dunkle Fenster und hellere Lampen (freie Gestaltungen, keine Nachbauten)
+- Cemaat (Gemeinschaftsgebet): Imam vorn, Gemeinde in Reihen (klein oder groß wie am Freitag); im natürlichen Takt folgt jeder mit eigener Verzögerung, eigenem Tempo und kleinen Abweichungen, ein Nachzügler kommt in der zweiten Rakʿa und holt sie nach dem Salām nach; danach Bittgebet im Sitzen; der Imam spricht Takbīr, „Samiʿa llāhu…“ und Salām (wenn das Gerät eine arabische Stimme hat); Frauenreihen hinter den Männern
+- Durch die Moschee gehen: W A S D am Computer, Stick auf der Quest
 - Handy-Version: Figur oben, Bedienung unten, Qibla-Kompass über den Handy-Sensor, installierbar und offline nutzbar
 
 ## Lokal testen (ohne Headset)
@@ -56,7 +58,8 @@ WebXR braucht HTTPS. Am einfachsten:
 - `src/figure.js` – Vorbeter-Figur und Haltungen
 - `src/panel.js` – Bedienpanel, Bodentafel und Bewegungs-Einblendung
 - `src/movement.js` – Bewegungsansagen, Piktogramme, Haltungserkennung
-- `src/environment.js` – Gebetsraum in drei Stilen
+- `src/environment.js` – Gebetsräume in vier Stilen
+- `src/congregation.js` – Imam und Gemeinde für das Gemeinschaftsgebet
 - `src/qibla.js` – Qibla-Berechnung und Städte
 - `src/prayertimes.js` – Gebetszeiten-Berechnung
 - `src/main.js` – Szene, Eingabe (Maus, Touch, Controller, Hand-Tracking), Zustand

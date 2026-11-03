@@ -3,8 +3,9 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import { STYLES, buildEnvironment, clearEnvironment, makeFloorCompass, makeRug } from './environment.js';
+import { STYLES, buildEnvironment, clearEnvironment, makeFloorCompass, makeRug, roomBounds, blocked } from './environment.js';
 import { Guide } from './figure.js';
+import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
 import { EXTRA_PRAYERS, MADHABS, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
@@ -45,7 +46,7 @@ scene.background = ROOM_BG;
 const arLight = new THREE.HemisphereLight(0xfff6e8, 0x8a7a66, 2.4);
 arLight.visible = false;
 scene.add(arLight);
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 60);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 150);
 camera.position.set(0, 1.6, 0);
 
 // `world` enthält den ganzen Gebetsraum; seine -Z-Achse ist die Qibla.
@@ -54,14 +55,18 @@ scene.add(world);
 // Der Raum selbst hängt in einer eigenen Gruppe, damit der Moschee-Stil gewechselt werden kann.
 const env = new THREE.Group();
 world.add(env);
-buildEnvironment(env, store.get('style', 'klassisch'));
 const compass = makeFloorCompass();
-world.add(compass, makeRug(0, -0.5), makeRug(1.5, -1.95));
+const guideRug = makeRug(1.5, -1.95);
+world.add(compass, makeRug(0, -0.5), guideRug);
 
 const guide = new Guide();
 guide.group.position.set(1.5, 0, -1.5);
 guide.group.rotation.y = Math.PI;
 world.add(guide.group);
+
+// Gemeinschaftsgebet: Imam und Gemeinde (statt der Vorbeter-Figur)
+const cong = new Congregation();
+world.add(cong.group);
 
 const panel = new Panel();
 panel.mesh.position.set(-0.75, 1.35, -1.5);
@@ -111,6 +116,11 @@ const state = {
   beginner: store.get('beginner', false),
   spiritual: store.get('spiritual', false),
   style: store.get('style', 'klassisch'),
+  night: false,
+  // Cemaat: Gemeinschaftsgebet mit Imam; Größe der Gemeinde; natürlicher Takt oder Gleichtakt
+  cemaat: store.get('cemaat', false),
+  cemaatSize: store.get('cemaatSize', 'small'),
+  cemaatNatural: store.get('cemaatNatural', true),
   breath: { on: false, t: 0, phase: 'in' },
   progress: { ...emptyProgress(), ...store.get('progress', {}) },
   quiz: null,
@@ -151,6 +161,33 @@ function applyQibla() {
   if (mobileUI) aimAtGuide();
 }
 
+// Nacht zwischen Maghrib und Sonnenaufgang: dunkle Fenster, hellere Lampen
+function isNight() {
+  const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
+  const now = new Date();
+  const { times } = prayerStatus(loc, now, state.method, state.asr);
+  return now < times.sunrise || now >= times.maghrib;
+}
+
+function rebuildEnv() {
+  state.night = isNight();
+  clearEnvironment(env);
+  buildEnvironment(env, state.style, { night: state.night });
+}
+
+function rebuildCong() {
+  cong.build({ size: state.cemaatSize, gender: state.gender, natural: state.cemaatNatural, blocked });
+  updateCast();
+}
+
+// Mit Cemaat beten Imam und Gemeinde; bei der Gebetswaschung zeigt weiter die Vorbeter-Figur.
+function updateCast() {
+  const wudu = state.view === 'step' && state.prayer?.kind === 'wudu';
+  cong.group.visible = state.cemaat && !wudu;
+  guide.group.visible = guideRug.visible = !cong.group.visible;
+}
+const leader = () => (cong.group.visible && cong.imam ? cong.imam.g : guide);
+
 // Blickrichtung (Yaw) von Kopf bzw. Desktop-Kamera; 0 = Start-Blickrichtung.
 function currentYaw() {
   const cam = renderer.xr.isPresenting ? renderer.xr.getCamera() : camera;
@@ -173,7 +210,7 @@ function view() {
         finger: renderer.xr.isPresenting && state.posture.finger,
       };
     case 'mosque':
-      return { type: 'mosque', styles: STYLES, style: state.style };
+      return { type: 'mosque', styles: STYLES, style: state.style, cemaat: state.cemaat, size: state.cemaatSize, natural: state.cemaatNatural };
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'settings':
@@ -220,6 +257,8 @@ function refresh() {
     card.render(v);
   }
   guide.setPose(v.type === 'step' ? v.step.pose : 'stand');
+  updateCast();
+  if (cong.group.visible && v.type === 'step') cong.lead(v.step.pose, v.step.rakah);
 }
 
 // Neuer Schritt: Erkennung zurücksetzen und bei einem Haltungswechsel die Ansage zeigen.
@@ -230,6 +269,7 @@ function onStep() {
   const step = state.steps[state.i];
   const m = step.wudu ? { arrow: null, cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
   if (state.beginner) speak();
+  else imamCall(step, state.steps[state.i - 1]);
   if (m.arrow || step.wudu) {
     banner.render(m);
     p.cueT = 3.5;
@@ -246,7 +286,30 @@ function start(prayer) {
   state.autoT = 0;
   state.view = 'step';
   state.posture.standH = null;
+  // Zurück auf den Gebetsplatz; mit Cemaat gibt der Imam den Takt vor
+  goHome();
+  cong.reset();
+  if (state.cemaat && prayer.kind !== 'wudu') state.auto = true;
   onStep();
+}
+
+// Imam spricht die Übergänge laut (arabische Stimme, falls das Gerät eine hat).
+const IMAM = { takbir: 'اللَّهُ أَكْبَرُ', sami: 'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ', salam: 'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ' };
+function imamCall(step, prev) {
+  if (!state.cemaat || step.wudu || !('speechSynthesis' in window)) return;
+  let line = null;
+  if (step.key === 'itidal') line = IMAM.sami;
+  else if (step.key === 'salam') line = IMAM.salam;
+  else if (step.key === 'takbir' || (prev && step.pose !== prev.pose && prev.pose !== 'takbir' && step.pose !== 'dua')) line = IMAM.takbir;
+  const voice = window.speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith('ar'));
+  if (!line || !voice) return;
+  const u = new SpeechSynthesisUtterance(line);
+  u.voice = voice;
+  u.lang = voice.lang;
+  u.rate = 0.75;
+  u.pitch = 0.8;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
 }
 
 function speak() {
@@ -301,7 +364,7 @@ function act(action) {
       store.set('madhab', arg);
       store.set('asr', state.asr);
       break;
-    case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); break;
+    case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); rebuildCong(); break;
     case 'lang':
       setLang(arg);
       store.set('lang', arg);
@@ -315,10 +378,14 @@ function act(action) {
       if (arg !== state.style) {
         state.style = arg;
         store.set('style', arg);
-        clearEnvironment(env);
-        buildEnvironment(env, arg);
+        rebuildEnv();
+        rebuildCong();
+        goHome();
       }
       break;
+    case 'cemaat': state.cemaat = !state.cemaat; store.set('cemaat', state.cemaat); cong.reset(); break;
+    case 'csize': state.cemaatSize = arg; store.set('cemaatSize', arg); rebuildCong(); break;
+    case 'ctakt': state.cemaatNatural = arg === 'natural'; store.set('cemaatNatural', state.cemaatNatural); rebuildCong(); break;
     case 'spiritual': state.spiritual = !state.spiritual; store.set('spiritual', state.spiritual); break;
     case 'breath': state.breath = { on: !state.breath.on, t: 0, phase: 'in' }; break;
     case 'beginner': state.beginner = !state.beginner; store.set('beginner', state.beginner); break;
@@ -349,6 +416,7 @@ function act(action) {
       if (state.i < state.steps.length - 1) { state.i++; onStep(); } else {
         state.view = 'done';
         state.auto = false;
+        if (cong.group.visible) cong.finish();
         recordPractice(state.progress, state.prayer.id);
         store.set('progress', state.progress);
       }
@@ -360,7 +428,7 @@ function act(action) {
       break;
     case 'auto': state.auto = !state.auto; state.autoT = 0; break;
     case 'speak': speak(); break;
-    case 'menu': state.view = 'menu'; state.auto = false; break;
+    case 'menu': state.view = 'menu'; state.auto = false; cong.reset(); break;
     case 'qibla': state.view = 'qibla'; state.msg = ''; break;
     case 'info': state.view = 'info'; break;
     case 'times': state.view = 'times'; break;
@@ -468,10 +536,17 @@ el.addEventListener('pointerup', (e) => {
   }
   drag = null;
 });
+// WASD: durch die Moschee gehen (Umschalt = schneller)
+const keys = new Set();
+window.addEventListener('keyup', (e) => keys.delete(e.key === 'Shift' ? 'shift' : e.key.toLowerCase()));
+window.addEventListener('blur', () => keys.clear());
 window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (['w', 'a', 's', 'd'].includes(k)) { keys.add(k); return; }
+  if (e.key === 'Shift') keys.add('shift');
   if (e.key === 'ArrowRight' || e.key === ' ') act('next');
   else if (e.key === 'ArrowLeft') act('prev');
-  else if (e.key.toLowerCase() === 'm') act('menu');
+  else if (k === 'm') act('menu');
 });
 
 // VR: Controller bzw. Hand-Tracking (Pinch löst ebenfalls „select“ aus)
@@ -553,10 +628,11 @@ const params = new URLSearchParams(location.search);
 const isMobile = params.has('mobile') || (!params.has('desktop') && window.innerWidth <= 820 && !/OculusBrowser|Quest/i.test(navigator.userAgent));
 const mobileUI = isMobile ? new MobileUI(document.getElementById('ui'), act) : null;
 
-// Auf dem Handy blickt die Kamera auf die Vorbeter-Figur.
+// Auf dem Handy blickt die Kamera auf die Vorbeter-Figur; mit Cemaat von schräg hinten über die Reihen.
 function aimAtGuide() {
+  camera.position.copy(cong.group.visible ? world.localToWorld(new THREE.Vector3(0, 2.3, 3.2)) : new THREE.Vector3(0, 1.6, 0));
   const target = new THREE.Vector3(0, 0.85, 0);
-  guide.group.localToWorld(target);
+  leader().group.localToWorld(target);
   const d = target.sub(camera.position);
   yaw = Math.atan2(-d.x, -d.z);
   pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
@@ -621,6 +697,48 @@ function updatePosture(dt) {
   }
 }
 
+// Gehen: Ziel nur annehmen, wenn es innerhalb der Moschee liegt (Weltkoordinaten des Raums).
+const walkTmp = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
+function insideMosque(scenePos) {
+  const b = roomBounds();
+  const p = world.worldToLocal(walkTmp.copy(scenePos));
+  return p.x > b.minX && p.x < b.maxX && p.z > b.minZ && p.z < b.maxZ;
+}
+
+function walk(dt) {
+  if (state.ar || mobileUI) return;
+  const dir = new THREE.Vector3();
+  let speed = 1.6;
+  if (renderer.xr.isPresenting) {
+    // Stick bewegt; die Welt rückt entgegengesetzt.
+    for (const src of renderer.xr.getSession()?.inputSources ?? []) {
+      const a = src.gamepad?.axes;
+      if (!a) continue;
+      const x = a[2] ?? a[0] ?? 0, y = a[3] ?? a[1] ?? 0;
+      if (Math.hypot(x, y) > 0.2) { dir.x += x; dir.z += y; }
+    }
+  } else {
+    if (keys.has('w')) dir.z -= 1;
+    if (keys.has('s')) dir.z += 1;
+    if (keys.has('a')) dir.x -= 1;
+    if (keys.has('d')) dir.x += 1;
+    if (keys.has('shift')) speed = 3.5;
+  }
+  if (!dir.lengthSq()) return;
+  if (dir.length() > 1) dir.normalize();
+  readHead();
+  dir.applyAxisAngle(UP, Math.atan2(-headDir.x, -headDir.z)).multiplyScalar(speed * dt);
+  const next = headPos.clone().add(dir);
+  if (!insideMosque(next)) return;
+  if (renderer.xr.isPresenting) world.position.sub(dir);
+  else camera.position.add(dir);
+}
+
+// Zurück auf den Gebetsteppich
+function goHome() {
+  if (renderer.xr.isPresenting) { if (!state.ar) world.position.set(0, 0, 0); } else if (!mobileUI) camera.position.set(0, 1.6, 0);
+}
+
 // Kurzes Vibrieren der Controller, wenn die Haltung erreicht ist.
 function pulse() {
   const session = renderer.xr.getSession();
@@ -682,6 +800,7 @@ renderer.setAnimationLoop(() => {
     const k = phase === 'in' ? br.t / BREATH.inhale : 1 - (br.t - BREATH.inhale) / BREATH.exhale;
     orb.scale.setScalar(0.7 + 1.3 * (0.5 - 0.5 * Math.cos(Math.PI * k)));
   }
+  walk(dt);
   const cue = state.posture;
   if (cue.cueT > 0 && state.view === 'step' && !mobileUI) {
     cue.cueT -= dt;
@@ -692,16 +811,20 @@ renderer.setAnimationLoop(() => {
   // Countdown im Menü und in der Zeiten-Ansicht einmal pro Minute auffrischen.
   const minute = Math.floor(Date.now() / 60000);
   if (minute !== lastMinute && (state.view === 'menu' || state.view === 'times')) refresh();
+  if (minute !== lastMinute && isNight() !== state.night) rebuildEnv();
   lastMinute = minute;
   guide.update(dt);
+  cong.update(dt);
   renderer.render(scene, camera);
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
-if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, camera, state, panel, card, world, setAR, view };
+if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, setAR, view };
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);
+rebuildEnv();
+rebuildCong();
 applyQibla();
 // Am Desktop zuerst aufs Panel schauen, auch wenn der Raum zur Qibla gedreht ist.
 if (!mobileUI) { yaw += world.rotation.y; camera.rotation.set(pitch, yaw, 0, 'YXZ'); }

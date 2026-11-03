@@ -246,6 +246,14 @@ export class MobileUI {
     return `${head(t('ui.mosqueTitle'))}
       <div class="list">${v.styles.map((s) => btn(s.name, `style:${s.id}`, { cls: s.id === v.style ? 'active' : '', sub: s.de })).join('')}</div>
       <p class="muted small">${esc(t('ui.mosqueNoteShort'))}</p>
+      <h3>${esc(t('ui.cemaat'))}</h3>
+      <p class="muted small">${esc(t('ui.cemaatSub'))}</p>
+      ${btn(v.cemaat ? t('ui.on') : t('ui.off'), 'cemaat', { cls: `wide ${v.cemaat ? 'active' : ''}` })}
+      <p class="muted small">${esc(t('ui.cemaatSize'))}</p>
+      <div class="grid2">${btn(t('ui.small'), 'csize:small', { cls: v.size !== 'large' ? 'active' : '' })}${btn(t('ui.large'), 'csize:large', { cls: v.size === 'large' ? 'active' : '' })}</div>
+      <p class="muted small">${esc(t('ui.takt'))} – ${esc(t('ui.taktSub'))}</p>
+      <div class="grid2">${btn(t('ui.natural'), 'ctakt:natural', { cls: v.natural ? 'active' : '' })}${btn(t('ui.sync'), 'ctakt:sync', { cls: v.natural ? '' : 'active' })}</div>
+      <p class="gold small">${esc(t('ui.cemaatTip'))}</p>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
   }
 
