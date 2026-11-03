@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NamazVR – Promo</title>
+<meta name="description" content="NamazVR: Beten lernen, Schritt für Schritt – auf Quest, Handy und im Browser.">
+<meta property="og:title" content="NamazVR – Beten lernen in VR">
+<meta property="og:description" content="Gebetsassistent für Meta Quest, Handy und Browser. Deutsch · Türkçe · English · العربية">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri:wght@700&family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #050b1a;
+    --deep: #0b1f3a;
+    --gold: #e9c46a;
+    --gold2: #f4a261;
+    --teal: #2a9d8f;
+    --text: #f5efe0;
+    --muted: #a9b4c7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 120%, var(--deep), var(--night) 70%);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+  [dir=rtl] body, [dir=rtl] .scene { font-family: 'Noto Sans Arabic', Inter, sans-serif; }
+
+  #stars { position: fixed; inset: 0; z-index: 0; }
+
+  .stage { position: relative; z-index: 1; width: min(92vw, 900px); height: min(86vh, 640px); }
+  .scene {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 18px; padding: 0 16px;
+    opacity: 0; transform: scale(.96); transition: opacity .8s ease, transform 1.2s ease;
+    pointer-events: none;
+  }
+  .scene.on { opacity: 1; transform: scale(1); pointer-events: auto; }
+
+  /* Szene 1: Logo */
+  .moon { width: 120px; height: 120px; filter: drop-shadow(0 0 30px rgba(233,196,106,.6)); }
+  .scene.on .moon { animation: rise 2s ease both; }
+  .logo { font-size: clamp(48px, 11vw, 110px); font-weight: 800; letter-spacing: -2px; line-height: 1; }
+  .logo b { background: linear-gradient(90deg, var(--gold), var(--gold2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .arabic { font-family: Amiri, serif; font-size: clamp(28px, 6vw, 48px); color: var(--gold); opacity: .9; }
+  .sub { font-size: clamp(16px, 3.4vw, 24px); color: var(--muted); max-width: 640px; }
+  .scene.on .reveal { animation: up .9s ease both; }
+  .scene.on .reveal:nth-child(2) { animation-delay: .35s; }
+  .scene.on .reveal:nth-child(3) { animation-delay: .7s; }
+  .scene.on .reveal:nth-child(4) { animation-delay: 1.05s; }
+
+  h2 { font-size: clamp(30px, 6.5vw, 60px); font-weight: 800; line-height: 1.1; }
+  h2 em { font-style: normal; color: var(--gold); }
+
+  /* Szene 2: Haltungen */
+  .poses { display: flex; gap: clamp(6px, 3vw, 36px); justify-content: center; }
+  .pose { width: clamp(60px, 19vw, 140px); display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; }
+  .pose svg { width: 100%; height: auto; }
+  .pose path, .pose line { stroke: var(--gold); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .pose circle { fill: var(--gold); }
+  .pose .floor { stroke: rgba(255,255,255,.18); stroke-width: 2; }
+  .pose span { font-size: clamp(12px, 2.6vw, 16px); color: var(--muted); }
+  .scene.on .pose { animation: up .6s ease both; }
+  .scene.on .pose:nth-child(1) { animation-delay: .4s; }
+  .scene.on .pose:nth-child(2) { animation-delay: 1.0s; }
+  .scene.on .pose:nth-child(3) { animation-delay: 1.6s; }
+  .scene.on .pose:nth-child(4) { animation-delay: 2.2s; }
+
+  /* Szene 3/4: Features */
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-width: 760px; }
+  .chip {
+    padding: 12px 20px; border-radius: 999px; font-size: clamp(14px, 3vw, 20px); font-weight: 600;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(233,196,106,.35);
+    opacity: 0;
+  }
+  .scene.on .chip { animation: pop .5s cubic-bezier(.2,1.6,.4,1) both; }
+  .scene.on .chip:nth-child(1) { animation-delay: .3s; }
+  .scene.on .chip:nth-child(2) { animation-delay: .55s; }
+  .scene.on .chip:nth-child(3) { animation-delay: .8s; }
+  .scene.on .chip:nth-child(4) { animation-delay: 1.05s; }
+  .scene.on .chip:nth-child(5) { animation-delay: 1.3s; }
+  .scene.on .chip:nth-child(6) { animation-delay: 1.55s; }
+
+  .langs { display: flex; gap: clamp(10px, 3vw, 28px); flex-wrap: wrap; justify-content: center; font-size: clamp(22px, 5vw, 40px); font-weight: 800; }
+  .langs span { opacity: 0; }
+  .langs .ar { font-family: 'Noto Sans Arabic', sans-serif; }
+  .scene.on .langs span { animation: up .6s ease both; }
+  .scene.on .langs span:nth-child(2) { animation-delay: .4s; color: var(--gold); }
+  .scene.on .langs span:nth-child(3) { animation-delay: .8s; }
+  .scene.on .langs span:nth-child(4) { animation-delay: 1.2s; }
+
+  /* Szene: Brille mit Händen */
+  .headset { width: clamp(180px, 40vw, 300px); }
+  .headset .glass { fill: #12233f; stroke: var(--gold); stroke-width: 4; }
+  .headset .hand { fill: none; stroke: var(--teal); stroke-width: 5; stroke-linecap: round; }
+  .scene.on .headset .hand { animation: wave 1.6s ease-in-out infinite alternate; transform-origin: center bottom; transform-box: fill-box; }
+  .scene.on .headset .hand.r { animation-delay: .3s; }
+
+  /* Schluss */
+  .cta {
+    display: inline-block; padding: 18px 36px; border-radius: 16px; text-decoration: none;
+    font-size: clamp(18px, 4vw, 26px); font-weight: 800; color: var(--night);
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    box-shadow: 0 10px 40px rgba(233,196,106,.35);
+  }
+  .scene.on .cta { animation: up .8s .5s ease both, pulse 2s 1.5s ease-in-out infinite; }
+  .url { font-size: clamp(14px, 3vw, 18px); color: var(--muted); }
+
+  /* Steuerung */
+  .bar { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--gold); width: 0; z-index: 3; }
+  .ctrl { position: fixed; top: 16px; right: 16px; display: flex; gap: 8px; z-index: 3; }
+  [dir=rtl] .ctrl { right: auto; left: 16px; }
+  .ctrl button {
+    background: rgba(255,255,255,.08); color: var(--text); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px; padding: 8px 12px; font: 600 14px Inter, sans-serif; cursor: pointer;
+  }
+  .ctrl button.act { border-color: var(--gold); color: var(--gold); }
+
+  @keyframes up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+  @keyframes pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(40px) rotate(-20deg); } to { opacity: 1; transform: none; } }
+  @keyframes pulse { 50% { transform: scale(1.05); } }
+  @keyframes wave { from { transform: rotate(-8deg) translateY(4px); } to { transform: rotate(8deg) translateY(-4px); } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; transition-duration: .01s !important; } }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div class="ctrl" id="ctrl"></div>
+
+<div class="stage">
+  <section class="scene">
+    <svg class="moon" viewBox="0 0 100 100" aria-hidden="true">
+      <defs><mask id="m"><rect width="100" height="100" fill="#fff"/><circle cx="62" cy="40" r="34" fill="#000"/></mask></defs>
+      <circle cx="46" cy="52" r="38" fill="#e9c46a" mask="url(#m)"/>
+      <path d="M78 22 l3 8 8 1 -6 5 2 8 -7 -4 -7 4 2 -8 -6 -5 8 -1z" fill="#f4a261"/>
+    </svg>
+    <div class="logo reveal">Namaz<b>VR</b></div>
+    <div class="arabic reveal">الصلاة</div>
+    <div class="sub reveal" data-t="tag"></div>
+  </section>
+
+  <section class="scene">
+    <h2 class="reveal" data-t="learn"></h2>
+    <div class="poses">
+      <div class="pose"><svg viewBox="0 0 120 120"><line class="floor" x1="5" y1="114" x2="115" y2="114"/>
+        <circle cx="60" cy="16" r="9"/><path d="M60 28 L60 62 M60 62 L55 110 M60 62 L65 110 M60 34 L52 46 L62 50 M60 34 L66 44 L58 50"/></svg><span data-t="p1"></span></div>
+      <div class="pose"><svg viewBox="0 0 120 120"><line class="floor" x1="5" y1="114" x2="115" y2="114"/>
+        <circle cx="99" cy="64" r="9"/><path d="M45 62 L88 60 M45 62 L42 110 M45 62 L50 110 M84 60 L74 84 L50 86"/></svg><span data-t="p2"></span></div>
+      <div class="pose"><svg viewBox="0 0 120 120"><line class="floor" x1="5" y1="114" x2="115" y2="114"/>
+        <circle cx="86" cy="104" r="8"/><path d="M22 110 L44 110 L40 86 L74 100 M72 99 L70 110 L80 110"/></svg><span data-t="p3"></span></div>
+      <div class="pose"><svg viewBox="0 0 120 120"><line class="floor" x1="5" y1="114" x2="115" y2="114"/>
+        <circle cx="48" cy="50" r="9"/><path d="M47 62 L45 102 L40 110 L78 110 M45 102 L76 108 M47 70 L58 86 L66 98"/></svg><span data-t="p4"></span></div>
+    </div>
+    <div class="sub reveal" data-t="learnSub"></div>
+  </section>
+
+  <section class="scene">
+    <svg class="headset" viewBox="0 0 300 170" aria-hidden="true">
+      <path class="hand l" d="M40 160 L40 110 M28 115 L30 82 M40 110 L40 72 M52 112 L54 78 M62 120 L68 96"/>
+      <path class="hand r" d="M260 160 L260 110 M272 115 L270 82 M260 110 L260 72 M248 112 L246 78 M238 120 L232 96"/>
+      <rect class="glass" x="80" y="40" width="140" height="70" rx="30"/>
+      <circle cx="122" cy="75" r="14" fill="#2a9d8f" opacity=".6"/><circle cx="178" cy="75" r="14" fill="#2a9d8f" opacity=".6"/>
+    </svg>
+    <h2 class="reveal" data-t="mr"></h2>
+    <div class="sub reveal" data-t="mrSub"></div>
+  </section>
+
+  <section class="scene">
+    <h2 class="reveal" data-t="langs"></h2>
+    <div class="langs"><span>Deutsch</span><span>Türkçe</span><span>English</span><span class="ar">العربية</span></div>
+  </section>
+
+  <section class="scene">
+    <h2 class="reveal" data-t="all"></h2>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="scene">
+    <div class="logo reveal">Namaz<b>VR</b></div>
+    <div class="sub reveal" data-t="end"></div>
+    <a class="cta" href="./" data-t="cta"></a>
+    <div class="url reveal">cembot90.github.io/namazvr</div>
+  </section>
+</div>
+
+<div class="bar" id="bar"></div>
+
+<script>
+const TEXT = {
+  de: {
+    tag: 'Beten lernen – Schritt für Schritt.',
+    learn: 'Jede Haltung. <em>Jedes Wort.</em>',
+    learnSub: 'Mit Arabisch, Umschrift und Bedeutung – zum Mitsprechen.',
+    p1: 'Qiyām', p2: 'Rukūʿ', p3: 'Sujūd', p4: 'Julūs',
+    mr: 'Dein Zimmer wird zur <em>Moschee.</em>',
+    mrSub: 'Mixed Reality auf der Quest – die Brille erkennt deine Hände und Haltung.',
+    langs: 'In deiner <em>Sprache.</em>',
+    all: 'Alles, was du <em>brauchst.</em>',
+    chips: ['5 Gebete', 'Wuḍūʾ', '4 Rechtsschulen', 'Gebetszeiten', 'Qibla', 'Quiz'],
+    end: 'Kostenlos. Ohne Anmeldung. Auf Quest, Handy und PC.',
+    cta: 'Jetzt starten',
+    replay: '↺ Nochmal',
+  },
+  tr: {
+    tag: 'Namaz kılmayı öğren – adım adım.',
+    learn: 'Her hareket. <em>Her kelime.</em>',
+    learnSub: 'Arapça, okunuşu ve anlamıyla – birlikte oku.',
+    p1: 'Kıyam', p2: 'Rükû', p3: 'Secde', p4: 'Ka‘de',
+    mr: 'Odan <em>mescide</em> dönüşsün.',
+    mrSub: 'Quest’te karma gerçeklik – gözlük ellerini ve duruşunu tanır.',
+    langs: '<em>Kendi dilinde.</em>',
+    all: 'İhtiyacın olan <em>her şey.</em>',
+    chips: ['5 vakit', 'Abdest', '4 mezhep', 'Namaz vakitleri', 'Kıble', 'Bilgi yarışması'],
+    end: 'Ücretsiz. Kayıt yok. Quest, telefon ve bilgisayarda.',
+    cta: 'Hemen başla',
+    replay: '↺ Tekrar',
+  },
+  en: {
+    tag: 'Learn to pray – step by step.',
+    learn: 'Every posture. <em>Every word.</em>',
+    learnSub: 'With Arabic, transliteration and meaning – recite along.',
+    p1: 'Qiyām', p2: 'Rukūʿ', p3: 'Sujūd', p4: 'Julūs',
+    mr: 'Your room becomes a <em>mosque.</em>',
+    mrSub: 'Mixed reality on Quest – the headset sees your hands and posture.',
+    langs: 'In <em>your language.</em>',
+    all: 'Everything you <em>need.</em>',
+    chips: ['5 prayers', 'Wuḍūʾ', '4 madhhabs', 'Prayer times', 'Qibla', 'Quiz'],
+    end: 'Free. No sign-up. On Quest, phone and PC.',
+    cta: 'Start now',
+    replay: '↺ Replay',
+  },
+  ar: {
+    tag: 'تعلّم الصلاة خطوة بخطوة.',
+    learn: 'كل حركة. <em>كل كلمة.</em>',
+    learnSub: 'بالنص العربي – ردّد معنا.',
+    p1: 'القيام', p2: 'الركوع', p3: 'السجود', p4: 'الجلوس',
+    mr: 'غرفتك تصبح <em>مسجدًا.</em>',
+    mrSub: 'واقع مختلط على Quest – النظارة تتعرّف على يديك ووضعيتك.',
+    langs: '<em>بلغتك.</em>',
+    all: 'كل ما <em>تحتاجه.</em>',
+    chips: ['الصلوات الخمس', 'الوضوء', 'المذاهب الأربعة', 'مواقيت الصلاة', 'القبلة', 'اختبار'],
+    end: 'مجاني. بدون تسجيل. على Quest والهاتف والحاسوب.',
+    cta: 'ابدأ الآن',
+    replay: '↺ إعادة',
+  },
+};
+
+const SAVED = (() => { try { return localStorage.getItem('salahvr.lang'); } catch { return null; } })();
+const nav = (navigator.language || 'de').slice(0, 2);
+let lang = TEXT[SAVED] ? SAVED : TEXT[nav] ? nav : 'de';
+
+const scenes = [...document.querySelectorAll('.scene')];
+const DUR = [3500, 4800, 4200, 3600, 4000, 6000];
+const TOTAL = DUR.reduce((a, b) => a + b, 0);
+let idx = -1, timer, start;
+
+function applyLang() {
+  const T = TEXT[lang];
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-t]').forEach((el) => { el.innerHTML = T[el.dataset.t]; });
+  document.getElementById('chips').innerHTML = T.chips.map((c) => `<span class="chip">${c}</span>`).join('');
+  const ctrl = document.getElementById('ctrl');
+  ctrl.innerHTML = Object.keys(TEXT).map((k) => `<button data-l="${k}" class="${k === lang ? 'act' : ''}">${k.toUpperCase()}</button>`).join('')
+    + `<button id="replay">${T.replay}</button>`;
+}
+
+function show(i) {
+  scenes.forEach((s, k) => s.classList.toggle('on', k === i));
+  idx = i;
+  if (i < scenes.length - 1) timer = setTimeout(() => show(i + 1), DUR[i]);
+}
+
+function play() {
+  clearTimeout(timer);
+  scenes.forEach((s) => s.classList.remove('on'));
+  start = performance.now();
+  requestAnimationFrame(() => show(0));
+}
+
+document.getElementById('ctrl').addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.l) {
+    lang = b.dataset.l;
+    try { localStorage.setItem('salahvr.lang', lang); } catch {}
+    applyLang();
+  }
+  play();
+});
+
+// Fortschrittsbalken
+const bar = document.getElementById('bar');
+(function tick() {
+  bar.style.width = Math.min(100, ((performance.now() - start) / TOTAL) * 100) + '%';
+  requestAnimationFrame(tick);
+})();
+
+// Sternenhimmel
+const cv = document.getElementById('stars'), cx = cv.getContext('2d');
+let stars = [];
+function resize() {
+  cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio;
+  stars = Array.from({ length: 160 }, () => ({ x: Math.random() * cv.width, y: Math.random() * cv.height * 0.85, r: Math.random() * 1.4 + 0.3, p: Math.random() * 6 }));
+}
+function draw(t) {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  for (const s of stars) {
+    cx.globalAlpha = 0.35 + 0.65 * Math.abs(Math.sin(t / 1400 + s.p));
+    cx.beginPath(); cx.arc(s.x, s.y, s.r * devicePixelRatio, 0, 7); cx.fillStyle = '#fff'; cx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+addEventListener('resize', resize);
+resize(); requestAnimationFrame(draw);
+
+applyLang();
+play();
+</script>
+</body>
+</html>
