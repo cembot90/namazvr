@@ -1,0 +1,60 @@
+# Salah – Gebetsassistent für Meta Quest und Handy
+
+Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (Meta Quest, WebXR) in einem virtuellen Gebetsraum, auf dem Handy als installierbare App (PWA) und am Computer im Browser.
+
+## Funktionen
+- Alle 5 Pflichtgebete (Fajr 2, Dhuhr 4, Asr 4, Maghrib 3, Isha 4 Rakʿāt) mit korrektem Ablauf
+- Jeder Schritt mit Arabisch, Umschrift und deutscher Bedeutung
+- Gesichtslose Vorbeter-Figur zeigt die Haltung (Takbīr, Qiyām, Rukūʿ, Sujūd, Sitzen, Taslīm)
+- Bodentafel vor dem Gebetsteppich – lesbar in Rukūʿ und Sujūd
+- Bewegungsanzeige: Piktogramm mit Pfeil und Ansage („Verbeugen“, „Niederwerfen“, „Aufsetzen“ …) im Panel, auf der Bodentafel und als kurze Einblendung vor dem Blick
+- Haltungserkennung in VR über Kopfhöhe und Blickneigung (Stehen, Rukūʿ, Sujūd, Sitzen, Kopfdrehung beim Taslīm) – mit Vibration, wenn die Haltung erreicht ist; der Auto-Modus wartet, bis du die Haltung eingenommen hast
+- Auto-Modus (schaltet automatisch weiter) und Vorlesen (Sprachausgabe)
+- Qibla: Stadt oder GPS wählen, nach Norden schauen, kalibrieren → der Mihrab zeigt nach Mekka
+- Tasbīḥ-Zähler (33 / 33 / 34)
+- Gebetszeiten offline aus dem Sonnenstand: aktuelles und nächstes Gebet mit Countdown im Menü, Tagesübersicht, Methoden MWL, Diyanet (Näherung), ISNA, Ägypten, Umm al-Qura sowie Asr Standard/Ḥanafī; Näherung für hohe Breiten im Sommer
+- Rechtsschule wählbar (Ḥanafī, Shāfiʿī, Mālikī, Ḥanbalī): Handhaltung, Eröffnungs-Bittgebet, Rafʿ al-Yadayn, Sitzhaltung (Iftirāsh/Tawarruk), Qunūt, Witr-Form, Asr-Berechnung
+- Anleitung für Männer oder Frauen (Handhaltung, Verbeugung, Niederwerfung, Sitzen, ʿAwra, Hinweise); Vorbeterin mit Kopftuch
+- Weitere Gebete: Sunnah vor/nach den Pflichtgebeten, Witr, Jumuʿa, Taḥiyyat al-Masjid
+- Wuḍūʾ-Trainer: 12 Schritte mit Körper-Piktogramm, Pflicht/Sunnah je Rechtsschule
+- Lernen & Quiz: 24 Fragen (zufällig 10), Fortschritt, Tage in Folge, Abzeichen
+- Anfänger-Modus (langsamer, liest jeden Schritt vor) und Spiritueller Modus (innere Bedeutung jedes Schritts, Atem-Dhikr im Tasbīḥ)
+- Drei Moschee-Stile: Klassisch, Osmanisch, Andalusisch (freie Gestaltungen, keine Nachbauten)
+- Handy-Version: Figur oben, Bedienung unten, Qibla-Kompass über den Handy-Sensor, installierbar und offline nutzbar
+
+## Lokal testen (ohne Headset)
+```bash
+python3 -m http.server 8080
+```
+Dann http://localhost:8080 öffnen. Maus ziehen = umsehen, Klick = Button, ← / → = Schritte.
+Handy-Ansicht am Computer testen: http://localhost:8080/?mobile (oder das Browserfenster schmal machen).
+
+Für VR-Simulation im Browser: Chrome-Erweiterung **Immersive Web Emulator** (von Meta) installieren.
+
+## Auf die Meta Quest bringen
+WebXR braucht HTTPS. Am einfachsten:
+1. Ordner auf **GitHub Pages**, **Netlify** oder **Vercel** hochladen (kostenlos).
+2. Die URL im **Meta Quest Browser** öffnen → „ENTER VR“.
+3. Optional: Als PWA installieren oder später mit **Bubblewrap** als echte Quest-App (APK) für den Meta Horizon Store verpacken.
+
+## Als Handy-App (iOS / Android)
+- **Sofort:** Seite auf dem Handy öffnen → „Zum Home-Bildschirm“ (iOS: Teilen-Menü, Android: Menü → „App installieren“). Dann startet sie wie eine App, auch offline.
+- **Für App Store / Google Play:** Mit [Capacitor](https://capacitorjs.com) verpacken (`npm i @capacitor/core @capacitor/cli`, `npx cap init`, `npx cap add ios` / `android`). Für iOS braucht man Xcode und ein Apple-Developer-Konto (99 $/Jahr), für Android Android Studio und ein Google-Play-Konto (einmalig 25 $).
+
+## Dateien
+- `src/prayer.js` – Gebete, Texte, Rechtsschulen, Unterschiede Frauen/Männer, Schrittfolge
+- `src/wudu.js` – Gebetswaschung und Körper-Piktogramm
+- `src/learn.js` – Quiz, Fortschritt, Abzeichen
+- `src/spirit.js` – Spiritueller Modus (innere Bedeutung, Atem-Rhythmus)
+- `src/mobile.js` – Handy-Oberfläche und Kompass
+- `src/figure.js` – Vorbeter-Figur und Haltungen
+- `src/panel.js` – Bedienpanel, Bodentafel und Bewegungs-Einblendung
+- `src/movement.js` – Bewegungsansagen, Piktogramme, Haltungserkennung
+- `src/environment.js` – Gebetsraum in drei Stilen
+- `src/qibla.js` – Qibla-Berechnung und Städte
+- `src/prayertimes.js` – Gebetszeiten-Berechnung
+- `src/main.js` – Szene, Eingabe (Maus, Touch, Controller, Hand-Tracking), Zustand
+- `manifest.webmanifest`, `sw.js`, `icons/` – installierbare App (PWA), offline
+
+## Hinweis
+Lernhilfe nach verbreiteter sunnitischer Praxis. Die Unterschiede der Rechtsschulen und zwischen Frauen und Männern sind vereinfacht dargestellt. Vor einer Veröffentlichung sollten ein Imam oder Gelehrte die Inhalte prüfen.
