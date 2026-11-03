@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
+import { ARButton } from 'three/addons/webxr/ARButton.js';
+import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 import { STYLES, buildEnvironment, clearEnvironment, makeFloorCompass, makeRug } from './environment.js';
 import { Guide } from './figure.js';
@@ -11,6 +13,7 @@ import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
 import { MobileUI } from './mobile.js';
+import { checkHands, indexRaised, readHand } from './hands.js';
 import { CITIES, qiblaBearing } from './qibla.js';
 import { ASR, METHODS, TIME_NAMES, formatCountdown, formatTime, prayerStatus } from './prayertimes.js';
 
@@ -24,16 +27,24 @@ const store = {
 };
 
 // --- Renderer, Szene, Kamera ---
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// alpha: In Mixed Reality scheint das echte Zimmer (Passthrough) durch.
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType('local-floor');
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
+// Mixed Reality: Gebetsplatz im eigenen Zimmer, mit Handerkennung
+document.body.appendChild(ARButton.createButton(renderer, { optionalFeatures: ['local-floor', 'hand-tracking'] }));
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1a1410);
+const ROOM_BG = new THREE.Color(0x1a1410);
+scene.background = ROOM_BG;
+// Licht für Mixed Reality, wenn der Moscheeraum (mit seinen Lampen) ausgeblendet ist
+const arLight = new THREE.HemisphereLight(0xfff6e8, 0x8a7a66, 2.4);
+arLight.visible = false;
+scene.add(arLight);
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 60);
 camera.position.set(0, 1.6, 0);
 
@@ -87,6 +98,10 @@ const state = {
   autoT: 0,
   location: store.get('location', CITIES[0]),
   northYaw: store.get('northYaw', null),
+  // Alternative zur Nord-Kalibrierung: Blickrichtung zur Qibla direkt festgelegt
+  qiblaYaw: store.get('qiblaYaw', null),
+  ar: false,
+  placePending: false,
   msg: '',
   tasbih: { phase: 0, count: 0 },
   method: store.get('method', 'mwl'),
@@ -100,11 +115,13 @@ const state = {
   progress: { ...emptyProgress(), ...store.get('progress', {}) },
   quiz: null,
   // Haltungserkennung in VR: Stehhöhe des Kopfes, erkannte Haltung, wie lange schon gehalten
-  posture: { standH: null, ok: false, held: 0, cueT: 0 },
+  // dazu in Mixed Reality/VR mit Hand-Erkennung: Hinweis zur Handhaltung und erhobener Zeigefinger
+  posture: { standH: null, ok: false, held: 0, cueT: 0, handHint: null, finger: false },
 };
 
 const madhab = () => MADHABS.find((m) => m.id === state.madhab) || MADHABS[0];
 const bearing = () => qiblaBearing(state.location.lat, state.location.lon);
+const isCalibrated = () => state.northYaw != null || state.qiblaYaw != null;
 // Der eigene Standort heißt in jeder Sprache anders (ältere Speicherstände kennen nur den deutschen Namen).
 const isGps = () => !!state.location.gps || state.location.name === 'Mein Standort';
 const locationName = () => (isGps() ? t('ui.myLocation') : state.location.name);
@@ -129,7 +146,7 @@ function timesInfo() {
 
 function applyQibla() {
   const b = THREE.MathUtils.degToRad(bearing());
-  world.rotation.y = state.northYaw == null ? 0 : state.northYaw - b;
+  world.rotation.y = state.qiblaYaw != null ? state.qiblaYaw : state.northYaw == null ? 0 : state.northYaw - b;
   compass.rotation.y = b;
   if (mobileUI) aimAtGuide();
 }
@@ -145,13 +162,15 @@ function currentYaw() {
 function view() {
   switch (state.view) {
     case 'qibla':
-      return { type: 'qibla', cities: CITIES, location: { ...state.location, gps: isGps() }, locationName: locationName(), bearing: bearing(), calibrated: state.northYaw != null, msg: state.msg };
+      return { type: 'qibla', cities: CITIES, location: { ...state.location, gps: isGps() }, locationName: locationName(), bearing: bearing(), calibrated: isCalibrated(), xr: renderer.xr.isPresenting, msg: state.msg };
     case 'step':
       return {
         type: 'step', prayer: state.prayer, step: state.steps[state.i], index: state.i, total: state.steps.length, auto: state.auto,
         prevPose: state.steps[state.i - 1]?.pose ?? null,
         inner: state.spiritual ? innerMeaning(state.steps[state.i]) : '',
         posture: state.steps[state.i].wudu ? 'wudu' : !renderer.xr.isPresenting ? 'off' : state.posture.ok ? 'ok' : 'wait',
+        handHint: renderer.xr.isPresenting ? state.posture.handHint : null,
+        finger: renderer.xr.isPresenting && state.posture.finger,
       };
     case 'mosque':
       return { type: 'mosque', styles: STYLES, style: state.style };
@@ -185,7 +204,7 @@ function view() {
         type: 'menu',
         prayers: PRAYERS,
         qibla: t('ui.qiblaLine', locationName(), Math.round(bearing())),
-        calibrated: state.northYaw != null,
+        calibrated: isCalibrated(),
         times: timesInfo(),
         madhab: madhab().name,
         wuduDone: state.progress.wudu > 0,
@@ -364,13 +383,31 @@ function act(action) {
     case 'gps': locate(); break;
     case 'calibrate':
       state.northYaw = currentYaw();
+      state.qiblaYaw = null;
       store.set('northYaw', state.northYaw);
+      store.set('qiblaYaw', null);
       state.msg = t('ui.calDone');
       applyQibla();
       break;
+    case 'qiblahere':
+      // Blickrichtung ist die Qibla (z. B. vorher mit dem Handy-Kompass bestimmt); der Teppich kommt unter die Füße
+      state.qiblaYaw = currentYaw();
+      state.northYaw = null;
+      store.set('qiblaYaw', state.qiblaYaw);
+      store.set('northYaw', null);
+      if (renderer.xr.isPresenting) placeHere();
+      state.msg = t('ui.qiblaHereDone');
+      applyQibla();
+      break;
+    case 'placehere':
+      placeHere();
+      state.msg = t('ui.placeDone');
+      break;
     case 'resetcal':
       state.northYaw = null;
+      state.qiblaYaw = null;
       store.set('northYaw', null);
+      store.set('qiblaYaw', null);
       state.msg = t('ui.calReset');
       applyQibla();
       break;
@@ -468,8 +505,48 @@ function aim(c) {
 }
 
 // Beim Betreten/Verlassen von VR ändert sich, ob die Haltung erkannt werden kann.
-renderer.xr.addEventListener('sessionstart', () => { state.posture.standH = null; refresh(); });
-renderer.xr.addEventListener('sessionend', () => refresh());
+// Hände: Modell in VR, in Mixed Reality sieht man die echten Hände
+const handModels = new XRHandModelFactory();
+const hands = { left: null, right: null };
+for (let i = 0; i < 2; i++) {
+  const hand = renderer.xr.getHand(i);
+  const model = handModels.createHandModel(hand, 'mesh');
+  hand.add(model);
+  hand.userData.model = model;
+  hand.addEventListener('connected', (e) => { if (e.data.hand) hands[e.data.handedness] = hand; });
+  hand.addEventListener('disconnected', () => { for (const k of ['left', 'right']) if (hands[k] === hand) hands[k] = null; });
+  scene.add(hand);
+}
+
+// Mixed Reality: Moscheeraum ausblenden, das echte Zimmer scheint durch; der Gebetsplatz kommt unter die Füße.
+function setAR(on) {
+  state.ar = on;
+  env.visible = !on;
+  scene.background = on ? null : ROOM_BG;
+  arLight.visible = on;
+  for (let i = 0; i < 2; i++) renderer.xr.getHand(i).userData.model.visible = !on;
+  if (!on) world.position.set(0, 0, 0);
+}
+
+// Gebetsplatz (Ursprung des Raums, dort steht man auf dem Teppich) an die aktuelle Kopfposition legen.
+function placeHere() {
+  readHead();
+  world.position.set(headPos.x, 0, headPos.z);
+}
+
+renderer.xr.addEventListener('sessionstart', () => {
+  state.posture.standH = null;
+  const mode = renderer.xr.getSession()?.environmentBlendMode;
+  setAR(!!mode && mode !== 'opaque');
+  // Kopfposition gibt es erst im ersten Frame
+  state.placePending = state.ar;
+  refresh();
+});
+renderer.xr.addEventListener('sessionend', () => {
+  setAR(false);
+  applyQibla();
+  refresh();
+});
 
 // Handy (schmaler Bildschirm, nicht der Quest-Browser): HTML-Bedienung unten, Figur oben. ?mobile / ?desktop erzwingen.
 const params = new URLSearchParams(location.search);
@@ -526,12 +603,20 @@ function updatePosture(dt) {
   const head = readHead();
   if (head.height > (p.standH ?? 0) && head.height < 2.1) p.standH = Math.max(head.height, 1.1);
   const body = classifyHead(head.height, p.standH ?? 1.6, head.pitch);
-  const match = matchesPose(step.pose, body, head.yawRel);
+  const headOk = matchesPose(step.pose, body, head.yawRel);
+  // Mit Hand-Erkennung zählt auch die Handhaltung; mit Controllern nur der Kopf.
+  const hc = checkHands(step.pose, { left: readHand(hands.left), right: readHand(hands.right) }, headPos, p.standH ?? 1.6);
+  const match = headOk && hc.ok !== false;
+  const hint = headOk ? hc.hint : null;
+  const { key: kind } = step;
+  const finger = kind === 'tashahhud' && indexRaised(readHand(hands.right));
   p.held = match ? p.held + dt : 0;
   const ok = p.held > 0.4;
-  if (ok !== p.ok) {
+  if (ok !== p.ok || hint !== p.handHint || finger !== p.finger) {
+    if (ok && !p.ok) pulse();
     p.ok = ok;
-    if (ok) pulse();
+    p.handHint = hint;
+    p.finger = finger;
     refresh();
   }
 }
@@ -558,6 +643,15 @@ const clock = new THREE.Clock();
 let lastMinute = Math.floor(Date.now() / 60000);
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.1);
+  if (state.placePending && renderer.xr.isPresenting) {
+    // Mixed Reality gestartet: Gebetsplatz hierher; ohne Kalibrierung zeigt die Qibla erst einmal nach vorn
+    state.placePending = false;
+    placeHere();
+    if (!isCalibrated()) world.rotation.y = currentYaw();
+    state.view = 'qibla';
+    state.msg = t('ui.arWelcome');
+    refresh();
+  }
   if (renderer.xr.isPresenting) {
     let hover = null;
     for (const c of controllers) {
@@ -604,7 +698,7 @@ renderer.setAnimationLoop(() => {
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
-if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, camera, state, panel, card, world };
+if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, camera, state, panel, card, world, setAR, view };
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);

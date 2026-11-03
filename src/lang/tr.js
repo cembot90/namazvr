@@ -274,6 +274,10 @@ export default {
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (yaklaşık)', isna: 'ISNA (Kuzey Amerika)', egypt: 'Mısır', makkah: 'Ümmü\'l-Kurâ (Mekke)' },
   asrName: { standard: 'Standart (Şâfiî, Mâlikî, Hanbelî)', hanafi: 'Hanefî' },
 
+  hands: {
+    raise: 'Ellerini kulak veya omuz hizasına kaldır', fold: 'Ellerini bağla', dua: 'Ellerini göğüs hizasında duaya kaldır',
+    knees: 'Ellerini dizlerine koy', floor: 'Avuçlarını yere koy', thighs: 'Ellerini uyluklarının üzerine koy', finger: '✓ Şehadet parmağı kalktı',
+  },
   ui: {
     sub: 'Namaz rehberi',
     choose: 'Bir namaz seç – sana adım adım yol göstereyim.',
@@ -294,7 +298,9 @@ export default {
     hours: (h, m) => `${h} sa. ${m} dk.`, minutes: (m) => `${m} dk.`,
     qiblaTitle: 'Kıble yönü', qiblaMobileTitle: 'Kıble ve pusula',
     qiblaHelp1: 'Quest\'te pusula yok. Odayı Mekke\'ye şöyle yönlendirirsin:',
-    qiblaHelp2: '1. Yerini seç.   2. Tam kuzeye bak (örneğin telefonundaki pusula uygulamasıyla) ve „Kuzeye bakıyorum“ düğmesine bas. Sonra mihrap kıbleyi gösterir.',
+    qiblaHelp2: '1. Yerini seç.   2. Tam kuzeye bak (örneğin telefonundaki pusula uygulamasıyla) ve „Kuzeye bakıyorum“ düğmesine bas – ya da doğrudan kıbleye bak ve „Kıble burası“ düğmesine bas.',
+    qiblaHere: 'Kıble burası', qiblaHereDone: 'Kıble ayarlandı – mihrap artık baktığın yönü gösteriyor.', placeHere: 'Seccade buraya', placeDone: 'Namaz yeri artık ayaklarının altında.',
+    arWelcome: 'Karma gerçeklik: Namaz kılacağın yere geç, kıbleye bak (örneğin telefon sürümünün pusulasıyla bul) ve „Kıble burası“ düğmesine bas.',
     placeLine: (loc, deg) => `Yer: ${loc}  ·  Kıble kuzeyden ${deg}°`,
     statusCal: 'Durum: ayarlandı ✓', statusNotCal: 'Durum: ayarlanmadı',
     lookNorth: 'Kuzeye bakıyorum', reset: 'Sıfırla', myLocation: 'Konumum',
@@ -343,6 +349,6 @@ export default {
       'Sorularında güvendiğin bir imama ya da bilgili bir kişiye danış. İmam figürü bilerek yüzsüz tasarlanmıştır.',
     ],
     cardIdle: 'Panelden bir namaz seç',
-    hint: '<b>Gözlüksüz:</b> Fareyi sürükle = etrafa bak · Tıkla = düğme · ← / → = adımlar · M = menü<br><b>Meta Quest ile:</b> Sayfayı Quest tarayıcısında aç → „ENTER VR“ · Tetik veya çimdik = seç',
+    hint: '<b>Gözlüksüz:</b> Fareyi sürükle = etrafa bak · Tıkla = düğme · ← / → = adımlar · M = menü<br><b>Meta Quest ile:</b> Sayfayı Quest tarayıcısında aç → „ENTER VR“ (cami) veya „START AR“ (kendi odanda karma gerçeklik) · Tetik veya çimdik = seç',
   },
 };

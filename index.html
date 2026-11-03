@@ -22,10 +22,13 @@
     }
     #hint b { color: #e6c77f; }
     #ui { display: none; }
+    /* VR- und Mixed-Reality-Knopf nebeneinander */
+    #VRButton { left: auto !important; right: 206px; width: 170px !important; }
+    #ARButton { left: auto !important; right: 20px; width: 170px !important; }
 
     /* Handy: oben die 3D-Szene mit der Figur, darunter die Bedienung */
     body.mobile { overflow: hidden; }
-    body.mobile #hint, body.mobile #VRButton { display: none !important; }
+    body.mobile #hint, body.mobile #VRButton, body.mobile #ARButton { display: none !important; }
     body.mobile canvas:first-of-type { display: block; }
     body.mobile #ui {
       --gold: #e6c77f; --muted: #9fb0c6; --btn: #1d2b45; --line: rgba(201,168,92,.35);
@@ -112,7 +115,6 @@
     html[dir="rtl"] #ui .list button { align-items: flex-start; text-align: right; }
     html[dir="rtl"] #ui .row { text-align: right; }
     html[dir="rtl"] #ui .notes { padding-left: 0; padding-right: 18px; }
-    html[dir="rtl"] #hint { left: auto; right: 16px; }
     @keyframes grow { from { transform: scale(.6); } to { transform: scale(1.4); } }
     @keyframes shrink { from { transform: scale(1.4); } to { transform: scale(.6); } }
   </style>

@@ -236,11 +236,14 @@ export class Panel extends CanvasPlane {
     this.btn('📍 GPS', 60 + 4 * (w + gap), y + h + gap, w, h, 'gps', { size: 28, active: !!v.location.gps });
     y += 2 * (h + gap) + 20;
     this.text(v.calibrated ? t('ui.statusCal') : t('ui.statusNotCal'), 60, y + 20, { size: 28, color: v.calibrated ? '#7fd1a8' : C.muted });
-    if (v.msg) this.text(v.msg, 60, y + 64, { size: 28, color: C.gold });
+    if (v.msg) this.paragraphs([v.msg], y + 62, { size: 26, color: C.gold, gap: 0 });
+    // Qibla über Norden oder direkt über die Blickrichtung; in VR/Mixed Reality auch den Teppich hierher legen
     const by = H - 140;
-    this.btn(t('ui.lookNorth'), 60, by, 560, 96, 'calibrate', { primary: true });
-    this.btn(t('ui.reset'), 640, by, 300, 96, 'resetcal');
-    this.btn(t('ui.back'), 960, by, W - 1020, 96, 'menu');
+    if (v.xr) this.btn(t('ui.placeHere'), 60, by - 112, 400, 92, 'placehere', { size: 28 });
+    this.btn(t('ui.lookNorth'), 60, by, 400, 96, 'calibrate', { size: 28 });
+    this.btn(t('ui.qiblaHere'), 480, by, 400, 96, 'qiblahere', { primary: true, size: 28 });
+    this.btn(t('ui.reset'), 900, by, 220, 96, 'resetcal', { size: 28 });
+    this.btn(t('ui.back'), 1140, by, W - 1200, 96, 'menu', { size: 28 });
   }
 
   v_step(v) {
@@ -296,8 +299,8 @@ export class Panel extends CanvasPlane {
       y += 36;
     }
     const status = {
-      ok: [t('ui.postureOk'), '#7fd1a8'],
-      wait: [t('ui.postureWait'), C.gold],
+      ok: [v.finger ? t('hands.finger') : t('ui.postureOk'), '#7fd1a8'],
+      wait: [v.handHint ? t(`hands.${v.handHint}`) : t('ui.postureWait'), C.gold],
       off: [t('ui.postureOff'), C.muted],
       wudu: [t('wudu.stepOf', v.index + 1, v.total), C.muted],
     }[v.posture] || ['', C.muted];

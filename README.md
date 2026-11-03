@@ -10,6 +10,8 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Bodentafel vor dem Gebetsteppich – lesbar in Rukūʿ und Sujūd
 - Bewegungsanzeige: Piktogramm mit Pfeil und Ansage („Verbeugen“, „Niederwerfen“, „Aufsetzen“ …) im Panel, auf der Bodentafel und als kurze Einblendung vor dem Blick
 - Haltungserkennung in VR über Kopfhöhe und Blickneigung (Stehen, Rukūʿ, Sujūd, Sitzen, Kopfdrehung beim Taslīm) – mit Vibration, wenn die Haltung erreicht ist; der Auto-Modus wartet, bis du die Haltung eingenommen hast
+- Mixed Reality („START AR“ auf der Quest): Gebetsteppich, Vorbeter und Tafel im eigenen Zimmer, der Moscheeraum wird ausgeblendet; Qibla per „Hier ist die Qibla“ (Blickrichtung) oder Nord-Kalibrierung, „Teppich hierher“ legt den Platz unter die Füße
+- Handerkennung (ohne Controller): prüft Hände beim Takbīr, übereinandergelegt, auf den Knien, auf dem Boden, auf den Oberschenkeln und beim Bittgebet, mit Hinweis, was noch fehlt; erkennt den erhobenen Zeigefinger im Tashahhud
 - Auto-Modus (schaltet automatisch weiter) und Vorlesen (Sprachausgabe)
 - Qibla: Stadt oder GPS wählen, nach Norden schauen, kalibrieren → der Mihrab zeigt nach Mekka
 - Tasbīḥ-Zähler (33 / 33 / 34)
@@ -46,6 +48,7 @@ WebXR braucht HTTPS. Am einfachsten:
 - `src/i18n.js` – Sprachwahl und Textzugriff `t()`
 - `src/lang/de.js`, `tr.js`, `en.js`, `ar.js` – alle Texte je Sprache (Oberfläche, Anleitungen, Bedeutungen, Quiz)
 - `src/prayer.js` – Gebete, arabische Texte, Rechtsschulen, Unterschiede Frauen/Männer, Schrittfolge
+- `src/hands.js` – Handhaltung aus der Hand-Erkennung
 - `src/wudu.js` – Gebetswaschung und Körper-Piktogramm
 - `src/learn.js` – Quiz, Fortschritt, Abzeichen
 - `src/spirit.js` – Spiritueller Modus (innere Bedeutung, Atem-Rhythmus)

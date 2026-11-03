@@ -247,6 +247,10 @@ export default {
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (approximation)', isna: 'ISNA (North America)', egypt: 'Egypt', makkah: 'Umm al-Qura (Mecca)' },
   asrName: { standard: 'Standard (Shāfiʿī, Mālikī, Ḥanbalī)', hanafi: 'Ḥanafī' },
 
+  hands: {
+    raise: 'Raise your hands to ear or shoulder level', fold: 'Fold your hands', dua: 'Raise your hands in front of your chest',
+    knees: 'Place your hands on your knees', floor: 'Place your palms on the floor', thighs: 'Place your hands on your thighs', finger: '✓ Index finger raised',
+  },
   ui: {
     sub: 'Prayer guide',
     choose: 'Choose a prayer – I will guide you through it step by step.',
@@ -267,7 +271,9 @@ export default {
     hours: (h, m) => `${h} h ${m} min`, minutes: (m) => `${m} min`,
     qiblaTitle: 'Qibla direction', qiblaMobileTitle: 'Qibla & compass',
     qiblaHelp1: 'The Quest has no compass. This is how you align the room with Mecca:',
-    qiblaHelp2: '1. Choose your location.   2. Face exactly north (e.g. with your phone’s compass app) and press “I am facing north”. The mihrab will then show the qibla.',
+    qiblaHelp2: '1. Choose your location.   2. Face exactly north (e.g. with your phone’s compass app) and press “I am facing north” – or face the qibla directly and press “The qibla is here”.',
+    qiblaHere: 'The qibla is here', qiblaHereDone: 'Qibla set – the mihrab now points where you are looking.', placeHere: 'Rug here', placeDone: 'Your prayer place is now under your feet.',
+    arWelcome: 'Mixed reality: stand on your prayer spot, face the qibla (e.g. found with the compass in the phone version) and press “The qibla is here”.',
     placeLine: (loc, deg) => `Location: ${loc}  ·  Qibla ${deg}° from north`,
     statusCal: 'Status: calibrated ✓', statusNotCal: 'Status: not calibrated',
     lookNorth: 'I am facing north', reset: 'Reset', myLocation: 'My location',
@@ -316,6 +322,6 @@ export default {
       'If you have questions, ask an imam or a knowledgeable person you trust. The prayer leader figure is deliberately designed without a face.',
     ],
     cardIdle: 'Choose a prayer on the panel',
-    hint: '<b>Without headset:</b> drag mouse = look around · click = button · ← / → = steps · M = menu<br><b>With Meta Quest:</b> open the page in the Quest browser → “ENTER VR” · trigger or pinch = select',
+    hint: '<b>Without headset:</b> drag mouse = look around · click = button · ← / → = steps · M = menu<br><b>With Meta Quest:</b> open the page in the Quest browser → “ENTER VR” (mosque) or “START AR” (mixed reality in your own room) · trigger or pinch = select',
   },
 };

@@ -255,6 +255,10 @@ export default {
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (Näherung)', isna: 'ISNA (Nordamerika)', egypt: 'Ägypten', makkah: 'Umm al-Qura (Mekka)' },
   asrName: { standard: 'Standard (Shāfiʿī, Mālikī, Ḥanbalī)', hanafi: 'Ḥanafī' },
 
+  hands: {
+    raise: 'Hebe die Hände bis auf Ohren- bzw. Schulterhöhe', fold: 'Lege die Hände übereinander', dua: 'Hebe die Hände vor die Brust',
+    knees: 'Lege die Hände auf die Knie', floor: 'Lege die Handflächen auf den Boden', thighs: 'Lege die Hände auf die Oberschenkel', finger: '✓ Zeigefinger erhoben',
+  },
   // Oberfläche
   ui: {
     sub: 'Gebetsassistent',
@@ -276,7 +280,9 @@ export default {
     hours: (h, m) => `${h} Std. ${m} Min.`, minutes: (m) => `${m} Min.`,
     qiblaTitle: 'Qibla-Richtung', qiblaMobileTitle: 'Qibla & Kompass',
     qiblaHelp1: 'Die Quest hat keinen Kompass. So richtest du den Raum nach Mekka aus:',
-    qiblaHelp2: '1. Wähle deinen Ort.   2. Schau genau nach Norden (z. B. mit der Kompass-App deines Handys) und drücke „Ich schaue nach Norden“. Danach zeigt der Mihrab die Qibla.',
+    qiblaHelp2: '1. Wähle deinen Ort.   2. Schau genau nach Norden (z. B. mit der Kompass-App deines Handys) und drücke „Ich schaue nach Norden“ – oder schau direkt zur Qibla und drücke „Hier ist die Qibla“.',
+    qiblaHere: 'Hier ist die Qibla', qiblaHereDone: 'Qibla festgelegt – der Mihrab zeigt jetzt in deine Blickrichtung.', placeHere: 'Teppich hierher', placeDone: 'Der Gebetsplatz liegt jetzt unter deinen Füßen.',
+    arWelcome: 'Mixed Reality: Stell dich auf deinen Gebetsplatz, schau zur Qibla (z. B. mit dem Kompass der Handy-Version bestimmt) und drücke „Hier ist die Qibla“.',
     placeLine: (loc, deg) => `Ort: ${loc}  ·  Qibla ${deg}° von Norden`,
     statusCal: 'Status: kalibriert ✓', statusNotCal: 'Status: nicht kalibriert',
     lookNorth: 'Ich schaue nach Norden', reset: 'Zurücksetzen', myLocation: 'Mein Standort',
@@ -325,6 +331,6 @@ export default {
       'Bei Fragen wende dich an einen Imam oder eine kundige Person deines Vertrauens. Die Vorbeter-Figur ist bewusst gesichtslos gestaltet.',
     ],
     cardIdle: 'Wähle am Panel ein Gebet',
-    hint: '<b>Ohne Headset:</b> Maus ziehen = umsehen · Klick = Button · ← / → = Schritte · M = Menü<br><b>Mit Meta Quest:</b> Seite im Quest-Browser öffnen → „ENTER VR“ · Trigger oder Pinch = auswählen',
+    hint: '<b>Ohne Headset:</b> Maus ziehen = umsehen · Klick = Button · ← / → = Schritte · M = Menü<br><b>Mit Meta Quest:</b> Seite im Quest-Browser öffnen → „ENTER VR“ (Moschee) oder „START AR“ (Mixed Reality im eigenen Zimmer) · Trigger oder Pinch = auswählen',
   },
 };
