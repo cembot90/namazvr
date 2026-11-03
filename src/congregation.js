@@ -16,6 +16,51 @@ const pick = (list) => list[Math.floor(Math.random() * list.length)];
 // Was der Nachzügler nach dem Salām des Imams allein nachholt: eine Rakʿa bis zum eigenen Salām (Sekunden ab Salām).
 const MAKEUP = [[1.5, 'stand'], [2.5, 'qiyam'], [10, 'ruku'], [13, 'stand'], [15, 'sujud'], [18, 'sit'], [20, 'sujud'], [23, 'sit'], [33, 'taslimR'], [34.5, 'taslimL'], [36, 'sit']];
 
+// Holzgitterwand zwischen Männer- und Frauenbereich
+const SCREEN_Z = -2.5, SCREEN_H = 2.3;
+let latticeMap = null;
+function latticeScreen(width, z) {
+  if (!latticeMap) {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#6b4426';
+    ctx.fillRect(0, 0, 128, 128);
+    ctx.strokeStyle = '#8a5a34';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, 124, 124);
+    // Achtzackige Öffnungen im Raster ausstanzen
+    ctx.globalCompositeOperation = 'destination-out';
+    for (const [cx, cy, r] of [[32, 32, 20], [96, 32, 20], [32, 96, 20], [96, 96, 20], [64, 64, 9], [0, 64, 9], [128, 64, 9], [64, 0, 9], [64, 128, 9]]) {
+      for (const a of [0, Math.PI / 4]) {
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(a); ctx.fillRect(-r * 0.7, -r * 0.7, r * 1.4, r * 1.4); ctx.restore();
+      }
+    }
+    latticeMap = new THREE.CanvasTexture(c);
+    latticeMap.colorSpace = THREE.SRGBColorSpace;
+    latticeMap.wrapS = latticeMap.wrapT = THREE.RepeatWrapping;
+  }
+  const g = new THREE.Group();
+  const map = latticeMap.clone();
+  map.needsUpdate = true;
+  map.repeat.set(width / 0.5, SCREEN_H / 0.5);
+  const panel = new THREE.Mesh(
+    new THREE.PlaneGeometry(width, SCREEN_H),
+    new THREE.MeshStandardMaterial({ map, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.8 }),
+  );
+  panel.position.set(0, SCREEN_H / 2, z);
+  const wood = new THREE.MeshStandardMaterial({ color: 0x4e3019, roughness: 0.8 });
+  const rail = new THREE.Mesh(new THREE.BoxGeometry(width + 0.1, 0.1, 0.08), wood);
+  rail.position.set(0, SCREEN_H, z);
+  g.add(panel, rail);
+  for (let x = -width / 2; x <= width / 2 + 1e-6; x += width / Math.round(width / 2)) {
+    const post = new THREE.Mesh(new THREE.BoxGeometry(0.08, SCREEN_H, 0.1), wood);
+    post.position.set(x, SCREEN_H / 2, z);
+    g.add(post);
+  }
+  return g;
+}
+
 export class Congregation {
   constructor() {
     this.group = new THREE.Group();
@@ -38,12 +83,14 @@ export class Congregation {
     const side = large ? 7 : 3;
     for (let k = 1; k <= side; k++) for (const s of [-1, 1]) if (!blocked(s * k * SLOT, 0)) this.add({ x: s * k * SLOT, z: 0, female });
     (large ? [14, 13, 12] : [6]).forEach((n, r) => this.addRow(n, (r + 1) * ROW, female));
-    // Betet der Nutzer als Frau, stehen die Männerreihen davor; vor dem Nutzer bleibt Platz für die Tafel.
+    // Betet der Nutzer als Frau: eigener Frauenbereich hinter einer Holzgitterwand (Kafes),
+    // die Männer beten davor; durch das Gitter sieht man den Imam und kann ihm folgen.
     let imamZ = -2.1;
     if (female) {
       const rows = large ? [15, 15] : [7];
-      rows.forEach((n, r) => this.addRow(n, -1.9 - r * ROW, false, r === 0 ? [-1.7, 0.5] : null));
-      imamZ = -1.9 - rows.length * ROW;
+      rows.forEach((n, r) => this.addRow(n, -3.6 - r * ROW, false));
+      imamZ = -3.6 - rows.length * ROW;
+      this.group.add(latticeScreen(large ? 16 : 9, SCREEN_Z));
     }
     this.imam = this.add({ x: 0.25, z: imamZ, female: false, imam: true });
     // Ein Nachzügler (Masbūq) kommt in der zweiten Rakʿa dazu und holt die verpasste Rakʿa nach dem Salām nach.

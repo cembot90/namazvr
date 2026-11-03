@@ -23,7 +23,7 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Lernen & Quiz: 24 Fragen (zufällig 10), Fortschritt, Tage in Folge, Abzeichen
 - Anfänger-Modus (langsamer, liest jeden Schritt vor) und Spiritueller Modus (innere Bedeutung jedes Schritts, Atem-Dhikr im Tasbīḥ)
 - Vier große Moscheen (26–60 m): Klassisch, Osmanisch, Andalusisch und Großmoschee mit Nebenkuppeln, Emporen und Buntglas; jede mit Minbar; nachts dunkle Fenster und hellere Lampen (freie Gestaltungen, keine Nachbauten)
-- Cemaat (Gemeinschaftsgebet): Imam vorn, Gemeinde in Reihen (klein oder groß wie am Freitag); im natürlichen Takt folgt jeder mit eigener Verzögerung, eigenem Tempo und kleinen Abweichungen, ein Nachzügler kommt in der zweiten Rakʿa und holt sie nach dem Salām nach; danach Bittgebet im Sitzen; der Imam spricht Takbīr, „Samiʿa llāhu…“ und Salām (wenn das Gerät eine arabische Stimme hat); Frauenreihen hinter den Männern
+- Cemaat (Gemeinschaftsgebet): Imam vorn, Gemeinde in Reihen (klein oder groß wie am Freitag); im natürlichen Takt folgt jeder mit eigener Verzögerung, eigenem Tempo und kleinen Abweichungen, ein Nachzügler kommt in der zweiten Rakʿa und holt sie nach dem Salām nach; danach Bittgebet im Sitzen; der Imam spricht Takbīr, „Samiʿa llāhu…“ und Salām (wenn das Gerät eine arabische Stimme hat); als Frau betest du im eigenen Frauenbereich hinter einer Holzgitterwand (Kafes), die Männer beten davor, nie gemischt
 - Durch die Moschee gehen: W A S D am Computer, Stick auf der Quest
 - Handy-Version: Figur oben, Bedienung unten, Qibla-Kompass über den Handy-Sensor, installierbar und offline nutzbar
 
