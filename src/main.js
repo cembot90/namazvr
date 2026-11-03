@@ -13,6 +13,7 @@ import { LANGS, deviceLang, getLang, isRTL, langInfo, setLang, t } from './i18n.
 import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
+import { CALM_BREATHS, PEACE, kidLine } from './peace.js';
 import { MobileUI } from './mobile.js';
 import { checkHands, indexRaised, readHand } from './hands.js';
 import { CITIES, qiblaBearing } from './qibla.js';
@@ -115,6 +116,10 @@ const state = {
   gender: store.get('gender', 'm'),
   beginner: store.get('beginner', false),
   spiritual: store.get('spiritual', false),
+  // Kinder-Modus: einfache Erklärung je Schritt, langsamer, Sterne als Belohnung
+  kids: store.get('kids', false),
+  peace: 0,
+  calm: { count: 0 },
   style: store.get('style', 'klassisch'),
   night: false,
   // Cemaat: Gemeinschaftsgebet mit Imam; Größe der Gemeinde; natürlicher Takt oder Gleichtakt
@@ -208,7 +213,7 @@ function view() {
       return {
         type: 'step', prayer: state.prayer, step: state.steps[state.i], index: state.i, total: state.steps.length, auto: state.auto,
         prevPose: state.steps[state.i - 1]?.pose ?? null,
-        inner: state.spiritual ? innerMeaning(state.steps[state.i]) : '',
+        inner: state.kids ? kidLine(state.steps[state.i]) : state.spiritual ? innerMeaning(state.steps[state.i]) : '',
         posture: state.steps[state.i].wudu ? 'wudu' : !renderer.xr.isPresenting ? 'off' : state.posture.ok ? 'ok' : 'wait',
         handHint: renderer.xr.isPresenting ? state.posture.handHint : null,
         finger: renderer.xr.isPresenting && state.posture.finger,
@@ -230,7 +235,11 @@ function view() {
     case 'quiz':
       return { type: 'quiz', quiz: state.quiz, progress: state.progress };
     case 'done':
-      return { type: 'done', prayer: state.prayer };
+      return { type: 'done', prayer: state.prayer, kids: state.kids, stars: state.progress.stars || 0 };
+    case 'peace':
+      return { type: 'peace', item: PEACE[state.peace], index: state.peace, total: PEACE.length };
+    case 'calm':
+      return { type: 'calm', count: state.calm.count, total: CALM_BREATHS, breathPhase: state.breath.phase, finished: state.calm.count >= CALM_BREATHS };
     case 'tasbih': {
       const { phase, count } = state.tasbih;
       const finished = phase >= TASBIH.length;
@@ -249,6 +258,7 @@ function view() {
         times: timesInfo(),
         madhab: madhab().name,
         wuduDone: state.progress.wudu > 0,
+        kids: state.kids,
       };
   }
 }
@@ -394,6 +404,11 @@ function act(action) {
     case 'spiritual': state.spiritual = !state.spiritual; store.set('spiritual', state.spiritual); break;
     case 'breath': state.breath = { on: !state.breath.on, t: 0, phase: 'in' }; break;
     case 'beginner': state.beginner = !state.beginner; store.set('beginner', state.beginner); break;
+    case 'kids': state.kids = !state.kids; store.set('kids', state.kids); break;
+    case 'peace': state.view = 'peace'; break;
+    case 'peacenext': state.peace = (state.peace + 1) % PEACE.length; break;
+    case 'peaceprev': state.peace = (state.peace + PEACE.length - 1) % PEACE.length; break;
+    case 'calm': state.view = 'calm'; state.calm = { count: 0 }; state.breath = { on: true, t: 0, phase: 'in' }; break;
     case 'learn': state.view = 'learn'; break;
     case 'quiz': state.quiz = newQuiz(); state.view = 'quiz'; break;
     case 'answer': {
@@ -423,6 +438,8 @@ function act(action) {
         state.auto = false;
         if (cong.group.visible) cong.finish();
         recordPractice(state.progress, state.prayer.id);
+        // Kinder bekommen für jedes geschaffte Gebet einen Stern
+        if (state.kids) state.progress.stars = (state.progress.stars || 0) + 1;
         store.set('progress', state.progress);
       }
       state.autoT = 0;
@@ -790,16 +807,21 @@ renderer.setAnimationLoop(() => {
   // Auto-Modus wartet in VR, bis die Haltung eingenommen ist; im Anfänger-Modus langsamer.
   if (state.view === 'step' && state.auto && (state.posture.ok || !renderer.xr.isPresenting || wudu)) {
     state.autoT += dt;
-    if (state.autoT >= state.steps[state.i].dur * (state.beginner ? 1.6 : 1)) act('next');
+    if (state.autoT >= state.steps[state.i].dur * (state.beginner || state.kids ? 1.6 : 1)) act('next');
   }
   // Atem-Dhikr: einatmen (Kugel wächst), ausatmen (schrumpft); nach jedem Atemzug +1.
   const br = state.breath;
-  const breathing = state.view === 'tasbih' && br.on && state.tasbih.phase < TASBIH.length;
+  const calming = state.view === 'calm' && state.calm.count < CALM_BREATHS;
+  const breathing = calming || (state.view === 'tasbih' && br.on && state.tasbih.phase < TASBIH.length);
   orb.visible = breathing;
   if (breathing) {
     br.t += dt;
     const cycle = BREATH.inhale + BREATH.exhale;
-    if (br.t >= cycle) { br.t -= cycle; br.phase = 'in'; act('count'); }
+    if (br.t >= cycle) {
+      br.t -= cycle;
+      br.phase = 'in';
+      if (calming) { state.calm.count++; refresh(); } else act('count');
+    }
     const phase = br.t < BREATH.inhale ? 'in' : 'out';
     if (phase !== br.phase) { br.phase = phase; refresh(); }
     const k = phase === 'in' ? br.t / BREATH.inhale : 1 - (br.t - BREATH.inhale) / BREATH.exhale;

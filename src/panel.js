@@ -184,8 +184,9 @@ export class Panel extends CanvasPlane {
     [
       [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
+      [[t('ui.menuPeace'), 'peace'], [t('ui.kidsBtn', v.kids), 'kids']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      this.btn(label, 60 + i * (bw + gap), 630 + ri * 115, bw, 98, action, { primary: action === 'wudu' && !v.wuduDone });
+      this.btn(label, 60 + i * (bw + gap), 612 + ri * 90, bw, 78, action, { primary: action === 'wudu' && !v.wuduDone, active: action === 'kids' && v.kids, size: 30 });
     }));
     this.text('السَّلَامُ عَلَيْكُمْ', W / 2, this.H - 60, { size: 44, font: AR, color: C.gold, align: 'center', rtl: true });
   }
@@ -320,9 +321,41 @@ export class Panel extends CanvasPlane {
     this.heading(t('ui.prayerDone'), v.prayer.name);
     this.recitation(taqabbal(), 230, 560, true);
     this.paragraphs([t('ui.afterPrayer')], 620, { size: 28, color: C.muted });
+    if (v.kids) this.text(t('ui.kidsStars', v.stars), W / 2, 740, { size: 34, weight: 700, color: C.gold, align: 'center' });
     const by = H - 140, gap = 20, w = (W - 120 - 2 * gap) / 3;
     this.btn(t('ui.tasbihCount'), 60, by, w, 96, 'tasbih', { primary: true });
     this.btn(t('ui.prayAgain'), 60 + w + gap, by, w, 96, 'again');
+    this.btn(t('ui.menu'), 60 + 2 * (w + gap), by, w, 96, 'menu');
+  }
+
+  // Frieden & gutes Herz: ein Vers bzw. Hadith mit arabischem Original, Übersetzung und Quelle
+  v_peace(v) {
+    const { W, H } = this;
+    this.heading(t('ui.peaceTitle'), `${v.index + 1} / ${v.total}`);
+    const y = this.paragraphs([t('peace.intro')], 150, { size: 24, color: C.muted, gap: 0 });
+    const end = this.recitation({ ar: [v.item.ar], tr: [], de: [v.item.text].filter(Boolean) }, y + 30, H - 240, true);
+    this.text(v.item.source, W / 2, end + 24, { size: 28, color: C.gold, align: 'center', weight: 600 });
+    const by = H - 140, gap = 20, w = (W - 120 - 3 * gap) / 4;
+    this.btn('←', 60, by, w, 96, 'peaceprev', { size: 44 });
+    this.btn('→', 60 + (w + gap), by, w, 96, 'peacenext', { size: 44, primary: true });
+    this.btn(t('ui.calm'), 60 + 2 * (w + gap), by, w, 96, 'calm', { size: 28 });
+    this.btn(t('ui.menu'), 60 + 3 * (w + gap), by, w, 96, 'menu', { size: 28 });
+  }
+
+  // Ruhig werden: Schritte gegen die Wut, dazu Atemzüge mit der Kugel
+  v_calm(v) {
+    const { W, H, ctx } = this;
+    this.heading(t('ui.calm'), v.finished ? '' : t('ui.breathCount', Math.min(v.count + 1, v.total), v.total));
+    this.paragraphs(t('peace.calm').map((s, i) => `${i + 1}.  ${s}`), 160, { size: 27, gap: 10 });
+    const msg = v.finished ? t('peace.calmDone') : v.breathPhase === 'in' ? t('ui.inhale') : t('ui.calmOut');
+    this.paragraphs([msg], 640, { size: 36, color: v.finished ? C.gold : v.breathPhase === 'in' ? C.muted : '#7fd1a8', gap: 0 });
+    ctx.fillStyle = C.track;
+    ctx.beginPath(); ctx.roundRect(60, 760, W - 120, 12, 6); ctx.fill();
+    ctx.fillStyle = C.gold;
+    ctx.beginPath(); ctx.roundRect(60, 760, (W - 120) * Math.min(1, v.count / v.total), 12, 6); ctx.fill();
+    const by = H - 140, gap = 20, w = (W - 120 - 2 * gap) / 3;
+    this.btn(t('ui.again'), 60, by, w, 96, 'calm', { primary: v.finished });
+    this.btn(t('ui.menuPeace'), 60 + w + gap, by, w, 96, 'peace');
     this.btn(t('ui.menu'), 60 + 2 * (w + gap), by, w, 96, 'menu');
   }
 

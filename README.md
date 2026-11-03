@@ -21,6 +21,8 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Weitere Gebete: Sunnah vor/nach den Pflichtgebeten, Witr, Jumuʿa, Taḥiyyat al-Masjid
 - Wuḍūʾ-Trainer: 12 Schritte mit Körper-Piktogramm, Pflicht/Sunnah je Rechtsschule
 - Lernen & Quiz: 24 Fragen (zufällig 10), Fortschritt, Tage in Folge, Abzeichen
+- Kinder-Modus: zu jedem Schritt ein einfacher, liebevoller Satz, langsameres Tempo, ein Stern für jedes geschaffte Gebet
+- Frieden & gutes Herz: 15 Quran-Verse und Hadithe über Frieden, Barmherzigkeit und Selbstbeherrschung, jeweils mit arabischem Original, Übersetzung und Quelle; dazu „Ruhig werden“ – Schritte gegen die Wut nach der Sunnah und 5 Atemzüge mit der Atem-Kugel
 - Anfänger-Modus (langsamer, liest jeden Schritt vor) und Spiritueller Modus (innere Bedeutung jedes Schritts, Atem-Dhikr im Tasbīḥ)
 - Vier große Moscheen (26–60 m): Klassisch, Osmanisch, Andalusisch und Großmoschee mit Nebenkuppeln, Emporen und Buntglas; jede mit Minbar; nachts dunkle Fenster und hellere Lampen (freie Gestaltungen, keine Nachbauten)
 - Cemaat (Gemeinschaftsgebet): Imam vorn, Gemeinde in Reihen (klein oder groß wie am Freitag); im natürlichen Takt folgt jeder mit eigener Verzögerung, eigenem Tempo und kleinen Abweichungen, ein Nachzügler kommt in der zweiten Rakʿa und holt sie nach dem Salām nach; danach Bittgebet im Sitzen; der Imam spricht Takbīr, „Samiʿa llāhu…“ und Salām (wenn das Gerät eine arabische Stimme hat); als Frau betest du im eigenen Frauenbereich hinter einer Holzgitterwand (Kafes), die Männer beten davor, nie gemischt
@@ -59,6 +61,7 @@ WebXR braucht HTTPS. Am einfachsten:
 - `src/panel.js` – Bedienpanel, Bodentafel und Bewegungs-Einblendung
 - `src/movement.js` – Bewegungsansagen, Piktogramme, Haltungserkennung
 - `src/environment.js` – Gebetsräume in vier Stilen
+- `src/peace.js` – Verse und Hadithe zum Frieden, Ruhig-werden-Übung, Kinder-Sätze
 - `src/congregation.js` – Imam und Gemeinde für das Gemeinschaftsgebet
 - `src/qibla.js` – Qibla-Berechnung und Städte
 - `src/prayertimes.js` – Gebetszeiten-Berechnung

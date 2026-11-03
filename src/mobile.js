@@ -60,6 +60,7 @@ export class MobileUI {
         ${btn(t('ui.menuWudu'), 'wudu', { cls: v.wuduDone ? '' : 'primary' })}${btn(t('ui.menuLearn'), 'learn')}
         ${btn(t('ui.menuQiblaMobile'), 'qibla')}${btn(t('ui.menuTasbih'), 'tasbih')}
         ${btn(t('ui.menuMosque'), 'mosque')}${btn(t('ui.menuSettings'), 'settings')}
+        ${btn(t('ui.menuPeace'), 'peace')}${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: v.kids ? 'active' : '' })}
       </div>`;
   }
 
@@ -173,7 +174,28 @@ export class MobileUI {
     return `${head(t('ui.prayerDone'), v.prayer.name)}
       ${recitation(taqabbal())}
       <p class="muted">${esc(t('ui.afterPrayer'))}</p>
+      ${v.kids ? `<p class="gold center">${esc(t('ui.kidsStars', v.stars))}</p>` : ''}
       <div class="grid3">${btn(t('ui.tasbih'), 'tasbih', { cls: 'primary' })}${btn(t('ui.again'), 'again')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_peace(v) {
+    return `${head(t('ui.peaceTitle'), `${v.index + 1} / ${v.total}`)}
+      <p class="muted small">${esc(t('peace.intro'))}</p>
+      <p class="ar big center" dir="rtl">${esc(v.item.ar)}</p>
+      ${v.item.text ? `<p class="center">${esc(v.item.text)}</p>` : ''}
+      <p class="gold center">${esc(v.item.source)}</p>
+      <div class="grid2">${btn('←', 'peaceprev')}${btn('→', 'peacenext', { cls: 'primary' })}</div>
+      <div class="grid2">${btn(t('ui.calm'), 'calm')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_calm(v) {
+    const msg = v.finished ? t('peace.calmDone') : v.breathPhase === 'in' ? t('ui.inhale') : t('ui.calmOut');
+    return `${head(t('ui.calm'), v.finished ? '' : t('ui.breathCount', Math.min(v.count + 1, v.total), v.total))}
+      <ol class="steps">${t('peace.calm').map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+      ${v.finished ? '' : `<div class="breath ${v.breathPhase}"></div>`}
+      <p class="center ${v.finished ? 'gold' : v.breathPhase === 'in' ? 'muted' : 'ok'}">${esc(msg)}</p>
+      ${progressBar(Math.min(1, v.count / v.total))}
+      <div class="grid3">${btn(t('ui.again'), 'calm', { cls: v.finished ? 'primary' : '' })}${btn(t('ui.menuPeace'), 'peace')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   v_tasbih(v) {
