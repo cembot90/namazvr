@@ -183,8 +183,12 @@ function rebuildCong() {
 // Mit Cemaat beten Imam und Gemeinde; bei der Gebetswaschung zeigt weiter die Vorbeter-Figur.
 function updateCast() {
   const wudu = state.view === 'step' && state.prayer?.kind === 'wudu';
-  cong.group.visible = state.cemaat && !wudu;
-  guide.group.visible = guideRug.visible = !cong.group.visible;
+  const show = state.cemaat && !wudu;
+  if (show === cong.group.visible) return;
+  cong.group.visible = show;
+  guide.group.visible = guideRug.visible = !show;
+  // Handy: Kamera auf Imam und Reihen bzw. zurück auf die Vorbeter-Figur
+  if (mobileUI) aimAtGuide();
 }
 const leader = () => (cong.group.visible && cong.imam ? cong.imam.g : guide);
 
@@ -384,8 +388,9 @@ function act(action) {
       }
       break;
     case 'cemaat': state.cemaat = !state.cemaat; store.set('cemaat', state.cemaat); cong.reset(); break;
-    case 'csize': state.cemaatSize = arg; store.set('cemaatSize', arg); rebuildCong(); break;
-    case 'ctakt': state.cemaatNatural = arg === 'natural'; store.set('cemaatNatural', state.cemaatNatural); rebuildCong(); break;
+    // Größe oder Takt wählen schaltet Cemaat gleich mit ein
+    case 'csize': state.cemaatSize = arg; store.set('cemaatSize', arg); state.cemaat = true; store.set('cemaat', true); rebuildCong(); break;
+    case 'ctakt': state.cemaatNatural = arg === 'natural'; store.set('cemaatNatural', state.cemaatNatural); state.cemaat = true; store.set('cemaat', true); rebuildCong(); break;
     case 'spiritual': state.spiritual = !state.spiritual; store.set('spiritual', state.spiritual); break;
     case 'breath': state.breath = { on: !state.breath.on, t: 0, phase: 'in' }; break;
     case 'beginner': state.beginner = !state.beginner; store.set('beginner', state.beginner); break;
