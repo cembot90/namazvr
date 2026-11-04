@@ -116,6 +116,8 @@ const state = {
   madhab: store.get('madhab', 'hanafi'),
   gender: store.get('gender', 'm'),
   beginner: store.get('beginner', false),
+  // Jeden Schritt automatisch vorlesen (Schalter „Vorlesen“)
+  voice: store.get('voice', true),
   spiritual: store.get('spiritual', false),
   // Kinder-Modus: einfache Erklärung je Schritt, langsamer, Sterne als Belohnung
   kids: store.get('kids', false),
@@ -221,6 +223,8 @@ function view() {
         posture: state.steps[state.i].wudu ? 'wudu' : !renderer.xr.isPresenting ? 'off' : state.posture.ok ? 'ok' : 'wait',
         handHint: renderer.xr.isPresenting ? state.posture.handHint : null,
         finger: renderer.xr.isPresenting && state.posture.finger,
+        voice: state.voice,
+        noVoice: state.voice && voiceMissing(),
       };
     case 'mosque':
       return { type: 'mosque', styles: STYLES, style: state.style, cemaat: state.cemaat, size: state.cemaatSize, natural: state.cemaatNatural };
@@ -295,7 +299,9 @@ function onStep() {
   p.held = 0;
   const step = state.steps[state.i];
   const m = step.wudu ? { arrow: null, cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
-  if (state.beginner) speak();
+  // Mit Cemaat spricht der Imam; sonst wird der Schritt vorgelesen (Anfänger-Modus immer)
+  const imamLeads = state.cemaat && state.prayer?.kind !== 'wudu';
+  if (state.beginner || (state.voice && !imamLeads)) speak();
   else imamCall(step, state.steps[state.i - 1]);
   if (m.arrow || step.wudu) {
     banner.render(m);
@@ -345,6 +351,14 @@ function imamCall(step, prev) {
   else if (step.key === 'takbir' || (prev && step.pose !== prev.pose && prev.pose !== 'takbir' && step.pose !== 'dua')) line = IMAM.takbir;
   if (line) sayArabic(line, { rate: 0.75, pitch: 0.8 });
 }
+
+// Hat das Gerät eine Stimme für die gewählte Sprache? (Solange die Stimmen noch laden: ja annehmen.)
+function voiceMissing() {
+  if (!('speechSynthesis' in window)) return true;
+  const voices = window.speechSynthesis.getVoices();
+  return voices.length > 0 && !voices.some((v) => v.lang?.toLowerCase().startsWith(langInfo().speech));
+}
+if ('speechSynthesis' in window) window.speechSynthesis.addEventListener?.('voiceschanged', () => refresh());
 
 function speak() {
   const step = state.view === 'step' && state.steps[state.i];
@@ -494,7 +508,12 @@ function act(action) {
       state.autoT = 0;
       break;
     case 'auto': state.auto = !state.auto; state.autoT = 0; break;
-    case 'speak': speak(); break;
+    case 'speak':
+      state.voice = !state.voice;
+      store.set('voice', state.voice);
+      if (state.voice) speak();
+      else window.speechSynthesis?.cancel();
+      break;
     case 'menu': state.view = 'menu'; state.auto = false; cong.reset(); break;
     case 'qibla': state.view = 'qibla'; state.msg = ''; break;
     case 'info': state.view = 'info'; break;

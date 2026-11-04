@@ -324,7 +324,8 @@ export default {
     },
   },
   ui: {
-    menuSuras: 'Suren lernen', surasTitle: 'Suren lernen', surasSub: 'Kurze Suren für das Gebet – Schritt für Schritt auswendig lernen', verses: (n) => `${n} Verse`, learned: '✓ gelernt', modeRead: 'Lesen', modeVerse: 'Vers für Vers', modeTest: 'Abfragen', verseOf: (i, n) => `Vers ${i} / ${n}`, reveal: 'Aufdecken', hide: 'Verdecken', speak: '🔊 Hören', markLearned: '✓ Gelernt', isLearned: '✓ Gelernt!', usePrayer: 'Im Gebet beten', inPrayer: '★ Im Gebet', testHint: 'Sprich den Vers aus dem Gedächtnis – dann aufdecken.', noVoice: 'Auf diesem Gerät gibt es keine arabische Stimme.',
+    noVoiceLang: 'Dieses Gerät hat keine deutsche Stimme – Vorlesen geht hier leider nicht.',
+    menuSuras: 'Suren lernen', surasTitle: 'Suren lernen', surasSub: 'Kurze Suren für das Gebet – Schritt für Schritt auswendig lernen', verses: (n) => `${n} Verse`, learned: '✓ gelernt', modeRead: 'Lesen', modeVerse: 'Vers für Vers', modeTest: 'Abfragen', verseOf: (i, n) => `Vers ${i} / ${n}`, reveal: 'Aufdecken', hide: 'Verdecken', listen: '🔊 Hören', markLearned: '✓ Gelernt', isLearned: '✓ Gelernt!', usePrayer: 'Im Gebet beten', inPrayer: '★ Im Gebet', testHint: 'Sprich den Vers aus dem Gedächtnis – dann aufdecken.', noVoice: 'Auf diesem Gerät gibt es keine arabische Stimme.',
     menuPeace: 'Frieden & Herz', kidsBtn: (on) => (on ? 'Kinder-Modus: an' : 'Kinder-Modus'), kidsStars: (n) => `⭐ ${n} ${n === 1 ? "Stern" : "Sterne"} gesammelt – Maşallah, toll gemacht!`, peaceTitle: 'Frieden & gutes Herz', calm: 'Ruhig werden', breathCount: (n, total) => `Atemzug ${n} / ${total}`, calmOut: 'Langsam ausatmen …',
     sub: 'Gebetsassistent',
     choose: 'Wähle ein Gebet – ich führe dich Schritt für Schritt hindurch.',

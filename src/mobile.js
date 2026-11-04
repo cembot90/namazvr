@@ -152,7 +152,7 @@ export class MobileUI {
       <p class="muted">${esc(s.instr)}</p>
       ${recitation(s)}
       <div class="dock">
-        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn(t('ui.menu'), 'menu')}${btn(v.auto ? t('ui.autoOnShort') : t('ui.autoShort'), 'auto', { cls: v.auto ? 'active' : '' })}${btn('🔊', 'speak')}
+        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn(t('ui.menu'), 'menu')}${btn(v.auto ? t('ui.autoOnShort') : t('ui.autoShort'), 'auto', { cls: v.auto ? 'active' : '' })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '' })}
         ${btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 'next', { cls: 'primary' })}
       </div>`;
   }
@@ -200,7 +200,7 @@ export class MobileUI {
       ${body}
       ${v.msg ? `<p class="gold small center">${esc(v.msg)}</p>` : ''}
       ${nav}
-      <div class="grid2">${btn(t('ui.speak'), 'sspeak')}${btn(v.learned ? t('ui.isLearned') : t('ui.markLearned'), 'slearned', { cls: v.learned ? 'active' : '' })}</div>
+      <div class="grid2">${btn(t('ui.listen'), 'sspeak')}${btn(v.learned ? t('ui.isLearned') : t('ui.markLearned'), 'slearned', { cls: v.learned ? 'active' : '' })}</div>
       ${v.id !== 'fatiha' ? btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), 'sprayer', { cls: `wide ${v.inPrayer ? 'active' : ''}` }) : ''}
       ${btn(t('ui.back'), 'suras', { cls: 'wide' })}`;
   }

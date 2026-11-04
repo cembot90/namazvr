@@ -270,7 +270,8 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.prev'), 60, by, 220, bh, 'prev');
     this.btn(t('ui.menu'), 300, by, 170, bh, 'menu');
     this.btn(v.auto ? t('ui.autoOn') : t('ui.autoOff'), 490, by, 220, bh, 'auto', { active: v.auto });
-    this.btn(t('ui.speak'), 730, by, 230, bh, 'speak');
+    this.btn(`${v.voice ? '🔊' : '🔇'} ${t('ui.speak')}`, 730, by, 230, bh, 'speak', { active: v.voice });
+    if (v.noVoice) this.text(t('ui.noVoiceLang'), W - 60, by - 12, { size: 21, color: C.gold, align: 'right' });
     this.btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 980, by, W - 1040, bh, 'next', { primary: true });
   }
 
@@ -400,7 +401,7 @@ export class Panel extends CanvasPlane {
       if (v.mode === 'test' && !v.reveal) this.btn(t('ui.reveal'), x(1), by, w, 96, 'sreveal', { primary: true, size: 28 });
       else this.btn('→', x(1), by, w, 96, 'snext', { size: 44, primary: true });
     }
-    this.btn(t('ui.speak'), x(2), by, w, 96, 'sspeak', { size: 28 });
+    this.btn(t('ui.listen'), x(2), by, w, 96, 'sspeak', { size: 28 });
     this.btn(v.learned ? t('ui.isLearned') : t('ui.markLearned'), x(3), by, w, 96, 'slearned', { size: 26, active: v.learned });
     this.btn(t('ui.back'), x(4), by, w, 96, 'suras', { size: 28 });
   }
