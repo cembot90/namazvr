@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NamazVR Anleitung</title>
+<meta name="description" content="Anleitung für NamazVR: Beten lernen Schritt für Schritt – auf Meta Quest, Handy und Computer.">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1220; --card: #13203a; --line: #2a3a5a; --text: #eef2f7; --muted: #9fb0c6;
+    --gold: #e6c77f; --green: #2f9670; --ok: #7fd1a8;
+  }
+  :root[data-theme="light"] { --bg: #f7f3ea; --card: #ffffff; --line: #e3d9c4; --text: #1d2433; --muted: #5d6676; --gold: #8a6420; --green: #24785a; --ok: #24785a; }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) { --bg: #f7f3ea; --card: #ffffff; --line: #e3d9c4; --text: #1d2433; --muted: #5d6676; --gold: #8a6420; --green: #24785a; --ok: #24785a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 Inter, system-ui, sans-serif; }
+  a { color: var(--gold); }
+  header { padding: 40px 16px 24px; text-align: center; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: clamp(30px, 6vw, 44px); font-weight: 800; }
+  header h1 b { color: var(--gold); }
+  header p { margin: 8px auto 0; max-width: 640px; color: var(--muted); }
+  .ar { font-family: Amiri, serif; color: var(--gold); font-size: 26px; }
+  .wrap { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 32px; max-width: 1100px; margin: 0 auto; padding: 24px 16px 80px; }
+  nav { position: sticky; top: 16px; align-self: start; font-size: 14px; }
+  nav a { display: block; padding: 5px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; }
+  nav a:hover { background: var(--card); color: var(--text); }
+  main { min-width: 0; }
+  section { margin-bottom: 40px; scroll-margin-top: 16px; }
+  h2 { font-size: 26px; margin: 0 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--gold); display: inline-block; }
+  h3 { font-size: 18px; margin: 22px 0 6px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 12px 0; }
+  .tip { border-left: 4px solid var(--green); }
+  .warn { border-left: 4px solid var(--gold); }
+  ol, ul { padding-left: 22px; }
+  li { margin: 4px 0; }
+  kbd { background: var(--card); border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 6px; padding: 1px 7px; font: 600 13px Inter, sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .grid .card { margin: 0; }
+  .grid h3 { margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  .log time { display: inline-block; min-width: 110px; color: var(--gold); font-weight: 600; }
+  .btn { display: inline-block; background: var(--green); color: #fff; text-decoration: none; padding: 12px 22px; border-radius: 12px; font-weight: 600; margin: 6px 6px 0 0; }
+  .btn.alt { background: transparent; color: var(--gold); border: 2px solid var(--gold); }
+  .theme { position: fixed; top: 12px; right: 12px; background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; cursor: pointer; font: 600 13px Inter, sans-serif; }
+  @media (max-width: 820px) {
+    .wrap { grid-template-columns: 1fr; }
+    nav { position: static; display: flex; flex-wrap: wrap; gap: 4px; }
+    nav a { background: var(--card); }
+    table { display: block; overflow-x: auto; font-size: 14px; }
+    th, td { padding: 6px; }
+  }
+</style>
+</head>
+<body>
+<button class="theme" id="theme" aria-label="Hell/Dunkel umschalten">◐</button>
+<header>
+  <div class="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+  <h1>Namaz<b>VR</b> – Anleitung</h1>
+  <p>Beten lernen, Schritt für Schritt – mit der Meta Quest, auf dem Handy oder am Computer. Diese Anleitung wächst mit der App: unten steht, was neu ist.</p>
+  <p><a class="btn" href="./">App öffnen</a><a class="btn alt" href="./beta.html">Beta-Test mitmachen</a></p>
+</header>
+
+<div class="wrap">
+<nav>
+  <a href="#start">1. Loslegen</a>
+  <a href="#bedienung">2. Bedienung</a>
+  <a href="#gebet">3. Ein Gebet beten</a>
+  <a href="#einstellungen">4. Einstellungen</a>
+  <a href="#stimmen">5. Stimmen</a>
+  <a href="#qibla">6. Qibla & Zeiten</a>
+  <a href="#lernen">7. Lernen</a>
+  <a href="#kinder">8. Kinder & Frieden</a>
+  <a href="#tracker">9. Gebets-Tracker</a>
+  <a href="#ramadan">10. Ramadan</a>
+  <a href="#moschee">11. Moschee & Cemaat</a>
+  <a href="#mr">12. Mixed Reality</a>
+  <a href="#probleme">13. Hilfe bei Problemen</a>
+  <a href="#neu">Was ist neu?</a>
+</nav>
+
+<main>
+<section id="start">
+  <h2>1. Loslegen</h2>
+  <p>NamazVR läuft im Browser – nichts muss aus einem Store installiert werden. Adresse:</p>
+  <div class="card"><b><a href="https://cembot90.github.io/namazvr/">cembot90.github.io/namazvr</a></b></div>
+  <div class="grid">
+    <div class="card"><h3>🥽 Meta Quest</h3><ol><li>Quest-Browser öffnen, Adresse eingeben.</li><li><b>ENTER VR</b>: du stehst in einer Moschee.</li><li><b>START AR</b>: dein eigenes Zimmer bleibt sichtbar (Mixed Reality).</li></ol></div>
+    <div class="card"><h3>📱 Handy</h3><ol><li>Adresse im Browser öffnen.</li><li>Oben die Figur, unten die Knöpfe.</li><li>Tipp: „Zum Home-Bildschirm“ – dann startet NamazVR wie eine App, auch ohne Internet.</li></ol></div>
+    <div class="card"><h3>💻 Computer</h3><ol><li>Adresse in Chrome, Edge oder Firefox öffnen.</li><li>Mit der Maus umsehen und Knöpfe auf der Tafel anklicken.</li></ol></div>
+  </div>
+  <div class="card tip">Beim ersten Start wählt die App die Sprache deines Geräts: Deutsch, Türkçe, English oder العربية. Ändern kannst du sie jederzeit unter <b>Einstellungen</b>.</div>
+</section>
+
+<section id="bedienung">
+  <h2>2. Bedienung</h2>
+  <table>
+    <tr><th></th><th>Auswählen</th><th>Weiter / Zurück</th><th>Gehen</th></tr>
+    <tr><td><b>Quest mit Controllern</b></td><td>Strahl auf den Knopf, Trigger drücken</td><td>Knöpfe „Weiter ▶“ / „◀ Zurück“</td><td>Stick</td></tr>
+    <tr><td><b>Quest mit Händen</b></td><td>Auf den Knopf zeigen, Daumen und Zeigefinger zusammen (Pinch)</td><td>Knöpfe</td><td>–</td></tr>
+    <tr><td><b>Computer</b></td><td>Klick</td><td><kbd>→</kbd> / <kbd>Leertaste</kbd> und <kbd>←</kbd>, <kbd>M</kbd> = Menü</td><td><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>, mit <kbd>Umschalt</kbd> schneller</td></tr>
+    <tr><td><b>Handy</b></td><td>Tippen</td><td>Knöpfe unten</td><td>–</td></tr>
+  </table>
+</section>
+
+<section id="gebet">
+  <h2>3. Ein Gebet beten</h2>
+  <ol>
+    <li>Im Menü eines der fünf Gebete wählen (das aktuelle ist golden markiert). Weitere Gebete wie Sunnah, Witr oder Freitagsgebet findest du unter <b>Weitere Gebete</b>.</li>
+    <li>Jeder Schritt zeigt: was du tun sollst (mit Bildchen und Pfeil), den arabischen Text, die Umschrift und die Bedeutung.</li>
+    <li>Die Vorbeter-Figur macht jede Haltung vor. Eine Tafel auf dem Boden kannst du auch beim Verbeugen und Niederwerfen lesen.</li>
+    <li><b>Auto</b> schaltet von selbst weiter. In VR wartet die App, bis du die Haltung wirklich eingenommen hast – dann vibriert der Controller und es erscheint „✓ Haltung erkannt“.</li>
+    <li><b>🔊 Vorlesen</b> liest jeden Schritt vor (ist von Anfang an eingeschaltet).</li>
+  </ol>
+  <div class="card tip"><b>Neu dabei?</b> Lerne zuerst die Gebetswaschung: Menü → <b>Wuḍūʾ lernen</b> (12 Schritte mit Körperbild).</div>
+  <div class="card warn">Wie erkennt die App meine Haltung? In VR über die Höhe und Neigung des Kopfes, mit Hand-Erkennung zusätzlich über die Hände (z. B. Hände auf den Knien, Zeigefinger im Tashahhud). Auf Handy und Computer gibt es keine Erkennung.</div>
+</section>
+
+<section id="einstellungen">
+  <h2>4. Einstellungen</h2>
+  <ul>
+    <li><b>Sprache</b>: Deutsch, Türkçe, English, العربية.</li>
+    <li><b>Rechtsschule</b>: Ḥanafī, Shāfiʿī, Mālikī, Ḥanbalī – die App zeigt, was sich jeweils ändert (Handhaltung, Eröffnungs-Duʿāʾ, Qunūt, Witr, Asr-Zeit …).</li>
+    <li><b>Anleitung für</b>: Männer oder Frauen (Haltungen, ʿAwra, Hinweise; die Vorbeterin trägt Kopftuch).</li>
+    <li><b>Anfänger-Modus</b>: langsamer, jeder Schritt wird vorgelesen.</li>
+    <li><b>Spiritueller Modus</b>: zu jedem Schritt die innere Bedeutung, Atem-Dhikr beim Tasbīḥ.</li>
+    <li><b>🔊 Stimmen</b>: kostenlose Stimmen laden (siehe nächster Abschnitt).</li>
+  </ul>
+</section>
+
+<section id="stimmen">
+  <h2>5. Kostenlose Stimmen</h2>
+  <p>Viele Geräte – auch die Quest – haben keine deutsche, türkische oder arabische Vorlesestimme. Deshalb kann NamazVR kostenlose, offene Stimmen laden:</p>
+  <ol>
+    <li>Einstellungen → <b>🔊 Stimmen</b>.</li>
+    <li>Bei der gewünschten Sprache <b>Laden</b> drücken (je ca. 63 MB – am besten im WLAN).</li>
+    <li>Mit <b>▶ Probe</b> anhören. Ab jetzt liest die App mit dieser Stimme vor, auch ohne Internet.</li>
+  </ol>
+  <table>
+    <tr><th>Sprache</th><th>Stimme</th><th>Wofür</th></tr>
+    <tr><td>Deutsch</td><td>Thorsten (CC0)</td><td>Anleitung auf Deutsch</td></tr>
+    <tr><td>Türkçe</td><td>DFKI</td><td>Anleitung auf Türkisch</td></tr>
+    <tr><td>العربية</td><td>Kareem</td><td>arabische Texte, Suren, Rufe des Imams</td></tr>
+  </table>
+  <div class="card warn">Eine Computerstimme ersetzt keine Rezitation mit Tajwīd. Die richtige Aussprache lernt man am besten bei einem Hoca oder einer Lehrerin.</div>
+</section>
+
+<section id="qibla">
+  <h2>6. Qibla & Gebetszeiten</h2>
+  <h3>Qibla</h3>
+  <ul>
+    <li><b>Handy</b>: Menü → Qibla & Kompass → „Kompass starten“, Handy flach halten und drehen, bis die Nadel nach oben zeigt.</li>
+    <li><b>Quest</b> (hat keinen Kompass): Menü → Qibla einstellen → Stadt oder GPS wählen. Dann entweder genau nach Norden schauen und „Ich schaue nach Norden“ drücken – oder direkt zur Qibla schauen (z. B. vorher mit dem Handy bestimmt) und „Hier ist die Qibla“ drücken.</li>
+  </ul>
+  <h3>Gebetszeiten</h3>
+  <p>Die Zeiten werden ohne Internet aus dem Sonnenstand berechnet. Unter <b>Gebetszeiten</b> kannst du die Methode (z. B. Diyanet, Muslim World League) und die Asr-Berechnung umstellen. Die Zeiten deiner Moschee können um einige Minuten abweichen.</p>
+</section>
+
+<section id="lernen">
+  <h2>7. Lernen</h2>
+  <ul>
+    <li><b>Lernen & Quiz</b>: 10 zufällige Fragen, bestes Ergebnis, Tage in Folge und Abzeichen.</li>
+    <li><b>Suren lernen</b>: Fātiḥa, Ikhlāṣ, Kauṯar, ʿAṣr, Falaq, Nās – lesen, Vers für Vers üben, abfragen (nur das erste Wort als Hilfe), anhören. Mit „Im Gebet beten“ wird die Sure im Gebet als Zusatzsure benutzt.</li>
+    <li><b>Tasbīḥ zählen</b>: 33 / 33 / 34, auf Wunsch mit Atem-Kugel.</li>
+  </ul>
+</section>
+
+<section id="kinder">
+  <h2>8. Kinder & Frieden</h2>
+  <ul>
+    <li><b>Kinder-Modus</b> (Knopf im Menü): einfache, liebevolle Sätze zu jedem Schritt, langsameres Tempo, Sterne für jedes geschaffte Gebet, jede gelernte Sure und jeden Tag mit allen 5 Gebeten.</li>
+    <li><b>Frieden & Herz</b>: Koranverse und Hadithe über Frieden, Barmherzigkeit und Selbstbeherrschung – jeweils mit arabischem Original und Quelle.</li>
+    <li><b>Ruhig werden</b>: Schritte gegen die Wut nach der Sunnah und 5 ruhige Atemzüge mit der leuchtenden Kugel.</li>
+  </ul>
+</section>
+
+<section id="tracker">
+  <h2>9. Gebets-Tracker</h2>
+  <ul>
+    <li>Menü → <b>Gebets-Tracker</b>: die fünf Gebete des Tages antippen, die du gebetet hast.</li>
+    <li>Pflichtgebete, die du mit der App betest, werden automatisch abgehakt.</li>
+    <li>Mit „◀ Tag davor“ kannst du bis zu 7 Tage nachtragen.</li>
+    <li>Darunter: die Woche auf einen Blick, ★ für Tage mit allen 5 Gebeten und wie viele solche Tage in Folge.</li>
+  </ul>
+  <div class="card tip">Alles bleibt nur auf deinem Gerät gespeichert – niemand sonst sieht es.</div>
+</section>
+
+<section id="ramadan">
+  <h2>10. Ramadan</h2>
+  <ul>
+    <li>Menü → <b>🌙 Ramadan</b>: islamisches Datum und die Tage bis Ramadan.</li>
+    <li>Im Ramadan: der wievielte Fastentag es ist, wann der Sahur endet (Imsāk) und wann Iftar ist – mit Countdown. In den letzten zehn Nächten ein Hinweis auf die Laylat al-Qadr, dazu die Tage bis zum Fest.</li>
+    <li>Knöpfe zum Anhören: <b>Iftar-Duʿāʾ</b> und die <b>Absicht (Niyya)</b> zum Fasten.</li>
+  </ul>
+  <div class="card warn">Der Kalender rechnet nach Umm al-Qura. Je nach Land und Mondsichtung kann der Beginn um einen Tag abweichen – richte dich nach deiner Gemeinde.</div>
+</section>
+
+<section id="moschee">
+  <h2>11. Moschee & Cemaat</h2>
+  <ul>
+    <li>Vier Moscheen zur Auswahl: Klassisch, Osmanisch, Andalusisch und Großmoschee (frei gestaltet, keine Nachbauten).</li>
+    <li><b>Cemaat</b>: Ein Imam leitet, die Gemeinde betet in Reihen mit dir – klein oder groß wie am Freitag. Im „natürlichen Takt“ bewegt sich jeder ein wenig anders, und ein Nachzügler kommt dazu.</li>
+    <li><b>Frauenbereich</b>: hinter dem Holzgitter oder auf der <b>Empore</b> der Großmoschee. Als Frau stehst du dann oben an der Brüstung und siehst unten Imam und Männerreihen.</li>
+  </ul>
+  <div class="card tip">Regel im Gemeinschaftsgebet: dem Imam folgen – erst nach ihm bewegen, nie vor ihm.</div>
+</section>
+
+<section id="mr">
+  <h2>12. Mixed Reality (Quest)</h2>
+  <ol>
+    <li>Auf der Startseite <b>START AR</b> drücken – du siehst dein Zimmer.</li>
+    <li>Auf den gewünschten Gebetsplatz stellen und „Teppich hierher“ drücken.</li>
+    <li>Zur Qibla schauen und „Hier ist die Qibla“ drücken.</li>
+  </ol>
+  <p>Ohne Controller erkennt die Quest deine Hände; die App prüft dann auch die Handhaltung.</p>
+</section>
+
+<section id="probleme">
+  <h2>13. Hilfe bei Problemen</h2>
+  <table>
+    <tr><th>Problem</th><th>Lösung</th></tr>
+    <tr><td>Es wird nichts vorgelesen</td><td>Prüfen, ob 🔊 an ist. Hinweis „keine Gerätestimme“? Dann unter Einstellungen → Stimmen eine kostenlose Stimme laden. Auf iPhone/Handy: Lautlos-Schalter aus.</td></tr>
+    <tr><td>Stimme lädt nicht</td><td>Internet prüfen, „Nochmal“ drücken. Im privaten/Inkognito-Modus kann die Stimme nicht gespeichert werden.</td></tr>
+    <tr><td>„ENTER VR“ fehlt</td><td>Seite im Quest-Browser öffnen (nicht in einer anderen App). Am Computer gibt es kein VR.</td></tr>
+    <tr><td>Mihrab zeigt in die falsche Richtung</td><td>Qibla neu einstellen (Abschnitt 6).</td></tr>
+    <tr><td>Haltung wird nicht erkannt</td><td>Einmal aufrecht hinstellen, damit die App deine Größe kennt. Beim Sitzen/Niederwerfen den Kopf ruhig halten.</td></tr>
+    <tr><td>Zeiten weichen ab</td><td>Unter Gebetszeiten eine andere Methode wählen (z. B. Diyanet).</td></tr>
+    <tr><td>Alte Version wird angezeigt</td><td>Seite neu laden (am Handy: App schließen und neu öffnen).</td></tr>
+  </table>
+  <div class="card warn">NamazVR ist eine Lernhilfe nach verbreiteter sunnitischer Praxis. Bei Fragen zum Gebet wende dich an einen Imam oder eine kundige Person deines Vertrauens.</div>
+</section>
+
+<section id="neu">
+  <h2>Was ist neu?</h2>
+  <div class="card log">
+    <p><time>04.11.2026</time> Kostenlose Stimmen für Deutsch, Türkisch und Arabisch · Gebets-Tracker · Ramadan-Countdown mit Sahur und Iftar · Frauenbereich auf der Empore der Großmoschee · Anleitung und Beta-Seite</p>
+    <p><time>davor</time> Vorlesen als Schalter · Suren lernen · Kinder-Modus · Frieden & gutes Herz · Cemaat mit Imam, Gemeinde und Frauenbereich · große Moscheen · Mixed Reality mit Hand-Erkennung · vier Sprachen · Rechtsschulen · Wuḍūʾ-Trainer · Gebetszeiten und Qibla</p>
+  </div>
+</section>
+</main>
+</div>
+<script>
+  // Hell/Dunkel merken (nur auf diesem Gerät)
+  const root = document.documentElement;
+  try { const s = localStorage.getItem('namazvr.theme'); if (s) root.dataset.theme = s; } catch {}
+  document.getElementById('theme').onclick = () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : !matchMedia('(prefers-color-scheme: light)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('namazvr.theme', root.dataset.theme); } catch {}
+  };
+</script>
+</body>
+</html>

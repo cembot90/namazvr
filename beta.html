@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NamazVR Beta-Test</title>
+<meta name="description" content="Teste NamazVR vor allen anderen: Beten lernen in VR, auf dem Handy und am Computer.">
+<meta property="og:title" content="NamazVR – Werde Beta-Tester">
+<meta property="og:description" content="Beten lernen Schritt für Schritt – auf Meta Quest, Handy und Computer. Kostenlos. Deutsch · Türkçe · English · العربية">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --night: #050b1a; --deep: #0b1f3a; --card: rgba(255,255,255,.05); --line: rgba(233,196,106,.28); --gold: #e9c46a; --gold2: #f4a261; --teal: #2a9d8f; --text: #f5efe0; --muted: #a9b4c7; }
+  * { box-sizing: border-box; }
+  html { background: var(--night); }
+  body { margin: 0; color: var(--text); font: 17px/1.6 Inter, system-ui, sans-serif; background: radial-gradient(ellipse at 50% -10%, #12305a, var(--night) 60%) fixed; }
+  a { color: var(--gold); }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+  .lang { position: fixed; top: 12px; right: 12px; z-index: 5; display: flex; gap: 4px; background: rgba(5,11,26,.8); border: 1px solid var(--line); border-radius: 999px; padding: 4px; }
+  .lang button { border: 0; background: transparent; color: var(--muted); font: 600 14px Inter, sans-serif; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+  .lang button.on { background: var(--gold); color: #1b1404; }
+
+  .hero { min-height: 92vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 18px; padding: 70px 0 40px; }
+  .moon { width: 92px; height: 92px; filter: drop-shadow(0 0 28px rgba(233,196,106,.6)); animation: float 6s ease-in-out infinite; }
+  .badge { display: inline-block; border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 4px 14px; font-weight: 600; font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { margin: 0; font-size: clamp(44px, 10vw, 92px); font-weight: 800; letter-spacing: -2px; line-height: 1; }
+  h1 b { background: linear-gradient(90deg, var(--gold), var(--gold2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .ar { font-family: Amiri, serif; color: var(--gold); font-size: clamp(26px, 5vw, 38px); }
+  .lead { font-size: clamp(18px, 3vw, 23px); color: var(--muted); max-width: 640px; margin: 0; }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 8px; }
+  .btn { display: inline-block; border: 0; cursor: pointer; text-decoration: none; background: linear-gradient(90deg, var(--gold), var(--gold2)); color: #1b1404; font: 700 18px Inter, sans-serif; padding: 15px 28px; border-radius: 14px; }
+  .btn.alt { background: transparent; color: var(--gold); border: 2px solid var(--gold); }
+  .btn.green { background: var(--teal); color: #fff; }
+
+  section { padding: 56px 0; }
+  h2 { font-size: clamp(28px, 5vw, 42px); margin: 0 0 8px; font-weight: 800; }
+  h2 em { font-style: normal; color: var(--gold); }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+  .card .ico { font-size: 34px; }
+  .card h3 { margin: 6px 0 4px; font-size: 20px; }
+  .card p { margin: 0; color: var(--muted); }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+  .steps li { counter-increment: s; position: relative; padding-left: 44px; margin: 10px 0; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--gold); color: #1b1404; font-weight: 800; display: grid; place-items: center; font-size: 15px; }
+
+  .check label { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; }
+  .check label:hover { border-color: var(--line); }
+  .check input { width: 22px; height: 22px; accent-color: var(--teal); flex: none; margin-top: 2px; }
+  .check input:checked + span { color: var(--muted); text-decoration: line-through; }
+  .bar { height: 10px; background: rgba(255,255,255,.08); border-radius: 6px; overflow: hidden; margin: 8px 0 16px; }
+  .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--teal), var(--gold)); transition: width .4s; }
+
+  form { display: grid; gap: 14px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  label.f { display: grid; gap: 6px; font-weight: 600; font-size: 15px; }
+  select, textarea { width: 100%; background: rgba(5,11,26,.6); color: var(--text); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font: 16px Inter, sans-serif; }
+  textarea { min-height: 110px; resize: vertical; }
+  .stars { display: flex; gap: 6px; }
+  .stars button { background: none; border: 0; font-size: 34px; cursor: pointer; color: rgba(233,196,106,.3); padding: 0; }
+  .stars button.on { color: var(--gold); }
+  .msg { color: #7fd1a8; min-height: 1.6em; margin: 0; }
+  footer { text-align: center; color: var(--muted); padding: 40px 16px 60px; font-size: 14px; border-top: 1px solid var(--line); }
+  @keyframes float { 50% { transform: translateY(-10px); } }
+</style>
+</head>
+<body>
+<div class="lang"><button data-l="de" class="on">DE</button><button data-l="tr">TR</button></div>
+
+<div class="wrap">
+  <header class="hero">
+    <svg class="moon" viewBox="0 0 100 100" aria-hidden="true"><path d="M62 8a42 42 0 1 0 30 62A34 34 0 1 1 62 8z" fill="#e9c46a"/><path d="M76 22l3 7 7 1-5 5 1 7-6-4-6 4 1-7-5-5 7-1z" fill="#f4a261"/></svg>
+    <span class="badge" data-i="badge"></span>
+    <h1>Namaz<b>VR</b></h1>
+    <div class="ar">السَّلَامُ عَلَيْكُمْ</div>
+    <p class="lead" data-i="lead"></p>
+    <div class="cta">
+      <a class="btn" href="./" data-i="open"></a>
+      <a class="btn alt" href="#test" data-i="howto"></a>
+    </div>
+  </header>
+
+  <section>
+    <h2 data-i="whatH"></h2>
+    <p class="sub" data-i="whatP"></p>
+    <div class="grid" id="features"></div>
+  </section>
+
+  <section id="test">
+    <h2 data-i="startH"></h2>
+    <p class="sub" data-i="startP"></p>
+    <div class="grid">
+      <div class="card"><div class="ico">🥽</div><h3>Meta Quest</h3><ol class="steps" id="s-quest"></ol></div>
+      <div class="card"><div class="ico">📱</div><h3 data-i="phone"></h3><ol class="steps" id="s-phone"></ol></div>
+      <div class="card"><div class="ico">💻</div><h3 data-i="pc"></h3><ol class="steps" id="s-pc"></ol></div>
+    </div>
+    <p style="margin-top:18px"><a class="btn green" href="./" data-i="open"></a> <a class="btn alt" href="./anleitung.html" data-i="guide"></a></p>
+  </section>
+
+  <section>
+    <h2 data-i="listH"></h2>
+    <p class="sub" data-i="listP"></p>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="card check" id="checks"></div>
+  </section>
+
+  <section id="feedback">
+    <h2 data-i="fbH"></h2>
+    <p class="sub" data-i="fbP"></p>
+    <form class="card" id="fb" onsubmit="return false">
+      <div class="row">
+        <label class="f"><span data-i="fDevice"></span><select id="device"></select></label>
+        <label class="f"><span data-i="fLang"></span><select id="applang"><option>Deutsch</option><option>Türkçe</option><option>English</option><option>العربية</option></select></label>
+      </div>
+      <div class="f"><span data-i="fStars"></span><div class="stars" id="stars"></div></div>
+      <label class="f"><span data-i="fGood"></span><textarea id="good"></textarea></label>
+      <label class="f"><span data-i="fBad"></span><textarea id="bad"></textarea></label>
+      <label class="f"><span data-i="fIdea"></span><textarea id="idea"></textarea></label>
+      <div class="cta" style="justify-content:flex-start">
+        <button class="btn" id="share" data-i="send"></button>
+        <a class="btn green" id="wa" target="_blank" rel="noopener" data-i="wa"></a>
+        <button class="btn alt" id="copy" data-i="copy"></button>
+      </div>
+      <p class="msg" id="msg"></p>
+    </form>
+  </section>
+</div>
+<footer><span data-i="foot"></span><br><a href="./anleitung.html" data-i="guide"></a> · <a href="./" data-i="open"></a></footer>
+
+<script>
+const T = {
+  de: {
+    badge: 'Beta-Test · Einladung', open: 'App öffnen', howto: 'So machst du mit', guide: 'Anleitung lesen',
+    lead: 'Beten lernen, Schritt für Schritt – in einer virtuellen Moschee mit der Meta Quest, auf dem Handy oder am Computer. Du gehörst zu den Ersten, die es ausprobieren. Danke, dass du hilfst!',
+    whatH: 'Was ist <em>NamazVR</em>?', whatP: 'Ein kostenloser Gebetsassistent – gemacht für Kinder, Jugendliche, Neue im Islam und alle, die sicherer werden wollen.',
+    feat: [
+      ['🕌', 'Schritt für Schritt', 'Alle 5 Gebete mit Arabisch, Umschrift und Bedeutung. Eine Figur macht jede Haltung vor.'],
+      ['🥽', 'In VR & im eigenen Zimmer', 'Mit der Quest in der Moschee stehen – oder in Mixed Reality zu Hause. Die App erkennt deine Haltung.'],
+      ['🔊', 'Liest vor', 'Kostenlose Stimmen auf Deutsch, Türkisch und Arabisch – nach einmal Laden auch ohne Internet.'],
+      ['👨‍👩‍👧', 'Für Kinder', 'Kinder-Modus mit einfachen Sätzen und Sternen. Suren lernen, Quiz und Abzeichen.'],
+      ['🤝', 'Cemaat', 'Mit Imam und Gemeinde beten – Frauen hinter dem Holzgitter oder auf der Empore.'],
+      ['🌙', 'Alltag', 'Gebetszeiten, Qibla-Kompass, Gebets-Tracker, Ramadan-Countdown mit Sahur und Iftar.'],
+      ['☮️', 'Frieden & Herz', 'Verse und Hadithe über Frieden und Barmherzigkeit, dazu eine Übung zum Ruhigwerden.'],
+      ['🌍', '4 Sprachen', 'Deutsch, Türkçe, English, العربية – und vier Rechtsschulen.'],
+    ],
+    startH: 'So <em>startest</em> du', startP: 'Kein App-Store nötig – einfach die Adresse öffnen: cembot90.github.io/namazvr',
+    phone: 'Handy', pc: 'Computer',
+    quest: ['Quest-Browser öffnen und die Adresse eingeben.', '„ENTER VR“ für die Moschee oder „START AR“ für dein Zimmer.', 'Mit Trigger oder Pinch die Knöpfe auf der Tafel drücken.'],
+    phoneS: ['Adresse im Browser öffnen.', 'Teilen-Menü → „Zum Home-Bildschirm“ – dann ist es wie eine App.', 'Unter Einstellungen → Stimmen eine Stimme laden.'],
+    pcS: ['Adresse in Chrome, Edge oder Firefox öffnen.', 'Mit der Maus umsehen und Knöpfe anklicken.', 'Pfeiltasten = Schritte, W A S D = durch die Moschee gehen.'],
+    listH: 'Deine <em>Test-Aufgaben</em>', listP: 'Hake ab, was du ausprobiert hast. Dein Häkchen bleibt auf deinem Gerät gespeichert.',
+    checks: [
+      'Sprache gewählt (Einstellungen)', 'Eine Stimme geladen und „Probe“ angehört', 'Wuḍūʾ lernen einmal durchgemacht',
+      'Ein ganzes Pflichtgebet mit Vorlesen gebetet', 'Auto-Modus ausprobiert (in VR: wird deine Haltung erkannt?)', 'Qibla eingestellt bzw. Handy-Kompass benutzt',
+      'Gebetszeiten mit deiner Moschee verglichen', 'Eine Sure gelernt und abgefragt', 'Kinder-Modus ausprobiert (gern mit einem Kind!)',
+      'Gebets-Tracker: heutige Gebete abgehakt', 'Ramadan-Seite angesehen', 'Cemaat in der Großmoschee (Frauen: auf der Empore)',
+      'Quiz gemacht', 'Mixed Reality (START AR) auf der Quest probiert',
+    ],
+    fbH: 'Deine <em>Rückmeldung</em>', fbP: 'Was war gut, was hat nicht geklappt, was fehlt? Die Nachricht geht nirgendwo automatisch hin – du schickst sie selbst, z. B. per WhatsApp.',
+    fDevice: 'Gerät', fLang: 'Sprache in der App', fStars: 'Wie gefällt dir NamazVR?', fGood: 'Das hat mir gefallen', fBad: 'Das hat nicht geklappt / war falsch', fIdea: 'Das wünsche ich mir',
+    devices: ['Meta Quest 3 / 3S', 'Meta Quest 2 / Pro', 'Android-Handy', 'iPhone', 'Tablet', 'Computer'],
+    send: 'Teilen', wa: 'Per WhatsApp', copy: 'Kopieren', copied: '✓ Kopiert – jetzt in eine Nachricht einfügen.', shared: '✓ Danke!',
+    mTitle: 'NamazVR Beta – Rückmeldung', mDevice: 'Gerät', mLang: 'Sprache', mStars: 'Bewertung', mGood: 'Gut', mBad: 'Probleme', mIdea: 'Wünsche', mDone: 'Getestet',
+    foot: 'NamazVR ist eine Lernhilfe nach verbreiteter sunnitischer Praxis. Bei Fragen zum Gebet wende dich an einen Imam deines Vertrauens.',
+  },
+  tr: {
+    badge: 'Beta testi · Davet', open: 'Uygulamayı aç', howto: 'Nasıl katılırım', guide: 'Kılavuzu oku',
+    lead: 'Adım adım namaz öğren – Meta Quest ile sanal bir camide, telefonda veya bilgisayarda. Deneyen ilk kişilerdensin. Yardımın için teşekkürler!',
+    whatH: '<em>NamazVR</em> nedir?', whatP: 'Ücretsiz bir namaz asistanı – çocuklar, gençler, İslam’a yeni girenler ve kendini daha güvende hissetmek isteyen herkes için.',
+    feat: [
+      ['🕌', 'Adım adım', '5 vakit namazın hepsi Arapça, okunuş ve anlamıyla. Bir figür her hareketi gösterir.'],
+      ['🥽', 'VR’da ve kendi odanda', 'Quest ile camide dur – ya da evde karma gerçeklikte. Uygulama duruşunu tanır.'],
+      ['🔊', 'Sesli okur', 'Almanca, Türkçe ve Arapça ücretsiz sesler – bir kez indirince internetsiz de çalışır.'],
+      ['👨‍👩‍👧', 'Çocuklar için', 'Basit cümleler ve yıldızlarla çocuk modu. Sure ezberleme, quiz ve rozetler.'],
+      ['🤝', 'Cemaat', 'İmam ve cemaatle namaz – kadınlar kafes arkasında veya mahfilde.'],
+      ['🌙', 'Günlük hayat', 'Namaz vakitleri, kıble pusulası, namaz takibi, sahur ve iftarlı Ramazan sayacı.'],
+      ['☮️', 'Barış ve gönül', 'Barış ve merhamet üzerine ayet ve hadisler, sakinleşme egzersizi.'],
+      ['🌍', '4 dil', 'Deutsch, Türkçe, English, العربية – ve dört mezhep.'],
+    ],
+    startH: 'Nasıl <em>başlarsın</em>', startP: 'Uygulama mağazası gerekmez – adresi aç yeter: cembot90.github.io/namazvr',
+    phone: 'Telefon', pc: 'Bilgisayar',
+    quest: ['Quest tarayıcısını aç ve adresi gir.', 'Cami için „ENTER VR“, kendi odan için „START AR“.', 'Paneldeki düğmelere tetik veya çimdikle bas.'],
+    phoneS: ['Adresi tarayıcıda aç.', 'Paylaş menüsü → „Ana ekrana ekle“ – uygulama gibi açılır.', 'Ayarlar → Sesler’den bir ses indir.'],
+    pcS: ['Adresi Chrome, Edge veya Firefox’ta aç.', 'Fareyle etrafa bak ve düğmelere tıkla.', 'Ok tuşları = adımlar, W A S D = camide yürü.'],
+    listH: 'Test <em>görevlerin</em>', listP: 'Denediklerini işaretle. İşaretlerin sadece senin cihazında kalır.',
+    checks: [
+      'Dil seçildi (Ayarlar)', 'Bir ses indirildi ve „Dinle“ ile denendi', 'Abdest öğrenme bir kez baştan sona yapıldı',
+      'Sesli okumayla bir farz namaz kılındı', 'Otomatik mod denendi (VR’da: duruşun tanınıyor mu?)', 'Kıble ayarlandı veya telefon pusulası kullanıldı',
+      'Namaz vakitleri camininkilerle karşılaştırıldı', 'Bir sure öğrenildi ve soruldu', 'Çocuk modu denendi (bir çocukla olursa daha iyi!)',
+      'Namaz takibi: bugünkü namazlar işaretlendi', 'Ramazan sayfasına bakıldı', 'Büyük camide cemaat (kadınlar: mahfilde)',
+      'Quiz çözüldü', 'Quest’te karma gerçeklik (START AR) denendi',
+    ],
+    fbH: 'Senin <em>görüşün</em>', fbP: 'Ne güzeldi, ne çalışmadı, ne eksik? Mesaj otomatik bir yere gitmez – sen kendin gönderirsin, mesela WhatsApp ile.',
+    fDevice: 'Cihaz', fLang: 'Uygulamadaki dil', fStars: 'NamazVR’ı nasıl buldun?', fGood: 'Beğendiklerim', fBad: 'Çalışmayan / yanlış olan', fIdea: 'İsteklerim',
+    devices: ['Meta Quest 3 / 3S', 'Meta Quest 2 / Pro', 'Android telefon', 'iPhone', 'Tablet', 'Bilgisayar'],
+    send: 'Paylaş', wa: 'WhatsApp ile', copy: 'Kopyala', copied: '✓ Kopyalandı – şimdi bir mesaja yapıştır.', shared: '✓ Teşekkürler!',
+    mTitle: 'NamazVR Beta – Görüş', mDevice: 'Cihaz', mLang: 'Dil', mStars: 'Puan', mGood: 'Güzel', mBad: 'Sorunlar', mIdea: 'İstekler', mDone: 'Test edilen',
+    foot: 'NamazVR, yaygın Sünnî uygulamaya göre hazırlanmış bir öğrenme yardımcısıdır. Namazla ilgili sorularında güvendiğin bir imama danış.',
+  },
+};
+const $ = (id) => document.getElementById(id);
+const store = { get(k, d) { try { const v = localStorage.getItem('namazvr.beta.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem('namazvr.beta.' + k, JSON.stringify(v)); } catch {} } };
+let lang = store.get('lang', (navigator.language || 'de').toLowerCase().startsWith('tr') ? 'tr' : 'de');
+let stars = store.get('stars', 0);
+let done = store.get('done', []);
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+function render() {
+  const L = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang button').forEach((b) => b.classList.toggle('on', b.dataset.l === lang));
+  document.querySelectorAll('[data-i]').forEach((el) => { el.innerHTML = L[el.dataset.i]; });
+  $('features').innerHTML = L.feat.map(([i, h, p]) => `<div class="card"><div class="ico">${i}</div><h3>${esc(h)}</h3><p>${esc(p)}</p></div>`).join('');
+  $('s-quest').innerHTML = L.quest.map((s) => `<li>${esc(s)}</li>`).join('');
+  $('s-phone').innerHTML = L.phoneS.map((s) => `<li>${esc(s)}</li>`).join('');
+  $('s-pc').innerHTML = L.pcS.map((s) => `<li>${esc(s)}</li>`).join('');
+  $('checks').innerHTML = L.checks.map((c, i) => `<label><input type="checkbox" data-c="${i}" ${done.includes(i) ? 'checked' : ''}><span>${esc(c)}</span></label>`).join('');
+  const dev = $('device').value;
+  $('device').innerHTML = L.devices.map((d, i) => `<option value="${i}">${esc(d)}</option>`).join('');
+  if (dev) $('device').value = dev;
+  $('stars').innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-s="${n}" class="${n <= stars ? 'on' : ''}" aria-label="${n}">★</button>`).join('');
+  $('bar').style.width = `${Math.round(100 * done.length / L.checks.length)}%`;
+  $('wa').href = 'https://wa.me/?text=' + encodeURIComponent(message());
+  $('msg').textContent = '';
+}
+
+function message() {
+  const L = T[lang];
+  const v = (id) => $(id).value.trim() || '–';
+  return [
+    L.mTitle,
+    `${L.mDevice}: ${L.devices[$('device').value || 0]} · ${L.mLang}: ${$('applang').value}`,
+    `${L.mStars}: ${'★'.repeat(stars)}${'☆'.repeat(5 - stars)}`,
+    `${L.mDone}: ${done.length}/${L.checks.length}`,
+    `${L.mGood}: ${v('good')}`,
+    `${L.mBad}: ${v('bad')}`,
+    `${L.mIdea}: ${v('idea')}`,
+  ].join('\n');
+}
+
+document.querySelector('.lang').onclick = (e) => { const l = e.target.dataset.l; if (l) { lang = l; store.set('lang', l); render(); } };
+$('checks').onchange = (e) => {
+  const i = Number(e.target.dataset.c);
+  done = e.target.checked ? [...new Set([...done, i])] : done.filter((x) => x !== i);
+  store.set('done', done);
+  $('bar').style.width = `${Math.round(100 * done.length / T[lang].checks.length)}%`;
+};
+$('stars').onclick = (e) => { const n = Number(e.target.dataset.s); if (n) { stars = n; store.set('stars', n); render(); } };
+// Entwurf der Rückmeldung merken, falls die Seite zugeht
+for (const id of ['good', 'bad', 'idea', 'device', 'applang']) {
+  const el = $(id);
+  const saved = store.get('f.' + id, null);
+  if (saved != null) el.value = saved;
+  el.addEventListener('input', () => { store.set('f.' + id, el.value); $('wa').href = 'https://wa.me/?text=' + encodeURIComponent(message()); });
+}
+$('share').onclick = async () => {
+  const text = message();
+  if (navigator.share) { try { await navigator.share({ title: T[lang].mTitle, text }); $('msg').textContent = T[lang].shared; } catch {} } else $('copy').click();
+};
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(message()); } catch {
+    const ta = document.createElement('textarea'); ta.value = message(); document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  $('msg').textContent = T[lang].copied;
+};
+render();
+for (const id of ['device', 'applang']) { const s = store.get('f.' + id, null); if (s != null) $(id).value = s; }
+$('wa').href = 'https://wa.me/?text=' + encodeURIComponent(message());
+</script>
+</body>
+</html>

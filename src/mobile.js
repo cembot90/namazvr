@@ -372,6 +372,7 @@ export class MobileUI {
   v_info() {
     return `${head(t('ui.info'))}
       ${t('ui.infoText').map((p) => `<p>${esc(p)}</p>`).join('')}
+      <p><a class="gold" href="./anleitung.html">📖 Anleitung</a> · <a class="gold" href="./beta.html">🧪 Beta-Test</a></p>
       ${btn(t('ui.back'), 'settings', { cls: 'wide' })}`;
   }
 }

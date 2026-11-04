@@ -34,6 +34,11 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Durch die Moschee gehen: W A S D am Computer, Stick auf der Quest
 - Handy-Version: Figur oben, Bedienung unten, Qibla-Kompass über den Handy-Sensor, installierbar und offline nutzbar
 
+## Anleitung und Beta-Test
+- `anleitung.html` – Anleitung für Nutzer (https://cembot90.github.io/namazvr/anleitung.html). **Wird bei jeder Änderung mitgepflegt**: neue Funktion → passenden Abschnitt ergänzen und unter „Was ist neu?“ eintragen.
+- `beta.html` – Einladung für Beta-Tester auf Deutsch und Türkisch (https://cembot90.github.io/namazvr/beta.html): Funktionen, Start auf Quest/Handy/PC, Test-Checkliste, Rückmeldung per WhatsApp/Teilen/Kopieren (keine Daten an einen Server).
+- `promo.html` – animierte Werbe-Präsentation.
+
 ## Lokal testen (ohne Headset)
 ```bash
 python3 -m http.server 8080
