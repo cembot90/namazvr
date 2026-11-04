@@ -36,9 +36,9 @@ export function newQuiz(count = 10) {
 }
 
 // --- Fortschritt ---
-export const emptyProgress = () => ({ done: {}, wudu: 0, quizBest: 0, quizRuns: 0, days: [], suras: {}, stars: 0 });
+export const emptyProgress = () => ({ done: {}, wudu: 0, quizBest: 0, quizRuns: 0, days: [], suras: {}, stars: 0, log: {}, starDays: [] });
 
-const dayKey = (d = new Date()) => {
+export const dayKey = (d = new Date()) => {
   const p = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 };
@@ -60,6 +60,8 @@ export function streak(progress) {
   return n;
 }
 
+const fullDay = (list) => PRAYERS.every((x) => list.includes(x.id));
+
 const BADGE_TESTS = [
   (p) => Object.keys(p.done).length > 0,
   (p) => PRAYERS.every((x) => p.done[x.id]),
@@ -70,5 +72,15 @@ const BADGE_TESTS = [
   (p) => Object.values(p.suras || {}).some(Boolean),
   (p) => ['fatiha', 'ikhlas', 'kawthar', 'asr', 'falaq', 'nas'].every((id) => p.suras?.[id]),
   (p) => (p.stars || 0) >= 10,
+  // Gebets-Tracker: ein Tag mit allen 5 Gebeten, 7 solche Tage in Folge
+  (p) => Object.values(p.log || {}).some(fullDay),
+  (p) => {
+    const full = (d) => fullDay(p.log?.[dayKey(d)] || []);
+    const d = new Date();
+    if (!full(d)) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while (n < 7 && full(d)) { n++; d.setDate(d.getDate() - 1); }
+    return n >= 7;
+  },
 ];
 export const BADGES = BADGE_TESTS.map((test, i) => ({ test, get name() { return t('badges')[i]; } }));

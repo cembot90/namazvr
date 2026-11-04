@@ -6,6 +6,8 @@ self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith('http')) return;
+  // Stimmen (Hugging Face) speichert die App selbst im Cache – nicht doppelt ablegen
+  if (new URL(e.request.url).hostname.endsWith('huggingface.co')) return;
   e.respondWith(
     fetch(e.request)
       .then((res) => {

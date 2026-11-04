@@ -184,11 +184,13 @@ export class Panel extends CanvasPlane {
     [
       [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
-      [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('ui.kidsBtn', v.kids), 'kids']],
+      [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('track.menu', v.tracked), 'tracker'], [t('ram.menu'), 'ramadan']],
+      [[t('ui.kidsBtn', v.kids), 'kids']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      this.btn(label, 60 + i * (bw + gap), 612 + ri * 90, bw, 78, action, { primary: action === 'wudu' && !v.wuduDone, active: action === 'kids' && v.kids, size: 30 });
+      const w = row.length === 1 ? 2 * bw + gap : bw;
+      this.btn(label, 60 + i * (bw + gap), 612 + ri * 84, w, 72, action, { primary: action === 'wudu' && !v.wuduDone, active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
     }));
-    this.text('السَّلَامُ عَلَيْكُمْ', W / 2, this.H - 60, { size: 44, font: AR, color: C.gold, align: 'center', rtl: true });
+    this.text('السَّلَامُ عَلَيْكُمْ', (60 + 2 * bw + 2 * gap + W - 60) / 2, 612 + 3 * 84 + 50, { size: 42, font: AR, color: C.gold, align: 'center', rtl: true, fixed: true });
   }
 
   v_times(v) {
@@ -271,7 +273,7 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.menu'), 300, by, 170, bh, 'menu');
     this.btn(v.auto ? t('ui.autoOn') : t('ui.autoOff'), 490, by, 220, bh, 'auto', { active: v.auto });
     this.btn(`${v.voice ? '🔊' : '🔇'} ${t('ui.speak')}`, 730, by, 230, bh, 'speak', { active: v.voice });
-    if (v.noVoice) this.text(t('ui.noVoiceLang'), W - 60, by - 12, { size: 21, color: C.gold, align: 'right' });
+    if (v.noVoice) this.text(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'), W - 60, by - 12, { size: 21, color: C.gold, align: 'right' });
     this.btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 980, by, W - 1040, bh, 'next', { primary: true });
   }
 
@@ -501,23 +503,25 @@ export class Panel extends CanvasPlane {
     row(645, t('ui.guideFor'), '', [[t('ui.men'), 'gender:m', v.gender !== 'f'], [t('ui.women'), 'gender:f', v.gender === 'f']]);
     row(728, t('ui.beginner'), t('ui.beginnerSub'), [[v.beginner ? t('ui.on') : t('ui.off'), 'beginner', v.beginner]]);
     row(811, t('ui.spiritual'), t('ui.spiritualSub'), [[v.spiritual ? t('ui.on') : t('ui.off'), 'spiritual', v.spiritual]]);
-    const half = (W - 120 - 20) / 2;
-    this.btn(t('ui.info'), 60, H - 98, half, 80, 'info');
-    this.btn(t('ui.back'), 60 + half + 20, H - 98, half, 80, 'menu');
+    const third = (W - 120 - 40) / 3;
+    this.btn(t('voice.btn'), 60, H - 98, third, 80, 'voice', { primary: true });
+    this.btn(t('ui.info'), 60 + third + 20, H - 98, third, 80, 'info');
+    this.btn(t('ui.back'), 60 + 2 * (third + 20), H - 98, third, 80, 'menu');
   }
 
   v_mosque(v) {
     const { W, H } = this;
     this.heading(t('ui.mosqueTitle'), t('ui.mosqueSub'));
     v.styles.forEach((st, i) => {
-      this.btn(st.name, 60, 130 + i * 110, W - 120, 98, `style:${st.id}`, { size: 36, sub: st.de, subSize: 23, active: st.id === v.style });
+      this.btn(st.name, 60, 128 + i * 100, W - 120, 90, `style:${st.id}`, { size: 31, sub: st.de, subSize: 21, active: st.id === v.style });
     });
-    this.paragraphs([t('ui.mosqueNote')], 598, { size: 21, color: C.muted, gap: 0 });
+    this.paragraphs([t('ui.mosqueNote')], 548, { size: 20, color: C.muted, gap: 0 });
     // Cemaat: Gemeinschaftsgebet mit Imam
     const row = (...a) => this.switchRow(...a);
-    row(650, t('ui.cemaat'), t('ui.cemaatTip'), [[v.cemaat ? t('ui.on') : t('ui.off'), 'cemaat', v.cemaat]]);
-    row(733, t('ui.cemaatSize'), '', [[t('ui.small'), 'csize:small', v.size !== 'large'], [t('ui.large'), 'csize:large', v.size === 'large']]);
-    row(816, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
+    row(585, t('ui.cemaat'), t('ui.cemaatTip'), [[v.cemaat ? t('ui.on') : t('ui.off'), 'cemaat', v.cemaat]]);
+    row(662, t('ui.cemaatSize'), '', [[t('ui.small'), 'csize:small', v.size !== 'large'], [t('ui.large'), 'csize:large', v.size === 'large']]);
+    row(739, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
+    row(816, t('gal.title'), t('gal.sub'), [[t('gal.screen'), 'women:screen', v.womenPlace !== 'gallery'], [t('gal.gallery'), 'women:gallery', v.womenPlace === 'gallery']]);
     this.btn(t('ui.back'), 60, H - 98, W - 120, 80, 'menu');
   }
 
@@ -541,12 +545,12 @@ export class Panel extends CanvasPlane {
     this.text(t('ui.badges'), 60, 350, { size: 32, weight: 600 });
     const bw = (W - 120 - gap * 2) / 3;
     v.badges.forEach((b, i) => {
-      const x = 60 + (i % 3) * (bw + gap), y = 375 + Math.floor(i / 3) * 90;
-      ctx.beginPath(); ctx.roundRect(x, y, bw, 74, 16);
+      const x = 60 + (i % 3) * (bw + gap), y = 372 + Math.floor(i / 3) * 78;
+      ctx.beginPath(); ctx.roundRect(x, y, bw, 66, 16);
       ctx.fillStyle = b.ok ? C.active : 'rgba(29,43,69,0.5)'; ctx.fill();
-      this.text(`${b.ok ? '★' : '☆'}  ${b.name}`, isRTL() ? x + bw - 24 : x + 24, y + 38, { size: 26, color: b.ok ? C.text : C.muted, base: 'middle', weight: b.ok ? 600 : '', align: isRTL() ? 'right' : 'left', fixed: true, rtl: isRTL() });
+      this.text(`${b.ok ? '★' : '☆'}  ${b.name}`, isRTL() ? x + bw - 24 : x + 24, y + 34, { size: 26, color: b.ok ? C.text : C.muted, base: 'middle', weight: b.ok ? 600 : '', align: isRTL() ? 'right' : 'left', fixed: true, rtl: isRTL() });
     });
-    this.text(t('ui.quizTeaser'), 60, 690, { size: 28, color: C.muted });
+    this.text(t('ui.quizTeaser'), 60, 718, { size: 26, color: C.muted });
     const by = H - 140, bw2 = (W - 120 - gap) / 2;
     this.btn(t('ui.quizStart'), 60, by - 120, W - 120, 100, 'quiz', { primary: true, size: 38 });
     this.btn(t('ui.resetProgress'), 60, by, bw2, 96, 'resetprogress', { size: 28 });
@@ -592,6 +596,89 @@ export class Panel extends CanvasPlane {
       this.btn(z.i === z.questions.length - 1 ? t('ui.result') : t('ui.nextQuestion'), W - 480, H - 140, 420, 96, 'quiznext', { primary: true });
     }
     this.btn(t('ui.cancel'), 60, H - 140, 300, 96, 'learn');
+  }
+
+  // Freie Stimmen: laden, probehören, löschen
+  v_voice(v) {
+    const { W, H, ctx } = this;
+    this.heading(t('voice.title'), t('voice.sub'));
+    let y = this.paragraphs(v.supported ? t('voice.intro') : [t('voice.unsupported')], 160, { size: 24, color: C.muted, gap: 4 });
+    this.switchRow(y, t('voice.use'), t('voice.useSub'), [[v.enabled ? t('ui.on') : t('ui.off'), 'piper', v.enabled]]);
+    y += 100;
+    for (const x of v.voices) {
+      ctx.beginPath(); ctx.roundRect(60, y, W - 120, 118, 18);
+      ctx.fillStyle = x.id === v.lang ? 'rgba(122,95,34,0.35)' : 'rgba(29,43,69,0.6)'; ctx.fill();
+      this.text(`${x.langName} – ${x.name}`, 90, y + 44, { size: 30, weight: 600 });
+      const status = x.status === 'ready' ? t('voice.ready') : x.status === 'loading' ? t('voice.loading', Math.round(x.progress * 100))
+        : x.status === 'error' ? t('voice.error') : t('voice.size', x.mb);
+      this.text(`${status} · ${x.license ? t('voice.license', x.license) : t('voice.licenseCard')}`, 90, y + 88, { size: 22, color: x.status === 'error' ? '#e8908a' : C.muted });
+      const b = (label, action, i, opt) => this.btn(label, isRTL() ? 80 + i * 210 : W - 80 - (i + 1) * 210 + 10, y + 19, 200, 80, action, { size: 26, ...opt });
+      if (x.status === 'ready') { b(t('voice.del'), `vdel:${x.id}`, 0); b(t('voice.test'), `vtest:${x.id}`, 1, { primary: true }); }
+      else if (x.status === 'loading') b(`${Math.round(x.progress * 100)} %`, 'noop', 0, { active: true });
+      else if (v.supported) b(x.status === 'error' ? t('voice.retry') : t('voice.load'), `vload:${x.id}`, 0, { primary: true });
+      y += 134;
+    }
+    this.paragraphs([t('voice.note')], y + 10, { size: 21, color: C.muted, gap: 0 });
+    this.btn(t('ui.back'), 60, H - 98, W - 120, 80, 'settings');
+  }
+
+  // Gebets-Tracker: heute (oder ein Tag davor) abhaken, darunter die Woche
+  v_tracker(v) {
+    const { W, H, ctx } = this;
+    const dayName = v.back === 0 ? t('track.today') : v.back === 1 ? t('track.yesterday') : `${v.day.label} ${v.day.date}`;
+    this.heading(t('track.title'), dayName);
+    const gap = 20, w = (W - 120 - gap * 4) / 5;
+    v.prayers.forEach((p, i) => {
+      this.btn(`${p.ok ? '✓ ' : ''}${p.name}`, 60 + i * (w + gap), 140, w, 150, `track:${p.id}`, { size: 34, sub: isRTL() ? '' : p.ar, subFont: AR, subSize: 40, primary: p.ok });
+    });
+    const n = v.prayers.filter((p) => p.ok).length;
+    this.text(v.dayDone ? t('track.allDone') : t('track.count', n), W / 2, 345, { size: 32, weight: 600, color: v.dayDone ? '#7fd1a8' : C.gold, align: 'center' });
+    // Woche: eine Spalte je Tag, ein Punkt je Gebet
+    const cw = (W - 120) / v.week.length;
+    v.week.forEach((d, k) => {
+      const x = isRTL() ? W - 60 - (k + 1) * cw : 60 + k * cw, cx = x + cw / 2;
+      if (d.back === v.back) { ctx.beginPath(); ctx.roundRect(x + 6, 380, cw - 12, 330, 16); ctx.fillStyle = 'rgba(122,95,34,0.35)'; ctx.fill(); }
+      this.text(d.label, cx, 418, { size: 26, weight: 600, align: 'center', fixed: true, color: d.back === 0 ? C.gold : C.text });
+      this.text(d.date, cx, 450, { size: 20, color: C.muted, align: 'center', fixed: true });
+      v.prayers.forEach((p, i) => {
+        ctx.beginPath(); ctx.arc(cx, 488 + i * 40, 13, 0, Math.PI * 2);
+        if (d.prayed.includes(p.id)) { ctx.fillStyle = C.gold; ctx.fill(); } else { ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(201,168,92,0.45)'; ctx.stroke(); }
+      });
+      if (d.done) this.text('★', cx, 700, { size: 30, color: C.gold, align: 'center', fixed: true });
+    });
+    this.text(t('track.streak', v.streak), 60, 760, { size: 28, weight: 600, color: v.streak ? '#7fd1a8' : C.muted });
+    this.text(v.kids ? t('track.kids') : t('track.auto'), 60, 800, { size: 22, color: C.muted });
+    const by = H - 140, bw = (W - 120 - 2 * gap) / 3;
+    this.btn(t('track.older'), 60, by, bw, 96, v.back < v.maxBack ? 'trackback' : 'noop', { size: 28 });
+    this.btn(t('track.newer'), 60 + bw + gap, by, bw, 96, v.back > 0 ? 'trackfwd' : 'noop', { size: 28 });
+    this.btn(t('ui.menu'), 60 + 2 * (bw + gap), by, bw, 96, 'menu');
+  }
+
+  // Ramadan: Countdown bzw. Fastentag mit Sahur- und Iftar-Zeit, dazu zwei Bittgebete
+  v_ramadan(v) {
+    const { W, H } = this;
+    this.heading(t('ram.title'), v.hijriToday);
+    let y;
+    if (v.inRamadan) {
+      this.text(t('ram.day', v.day, v.length), W / 2, 230, { size: 72, weight: 700, color: C.gold, align: 'center' });
+      const line = (label, x, yy) => this.text(`${label}: ${x.time}${x.past ? '' : ` · ${t('ui.inTime', x.inText)}`}`, 60, yy, { size: 32, weight: 600 });
+      line(t('ram.sahur'), v.sahur, 300);
+      if (v.iftar.past) this.text(t('ram.iftarDone'), 60, 350, { size: 32, weight: 600, color: '#7fd1a8' });
+      else line(t('ram.iftar'), v.iftar, 350);
+      y = this.paragraphs([v.lastTen ? t('ram.lastTen') : t('ram.fastNote'), v.eid ? t('ram.eidIn', v.eid.days, v.eidText) : ''].filter(Boolean), 400, { size: 24, color: C.muted, gap: 6 });
+    } else if (v.start) {
+      this.text(v.eidToday ? t('ram.eid') : t('ram.days', v.start.days), W / 2, 240, { size: v.eidToday ? 54 : 84, weight: 700, color: C.gold, align: 'center' });
+      this.text(t('ram.until', v.start.year), W / 2, 295, { size: 30, align: 'center' });
+      this.text(v.startText, W / 2, 345, { size: 32, weight: 600, align: 'center', color: C.gold });
+      y = this.paragraphs([t('ram.tarawih'), t('ram.sighting')], 395, { size: 24, color: C.muted, gap: 6 });
+    }
+    const d = v.dua && t(`ram.duas.${v.dua}`);
+    if (d) this.recitation({ ar: [d.ar], tr: [d.tr].filter(Boolean), de: [d.mean] }, y + 10, H - 160, true);
+    else this.paragraphs(v.kids ? [t('ram.kids')] : [t('ram.about')], y + 10, { size: 26, gap: 0 });
+    const by = H - 140, gap = 20, bw = (W - 120 - 2 * gap) / 3;
+    this.btn(t('ram.iftarDua'), 60, by, bw, 96, 'rdua:iftar', { size: 27, active: v.dua === 'iftar' });
+    this.btn(t('ram.niyyaBtn'), 60 + bw + gap, by, bw, 96, 'rdua:niyya', { size: 27, active: v.dua === 'niyya' });
+    this.btn(t('ui.menu'), 60 + 2 * (bw + gap), by, bw, 96, 'menu');
   }
 
   v_info() {

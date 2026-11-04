@@ -241,7 +241,7 @@ export default {
     ],
     rakat: (name) => `How many obligatory rakʿahs does the ${name} prayer have?`,
   },
-  badges: ['First prayer', 'All 5 daily prayers', 'Wuḍūʾ learned', 'Quiz pro (10/10)', '7 days in a row', 'Sunnah & Witr', 'First sura learned', 'All 6 suras', '10 stars'],
+  badges: ['First prayer', 'All 5 daily prayers', 'Wuḍūʾ learned', 'Quiz pro (10/10)', '7 days in a row', 'Sunnah & Witr', 'First sura learned', 'All 6 suras', '10 stars', 'A day with all 5 prayers', '7 days all 5 prayers'],
 
   styles: {
     klassisch: ['Classic', 'Wide hall with rows of columns, two domes, lanterns and a minbar'],
@@ -391,4 +391,42 @@ export default {
     cardIdle: 'Choose a prayer on the panel',
     hint: '<b>Without headset:</b> drag mouse = look around · click = button · ← / → = steps · M = menu · W A S D = walk through the mosque<br><b>With Meta Quest:</b> open the page in the Quest browser → “ENTER VR” (mosque) or “START AR” (mixed reality in your own room) · trigger or pinch = select · stick = walk',
   },
+
+  voice: {
+    btn: '🔊 Voices', title: 'Voices', sub: 'free · offline',
+    intro: ['Free, open voices (Piper) for German, Turkish and Arabic. Download once (Wi-Fi recommended) – then they work without internet.', 'Without a downloaded voice the app uses the device voice. The Arabic voice also reads the recitation and the imam’s calls.'],
+    use: 'Use free voices', useSub: 'when downloaded, instead of the device voice',
+    ready: '✓ downloaded, ready offline', loading: (p) => `downloading … ${p} %`, error: 'Download failed – check the internet', size: (mb) => `not downloaded · about ${mb} MB`,
+    license: (l) => `Licence ${l}`, licenseCard: 'Licence: see model card',
+    del: 'Delete', test: '▶ Sample', load: 'Download', retry: 'Retry',
+    note: 'Voices from the Piper project (rhasspy/piper-voices on Hugging Face). The files go directly to this device. A computer voice does not replace recitation with tajwīd.',
+    unsupported: 'This browser cannot play the free voices – the device voice is used.',
+    hintStep: 'No device voice – download a free voice under Settings → Voices.',
+  },
+  track: {
+    menu: (n) => `Prayer tracker ${n}/5`, title: 'Prayer tracker', today: 'Today', yesterday: 'Yesterday',
+    allDone: '✓ All 5 prayers – māshāʾ Allāh!', count: (n) => `${n} of 5 prayers prayed – tap what you have prayed`,
+    streak: (n) => (n ? `🔥 ${n} ${n === 1 ? 'day' : 'days'} in a row with all 5 prayers` : 'No days in a row with all 5 prayers yet'),
+    auto: 'Guided obligatory prayers are ticked automatically. Saved only on this device.',
+    kids: 'Every day with all 5 prayers earns an extra star ⭐',
+    older: '◀ Day before', newer: 'Day after ▶',
+  },
+  ram: {
+    menu: '🌙 Ramadan', title: 'Ramadan', day: (d, n) => `Day ${d} of ${n}`,
+    sahur: 'Suhoor ends (imsāk)', iftar: 'Iftar (Maghrib)', iftarDone: '✓ Iftar time has passed – enjoy your meal!',
+    lastTen: 'The last ten nights: one of them is Laylat al-Qadr, better than a thousand months (Quran 97:3).',
+    fastNote: 'The fast lasts from dawn (Fajr) until sunset (Maghrib).',
+    eidIn: (n, date) => `Eid al-Fitr in ${n} ${n === 1 ? 'day' : 'days'}: ${date}`,
+    eid: 'Eid mubarak! 🌙', days: (n) => `${n} ${n === 1 ? 'day' : 'days'}`, until: (y) => `until Ramadan ${y}`,
+    tarawih: 'The first tarāwīḥ prayer is on the evening before.',
+    sighting: 'Calculated with the Umm al-Qura calendar; depending on the country and moon sighting the start may differ by one day.',
+    kids: 'In Ramadan adults fast from dawn to sunset. Children don’t have to fast yet – they may practise, for example until midday. The best things in Ramadan: sharing, helping and being kind.',
+    about: 'Ramadan is the month in which the Quran was revealed (Quran 2:185): fasting, prayer, reading the Quran, charity and mercy.',
+    iftarDua: '🔊 Iftar duʿāʾ', niyyaBtn: '🔊 Intention (niyya)',
+    duas: {
+      iftar: { ar: 'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ', tr: 'Dhahaba ẓ-ẓamaʾu wa-btallati l-ʿurūqu wa-thabata l-ajru in shāʾa llāh', mean: 'The thirst has gone, the veins are moistened, and the reward is certain, if Allah wills. (Abū Dāwūd)' },
+      niyya: { ar: 'نَوَيْتُ أَنْ أَصُومَ غَدًا مِنْ شَهْرِ رَمَضَانَ', tr: 'Nawaitu an aṣūma ghadan min shahri Ramaḍān', mean: 'I intend to fast tomorrow in the month of Ramadan. – The intention in the heart is enough; saying it aloud is not required.' },
+    },
+  },
+  gal: { title: 'Women’s section', sub: 'behind the lattice or on the gallery (great mosque)', screen: 'Lattice', gallery: 'Gallery' },
 };

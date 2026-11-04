@@ -27,6 +27,10 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Anfänger-Modus (langsamer, liest jeden Schritt vor) und Spiritueller Modus (innere Bedeutung jedes Schritts, Atem-Dhikr im Tasbīḥ)
 - Vier große Moscheen (26–60 m): Klassisch, Osmanisch, Andalusisch und Großmoschee mit Nebenkuppeln, Emporen und Buntglas; jede mit Minbar; nachts dunkle Fenster und hellere Lampen (freie Gestaltungen, keine Nachbauten)
 - Cemaat (Gemeinschaftsgebet): Imam vorn, Gemeinde in Reihen (klein oder groß wie am Freitag); im natürlichen Takt folgt jeder mit eigener Verzögerung, eigenem Tempo und kleinen Abweichungen, ein Nachzügler kommt in der zweiten Rakʿa und holt sie nach dem Salām nach; danach Bittgebet im Sitzen; der Imam spricht Takbīr, „Samiʿa llāhu…“ und Salām (wenn das Gerät eine arabische Stimme hat); als Frau betest du im eigenen Frauenbereich hinter einer Holzgitterwand (Kafes), die Männer beten davor, nie gemischt
+- Frauenbereich wählbar: hinter dem Holzgitter oder auf der Empore der Großmoschee – als Frau betest du oben an der Brüstung und siehst unten Imam und Männerreihen; als Mann beten die Frauen oben auf der Empore
+- Freie Stimmen (kostenlos, offline): Piper-Stimmen für Deutsch (Thorsten, CC0), Türkisch (DFKI) und Arabisch (Kareem) – einmal in Einstellungen → Stimmen laden (je ca. 63 MB, direkt von Hugging Face auf das Gerät), danach ohne Internet; die arabische Stimme liest auch Rezitation, Suren und die Rufe des Imams; ohne geladene Stimme wird die Gerätestimme benutzt
+- Gebets-Tracker: die 5 Gebete des Tages abhaken (geführte Pflichtgebete automatisch), 7 Tage zurück nachtragen, Wochenübersicht, Tage in Folge mit allen 5 Gebeten, zwei neue Abzeichen; im Kinder-Modus ein Extra-Stern für jeden vollen Tag
+- Ramadan: islamisches Datum (Umm-al-Qura), Countdown bis Ramadan, im Ramadan Fastentag, Sahur-Ende (Imsāk) und Iftar mit Countdown, die letzten zehn Nächte, Countdown bis zum Fest; Iftar-Duʿāʾ und Niyya zum Anhören; kindgerechte Erklärung
 - Durch die Moschee gehen: W A S D am Computer, Stick auf der Quest
 - Handy-Version: Figur oben, Bedienung unten, Qibla-Kompass über den Handy-Sensor, installierbar und offline nutzbar
 
@@ -67,6 +71,10 @@ WebXR braucht HTTPS. Am einfachsten:
 - `src/congregation.js` – Imam und Gemeinde für das Gemeinschaftsgebet
 - `src/qibla.js` – Qibla-Berechnung und Städte
 - `src/prayertimes.js` – Gebetszeiten-Berechnung
+- `src/voice.js`, `src/piper-worker.js` – Sprachausgabe: freie Piper-Stimmen im Hintergrund-Worker, sonst Gerätestimme
+- `vendor/ort/` – ONNX Runtime Web 1.18 (MIT), `vendor/piper/` – espeak-ng-Lautschrift für Piper (piper-wasm, MIT; espeak-ng GPL-3.0)
+- `src/tracker.js` – Gebets-Tracker
+- `src/ramadan.js` – islamischer Kalender, Ramadan-Countdown, Sahur/Iftar
 - `src/main.js` – Szene, Eingabe (Maus, Touch, Controller, Hand-Tracking), Zustand
 - `manifest.webmanifest`, `sw.js`, `icons/` – installierbare App (PWA), offline
 

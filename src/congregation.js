@@ -65,6 +65,8 @@ export class Congregation {
   constructor() {
     this.group = new THREE.Group();
     this.group.visible = false;
+    // Zweite Ebene (Empore bzw. Saal darunter), gegenüber dem Nutzer verschoben
+    this.far = new THREE.Group();
     this.people = [];
     this.imam = null;
     this.late = null;
@@ -74,44 +76,60 @@ export class Congregation {
 
   // size: 'small' | 'large'; gender: des Nutzers; natural: natürlicher Takt statt Gleichtakt
   // blocked(x, z): steht dort eine Säule? Dann bleibt der Platz frei.
-  build({ size = 'small', gender = 'm', natural = true, blocked = () => false } = {}) {
+  // gallery: { top, z } – Frauen beten auf der Empore (Großmoschee); top = Höhe, z = Lage des Platzes an der Brüstung
+  build({ size = 'small', gender = 'm', natural = true, blocked = () => false, gallery = null } = {}) {
     this.clear();
     this.natural = natural;
-    this.blocked = blocked;
     const large = size === 'large', female = gender === 'f';
+    // Betet der Nutzer als Frau auf der Empore, stehen die eigene Reihe und die Reihen dahinter oben (ohne Säulen);
+    // Männer und Imam beten unten im Saal (Gruppe `far`, um Höhe und Abstand der Empore verschoben).
+    const up = female && gallery;
+    this.blocked = up ? () => false : blocked;
     // Erste Reihe links und rechts vom Nutzer, dahinter weitere Reihen
     const side = large ? 7 : 3;
-    for (let k = 1; k <= side; k++) for (const s of [-1, 1]) if (!blocked(s * k * SLOT, 0)) this.add({ x: s * k * SLOT, z: 0, female });
+    for (let k = 1; k <= side; k++) for (const s of [-1, 1]) if (!this.blocked(s * k * SLOT, 0)) this.add({ x: s * k * SLOT, z: 0, female });
     (large ? [14, 13, 12] : [6]).forEach((n, r) => this.addRow(n, (r + 1) * ROW, female));
-    // Betet der Nutzer als Frau: eigener Frauenbereich hinter einer Holzgitterwand (Kafes),
-    // die Männer beten davor; durch das Gitter sieht man den Imam und kann ihm folgen.
-    let imamZ = -2.1;
-    if (female) {
+    let imamZ = -2.1, imamParent = this.group;
+    if (gallery) {
+      this.far.position.set(0, up ? -gallery.top : gallery.top, up ? -gallery.z : gallery.z);
+      this.blocked = up ? blocked : () => false;
+      if (up) {
+        // Unten im Saal: Männerreihen, der Imam vorn am Mihrab
+        (large ? [15, 15, 14, 14, 13] : [7, 7]).forEach((n, r) => this.addRow(n, r * ROW, false, null, this.far));
+        imamParent = this.far;
+      } else {
+        // Der Nutzer betet unten; oben auf der Empore beten die Frauen
+        (large ? [15, 15] : [7]).forEach((n, r) => this.addRow(n, r * ROW, true, null, this.far));
+      }
+      this.blocked = up ? () => false : blocked;
+    } else if (female) {
+      // Eigener Frauenbereich hinter einer Holzgitterwand (Kafes), die Männer beten davor;
+      // durch das Gitter sieht man den Imam und kann ihm folgen.
       const rows = large ? [15, 15] : [7];
       rows.forEach((n, r) => this.addRow(n, -3.6 - r * ROW, false));
       imamZ = -3.6 - rows.length * ROW;
       this.group.add(latticeScreen(large ? 16 : 9, SCREEN_Z));
     }
-    this.imam = this.add({ x: 0.25, z: imamZ, female: false, imam: true });
+    this.imam = this.add({ x: 0.25, z: imamZ, female: false, imam: true, parent: imamParent });
     // Ein Nachzügler (Masbūq) kommt in der zweiten Rakʿa dazu und holt die verpasste Rakʿa nach dem Salām nach.
     if (natural) {
       let k = side + 1;
-      while (blocked(k * SLOT, 0)) k++;
+      while (this.blocked(k * SLOT, 0)) k++;
       this.late = this.add({ x: k * SLOT, z: 0, female });
       this.late.late = true;
     }
     this.reset();
   }
 
-  addRow(n, z, female, gap = null) {
+  addRow(n, z, female, gap = null, parent = this.group) {
     for (let k = 0; k < n; k++) {
       const x = (k - (n - 1) / 2) * SLOT;
       if ((gap && x > gap[0] && x < gap[1]) || this.blocked(x, z)) continue;
-      this.add({ x, z, female });
+      this.add({ x, z, female, parent });
     }
   }
 
-  add({ x, z, female, imam = false }) {
+  add({ x, z, female, imam = false, parent = this.group }) {
     const g = new Guide({
       robe: imam ? 0xfbfaf6 : pick(ROBES),
       skin: pick(SKINS),
@@ -130,13 +148,16 @@ export class Congregation {
         g.vary = { spine: rand(-0.07, 0.07), headX: rand(-0.12, 0.12), shZ: rand(-0.05, 0.05), elX: rand(-0.08, 0.08) };
       }
     }
-    this.group.add(g.group);
+    parent.add(g.group);
     this.people.push(p);
     return p;
   }
 
   clear() {
     this.group.clear();
+    this.far.clear();
+    this.far.position.set(0, 0, 0);
+    this.group.add(this.far);
     this.people = [];
     this.imam = this.late = null;
   }

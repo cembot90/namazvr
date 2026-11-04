@@ -61,6 +61,7 @@ export class MobileUI {
         ${btn(t('ui.menuQiblaMobile'), 'qibla')}${btn(t('ui.menuTasbih'), 'tasbih')}
         ${btn(t('ui.menuMosque'), 'mosque')}${btn(t('ui.menuSettings'), 'settings')}
         ${btn(t('ui.menuSuras'), 'suras', { cls: 'primary' })}${btn(t('ui.menuPeace'), 'peace')}
+        ${btn(t('track.menu', v.tracked), 'tracker', { cls: v.tracked === 5 ? 'active' : '' })}${btn(t('ram.menu'), 'ramadan')}
         ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: `wide ${v.kids ? 'active' : ''}` })}
       </div>`;
   }
@@ -152,6 +153,7 @@ export class MobileUI {
       <p class="muted">${esc(s.instr)}</p>
       ${recitation(s)}
       <div class="dock">
+        ${v.noVoice ? `<p class="gold small center">${esc(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'))}</p>` : ''}
         ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn(t('ui.menu'), 'menu')}${btn(v.auto ? t('ui.autoOnShort') : t('ui.autoShort'), 'auto', { cls: v.auto ? 'active' : '' })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '' })}
         ${btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 'next', { cls: 'primary' })}
       </div>`;
@@ -255,7 +257,66 @@ export class MobileUI {
       <div class="grid2">${btn(t('ui.men'), 'gender:m', { cls: v.gender !== 'f' ? 'active' : '' })}${btn(t('ui.women'), 'gender:f', { cls: v.gender === 'f' ? 'active' : '' })}</div>
       ${toggle(t('ui.beginner'), t('ui.beginnerSubShort'), 'beginner', v.beginner)}
       ${toggle(t('ui.spiritual'), t('ui.spiritualSubShort'), 'spiritual', v.spiritual)}
+      ${btn(t('voice.btn'), 'voice', { cls: 'primary wide' })}
       <div class="grid2">${btn(t('ui.info'), 'info')}${btn(t('ui.back'), 'menu')}</div>`;
+  }
+
+  v_voice(v) {
+    const row = (x) => {
+      const status = x.status === 'ready' ? t('voice.ready') : x.status === 'loading' ? t('voice.loading', Math.round(x.progress * 100))
+        : x.status === 'error' ? t('voice.error') : t('voice.size', x.mb);
+      const buttons = x.status === 'ready' ? `${btn(t('voice.test'), `vtest:${x.id}`, { cls: 'primary' })}${btn(t('voice.del'), `vdel:${x.id}`)}`
+        : x.status === 'loading' ? btn(`${Math.round(x.progress * 100)} %`, 'noop', { cls: 'active' })
+          : v.supported ? btn(x.status === 'error' ? t('voice.retry') : t('voice.load'), `vload:${x.id}`, { cls: 'primary' }) : '';
+      const lic = x.license ? t('voice.license', x.license) : t('voice.licenseCard');
+      return `<div class="voice ${x.id === v.lang ? 'cur' : ''}"><b>${esc(x.langName)} – ${esc(x.name)}</b>
+        <small class="${x.status === 'error' ? 'bad' : ''}">${esc(status)} · <a href="${esc(x.card)}" target="_blank" rel="noopener">${esc(lic)}</a></small>
+        <div class="grid2">${buttons}</div></div>`;
+    };
+    const toggle = `<div class="setting"><div><b>${esc(t('voice.use'))}</b><small>${esc(t('voice.useSub'))}</small></div>${btn(v.enabled ? t('ui.on') : t('ui.off'), 'piper', { cls: v.enabled ? 'active' : '' })}</div>`;
+    return `${head(t('voice.title'), t('voice.sub'))}
+      ${(v.supported ? t('voice.intro') : [t('voice.unsupported')]).map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
+      ${toggle}
+      ${v.voices.map(row).join('')}
+      <p class="muted small">${esc(t('voice.note'))}</p>
+      ${btn(t('ui.back'), 'settings', { cls: 'wide' })}`;
+  }
+
+  v_tracker(v) {
+    const dayName = v.back === 0 ? t('track.today') : v.back === 1 ? t('track.yesterday') : `${v.day.label} ${v.day.date}`;
+    const n = v.prayers.filter((p) => p.ok).length;
+    const weekRows = `<div class="week">${v.week.map((d) => `<div class="${d.back === v.back ? 'sel' : ''}"><b>${esc(d.label)}</b><small>${esc(d.date)}</small>${v.prayers.map((p) => `<i class="${d.prayed.includes(p.id) ? 'on' : ''}"></i>`).join('')}<em>${d.done ? '★' : ''}</em></div>`).join('')}</div>`;
+    return `${head(t('track.title'), dayName)}
+      <div class="grid5">${v.prayers.map((p) => btn(`${p.ok ? '✓ ' : ''}${p.name}`, `track:${p.id}`, { cls: p.ok ? 'primary' : '', sub: isRTL() ? '' : p.ar, subAr: true })).join('')}</div>
+      <p class="center ${v.dayDone ? 'ok' : 'gold'}">${esc(v.dayDone ? t('track.allDone') : t('track.count', n))}</p>
+      ${weekRows}
+      <p class="${v.streak ? 'ok' : 'muted'}">${esc(t('track.streak', v.streak))}</p>
+      <p class="muted small">${esc(v.kids ? t('track.kids') : t('track.auto'))}</p>
+      <div class="grid2">${btn(t('track.older'), v.back < v.maxBack ? 'trackback' : 'noop')}${btn(t('track.newer'), v.back > 0 ? 'trackfwd' : 'noop')}</div>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_ramadan(v) {
+    let top;
+    if (v.inRamadan) {
+      const line = (label, x) => `<p><b>${esc(label)}: ${esc(x.time)}</b>${x.past ? '' : ` <span class="muted">· ${esc(t('ui.inTime', x.inText))}</span>`}</p>`;
+      top = `<p class="count">${esc(t('ram.day', v.day, v.length))}</p>
+        ${line(t('ram.sahur'), v.sahur)}
+        ${v.iftar.past ? `<p class="ok"><b>${esc(t('ram.iftarDone'))}</b></p>` : line(t('ram.iftar'), v.iftar)}
+        <p class="muted small">${esc(v.lastTen ? t('ram.lastTen') : t('ram.fastNote'))}</p>
+        ${v.eid ? `<p class="gold">${esc(t('ram.eidIn', v.eid.days, v.eidText))}</p>` : ''}`;
+    } else if (v.start) {
+      top = `<p class="count">${esc(v.eidToday ? t('ram.eid') : t('ram.days', v.start.days))}</p>
+        <p class="center">${esc(t('ram.until', v.start.year))}</p>
+        <p class="center gold"><b>${esc(v.startText)}</b></p>
+        <p class="muted small">${esc(t('ram.tarawih'))} ${esc(t('ram.sighting'))}</p>`;
+    } else top = '';
+    const d = v.dua && t(`ram.duas.${v.dua}`);
+    return `${head(t('ram.title'), v.hijriToday)}
+      ${top}
+      ${d ? recitation({ ar: [d.ar], tr: [d.tr].filter(Boolean), de: [d.mean] }) : `<p>${esc(v.kids ? t('ram.kids') : t('ram.about'))}</p>`}
+      <div class="grid2">${btn(t('ram.iftarDua'), 'rdua:iftar', { cls: v.dua === 'iftar' ? 'active' : '' })}${btn(t('ram.niyyaBtn'), 'rdua:niyya', { cls: v.dua === 'niyya' ? 'active' : '' })}</div>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
   v_learn(v) {
@@ -302,6 +363,8 @@ export class MobileUI {
       <div class="grid2">${btn(t('ui.small'), 'csize:small', { cls: v.size !== 'large' ? 'active' : '' })}${btn(t('ui.large'), 'csize:large', { cls: v.size === 'large' ? 'active' : '' })}</div>
       <p class="muted small">${esc(t('ui.takt'))} – ${esc(t('ui.taktSub'))}</p>
       <div class="grid2">${btn(t('ui.natural'), 'ctakt:natural', { cls: v.natural ? 'active' : '' })}${btn(t('ui.sync'), 'ctakt:sync', { cls: v.natural ? '' : 'active' })}</div>
+      <p class="muted small">${esc(t('gal.title'))} – ${esc(t('gal.sub'))}</p>
+      <div class="grid2">${btn(t('gal.screen'), 'women:screen', { cls: v.womenPlace !== 'gallery' ? 'active' : '' })}${btn(t('gal.gallery'), 'women:gallery', { cls: v.womenPlace === 'gallery' ? 'active' : '' })}</div>
       <p class="gold small">${esc(t('ui.cemaatTip'))}</p>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
   }

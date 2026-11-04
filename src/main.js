@@ -3,7 +3,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import { STYLES, buildEnvironment, clearEnvironment, makeFloorCompass, makeRug, roomBounds, blocked } from './environment.js';
+import { STYLES, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked } from './environment.js';
 import { Guide } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
@@ -19,6 +19,10 @@ import { MobileUI } from './mobile.js';
 import { checkHands, indexRaised, readHand } from './hands.js';
 import { CITIES, qiblaBearing } from './qibla.js';
 import { ASR, METHODS, TIME_NAMES, formatCountdown, formatTime, prayerStatus } from './prayertimes.js';
+import { PIPER, SAMPLES, Voices } from './voice.js';
+import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
+import { formatDay, ramadanInfo } from './ramadan.js';
+import { dayKey } from './learn.js';
 
 const store = {
   get(key, fallback) {
@@ -132,6 +136,11 @@ const state = {
   cemaat: store.get('cemaat', false),
   cemaatSize: store.get('cemaatSize', 'small'),
   cemaatNatural: store.get('cemaatNatural', true),
+  // Frauenbereich: hinter dem Holzgitter ('screen') oder auf der Empore der Großmoschee ('gallery')
+  womenPlace: store.get('womenPlace', 'screen'),
+  // Gebets-Tracker: angezeigter Tag (0 = heute, 1 = gestern …)
+  trackBack: 0,
+  ramadanDua: null,
   breath: { on: false, t: 0, phase: 'in' },
   progress: { ...emptyProgress(), ...store.get('progress', {}) },
   quiz: null,
@@ -139,6 +148,9 @@ const state = {
   // dazu in Mixed Reality/VR mit Hand-Erkennung: Hinweis zur Handhaltung und erhobener Zeigefinger
   posture: { standH: null, ok: false, held: 0, cueT: 0, handHint: null, finger: false },
 };
+
+// Sprachausgabe: freie Piper-Stimmen, sonst die Stimme des Geräts
+const voices = new Voices({ enabled: store.get('piper', true), onChange: () => refresh() });
 
 const madhab = () => MADHABS.find((m) => m.id === state.madhab) || MADHABS[0];
 const bearing = () => qiblaBearing(state.location.lat, state.location.lon);
@@ -186,18 +198,25 @@ function rebuildEnv() {
   buildEnvironment(env, state.style, { night: state.night });
 }
 
+// Empore nur in der Großmoschee; sonst beten die Frauen hinter dem Holzgitter
+const gallery = () => (state.womenPlace === 'gallery' ? galleryInfo(state.style) : null);
+// Betet man als Frau auf der Empore, steht man oben: der Saal liegt tiefer und weiter vorn.
+const onGallery = () => !!gallery() && state.gender === 'f' && cong.group.visible;
+
 function rebuildCong() {
-  cong.build({ size: state.cemaatSize, gender: state.gender, natural: state.cemaatNatural, blocked });
-  updateCast();
+  cong.build({ size: state.cemaatSize, gender: state.gender, natural: state.cemaatNatural, blocked, gallery: gallery() });
+  updateCast(true);
 }
 
 // Mit Cemaat beten Imam und Gemeinde; bei der Gebetswaschung zeigt weiter die Vorbeter-Figur.
-function updateCast() {
+function updateCast(force = false) {
   const wudu = state.view === 'step' && state.prayer?.kind === 'wudu';
   const show = state.cemaat && !wudu;
-  if (show === cong.group.visible) return;
+  if (show === cong.group.visible && !force) return;
   cong.group.visible = show;
   guide.group.visible = guideRug.visible = !show;
+  const g = onGallery() ? gallery() : null;
+  env.position.set(0, g ? -g.top : 0, g ? -g.z : 0);
   // Handy: Kamera auf Imam und Reihen bzw. zurück auf die Vorbeter-Figur
   if (mobileUI) aimAtGuide();
 }
@@ -225,9 +244,35 @@ function view() {
         finger: renderer.xr.isPresenting && state.posture.finger,
         voice: state.voice,
         noVoice: state.voice && voiceMissing(),
+        canDownload: voices.supported && !!PIPER[langInfo().speech],
       };
     case 'mosque':
-      return { type: 'mosque', styles: STYLES, style: state.style, cemaat: state.cemaat, size: state.cemaatSize, natural: state.cemaatNatural };
+      return { type: 'mosque', styles: STYLES, style: state.style, cemaat: state.cemaat, size: state.cemaatSize, natural: state.cemaatNatural, womenPlace: state.womenPlace };
+    case 'voice':
+      return {
+        type: 'voice', enabled: voices.enabled, supported: voices.supported, lang: langInfo().speech,
+        voices: Object.entries(PIPER).map(([id, v]) => ({ ...v, id, model: v.id, langName: LANGS.find((l) => l.id === id).name, status: voices.status(id), progress: voices.progress(id), error: voices.state[id]?.error })),
+      };
+    case 'tracker': {
+      const p = state.progress, key = keyFor(state.trackBack);
+      return {
+        type: 'tracker', back: state.trackBack, maxBack: TRACK_DAYS - 1, kids: state.kids,
+        day: week(p).find((d) => d.back === state.trackBack),
+        prayers: PRAYERS.map((x) => ({ id: x.id, name: x.name, ar: x.ar, ok: prayedOn(p, key).includes(x.id) })),
+        week: week(p), streak: fullStreak(p), dayDone: dayDone(p, key),
+      };
+    }
+    case 'ramadan': {
+      const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
+      const r = ramadanInfo(loc, new Date(), state.method, state.asr);
+      const now = new Date();
+      const at = (d) => d && { time: formatTime(d, loc.timeZone), inText: formatCountdown(d - now), past: d <= now };
+      return {
+        type: 'ramadan', ...r, location: locationName(), kids: state.kids, dua: state.ramadanDua,
+        startText: r.start && formatDay(r.start.date), eidText: r.eid && formatDay(r.eid.date),
+        sahur: at(r.inRamadan && r.nextSahur), iftar: at(r.inRamadan && r.maghrib),
+      };
+    }
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'settings':
@@ -276,6 +321,7 @@ function view() {
         madhab: madhab().name,
         wuduDone: state.progress.wudu > 0,
         kids: state.kids,
+        tracked: prayedOn(state.progress, dayKey()).length,
       };
   }
 }
@@ -326,18 +372,10 @@ function start(prayer) {
   onStep();
 }
 
-// Arabisch vorlesen, falls das Gerät eine arabische Stimme hat; sonst false.
+// Arabisch vorlesen (freie Stimme oder Gerätestimme); false, wenn es keine arabische Stimme gibt.
 function sayArabic(line, { rate = 0.8, pitch = 1 } = {}) {
-  if (!('speechSynthesis' in window)) return false;
-  const voice = window.speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith('ar'));
-  if (!voice) return false;
-  const u = new SpeechSynthesisUtterance(line);
-  u.voice = voice;
-  u.lang = voice.lang;
-  u.rate = rate;
-  u.pitch = pitch;
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(u);
+  if (!voices.has('ar')) return false;
+  voices.say([{ text: line, lang: 'ar', rate, pitch }]);
   return true;
 }
 
@@ -352,35 +390,20 @@ function imamCall(step, prev) {
   if (line) sayArabic(line, { rate: 0.75, pitch: 0.8 });
 }
 
-// Hat das Gerät eine Stimme für die gewählte Sprache? (Solange die Stimmen noch laden: ja annehmen.)
-function voiceMissing() {
-  if (!('speechSynthesis' in window)) return true;
-  const voices = window.speechSynthesis.getVoices();
-  return voices.length > 0 && !voices.some((v) => v.lang?.toLowerCase().startsWith(langInfo().speech));
-}
+// Gibt es eine Stimme für die gewählte Sprache? (Solange die Gerätestimmen noch laden: ja annehmen.)
+const voiceMissing = () => voices.missing(langInfo().speech);
 if ('speechSynthesis' in window) window.speechSynthesis.addEventListener?.('voiceschanged', () => refresh());
 
 function speak() {
   const step = state.view === 'step' && state.steps[state.i];
-  if (!step || !('speechSynthesis' in window)) return;
-  const synth = window.speechSynthesis;
-  synth.cancel();
-  const voices = synth.getVoices();
-  const say = (text, lang, rate = 1) => {
-    const u = new SpeechSynthesisUtterance(text);
-    const voice = voices.find((v) => v.lang?.toLowerCase().startsWith(lang));
-    if (voice) u.voice = voice;
-    u.lang = voice?.lang || lang;
-    u.rate = rate;
-    synth.speak(u);
-    return !!voice;
-  };
+  if (!step) return;
   const m = step.wudu ? { cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
   // Arabisch: Anleitung und Rezitation in einem Zug mit derselben Stimme
   const lang = langInfo().speech;
-  if (lang === 'ar') { say([`${m.cue}.`, step.instr, ...step.ar].join(' '), 'ar', 0.9); return; }
-  say([`${m.cue}.`, step.instr, ...step.de].join(' '), lang);
-  if (step.ar.length && voices.some((v) => v.lang?.toLowerCase().startsWith('ar'))) say(step.ar.join('، '), 'ar', 0.8);
+  if (lang === 'ar') { voices.say([{ text: [`${m.cue}.`, step.instr, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
+  const parts = [{ text: [`${m.cue}.`, step.instr, ...step.de].join(' '), lang }];
+  if (step.ar.length && voices.has('ar')) parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
+  voices.say(parts);
 }
 
 function locate() {
@@ -397,6 +420,14 @@ function locate() {
     () => { state.msg = t('ui.gpsFail'); refresh(); },
     { timeout: 10000 },
   );
+}
+
+// Kinder bekommen für jeden Tag mit allen 5 Gebeten einen Extra-Stern (einmal je Tag)
+function fullDayStar(key) {
+  const p = state.progress;
+  if (!state.kids || (p.starDays || []).includes(key)) return;
+  p.starDays = [...(p.starDays || []), key].slice(-60);
+  p.stars = (p.stars || 0) + 1;
 }
 
 function act(action) {
@@ -497,6 +528,8 @@ function act(action) {
         state.auto = false;
         if (cong.group.visible) cong.finish();
         recordPractice(state.progress, state.prayer.id);
+        // Pflichtgebet geschafft: im Gebets-Tracker für heute abhaken
+        if (markPrayed(state.progress, state.prayer.id)) fullDayStar(dayKey());
         // Kinder bekommen für jedes geschaffte Gebet einen Stern
         if (state.kids) state.progress.stars = (state.progress.stars || 0) + 1;
         store.set('progress', state.progress);
@@ -512,9 +545,40 @@ function act(action) {
       state.voice = !state.voice;
       store.set('voice', state.voice);
       if (state.voice) speak();
-      else window.speechSynthesis?.cancel();
+      else voices.cancel();
       break;
-    case 'menu': state.view = 'menu'; state.auto = false; cong.reset(); break;
+    case 'voice': state.view = 'voice'; break;
+    case 'piper': voices.enabled = !voices.enabled; store.set('piper', voices.enabled); voices.cancel(); break;
+    case 'vload': voices.download(arg); break;
+    case 'vdel': voices.remove(arg); break;
+    case 'vtest': voices.say([{ text: SAMPLES[arg], lang: arg }]); break;
+    case 'tracker': state.view = 'tracker'; state.trackBack = 0; break;
+    case 'trackback': state.trackBack = Math.min(TRACK_DAYS - 1, state.trackBack + 1); break;
+    case 'trackfwd': state.trackBack = Math.max(0, state.trackBack - 1); break;
+    case 'track': {
+      const p = state.progress, key = keyFor(state.trackBack);
+      const was = dayDone(p, key);
+      if (toggleTrack(p, arg, state.trackBack) && !was) fullDayStar(key);
+      store.set('progress', p);
+      break;
+    }
+    case 'ramadan': state.view = 'ramadan'; state.ramadanDua = null; break;
+    case 'rdua': {
+      state.ramadanDua = arg;
+      const d = t(`ram.duas.${arg}`);
+      voices.say([{ text: d.ar, lang: 'ar', rate: 0.8 }, ...(langInfo().speech === 'ar' ? [] : [{ text: d.mean, lang: langInfo().speech }])]);
+      break;
+    }
+    case 'women':
+      state.womenPlace = arg;
+      store.set('womenPlace', arg);
+      // Die Empore gibt es in der Großmoschee
+      if (arg === 'gallery' && state.style !== 'gross') { state.style = 'gross'; store.set('style', 'gross'); rebuildEnv(); goHome(); }
+      state.cemaat = true;
+      store.set('cemaat', true);
+      rebuildCong();
+      break;
+    case 'menu': state.view = 'menu'; state.auto = false; cong.reset(); voices.cancel(); break;
     case 'qibla': state.view = 'qibla'; state.msg = ''; break;
     case 'info': state.view = 'info'; break;
     case 'times': state.view = 'times'; break;
@@ -786,8 +850,11 @@ function updatePosture(dt) {
 // Gehen: Ziel nur annehmen, wenn es innerhalb der Moschee liegt (Weltkoordinaten des Raums).
 const walkTmp = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
 function insideMosque(scenePos) {
-  const b = roomBounds();
+  const g = onGallery() ? gallery() : null;
+  const b = g ? g.bounds : roomBounds();
   const p = world.worldToLocal(walkTmp.copy(scenePos));
+  // Auf der Empore: Koordinaten des (verschobenen) Raums
+  if (g) p.z += g.z;
   return p.x > b.minX && p.x < b.maxX && p.z > b.minZ && p.z < b.maxZ;
 }
 
@@ -910,7 +977,7 @@ renderer.setAnimationLoop(() => {
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
-if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, setAR, view };
+if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, setAR, view, voices };
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);

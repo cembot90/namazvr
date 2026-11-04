@@ -249,7 +249,7 @@ export default {
     ],
     rakat: (name) => `Wie viele Pflicht-Rakʿāt hat das ${name}-Gebet?`,
   },
-  badges: ['Erstes Gebet', 'Alle 5 Pflichtgebete', 'Wuḍūʾ gelernt', 'Quiz-Profi (10/10)', '7 Tage in Folge', 'Sunnah & Witr', 'Erste Sure gelernt', 'Alle 6 Suren', '10 Sterne'],
+  badges: ['Erstes Gebet', 'Alle 5 Pflichtgebete', 'Wuḍūʾ gelernt', 'Quiz-Profi (10/10)', '7 Tage in Folge', 'Sunnah & Witr', 'Erste Sure gelernt', 'Alle 6 Suren', '10 Sterne', 'Ein Tag mit allen 5 Gebeten', '7 Tage alle 5 Gebete'],
 
   styles: {
     klassisch: ['Klassisch', 'Weite Halle mit Säulenreihen, zwei Kuppeln, Laternen und Minbar'],
@@ -400,4 +400,42 @@ export default {
     cardIdle: 'Wähle am Panel ein Gebet',
     hint: '<b>Ohne Headset:</b> Maus ziehen = umsehen · Klick = Button · ← / → = Schritte · M = Menü · W A S D = durch die Moschee gehen<br><b>Mit Meta Quest:</b> Seite im Quest-Browser öffnen → „ENTER VR“ (Moschee) oder „START AR“ (Mixed Reality im eigenen Zimmer) · Trigger oder Pinch = auswählen · Stick = gehen',
   },
+
+  voice: {
+    btn: '🔊 Stimmen', title: 'Stimmen', sub: 'kostenlos · offline',
+    intro: ['Freie, kostenlose Stimmen (Piper) für Deutsch, Türkisch und Arabisch. Einmal laden (WLAN empfohlen) – danach funktionieren sie ohne Internet.', 'Ohne geladene Stimme liest die App mit der Stimme des Geräts vor. Die arabische Stimme spricht auch die Rezitation und die Rufe des Imams.'],
+    use: 'Freie Stimmen benutzen', useSub: 'wenn geladen, statt der Gerätestimme',
+    ready: '✓ geladen, offline bereit', loading: (p) => `lädt … ${p} %`, error: 'Laden fehlgeschlagen – Internet prüfen', size: (mb) => `nicht geladen · ca. ${mb} MB`,
+    license: (l) => `Lizenz ${l}`, licenseCard: 'Lizenz: siehe Modellkarte',
+    del: 'Löschen', test: '▶ Probe', load: 'Laden', retry: 'Nochmal',
+    note: 'Stimmen aus dem Piper-Projekt (rhasspy/piper-voices auf Hugging Face). Die Dateien kommen direkt auf dieses Gerät. Eine Computerstimme ersetzt keine Rezitation mit Tajwīd.',
+    unsupported: 'Dieser Browser kann die freien Stimmen leider nicht abspielen – es wird die Gerätestimme benutzt.',
+    hintStep: 'Keine Gerätestimme – unter Einstellungen → Stimmen eine freie Stimme laden.',
+  },
+  track: {
+    menu: (n) => `Gebets-Tracker ${n}/5`, title: 'Gebets-Tracker', today: 'Heute', yesterday: 'Gestern',
+    allDone: '✓ Alle 5 Gebete – Māshāʾ Allāh!', count: (n) => `${n} von 5 Gebeten gebetet – tippe an, was du gebetet hast`,
+    streak: (n) => (n ? `🔥 ${n} ${n === 1 ? 'Tag' : 'Tage'} in Folge alle 5 Gebete` : 'Noch keine Tage mit allen 5 Gebeten in Folge'),
+    auto: 'Geführte Pflichtgebete werden automatisch abgehakt. Nur auf diesem Gerät gespeichert.',
+    kids: 'Für jeden Tag mit allen 5 Gebeten gibt es einen Extra-Stern ⭐',
+    older: '◀ Tag davor', newer: 'Tag danach ▶',
+  },
+  ram: {
+    menu: '🌙 Ramadan', title: 'Ramadan', day: (d, n) => `Tag ${d} von ${n}`,
+    sahur: 'Sahur endet (Imsāk)', iftar: 'Iftar (Maghrib)', iftarDone: '✓ Iftar-Zeit ist vorbei – guten Appetit!',
+    lastTen: 'Die letzten zehn Nächte: In einer davon liegt die Laylat al-Qadr, besser als tausend Monate (Koran 97:3).',
+    fastNote: 'Gefastet wird von der Morgendämmerung (Fajr) bis zum Sonnenuntergang (Maghrib).',
+    eidIn: (n, date) => `Ramadan-Fest (ʿĪd al-Fiṭr) in ${n} ${n === 1 ? 'Tag' : 'Tagen'}: ${date}`,
+    eid: 'ʿĪd mubārak! 🌙', days: (n) => `${n} ${n === 1 ? 'Tag' : 'Tage'}`, until: (y) => `bis Ramadan ${y}`,
+    tarawih: 'Das erste Tarāwīḥ-Gebet ist am Abend davor.',
+    sighting: 'Berechnet nach dem Umm-al-Qura-Kalender; je nach Land und Mondsichtung kann der Beginn um einen Tag abweichen.',
+    kids: 'Im Ramadan fasten Erwachsene von der Morgendämmerung bis Sonnenuntergang. Kinder müssen noch nicht fasten – sie dürfen üben, zum Beispiel bis mittags. Besonders schön im Ramadan: teilen, helfen und freundlich sein.',
+    about: 'Ramadan ist der Monat, in dem der Koran herabgesandt wurde (Koran 2:185): Fasten, Gebet, Koranlesen, Spenden und Barmherzigkeit.',
+    iftarDua: '🔊 Iftar-Duʿāʾ', niyyaBtn: '🔊 Absicht (Niyya)',
+    duas: {
+      iftar: { ar: 'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ', tr: 'Dhahaba ẓ-ẓamaʾu wa-btallati l-ʿurūqu wa-thabata l-ajru in shāʾa llāh', mean: 'Der Durst ist gegangen, die Adern sind befeuchtet, und der Lohn ist sicher, so Allah will. (Abū Dāwūd)' },
+      niyya: { ar: 'نَوَيْتُ أَنْ أَصُومَ غَدًا مِنْ شَهْرِ رَمَضَانَ', tr: 'Nawaitu an aṣūma ghadan min shahri Ramaḍān', mean: 'Ich beabsichtige, morgen im Monat Ramadan zu fasten. – Die Absicht im Herzen genügt; aussprechen ist nicht Pflicht.' },
+    },
+  },
+  gal: { title: 'Frauenbereich', sub: 'hinter dem Holzgitter oder auf der Empore (Großmoschee)', screen: 'Holzgitter', gallery: 'Empore' },
 };

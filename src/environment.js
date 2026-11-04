@@ -553,11 +553,11 @@ function buildGross(scene) {
   inst(scene, new THREE.CylinderGeometry(1.8, 2.0, H, 8), marble, piers);
   for (const y of [3.2, 9]) inst(scene, new THREE.CylinderGeometry(1.9, 1.9, 0.4, 8), blue, piers.map(([x, , z]) => [x, y, z]));
   // Emporen (Mahfil) an beiden Seiten und hinten, mit Brüstung und Säulen darunter
-  const gy = 6, depth = 6, z0 = -HD + 10, len = HD - 1 - z0;
-  const slabGeo = new THREE.BoxGeometry(depth, 0.45, len), railGeo = new THREE.BoxGeometry(0.12, 1.0, len);
+  const { y: gy, depth } = GALLERY, z0 = -HD + 10, len = HD - 1 - z0;
+  const slabGeo = new THREE.BoxGeometry(depth, GALLERY.slab, len), railGeo = new THREE.BoxGeometry(0.12, 1.0, len);
   inst(scene, slabGeo, marble, [-1, 1].map((s) => [s * (HW - depth / 2), gy, z0 + len / 2]));
   inst(scene, railGeo, gold(), [-1, 1].map((s) => [s * (HW - depth), gy + 0.7, z0 + len / 2]));
-  const back = new THREE.Mesh(new THREE.BoxGeometry(W - 2 * depth, 0.45, depth), marble);
+  const back = new THREE.Mesh(new THREE.BoxGeometry(W - 2 * depth, GALLERY.slab, depth), marble);
   back.position.set(0, gy, HD - depth / 2);
   const backRail = new THREE.Mesh(new THREE.BoxGeometry(W - 2 * depth, 1.0, 0.12), gold());
   backRail.position.set(0, gy + 0.7, HD - depth);
@@ -604,6 +604,15 @@ export function buildEnvironment(group, style = 'klassisch', { night = false } =
   room.position.z = HD - FRONT;
   BUILDERS[style](room);
   group.add(room);
+}
+
+// Empore der Großmoschee (hinten): Höhe der Oberfläche, Gebetsplatz an der Brüstung (Welt-z), begehbarer Bereich.
+const GALLERY = { y: 6, depth: 6, slab: 0.45 };
+export function galleryInfo(style) {
+  if (style !== 'gross') return null;
+  const { w, d } = SIZES.gross;
+  const rail = d - FRONT - GALLERY.depth;
+  return { top: GALLERY.y + GALLERY.slab / 2, z: rail + 0.9, bounds: { minX: -w / 2 + 0.6, maxX: w / 2 - 0.6, minZ: rail + 0.45, maxZ: d - FRONT - 0.6 } };
 }
 
 // Steht an (x, z) (Welt) eine Säule im Weg?

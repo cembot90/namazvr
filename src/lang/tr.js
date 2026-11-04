@@ -272,7 +272,7 @@ export default {
     ],
     rakat: (name) => `${name} namazının farzı kaç rekâttır?`,
   },
-  badges: ['İlk namaz', '5 vakit namazın hepsi', 'Abdest öğrenildi', 'Quiz ustası (10/10)', '7 gün üst üste', 'Sünnet ve Vitir', 'İlk sure ezberlendi', '6 surenin hepsi', '10 yıldız'],
+  badges: ['İlk namaz', '5 vakit namazın hepsi', 'Abdest öğrenildi', 'Quiz ustası (10/10)', '7 gün üst üste', 'Sünnet ve Vitir', 'İlk sure ezberlendi', '6 surenin hepsi', '10 yıldız', '5 vaktin hepsi bir günde', '7 gün 5 vakit'],
 
   styles: {
     klassisch: ['Klasik', 'Sütun sıralı geniş salon, iki kubbe, kandiller ve minber'],
@@ -422,4 +422,42 @@ export default {
     cardIdle: 'Panelden bir namaz seç',
     hint: '<b>Gözlüksüz:</b> Fareyi sürükle = etrafa bak · Tıkla = düğme · ← / → = adımlar · M = menü · W A S D = camide yürü<br><b>Meta Quest ile:</b> Sayfayı Quest tarayıcısında aç → „ENTER VR“ (cami) veya „START AR“ (kendi odanda karma gerçeklik) · Tetik veya çimdik = seç · Çubuk = yürü',
   },
+
+  voice: {
+    btn: '🔊 Sesler', title: 'Sesler', sub: 'ücretsiz · çevrimdışı',
+    intro: ['Almanca, Türkçe ve Arapça için ücretsiz, açık sesler (Piper). Bir kez indir (Wi-Fi önerilir) – sonra internetsiz çalışır.', 'Ses indirilmemişse uygulama cihazın sesiyle okur. Arapça ses kıraati ve imamın tekbirlerini de okur.'],
+    use: 'Ücretsiz sesleri kullan', useSub: 'indirildiyse cihaz sesi yerine',
+    ready: '✓ indirildi, çevrimdışı hazır', loading: (p) => `indiriliyor … %${p}`, error: 'İndirme başarısız – interneti kontrol et', size: (mb) => `indirilmedi · yaklaşık ${mb} MB`,
+    license: (l) => `Lisans ${l}`, licenseCard: 'Lisans: model kartına bak',
+    del: 'Sil', test: '▶ Dinle', load: 'İndir', retry: 'Tekrar',
+    note: 'Sesler Piper projesinden (Hugging Face’te rhasspy/piper-voices). Dosyalar doğrudan bu cihaza iner. Bilgisayar sesi tecvidli kıraatin yerini tutmaz.',
+    unsupported: 'Bu tarayıcı ücretsiz sesleri çalamıyor – cihazın sesi kullanılır.',
+    hintStep: 'Cihazda ses yok – Ayarlar → Sesler’den ücretsiz bir ses indir.',
+  },
+  track: {
+    menu: (n) => `Namaz takibi ${n}/5`, title: 'Namaz takibi', today: 'Bugün', yesterday: 'Dün',
+    allDone: '✓ 5 vaktin hepsi – Maşallah!', count: (n) => `5 vakitten ${n} kılındı – kıldığın namaza dokun`,
+    streak: (n) => (n ? `🔥 ${n} gün üst üste 5 vakit` : 'Henüz üst üste 5 vakit kılınan gün yok'),
+    auto: 'Rehberli kılınan farz namazlar otomatik işaretlenir. Sadece bu cihazda kaydedilir.',
+    kids: '5 vaktin hepsini kıldığın her gün için ekstra bir yıldız ⭐',
+    older: '◀ Önceki gün', newer: 'Sonraki gün ▶',
+  },
+  ram: {
+    menu: '🌙 Ramazan', title: 'Ramazan', day: (d, n) => `${n} günün ${d}. günü`,
+    sahur: 'Sahur bitişi (İmsak)', iftar: 'İftar (Akşam)', iftarDone: '✓ İftar vakti geçti – afiyet olsun!',
+    lastTen: 'Son on gece: Kadir Gecesi bunlardan biridir, bin aydan hayırlıdır (Kadr 97:3).',
+    fastNote: 'Oruç imsaktan (sabah) akşam ezanına kadar tutulur.',
+    eidIn: (n, date) => `Ramazan Bayramı ${n} gün sonra: ${date}`,
+    eid: 'Bayramınız mübarek olsun! 🌙', days: (n) => `${n} gün`, until: (y) => `Ramazan ${y} başlangıcına`,
+    tarawih: 'İlk teravih namazı bir önceki akşam kılınır.',
+    sighting: 'Ümmü’l-Kurâ takvimine göre hesaplandı; ülkeye ve hilalin görülmesine göre başlangıç bir gün farklı olabilir.',
+    kids: 'Ramazan’da büyükler sabahtan akşama kadar oruç tutar. Çocukların henüz oruç tutması gerekmez – mesela öğlene kadar deneyebilirler. Ramazan’da en güzeli: paylaşmak, yardım etmek ve güler yüzlü olmak.',
+    about: 'Ramazan, Kur’an’ın indirildiği aydır (Bakara 2:185): oruç, namaz, Kur’an okumak, sadaka ve merhamet ayı.',
+    iftarDua: '🔊 İftar duası', niyyaBtn: '🔊 Oruç niyeti',
+    duas: {
+      iftar: { ar: 'ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الْأَجْرُ إِنْ شَاءَ اللَّهُ', tr: 'Zehebe’z-zameü vebtelleti’l-urûku ve sebete’l-ecru inşâallah', mean: 'Susuzluk gitti, damarlar ıslandı, ecir de inşallah sabit oldu. (Ebû Dâvûd)' },
+      niyya: { ar: 'نَوَيْتُ أَنْ أَصُومَ غَدًا مِنْ شَهْرِ رَمَضَانَ', tr: 'Neveytü en esûme ğaden min şehri Ramazân', mean: 'Niyet ettim Allah rızası için yarınki Ramazan orucunu tutmaya. – Niyet kalp ile yapılır; dil ile söylemek güzeldir.' },
+    },
+  },
+  gal: { title: 'Kadınlar bölümü', sub: 'kafes arkasında veya mahfilde (büyük cami)', screen: 'Kafes', gallery: 'Mahfil' },
 };
