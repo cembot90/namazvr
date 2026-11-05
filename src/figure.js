@@ -23,6 +23,14 @@ export const POSES = {
 };
 const KEYS = Object.keys(POSES.stand);
 
+// Bewegung in den Wasch-Haltungen: [Gelenk, Ausschlag, Tempo] – Hände reiben, Gesicht waschen, über den Kopf wischen
+const MOTION = {
+  wash: [['elZ', 0.22, 6], ['shX', 0.06, 6]],
+  face: [['elX', 0.16, 3.5], ['shZ', 0.05, 3.5]],
+  head: [['shX', 0.22, 2.2], ['elX', 0.15, 2.2]],
+  feet: [['elZ', 0.2, 5.5], ['shX', 0.08, 5.5]],
+};
+
 // Geometrien und Materialien werden zwischen allen Figuren geteilt (eine ganze Gemeinde bleibt so leicht).
 const GEO = new Map(), MAT = new Map();
 const geo = (key, make) => GEO.get(key) || GEO.set(key, make()).get(key);
@@ -119,6 +127,8 @@ export class Guide {
       return { hip, knee };
     });
 
+    this.t = 0;
+    this.shown = {};
     this.cur = { ...POSES.stand };
     this.target = POSES.stand;
     this.apply(this.cur);
@@ -139,9 +149,23 @@ export class Guide {
 
   update(dt) {
     const k = 1 - Math.exp(-dt * this.speed);
+    this.t += dt;
     for (const key of KEYS) this.cur[key] += (this.target[key] - this.cur[key]) * k;
-    this.apply(this.cur);
+    const motion = MOTION[this.pose];
+    if (!motion) { this.apply(this.cur); return; }
+    Object.assign(this.shown, this.cur);
+    for (const [key, amp, speed] of motion) this.shown[key] += Math.sin(this.t * speed) * amp;
+    this.apply(this.shown);
   }
+
+  // Ghost: durchscheinend und leuchtend, ohne Schatten auf den Rest der Szene
+  makeGhost(color = 0x8fd8ff) {
+    this.ghostMat = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.55, transparent: true, opacity: 0.38, depthWrite: false, roughness: 0.6 });
+    this.group.traverse((o) => { if (o.isMesh) { o.material = this.ghostMat; o.renderOrder = 2; } });
+    return this;
+  }
+
+  setGhostColor(color) { this.ghostMat?.color.setHex(color); this.ghostMat?.emissive.setHex(color); }
 
   apply(p) {
     this.root.position.y = p.y;

@@ -460,4 +460,5 @@ export default {
     },
   },
   gal: { title: 'Kadınlar bölümü', sub: 'kafes arkasında veya mahfilde (büyük cami)', screen: 'Kafes', gallery: 'Mahfil' },
+  ghost: { btn: '👤 Gölge', front: 'önünde', side: 'yanında', off: 'kapalı' },
 };

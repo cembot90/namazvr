@@ -154,7 +154,7 @@ export class MobileUI {
       ${recitation(s)}
       <div class="dock">
         ${v.noVoice ? `<p class="gold small center">${esc(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'))}</p>` : ''}
-        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn(t('ui.menu'), 'menu')}${btn(v.auto ? t('ui.autoOnShort') : t('ui.autoShort'), 'auto', { cls: v.auto ? 'active' : '' })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '' })}
+        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn(t('ui.menu'), 'menu')}${btn(v.auto ? t('ui.autoOnShort') : t('ui.autoShort'), 'auto', { cls: v.auto ? 'active' : '' })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '' })}${btn('👤', 'ghost', { cls: v.ghost !== 'off' ? 'active' : '' })}
         ${btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 'next', { cls: 'primary' })}
       </div>`;
   }

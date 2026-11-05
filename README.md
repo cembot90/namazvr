@@ -19,7 +19,8 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Rechtsschule wählbar (Ḥanafī, Shāfiʿī, Mālikī, Ḥanbalī): Handhaltung, Eröffnungs-Bittgebet, Rafʿ al-Yadayn, Sitzhaltung (Iftirāsh/Tawarruk), Qunūt, Witr-Form, Asr-Berechnung
 - Anleitung für Männer oder Frauen (Handhaltung, Verbeugung, Niederwerfung, Sitzen, ʿAwra, Hinweise); Vorbeterin mit Kopftuch
 - Weitere Gebete: Sunnah vor/nach den Pflichtgebeten, Witr, Jumuʿa, Taḥiyyat al-Masjid
-- Wuḍūʾ-Trainer: 12 Schritte mit Körper-Piktogramm, Pflicht/Sunnah je Rechtsschule
+- Wuḍūʾ-Trainer: 12 Schritte mit Körper-Piktogramm, Pflicht/Sunnah je Rechtsschule – im eigenen Waschraum (Abdesthane) mit Waschbecken, Hähnen, fließendem Wasser und Hockern zum Füßewaschen; die Figuren reiben, waschen und wischen
+- Ghost-Modus: durchscheinende Figur vor oder neben dir mit gleicher Blickrichtung (nicht gespiegelt) macht jede Bewegung mit, in VR grün bei erkannter Haltung
 - Lernen & Quiz: 24 Fragen (zufällig 10), Fortschritt, Tage in Folge, Abzeichen
 - Suren lernen: Fātiḥa, Ikhlāṣ, Kauṯar, ʿAṣr, Falaq, Nās – lesen, Vers für Vers üben, sich abfragen (nur das erste Wort als Hilfe), anhören, als gelernt markieren; die gewählte Sure wird im Gebet als Zusatzsure gebetet
 - Kinder-Modus: zu jedem Schritt ein einfacher, liebevoller Satz, langsameres Tempo, ein Stern für jedes geschaffte Gebet

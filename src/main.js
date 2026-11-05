@@ -3,7 +3,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import { STYLES, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked } from './environment.js';
+import { STYLES, WUDU_BASINS, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked, setWater } from './environment.js';
 import { Guide } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
@@ -63,7 +63,8 @@ const env = new THREE.Group();
 world.add(env);
 const compass = makeFloorCompass();
 const guideRug = makeRug(1.5, -1.95);
-world.add(compass, makeRug(0, -0.5), guideRug);
+const userRug = makeRug(0, -0.5);
+world.add(compass, userRug, guideRug);
 
 const guide = new Guide();
 guide.group.position.set(1.5, 0, -1.5);
@@ -73,6 +74,13 @@ world.add(guide.group);
 // Gemeinschaftsgebet: Imam und Gemeinde (statt der Vorbeter-Figur)
 const cong = new Congregation();
 world.add(cong.group);
+
+// Ghost: durchscheinende Figur vor oder neben dir, gleiche Blickrichtung wie du (nicht gespiegelt), macht jede Bewegung mit
+const ghost = new Guide().makeGhost();
+ghost.group.rotation.y = Math.PI;
+ghost.group.visible = false;
+world.add(ghost.group);
+const GHOST_OK = 0x7fe0a8, GHOST_WAIT = 0x8fd8ff;
 
 const panel = new Panel();
 panel.mesh.position.set(-0.75, 1.35, -1.5);
@@ -142,6 +150,9 @@ const state = {
   trackBack: 0,
   ramadanDua: null,
   breath: { on: false, t: 0, phase: 'in' },
+  // Ghost-Modus: 'off' | 'front' (vor dir) | 'side' (neben dir)
+  ghost: store.get('ghost', 'front'),
+  wuduRoom: false,
   progress: { ...emptyProgress(), ...store.get('progress', {}) },
   quiz: null,
   // Haltungserkennung in VR: Stehhöhe des Kopfes, erkannte Haltung, wie lange schon gehalten
@@ -192,16 +203,62 @@ function isNight() {
   return now < times.sunrise || now >= times.maghrib;
 }
 
+// Die Gebetswaschung findet im Waschraum statt, nicht im Gebetssaal
+const wantsWuduRoom = () => state.prayer?.kind === 'wudu' && (state.view === 'step' || state.view === 'done');
+
 function rebuildEnv() {
   state.night = isNight();
+  state.wuduRoom = wantsWuduRoom();
   clearEnvironment(env);
-  buildEnvironment(env, state.style, { night: state.night });
+  buildEnvironment(env, state.wuduRoom ? 'wudu' : state.style, { night: state.night });
+  layoutRoom();
 }
 
 // Empore nur in der Großmoschee; sonst beten die Frauen hinter dem Holzgitter
 const gallery = () => (state.womenPlace === 'gallery' ? galleryInfo(state.style) : null);
 // Betet man als Frau auf der Empore, steht man oben: der Saal liegt tiefer und weiter vorn.
 const onGallery = () => !!gallery() && state.gender === 'f' && cong.group.visible;
+
+// Panel, Vorbeter und Teppiche je nach Raum: im Waschraum hängt das Panel über deinem Becken,
+// der Vorbeter wäscht sich am Becken rechts neben dir.
+function layoutRoom() {
+  const w = state.wuduRoom;
+  if (w) {
+    guide.group.position.set(1.1, 0, 0);
+    panel.mesh.position.set(0, 1.62, -0.84);
+    panel.mesh.rotation.set(0.1, 0, 0);
+    panel.mesh.scale.setScalar(0.72);
+  } else {
+    guide.group.position.set(1.5, 0, -1.5);
+    panel.mesh.position.set(-0.75, 1.35, -1.5);
+    panel.mesh.rotation.set(-0.05, 0.32, 0, 'YXZ');
+    panel.mesh.scale.setScalar(1);
+  }
+  userRug.visible = compass.visible = !w;
+  card.mesh.visible = !w && !mobileUI;
+  if (!w) guideRug.visible = guide.group.visible;
+  else guideRug.visible = false;
+  placeGhost();
+  if (mobileUI) aimAtGuide();
+  // Am Computer auf das Panel schauen, wenn der Raum wechselt
+  else if (!renderer.xr.isPresenting) {
+    const target = panel.mesh.getWorldPosition(new THREE.Vector3());
+    const d = target.sub(camera.position);
+    yaw = Math.atan2(-d.x, -d.z);
+    pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
+    camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  }
+}
+
+// Ghost vor dir (Blick zur Qibla wie du) oder neben dir; im Waschraum am Becken links neben dir
+function placeGhost() {
+  const g = ghost.group;
+  g.visible = state.ghost !== 'off' && (state.view === 'step' || (state.wuduRoom && state.view === 'done'));
+  if (state.wuduRoom) g.position.set(WUDU_BASINS[2], 0, 0);
+  else if (state.ghost === 'side' && !(state.cemaat && cong.group.visible)) g.position.set(0.85, 0, 0);
+  // Mit Cemaat steht neben dir schon jemand: dann vor dir; auf der Empore dicht vor der Brüstung
+  else g.position.set(0, 0, onGallery() ? -0.6 : -1.3);
+}
 
 function rebuildCong() {
   cong.build({ size: state.cemaatSize, gender: state.gender, natural: state.cemaatNatural, blocked, gallery: gallery() });
@@ -214,7 +271,8 @@ function updateCast(force = false) {
   const show = state.cemaat && !wudu;
   if (show === cong.group.visible && !force) return;
   cong.group.visible = show;
-  guide.group.visible = guideRug.visible = !show;
+  guide.group.visible = !show;
+  guideRug.visible = !show && !state.wuduRoom;
   const g = onGallery() ? gallery() : null;
   env.position.set(0, g ? -g.top : 0, g ? -g.z : 0);
   // Handy: Kamera auf Imam und Reihen bzw. zurück auf die Vorbeter-Figur
@@ -243,6 +301,7 @@ function view() {
         handHint: renderer.xr.isPresenting ? state.posture.handHint : null,
         finger: renderer.xr.isPresenting && state.posture.finger,
         voice: state.voice,
+        ghost: state.ghost,
         noVoice: state.voice && voiceMissing(),
         canDownload: voices.supported && !!PIPER[langInfo().speech],
       };
@@ -333,7 +392,13 @@ function refresh() {
     panel.render(v);
     card.render(v);
   }
-  guide.setPose(v.type === 'step' ? v.step.pose : 'stand');
+  if (wantsWuduRoom() !== state.wuduRoom) rebuildEnv();
+  const pose = v.type === 'step' ? v.step.pose : 'stand';
+  guide.setPose(pose);
+  ghost.setPose(pose);
+  placeGhost();
+  // Grün, wenn deine Haltung in VR erkannt ist
+  ghost.setGhostColor(v.type === 'step' && v.posture === 'ok' ? GHOST_OK : GHOST_WAIT);
   updateCast();
   if (cong.group.visible && v.type === 'step') cong.lead(v.step.pose, v.step.rakah);
 }
@@ -443,7 +508,13 @@ function act(action) {
       store.set('madhab', arg);
       store.set('asr', state.asr);
       break;
-    case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); rebuildCong(); break;
+    case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); ghost.setGender(arg); rebuildCong(); break;
+    case 'ghost': {
+      const order = ['front', 'side', 'off'];
+      state.ghost = order[(order.indexOf(state.ghost) + 1) % order.length];
+      store.set('ghost', state.ghost);
+      break;
+    }
     case 'lang':
       setLang(arg);
       store.set('lang', arg);
@@ -780,9 +851,13 @@ const mobileUI = isMobile ? new MobileUI(document.getElementById('ui'), act) : n
 
 // Auf dem Handy blickt die Kamera auf die Vorbeter-Figur; mit Cemaat von schräg hinten über die Reihen.
 function aimAtGuide() {
-  camera.position.copy(cong.group.visible ? world.localToWorld(new THREE.Vector3(0, 2.3, 3.2)) : new THREE.Vector3(0, 1.6, 0));
+  // Waschraum: von hinten auf die Becken, Vorbeter und Ghost
+  const eye = state.wuduRoom ? new THREE.Vector3(0.2, 1.75, 2.2) : cong.group.visible ? new THREE.Vector3(0, 2.3, 3.2) : null;
+  camera.position.copy(eye ? world.localToWorld(eye) : new THREE.Vector3(0, 1.6, 0));
   const target = new THREE.Vector3(0, 0.85, 0);
-  leader().group.localToWorld(target);
+  // Im Waschraum auf dein Becken: links der Ghost, rechts der Vorbeter
+  if (state.wuduRoom) world.localToWorld(target.set(0, 0.95, -0.4));
+  else leader().group.localToWorld(target);
   const d = target.sub(camera.position);
   yaw = Math.atan2(-d.x, -d.z);
   pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
@@ -972,7 +1047,13 @@ renderer.setAnimationLoop(() => {
   if (minute !== lastMinute && isNight() !== state.night) rebuildEnv();
   lastMinute = minute;
   guide.update(dt);
+  ghost.update(dt);
   cong.update(dt);
+  // Im Waschraum läuft das Wasser bei den Waschschritten (nicht bei Absicht und Bittgebet)
+  if (state.wuduRoom) {
+    const st = state.view === 'step' && state.steps[state.i];
+    setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, 1.1, ...(ghost.group.visible ? [WUDU_BASINS[2]] : [])]);
+  }
   renderer.render(scene, camera);
 });
 
@@ -981,6 +1062,7 @@ if (new URLSearchParams(location.search).has('debug')) window.salah = { act, gui
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);
+ghost.setGender(state.gender);
 rebuildEnv();
 rebuildCong();
 applyQibla();

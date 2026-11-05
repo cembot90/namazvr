@@ -438,4 +438,5 @@ export default {
     },
   },
   gal: { title: 'Frauenbereich', sub: 'hinter dem Holzgitter oder auf der Empore (Großmoschee)', screen: 'Holzgitter', gallery: 'Empore' },
+  ghost: { btn: '👤 Ghost', front: 'vor dir', side: 'neben dir', off: 'aus' },
 };

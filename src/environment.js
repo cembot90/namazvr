@@ -4,16 +4,22 @@ import { t } from './i18n.js';
 // Gebetsraum. Alles hängt an `group`; dessen -Z-Achse ist die Qibla.
 // Die Mihrab-Wand liegt immer FRONT Meter vor dem Gebetsplatz (Ursprung), der Raum erstreckt sich nach hinten.
 const FRONT = 6;
+// Waschraum (Abdesthane): Wand mit Waschbecken dicht vor dem Platz
+const WUDU_FRONT = 0.95;
 const SIZES = {
   klassisch: { w: 26, d: 30, h: 10 },
   osmanisch: { w: 36, d: 36, h: 13 },
   andalusisch: { w: 44, d: 40, h: 8.5 },
   gross: { w: 60, d: 56, h: 18 },
+  wudu: { w: 9, d: 6, h: 3.4 },
 };
 // Maße des aktuell gebauten Raums; NIGHT: Fenster dunkel, Lampen heller
 let W, D, H, HW, HD, NIGHT = false;
 // Säulen und Pfeiler als Kreise [x, z, r] in Weltkoordinaten – dort stellt sich niemand hin
 let OBSTACLES = [];
+// Wasserstrahlen im Waschraum (vorn der eigene Hahn) und begehbarer Bereich, falls vom Standard abweichend
+let WATER = [];
+let BOUNDS = null;
 const block = (list, r) => { for (const [x, , z] of list) OBSTACLES.push([x, z + HD - FRONT, r]); };
 
 // Freie Stile, inspiriert von Bautraditionen – keine Nachbauten bestimmter Moscheen.
@@ -591,14 +597,136 @@ function buildGross(scene) {
   for (const [x, z, r] of [[-23, domeZ, 3], [23, domeZ, 3], [-12, domeZ + 26, 4], [12, domeZ + 26, 4]]) lightRing(scene, x, z, r, 4.4, 28);
 }
 
+// Waschraum (Abdesthane) neben dem Gebetssaal: Reihe von Waschbecken mit Hähnen an der Wand vor dir,
+// rechts niedrige Hähne mit Hockern für die Füße, hinten der Durchgang zum Gebetssaal.
+// Gebaut in Weltkoordinaten: Platz am Ursprung, Becken vor dir (−Z).
+export const WUDU_BASINS = [-3.3, -2.2, -1.1, 0, 1.1, 2.2, 3.3];
+function buildWudu(scene) {
+  lights(scene, 1.15);
+  const zWall = -WUDU_FRONT, zBack = D - WUDU_FRONT, cx = 0, cz = (zWall + zBack) / 2;
+  // Boden: helle Marmorfliesen
+  const floorMap = canvasTexture(512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#e9e6df'; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#c9c3b6'; ctx.lineWidth = 4;
+    for (let i = 0; i <= 4; i++) { ctx.beginPath(); ctx.moveTo(i * 128, 0); ctx.lineTo(i * 128, h); ctx.moveTo(0, i * 128); ctx.lineTo(w, i * 128); ctx.stroke(); }
+    ctx.fillStyle = 'rgba(120,140,150,0.08)';
+    for (let i = 0; i < 40; i++) { ctx.beginPath(); ctx.ellipse(Math.random() * w, Math.random() * h, 30 + Math.random() * 60, 4, Math.random() * 3, 0, Math.PI * 2); ctx.fill(); }
+  });
+  floorMap.wrapS = floorMap.wrapT = THREE.RepeatWrapping;
+  floorMap.repeat.set(W / 2, D / 2);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: floorMap, roughness: 0.4 }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.set(cx, 0, cz);
+  // Wände: weiße Fliesen, unten ein türkises Band mit Muster
+  const wallMap = canvasTexture(512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#f4f6f6'; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#dfe5e6'; ctx.lineWidth = 3;
+    for (let i = 0; i <= 8; i++) { ctx.beginPath(); ctx.moveTo(i * 64, 0); ctx.lineTo(i * 64, h); ctx.moveTo(0, i * 64); ctx.lineTo(w, i * 64); ctx.stroke(); }
+    const top = h * 0.62;
+    ctx.fillStyle = '#1f7a86'; ctx.fillRect(0, top, w, 36);
+    for (let x = 0; x < w; x += 64) {
+      ctx.fillStyle = '#f4f6f6'; ctx.beginPath(); ctx.moveTo(x + 32, top + 4); ctx.lineTo(x + 50, top + 18); ctx.lineTo(x + 32, top + 32); ctx.lineTo(x + 14, top + 18); ctx.fill();
+      ctx.fillStyle = '#c0392b'; ctx.beginPath(); ctx.arc(x + 32, top + 18, 4, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.fillStyle = '#2b9aa8'; ctx.fillRect(0, top + 36, w, h - top - 36);
+  });
+  wallMap.wrapS = THREE.RepeatWrapping;
+  const wallMat = (len) => { const m = wallMap.clone(); m.needsUpdate = true; m.repeat.set(len / H, 1); return new THREE.MeshStandardMaterial({ map: m, roughness: 0.35 }); };
+  for (const [len, x, z, ry] of [[W, cx, zWall, 0], [W, cx, zBack, Math.PI], [D, -HW, cz, Math.PI / 2], [D, HW, cz, -Math.PI / 2]]) {
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(len, H), wallMat(len));
+    wall.position.set(x, H / 2, z);
+    wall.rotation.y = ry;
+    scene.add(wall);
+  }
+  const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 1, emissive: 0xf3efe6, emissiveIntensity: 0.25 }));
+  ceiling.rotation.x = Math.PI / 2;
+  ceiling.position.set(cx, H, cz);
+  scene.add(floor, ceiling);
+
+  // Waschtisch aus Marmor mit eingelassenen Becken
+  const marble = new THREE.MeshStandardMaterial({ color: 0xf1efe9, roughness: 0.3 });
+  const tile = new THREE.MeshStandardMaterial({ color: 0x1f7a86, roughness: 0.4 });
+  const brass = new THREE.MeshStandardMaterial({ color: 0xc9a85c, roughness: 0.25, metalness: 0.85 });
+  const len = W - 1.2;
+  const top = new THREE.Mesh(new THREE.BoxGeometry(len, 0.08, 0.55), marble);
+  top.position.set(cx, 0.86, zWall + 0.275);
+  const front = new THREE.Mesh(new THREE.BoxGeometry(len, 0.82, 0.08), tile);
+  front.position.set(cx, 0.41, zWall + 0.5);
+  scene.add(top, front);
+  const bowlZ = zWall + 0.3;
+  inst(scene, new THREE.CylinderGeometry(0.2, 0.15, 0.03, 28), new THREE.MeshStandardMaterial({ color: 0xc7d3d6, roughness: 0.2 }), WUDU_BASINS.map((x) => [x, 0.895, bowlZ]));
+  // Hähne: Rohr aus der Wand, Auslauf nach unten
+  inst(scene, new THREE.CylinderGeometry(0.018, 0.018, 0.2, 10).rotateX(Math.PI / 2), brass, WUDU_BASINS.map((x) => [x, 1.12, zWall + 0.1]));
+  inst(scene, new THREE.CylinderGeometry(0.016, 0.022, 0.06, 10), brass, WUDU_BASINS.map((x) => [x, 1.09, zWall + 0.2]));
+  inst(scene, new THREE.SphereGeometry(0.03, 12, 8), brass, WUDU_BASINS.map((x) => [x, 1.17, zWall + 0.05]));
+  // Wasserstrahlen: eigener Hahn (Index 3) und die beiden Nachbarn
+  const waterMat = new THREE.MeshStandardMaterial({ color: 0x9fdcf5, transparent: true, opacity: 0.55, roughness: 0.05, emissive: 0x2a6f8a, emissiveIntensity: 0.3 });
+  WATER = WUDU_BASINS.map((x) => {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.013, 0.17, 8), waterMat);
+    w.position.set(x, 0.99, zWall + 0.2);
+    w.visible = false;
+    scene.add(w);
+    return w;
+  });
+  // Wandbogen über jedem Becken (Nische) und ein Schriftband
+  const nicheMat = new THREE.MeshStandardMaterial({ color: 0xe9f3f4, roughness: 0.5 });
+  inst(scene, new THREE.ShapeGeometry(archShape(0.8, 1.0)), nicheMat, WUDU_BASINS.map((x) => [x, 1.25, zWall + 0.01]));
+  const banner = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.5), new THREE.MeshBasicMaterial({ map: bannerTexture() }));
+  banner.position.set(cx, 2.85, zWall + 0.015);
+  scene.add(banner);
+
+  // Rechts: niedrige Hähne mit Hockern (zum Füßewaschen im Sitzen)
+  const stoneMat = new THREE.MeshStandardMaterial({ color: 0xd9d3c7, roughness: 0.6 });
+  const footZ = range(0.6, zBack - 1.2, 0.9);
+  inst(scene, new THREE.CylinderGeometry(0.17, 0.19, 0.32, 16), stoneMat, footZ.map((z) => [HW - 0.75, 0.16, z]));
+  inst(scene, new THREE.CylinderGeometry(0.016, 0.016, 0.22, 10).rotateZ(Math.PI / 2), brass, footZ.map((z) => [HW - 0.12, 0.55, z]));
+  const gutter = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, zBack - 0.4), new THREE.MeshStandardMaterial({ color: 0x8fa3a8, roughness: 0.3 }));
+  gutter.position.set(HW - 0.2, 0.025, (0.2 + zBack) / 2);
+  scene.add(gutter);
+
+  // Links: Fenster, Handtuchhaken; hinten: Durchgang zum Gebetssaal und Schuhregal
+  const glass = new THREE.MeshBasicMaterial({ color: glassColor(0xd9ecff) });
+  for (const z of [0.6, 2.6]) {
+    const win = new THREE.Mesh(new THREE.ShapeGeometry(archShape(0.9, 1.3)), glass);
+    win.position.set(-HW + 0.02, 1.3, z);
+    win.rotation.y = Math.PI / 2;
+    scene.add(win);
+  }
+  inst(scene, new THREE.SphereGeometry(0.025, 8, 6), brass, range(-0.4, 3.6, 0.5).map((z) => [-HW + 0.04, 1.5, z]));
+  const door = new THREE.Mesh(new THREE.ShapeGeometry(archShape(1.6, 2.4)), new THREE.MeshBasicMaterial({ color: NIGHT ? 0x8a6a3a : 0xf3d9a0 }));
+  door.position.set(-1.6, 0, zBack - 0.02);
+  door.rotation.y = Math.PI;
+  scene.add(door);
+  const shelf = new THREE.MeshStandardMaterial({ color: 0x6b4426, roughness: 0.7 });
+  for (const y of [0.15, 0.55, 0.95]) {
+    const b = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.04, 0.35), shelf);
+    b.position.set(1.8, y, zBack - 0.2);
+    scene.add(b);
+  }
+  lanterns(scene, [[-2, 0.8, 2.6], [2, 0.8, 2.6], [-2, 3.2, 2.6], [2, 3.2, 2.6]], 0xfff0c8);
+  BOUNDS = { minX: -HW + 0.5, maxX: HW - 1.1, minZ: zWall + 0.75, maxZ: zBack - 0.5 };
+  OBSTACLES = footZ.map((z) => [HW - 0.75, z, 0.25]);
+}
+
+// Wasser laufen lassen: on = eigener Hahn und der der Vorbeter-Figur (Nachbarbecken), t = Zeit für das Flackern
+export function setWater(on, t = 0, basins = [0, 1.1]) {
+  WATER.forEach((w, i) => {
+    w.visible = on && basins.includes(WUDU_BASINS[i]);
+    if (w.visible) w.scale.set(1 + Math.sin(t * 23 + i) * 0.15, 1, 1 + Math.cos(t * 19 + i) * 0.15);
+  });
+}
+
 const BUILDERS = { klassisch: buildKlassisch, osmanisch: buildOsmanisch, andalusisch: buildAndalusisch, gross: buildGross };
 
 // night: nach Sonnenuntergang bzw. vor Sonnenaufgang
 export function buildEnvironment(group, style = 'klassisch', { night = false } = {}) {
-  if (!BUILDERS[style]) style = 'klassisch';
+  if (!BUILDERS[style] && style !== 'wudu') style = 'klassisch';
   ({ w: W, d: D, h: H } = SIZES[style]);
   HW = W / 2; HD = D / 2; NIGHT = night;
   OBSTACLES = [];
+  WATER = [];
+  BOUNDS = null;
+  if (style === 'wudu') { buildWudu(group); return; }
   // Raumkoordinaten: Mitte des Raums; die Mihrab-Wand liegt FRONT Meter vor dem Gebetsplatz
   const room = new THREE.Group();
   room.position.z = HD - FRONT;
@@ -622,7 +750,7 @@ export function blocked(x, z, pad = 0.25) {
 
 // Begehbarer Bereich in Weltkoordinaten (für das Gehen durch die Moschee)
 export function roomBounds() {
-  return { minX: -HW + 0.6, maxX: HW - 0.6, minZ: -FRONT + 0.8, maxZ: D - FRONT - 0.6 };
+  return BOUNDS || { minX: -HW + 0.6, maxX: HW - 0.6, minZ: -FRONT + 0.8, maxZ: D - FRONT - 0.6 };
 }
 
 // Raum abbauen (Geometrien, Materialien, Texturen freigeben), um einen anderen Stil zu laden.

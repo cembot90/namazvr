@@ -269,12 +269,13 @@ export class Panel extends CanvasPlane {
     this.recitation(step, y, H - 150);
 
     const by = H - 120, bh = 90;
-    this.btn(t('ui.prev'), 60, by, 220, bh, 'prev');
-    this.btn(t('ui.menu'), 300, by, 170, bh, 'menu');
-    this.btn(v.auto ? t('ui.autoOn') : t('ui.autoOff'), 490, by, 220, bh, 'auto', { active: v.auto });
-    this.btn(`${v.voice ? '🔊' : '🔇'} ${t('ui.speak')}`, 730, by, 230, bh, 'speak', { active: v.voice });
+    this.btn(t('ui.prev'), 60, by, 200, bh, 'prev', { size: 30 });
+    this.btn(t('ui.menu'), 280, by, 160, bh, 'menu', { size: 30 });
+    this.btn(v.auto ? t('ui.autoOn') : t('ui.autoOff'), 460, by, 200, bh, 'auto', { active: v.auto, size: 30 });
+    this.btn(`${v.voice ? '🔊' : '🔇'} ${t('ui.speak')}`, 680, by, 210, bh, 'speak', { active: v.voice, size: 28 });
+    this.btn(t('ghost.btn'), 910, by, 200, bh, 'ghost', { active: v.ghost !== 'off', size: 28, sub: t(`ghost.${v.ghost}`), subSize: 22 });
     if (v.noVoice) this.text(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'), W - 60, by - 12, { size: 21, color: C.gold, align: 'right' });
-    this.btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 980, by, W - 1040, bh, 'next', { primary: true });
+    this.btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 1130, by, W - 1190, bh, 'next', { primary: true, size: 30 });
   }
 
   // Bewegungs-Box: Piktogramm, Ansage, Ausführung und – in VR – ob die Haltung erkannt wurde.

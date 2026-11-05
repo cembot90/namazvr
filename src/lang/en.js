@@ -429,4 +429,5 @@ export default {
     },
   },
   gal: { title: 'Women’s section', sub: 'behind the lattice or on the gallery (great mosque)', screen: 'Lattice', gallery: 'Gallery' },
+  ghost: { btn: '👤 Ghost', front: 'in front', side: 'beside you', off: 'off' },
 };

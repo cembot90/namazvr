@@ -87,10 +87,11 @@
     #ui .ar.big { font-size: 44px; text-align: center; }
     #ui .rec .tr, #ui .tr { color: var(--gold); font-style: italic; }
     #ui .dock {
-      position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1.3fr 1.3fr 1fr 2fr; gap: 6px;
+      position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: 1fr 1.3fr 1.2fr 1fr 1fr 2fr; gap: 6px;
       padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgba(10,18,32,.96); border-top: 1px solid var(--line);
     }
     #ui .dock button { padding: 10px 4px; }
+    #ui .dock p { grid-column: 1 / -1; margin: 0; }
     #ui .count { font-size: 56px; font-weight: 700; text-align: center; margin: 10px 0 0; }
     #ui .question { font-size: 20px; font-weight: 600; }
     #ui .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
