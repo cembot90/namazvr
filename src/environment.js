@@ -20,6 +20,8 @@ let OBSTACLES = [];
 // Wasserstrahlen im Waschraum (vorn der eigene Hahn) und begehbarer Bereich, falls vom Standard abweichend
 let WATER = [];
 let BOUNDS = null;
+// Hocker zum Füßewaschen [x, z] und die Wasserstrahlen der niedrigen Hähne
+let STOOLS = [], FOOT_WATER = [];
 const block = (list, r) => { for (const [x, , z] of list) OBSTACLES.push([x, z + HD - FRONT, r]); };
 
 // Freie Stile, inspiriert von Bautraditionen – keine Nachbauten bestimmter Moscheen.
@@ -678,8 +680,16 @@ function buildWudu(scene) {
   // Rechts: niedrige Hähne mit Hockern (zum Füßewaschen im Sitzen)
   const stoneMat = new THREE.MeshStandardMaterial({ color: 0xd9d3c7, roughness: 0.6 });
   const footZ = range(0.6, zBack - 1.2, 0.9);
-  inst(scene, new THREE.CylinderGeometry(0.17, 0.19, 0.32, 16), stoneMat, footZ.map((z) => [HW - 0.75, 0.16, z]));
+  inst(scene, new THREE.CylinderGeometry(0.17, 0.19, 0.4, 16), stoneMat, footZ.map((z) => [HW - 0.75, 0.2, z]));
   inst(scene, new THREE.CylinderGeometry(0.016, 0.016, 0.22, 10).rotateZ(Math.PI / 2), brass, footZ.map((z) => [HW - 0.12, 0.55, z]));
+  STOOLS = footZ.map((z) => [HW - 0.75, z]);
+  FOOT_WATER = footZ.map((z) => {
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.014, 0.5, 8), waterMat);
+    w.position.set(HW - 0.24, 0.29, z);
+    w.visible = false;
+    scene.add(w);
+    return w;
+  });
   const gutter = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, zBack - 0.4), new THREE.MeshStandardMaterial({ color: 0x8fa3a8, roughness: 0.3 }));
   gutter.position.set(HW - 0.2, 0.025, (0.2 + zBack) / 2);
   scene.add(gutter);
@@ -709,12 +719,15 @@ function buildWudu(scene) {
 }
 
 // Wasser laufen lassen: on = eigener Hahn und der der Vorbeter-Figur (Nachbarbecken), t = Zeit für das Flackern
-export function setWater(on, t = 0, basins = [0, 1.1]) {
-  WATER.forEach((w, i) => {
-    w.visible = on && basins.includes(WUDU_BASINS[i]);
-    if (w.visible) w.scale.set(1 + Math.sin(t * 23 + i) * 0.15, 1, 1 + Math.cos(t * 19 + i) * 0.15);
-  });
+// stools: Indizes der Hocker, an denen gerade die Füße gewaschen werden
+export function setWater(on, t = 0, basins = [0, 1.1], stools = []) {
+  const flicker = (w, i) => w.scale.set(1 + Math.sin(t * 23 + i) * 0.15, 1, 1 + Math.cos(t * 19 + i) * 0.15);
+  WATER.forEach((w, i) => { w.visible = on && basins.includes(WUDU_BASINS[i]); if (w.visible) flicker(w, i); });
+  FOOT_WATER.forEach((w, i) => { w.visible = on && stools.includes(i); if (w.visible) flicker(w, i); });
 }
+
+// Hocker im Waschraum in Weltkoordinaten
+export const wuduStools = () => STOOLS;
 
 const BUILDERS = { klassisch: buildKlassisch, osmanisch: buildOsmanisch, andalusisch: buildAndalusisch, gross: buildGross };
 
@@ -725,6 +738,8 @@ export function buildEnvironment(group, style = 'klassisch', { night = false } =
   HW = W / 2; HD = D / 2; NIGHT = night;
   OBSTACLES = [];
   WATER = [];
+  FOOT_WATER = [];
+  STOOLS = [];
   BOUNDS = null;
   if (style === 'wudu') { buildWudu(group); return; }
   // Raumkoordinaten: Mitte des Raums; die Mihrab-Wand liegt FRONT Meter vor dem Gebetsplatz

@@ -15,8 +15,8 @@ const PARTS = [
   ['armL', 'wash', 3, () => true],
   ['head', 'head', 1, () => true],
   ['ears', 'head', 1, (m) => m === 'hanbali'],
-  ['footR', 'feet', 3, () => true],
-  ['footL', 'feet', 3, () => true],
+  ['footR', 'footWash', 3, () => true],
+  ['footL', 'footWash', 3, () => true],
   ['heart', 'stand', 1, () => false],
 ];
 

@@ -3,7 +3,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import { STYLES, WUDU_BASINS, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked, setWater } from './environment.js';
+import { STYLES, WUDU_BASINS, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked, setWater, wuduStools } from './environment.js';
 import { Guide } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
@@ -224,12 +224,15 @@ const onGallery = () => !!gallery() && state.gender === 'f' && cong.group.visibl
 function layoutRoom() {
   const w = state.wuduRoom;
   if (w) {
-    guide.group.position.set(1.1, 0, 0);
+    state.atStools = atStools();
+    placeWuduFigures(true);
     panel.mesh.position.set(0, 1.62, -0.84);
     panel.mesh.rotation.set(0.1, 0, 0);
     panel.mesh.scale.setScalar(0.72);
   } else {
+    movers.delete(guide);
     guide.group.position.set(1.5, 0, -1.5);
+    guide.group.rotation.y = Math.PI;
     panel.mesh.position.set(-0.75, 1.35, -1.5);
     panel.mesh.rotation.set(-0.05, 0.32, 0, 'YXZ');
     panel.mesh.scale.setScalar(1);
@@ -250,12 +253,66 @@ function layoutRoom() {
   }
 }
 
+// --- Waschraum: Füße werden auf den Hockern rechts gewaschen ---
+// Ab dem ersten Fuß-Schritt (und danach beim Bittgebet) sitzen Vorbeter und Ghost dort; vorher stehen sie an den Becken.
+const atStools = () => state.wuduRoom && (state.view === 'done' || (state.view === 'step' && state.i >= state.steps.findIndex((x) => x.wudu === 'footR')));
+
+// Figuren gehen zu ihrem Platz: über einen Punkt hinter den Becken, damit niemand durch dich hindurchläuft
+const movers = new Map();
+function sendTo(fig, pos, rot, snap) {
+  const g = fig.group;
+  if (snap) { movers.delete(fig); g.position.copy(pos); g.rotation.y = rot; fig.setPose(fig.wantPose || 'stand'); return; }
+  const m = movers.get(fig);
+  if (m ? m.to.distanceTo(pos) < 0.02 : g.position.distanceTo(pos) < 0.02) { if (!m) g.rotation.y = rot; return; }
+  const via = pos.x > 2 ? new THREE.Vector3(g.position.x, 0, 1.15) : new THREE.Vector3(pos.x, 0, 1.15);
+  movers.set(fig, { path: [g.position.clone(), via, pos.clone()], i: 0, k: 0, t: 0, rot, to: pos.clone() });
+  fig.setPose('stand');
+}
+function placeWuduFigures(snap = false) {
+  const st = wuduStools(), feet = atStools() && st.length > 1;
+  sendTo(guide, feet ? new THREE.Vector3(st[0][0], 0, st[0][1]) : new THREE.Vector3(1.1, 0, 0), feet ? Math.PI / 2 : Math.PI, snap);
+  sendTo(ghost, feet ? new THREE.Vector3(st[1][0], 0, st[1][1]) : new THREE.Vector3(WUDU_BASINS[2], 0, 0), feet ? Math.PI / 2 : Math.PI, snap);
+}
+// Haltung setzen; wer gerade geht, nimmt sie erst am Ziel ein
+function posePerson(fig, pose) {
+  fig.wantPose = pose;
+  if (!movers.has(fig)) fig.setPose(pose);
+}
+function updateMovers(dt) {
+  for (const [fig, m] of movers) {
+    const a = m.path[m.i], b = m.path[m.i + 1];
+    m.t += dt;
+    m.k += (dt * 1.1) / Math.max(a.distanceTo(b), 0.001);
+    if (m.k >= 1) {
+      m.i++; m.k = 0;
+      if (m.i >= m.path.length - 1) {
+        fig.group.position.copy(m.to);
+        fig.group.rotation.y = m.rot;
+        movers.delete(fig);
+        fig.setPose(fig.wantPose || 'stand');
+        continue;
+      }
+    }
+    const p = m.path[m.i], q = m.path[m.i + 1];
+    fig.group.position.lerpVectors(p, q, m.k);
+    if (p.distanceTo(q) > 0.01) fig.group.rotation.y = Math.atan2(q.x - p.x, q.z - p.z);
+    // Schritte: Beine und Arme schwingen
+    const swing = Math.sin(m.t * 7) * 0.35;
+    fig.legs[0].hip.rotation.x = swing;
+    fig.legs[1].hip.rotation.x = -swing;
+    fig.arms[0].sh.rotation.x = -swing * 0.6;
+    fig.arms[1].sh.rotation.x = swing * 0.6;
+  }
+}
+
 // Ghost vor dir (Blick zur Qibla wie du) oder neben dir; im Waschraum am Becken links neben dir
 function placeGhost() {
   const g = ghost.group;
   g.visible = state.ghost !== 'off' && (state.view === 'step' || (state.wuduRoom && state.view === 'done'));
-  if (state.wuduRoom) g.position.set(WUDU_BASINS[2], 0, 0);
-  else if (state.ghost === 'side' && !(state.cemaat && cong.group.visible)) g.position.set(0.85, 0, 0);
+  if (state.wuduRoom) return;
+  movers.delete(ghost);
+  g.rotation.y = Math.PI;
+  if (state.ghost === 'side' && !(state.cemaat && cong.group.visible)) g.position.set(0.85, 0, 0);
   // Mit Cemaat steht neben dir schon jemand: dann vor dir; auf der Empore dicht vor der Brüstung
   else g.position.set(0, 0, onGallery() ? -0.6 : -1.3);
 }
@@ -394,9 +451,15 @@ function refresh() {
   }
   if (wantsWuduRoom() !== state.wuduRoom) rebuildEnv();
   const pose = v.type === 'step' ? v.step.pose : 'stand';
-  guide.setPose(pose);
-  ghost.setPose(pose);
+  posePerson(guide, pose);
+  posePerson(ghost, pose);
   placeGhost();
+  if (state.wuduRoom) {
+    const feet = atStools();
+    placeWuduFigures();
+    if (feet !== state.atStools && mobileUI) { state.atStools = feet; aimAtGuide(); }
+    state.atStools = feet;
+  }
   // Grün, wenn deine Haltung in VR erkannt ist
   ghost.setGhostColor(v.type === 'step' && v.posture === 'ok' ? GHOST_OK : GHOST_WAIT);
   updateCast();
@@ -856,7 +919,11 @@ function aimAtGuide() {
   camera.position.copy(eye ? world.localToWorld(eye) : new THREE.Vector3(0, 1.6, 0));
   const target = new THREE.Vector3(0, 0.85, 0);
   // Im Waschraum auf dein Becken: links der Ghost, rechts der Vorbeter
-  if (state.wuduRoom) world.localToWorld(target.set(0, 0.95, -0.4));
+  if (state.wuduRoom && state.atStools) {
+    // Beim Füßewaschen: auf die Hocker rechts
+    camera.position.copy(world.localToWorld(new THREE.Vector3(1.0, 1.8, 3.0)));
+    world.localToWorld(target.set(3.4, 0.5, 1.0));
+  } else if (state.wuduRoom) world.localToWorld(target.set(0, 0.95, -0.4));
   else leader().group.localToWorld(target);
   const d = target.sub(camera.position);
   yaw = Math.atan2(-d.x, -d.z);
@@ -1048,11 +1115,14 @@ renderer.setAnimationLoop(() => {
   lastMinute = minute;
   guide.update(dt);
   ghost.update(dt);
+  updateMovers(dt);
   cong.update(dt);
-  // Im Waschraum läuft das Wasser bei den Waschschritten (nicht bei Absicht und Bittgebet)
+  // Im Waschraum läuft das Wasser bei den Waschschritten (nicht bei Absicht und Bittgebet), bei den Füßen an den Hockern
   if (state.wuduRoom) {
     const st = state.view === 'step' && state.steps[state.i];
-    setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, 1.1, ...(ghost.group.visible ? [WUDU_BASINS[2]] : [])]);
+    const g = ghost.group.visible, arrived = (f) => !movers.has(f);
+    if (state.atStools) setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [], [...(arrived(guide) ? [0] : []), ...(g && arrived(ghost) ? [1] : [])]);
+    else setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : []), ...(g && arrived(ghost) ? [WUDU_BASINS[2]] : [])]);
   }
   renderer.render(scene, camera);
 });

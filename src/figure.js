@@ -19,6 +19,8 @@ export const POSES = {
   head:    { y: 0.95, spine: 0.05, headX: 0.2,  headY: 0,    shX: -2.3,  shZ: 0.45, elX: -1.5,  elZ: -0.3, hip: 0,     knee: 0 },
   // Bittgebet im Sitzen nach dem Gebet (Gemeinde)
   sitDua:  { y: 0.24, spine: 0.05, headX: 0.35, headY: 0,    shX: -0.6,  shZ: 0.15, elX: -1.5,  elZ: 0.1,  hip: -1.25, knee: 2.82 },
+  // Füße waschen im Sitzen auf dem Hocker: Oberschenkel waagerecht, vorgebeugt, Hände an den Füßen
+  footWash:{ y: 0.5,  spine: 0.75, headX: 0.35, headY: 0,    shX: -0.95, shZ: 0.12, elX: -0.25, elZ: 0,    hip: -1.55, knee: 1.55 },
   feet:    { y: 0.82, spine: 1.15, headX: -0.2, headY: 0,    shX: -1.0,  shZ: 0.1,  elX: -0.2,  elZ: 0,    hip: -0.35, knee: 0.6 },
 };
 const KEYS = Object.keys(POSES.stand);
@@ -29,6 +31,7 @@ const MOTION = {
   face: [['elX', 0.16, 3.5], ['shZ', 0.05, 3.5]],
   head: [['shX', 0.22, 2.2], ['elX', 0.15, 2.2]],
   feet: [['elZ', 0.2, 5.5], ['shX', 0.08, 5.5]],
+  footWash: [['elZ', 0.2, 5.5], ['shX', 0.1, 5.5]],
 };
 
 // Geometrien und Materialien werden zwischen allen Figuren geteilt (eine ganze Gemeinde bleibt so leicht).
