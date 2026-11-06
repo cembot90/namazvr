@@ -488,8 +488,10 @@ function cemevi(scene, night) {
   // Semah-Gruppe: sitzt zunächst innen am Rand und steht zum Semah auf
   for (let i = 0; i < 8; i++) list.push({ mode: 'semah', a: (i / 8) * Math.PI * 2, female: i % 2 === 0 });
   for (const p of list) {
-    const g = new Guide({ robe: p.dede ? 0xf3f0e8 : [0xf3f0e8, 0x2b2d33, 0x5f7f86, 0x7a2e2e, 0x4f6b4a, 0xd9cdb4][Math.floor(Math.random() * 6)], skin: [0xe2c2a2, 0xc9a988, 0xa77b58][Math.floor(Math.random() * 3)], scarf: [0xf3f0e8, 0x8a2a2a, 0x2f5d50][Math.floor(Math.random() * 3)], cap: false, scale: rand(0.94, 1.05) });
-    g.setGender(p.female ? 'f' : 'm');
+    // Im Cemevi tragen Frauen kein Kopftuch
+    const hair = [0x2b1d14, 0x3a2618, 0x5a3a22, 0x1a1412, 0x8a8580, 0x6b4a2e][Math.floor(Math.random() * 6)];
+    const g = new Guide({ robe: p.dede ? 0xf3f0e8 : [0xf3f0e8, 0x2b2d33, 0x5f7f86, 0x7a2e2e, 0x4f6b4a, 0xd9cdb4][Math.floor(Math.random() * 6)], skin: [0xe2c2a2, 0xc9a988, 0xa77b58][Math.floor(Math.random() * 3)], hair, cap: false, scale: rand(0.94, 1.05) });
+    g.setGender(p.female ? 'f' : 'm', { scarf: false });
     g.speed = rand(3, 4.5);
     scene.add(g.group);
     crowd.push({ g, ...p, t: rand(0, 10) });

@@ -60,7 +60,7 @@ const mat = (color, roughness) => {
 
 export class Guide {
   // robe/skin/scarf: Farben, cap: Gebetsmütze bei Männern, scale: Körpergröße
-  constructor({ robe: robeColor = 0xece6d8, skin: skinColor = 0xc9a988, scarf: scarfColor = 0x5f7f86, cap: capOn = true, scale = 1 } = {}) {
+  constructor({ robe: robeColor = 0xece6d8, skin: skinColor = 0xc9a988, scarf: scarfColor = 0x5f7f86, cap: capOn = true, scale = 1, hair: hairColor = 0x2b1d14 } = {}) {
     this.group = new THREE.Group();
     this.group.scale.setScalar(scale);
     this.capOn = capOn;
@@ -141,7 +141,20 @@ export class Guide {
     this.scarf.add(hood, drape);
     this.scarf.visible = false;
     this.cap = cap;
-    this.head.add(neck, headMesh, cap, this.scarf);
+    // Haar (ohne Kopfbedeckung): kurz für Männer, für Frauen zusätzlich langes Haar am Hinterkopf
+    const hairMat = mat(hairColor, 0.8);
+    const hairTop = new THREE.Mesh(geo('hairTop', () => new THREE.SphereGeometry(0.113, 24, 14, 0, Math.PI * 2, 0, Math.PI * 0.55)), hairMat);
+    hairTop.position.set(0, 0.14, -0.008);
+    hairTop.rotation.x = -0.35;
+    hairTop.scale.set(0.92, 1.05, 1.02);
+    const hairLong = new THREE.Mesh(geo('hairLong', () => new THREE.CapsuleGeometry(0.07, 0.16, 6, 14)), hairMat);
+    hairLong.position.set(0, 0.03, -0.075);
+    hairLong.scale.set(1.25, 1, 0.55);
+    this.hair = new THREE.Group();
+    this.hair.add(hairTop, hairLong);
+    this.hairLong = hairLong;
+    this.hair.visible = false;
+    this.head.add(neck, headMesh, cap, this.scarf, this.hair);
 
     this.arms = [1, -1].map((side) => {
       const sh = new THREE.Group();
@@ -195,10 +208,15 @@ export class Guide {
     this.apply(this.cur);
   }
 
-  setGender(g) {
+  // opts.scarf = false: Frau ohne Kopftuch (z. B. im Cemevi)
+  setGender(g, opts = {}) {
     this.gender = g;
-    this.scarf.visible = g === 'f';
+    if (opts.scarf !== undefined) this.noScarf = opts.scarf === false;
+    this.scarf.visible = g === 'f' && !this.noScarf;
     this.cap.visible = g !== 'f' && this.capOn && !this.ihram;
+    // Ohne Kopftuch oder Kappe sieht man das Haar
+    this.hair.visible = !this.scarf.visible && !this.cap.visible;
+    this.hairLong.visible = g === 'f';
   }
 
   // Iḥrām: Männer in zwei weißen Tüchern ohne Kopfbedeckung (Frauen bleiben in ihrer bedeckten Kleidung)

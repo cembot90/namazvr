@@ -620,6 +620,9 @@ function refresh() {
   }
   if (wantsWuduRoom() !== state.wuduRoom || wantsScene() !== state.scene) rebuildEnv();
   // Im Iḥrām: Männer in Weiß ohne Kappe
+  // Im Cemevi ohne Kopftuch (Rehber und Ghost, wenn man als Frau unterwegs ist)
+  const scarf = state.scene !== 'cemevi';
+  if (!!guide.noScarf !== !scarf) { guide.setGender(state.gender, { scarf }); ghost.setGender(state.gender, { scarf }); }
   const ihram = pilgrimActive() && isHajj(state.prayer);
   if (!!guide.ihram !== ihram) { guide.setIhram(ihram); ghost.setIhram(ihram); }
   if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
