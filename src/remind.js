@@ -4,6 +4,7 @@ import { t } from './i18n.js';
 import { TIME_NAMES, computeTimes, formatTime } from './prayertimes.js';
 
 export const BEFORE = [0, 5, 10, 15, 30];
+export const ALL_PRAYERS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
 const PRAYER_IDS = TIME_NAMES.filter((n) => n.prayer).map((n) => n.id);
 const nameOf = (id) => TIME_NAMES.find((n) => n.id === id).name;
 
@@ -29,9 +30,10 @@ export async function notify(title, body) {
  * Fällige Erinnerung? Prüft einmal pro Minute; sent = Menge bereits gemeldeter Schlüssel „Tag|Gebet“.
  * @returns {{ id, at, key } | null}
  */
-export function dueReminder(loc, now, method, asr, before, sent) {
+// prayers: nur an diese Gebete erinnern (Standard: alle fünf)
+export function dueReminder(loc, now, method, asr, before, sent, prayers = PRAYER_IDS) {
   const { times } = computeTimes(loc, now, method, asr);
-  for (const id of PRAYER_IDS) {
+  for (const id of PRAYER_IDS.filter((x) => prayers.includes(x))) {
     const at = times[id];
     const fire = at.getTime() - before * 60000;
     const key = `${at.toISOString().slice(0, 10)}|${id}`;
@@ -41,19 +43,22 @@ export function dueReminder(loc, now, method, asr, before, sent) {
   return null;
 }
 
+// Sanfte, wechselnde Worte – eine Einladung, kein Druck
 export function reminderText(id, at, before, timeZone) {
-  return { title: t('rem.title2', nameOf(id), formatTime(at, timeZone)), body: t('rem.body', before) };
+  const lines = t('rem.gentle');
+  const line = Array.isArray(lines) ? lines[Math.floor(Math.random() * lines.length)] : '';
+  return { title: t('rem.title2', nameOf(id), formatTime(at, timeZone)), body: [t('rem.body', before), line].filter(Boolean).join(' ') };
 }
 
 // Kalenderdatei mit den 5 Gebeten der nächsten `days` Tage, jeweils mit Alarm `before` Minuten vorher
-export function buildIcs(loc, method, asr, before = 10, days = 30, now = new Date()) {
+export function buildIcs(loc, method, asr, before = 10, days = 30, now = new Date(), prayers = PRAYER_IDS) {
   const stamp = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
   const esc = (s) => String(s).replace(/[\\;,]/g, (c) => `\\${c}`).replace(/\n/g, '\\n');
   const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//NamazVR//Gebetszeiten//DE', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', `X-WR-CALNAME:${esc('NamazVR')}`];
   for (let i = 0; i < days; i++) {
     const day = new Date(now.getTime() + i * 864e5);
     const { times } = computeTimes(loc, day, method, asr);
-    for (const id of PRAYER_IDS) {
+    for (const id of PRAYER_IDS.filter((x) => prayers.includes(x))) {
       const at = times[id];
       if (Number.isNaN(at.getTime()) || at < now) continue;
       lines.push(

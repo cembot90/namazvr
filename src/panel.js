@@ -521,10 +521,11 @@ export class Panel extends CanvasPlane {
     row(645, t('ui.guideFor'), '', [[t('ui.men'), 'gender:m', v.gender !== 'f'], [t('ui.women'), 'gender:f', v.gender === 'f']]);
     row(728, t('ui.beginner'), t('ui.beginnerSub'), [[v.beginner ? t('ui.on') : t('ui.off'), 'beginner', v.beginner]]);
     row(811, t('ui.spiritual'), t('ui.spiritualSub'), [[v.spiritual ? t('ui.on') : t('ui.off'), 'spiritual', v.spiritual]]);
-    const third = (W - 120 - 40) / 3;
-    this.btn(t('voice.btn'), 60, H - 98, third, 80, 'voice', { primary: true });
-    this.btn(t('ui.info'), 60 + third + 20, H - 98, third, 80, 'info');
-    this.btn(t('ui.back'), 60 + 2 * (third + 20), H - 98, third, 80, 'menu');
+    const q = (W - 120 - 60) / 4;
+    this.btn(t('voice.btn'), 60, H - 98, q, 80, 'voice', { primary: true, size: 28 });
+    this.btn(t('rem.btn'), 60 + q + 20, H - 98, q, 80, 'remind', { primary: true, size: 28 });
+    this.btn(t('ui.info'), 60 + 2 * (q + 20), H - 98, q, 80, 'info', { size: 28 });
+    this.btn(t('ui.back'), 60 + 3 * (q + 20), H - 98, q, 80, 'menu', { size: 28 });
   }
 
   v_mosque(v) {
@@ -747,10 +748,14 @@ export class Panel extends CanvasPlane {
     this.btn(t('rem.test'), isRTL() ? 380 : W - 60 - 340, 295, 340, 70, 'remtest', { size: 24 });
     let y = 400;
     if (v.ios) y = this.paragraphs([t('rem.ios')], y, { size: 23, color: C.muted, gap: 6 });
-    this.btn(t('rem.cal'), 60, y + 10, W - 120, 100, 'remcal', { primary: true, size: 34 });
-    y = this.paragraphs([t('rem.calSub')], y + 150, { size: 24, color: C.muted, gap: 0 });
-    if (v.msg) this.paragraphs([v.msg], y + 10, { size: 26, color: C.gold, gap: 0 });
-    this.btn(t('ui.back'), 60, H - 128, W - 120, 96, 'times');
+    this.btn(t('rem.cal'), 60, y + 10, W - 120, 90, 'remcal', { primary: true, size: 32 });
+    y = this.paragraphs([t('rem.calSub')], y + 132, { size: 22, color: C.muted, gap: 0 });
+    // Welche Gebete?
+    this.text(t('rem.which'), 60, y + 30, { size: 26, weight: 600 });
+    const gap = 16, w = (W - 120 - gap * 4) / 5;
+    v.prayerList.forEach((p, i) => this.btn(`${p.on ? '✓ ' : ''}${p.name}`, 60 + i * (w + gap), y + 50, w, 66, `remp:${p.id}`, { active: p.on, size: 26 }));
+    if (v.msg) this.paragraphs([v.msg], y + 150, { size: 24, color: C.gold, gap: 0 });
+    this.btn(t('ui.back'), 60, H - 128, W - 120, 96, v.back);
   }
 
   v_info() {

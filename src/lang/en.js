@@ -492,6 +492,8 @@ export default {
     note: 'Everything stays on this device. On the Quest you can change the name in the normal browser view (outside VR).',
   },
   rem: {
+    which: 'Remind me of which prayers?',
+    gentle: ['A few calm minutes for you and Allah.', 'No pressure – maybe now is a good moment.', 'If you like: pause for a moment and pray.', 'Every prayer counts, even a late one.', 'Take a breath – prayer is a rest for the heart.'],
     btn: '🔔 Reminder', title: 'Prayer time reminder', sub: 'notification & calendar',
     on: 'Notification', onSub: 'while NamazVR is open or running in the background',
     before: 'How early?', min: (n) => (n ? `${n} min before` : 'on time'),

@@ -26,7 +26,7 @@ import { Ambience } from './ambient.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
 import { formatDay, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
-import { BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
+import { ALL_PRAYERS, BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
 
 const store = {
   get(key, fallback) {
@@ -177,7 +177,7 @@ const state = {
   progress: loadProgress(profileId),
   pDel: null,
   // Erinnerung: an/aus und wie viele Minuten vorher
-  remind: { on: false, before: 10, ...store.get('remind', {}) },
+  remind: { on: false, before: 10, prayers: ALL_PRAYERS, ...store.get('remind', {}) },
   remMsg: '',
   quiz: null,
   // Haltungserkennung in VR: Stehhöhe des Kopfes, erkannte Haltung, wie lange schon gehalten
@@ -505,7 +505,7 @@ function view() {
     case 'pilgrim':
       return { type: 'pilgrim', list: PILGRIMAGES, walkAlong: state.walkAlong, sounds: state.sounds, madhab: madhab().name, gender: state.gender };
     case 'remind':
-      return { type: 'remind', ...state.remind, msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
+      return { type: 'remind', back: state.remFrom === 'settings' ? 'settings' : 'times', ...state.remind, prayerList: PRAYERS.map((p) => ({ id: p.id, name: p.name, on: state.remind.prayers.includes(p.id) })), msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
         ios: /iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone, next: timesInfo().next };
     case 'tracker': {
       const p = state.progress, key = keyFor(state.trackBack);
@@ -786,7 +786,7 @@ function act(action) {
       }
       state.pDel = null;
       break;
-    case 'remind': state.view = 'remind'; state.remMsg = ''; break;
+    case 'remind': state.remFrom = state.view; state.view = 'remind'; state.remMsg = ''; break;
     case 'pilgrim': state.view = 'pilgrim'; break;
     case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
     case 'sounds': state.sounds = !state.sounds; store.set('sounds', state.sounds); break;
@@ -799,11 +799,19 @@ function act(action) {
         refresh();
       });
       break;
+    case 'remp': {
+      // Gebet für die Erinnerung an- oder abwählen (mindestens eines bleibt)
+      const list = state.remind.prayers;
+      const next = list.includes(arg) ? list.filter((x) => x !== arg) : ALL_PRAYERS.filter((x) => x === arg || list.includes(x));
+      if (next.length) state.remind.prayers = next;
+      store.set('remind', state.remind);
+      break;
+    }
     case 'rembefore': state.remind.before = BEFORE[(BEFORE.indexOf(state.remind.before) + 1) % BEFORE.length]; store.set('remind', state.remind); break;
     case 'remtest': {
       const n = timesInfo().next;
       askPermission().then(async (perm) => {
-        const ok = perm === 'granted' && await notify(t('rem.title2', n.name, n.time), t('rem.body', state.remind.before));
+        const ok = perm === 'granted' && await notify(t('rem.title2', n.name, n.time), `${t('rem.body', state.remind.before)} ${t('rem.gentle')[0]}`);
         state.remMsg = ok ? '' : perm === 'unsupported' ? t('rem.unsupported') : t('rem.denied');
         refresh();
       });
@@ -811,7 +819,7 @@ function act(action) {
     }
     case 'remcal': {
       const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
-      downloadIcs(buildIcs(loc, state.method, state.asr, state.remind.before, 30));
+      downloadIcs(buildIcs(loc, state.method, state.asr, state.remind.before, 30, new Date(), state.remind.prayers));
       state.remMsg = t('rem.calDone');
       break;
     }
@@ -1286,7 +1294,7 @@ const sentReminders = new Set(store.get('remindSent', []));
 function checkReminder() {
   if (!state.remind.on || !canNotify() || Notification.permission !== 'granted') return;
   const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
-  const due = dueReminder(loc, new Date(), state.method, state.asr, state.remind.before, sentReminders);
+  const due = dueReminder(loc, new Date(), state.method, state.asr, state.remind.before, sentReminders, state.remind.prayers);
   if (!due) return;
   sentReminders.add(due.key);
   store.set('remindSent', [...sentReminders].slice(-20));

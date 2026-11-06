@@ -267,7 +267,7 @@ export class MobileUI {
       <div class="grid2">${btn(t('ui.men'), 'gender:m', { cls: v.gender !== 'f' ? 'active' : '' })}${btn(t('ui.women'), 'gender:f', { cls: v.gender === 'f' ? 'active' : '' })}</div>
       ${toggle(t('ui.beginner'), t('ui.beginnerSubShort'), 'beginner', v.beginner)}
       ${toggle(t('ui.spiritual'), t('ui.spiritualSubShort'), 'spiritual', v.spiritual)}
-      ${btn(t('voice.btn'), 'voice', { cls: 'primary wide' })}
+      <div class="grid2">${btn(t('voice.btn'), 'voice', { cls: 'primary' })}${btn(t('rem.btn'), 'remind', { cls: 'primary' })}</div>
       <div class="grid2">${btn(t('ui.info'), 'info')}${btn(t('ui.back'), 'menu')}</div>`;
   }
 
@@ -411,8 +411,10 @@ export class MobileUI {
       ${v.ios ? `<p class="muted small">${esc(t('rem.ios'))}</p>` : ''}
       ${btn(t('rem.cal'), 'remcal', { cls: 'primary wide' })}
       <p class="muted small">${esc(t('rem.calSub'))}</p>
+      <h3>${esc(t('rem.which'))}</h3>
+      <div class="grid5">${v.prayerList.map((p) => btn(`${p.on ? '✓ ' : ''}${p.name}`, `remp:${p.id}`, { cls: p.on ? 'active' : '' })).join('')}</div>
       ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
-      ${btn(t('ui.back'), 'times', { cls: 'wide' })}`;
+      ${btn(t('ui.back'), v.back, { cls: 'wide' })}`;
   }
 
   v_info() {

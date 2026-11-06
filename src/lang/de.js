@@ -501,6 +501,8 @@ export default {
     note: 'Alles bleibt auf diesem Gerät. Auf der Quest kann man den Namen in der normalen Browser-Ansicht (außerhalb von VR) ändern.',
   },
   rem: {
+    which: 'An welche Gebete erinnern?',
+    gentle: ['Ein paar ruhige Minuten für dich und Allah.', 'Kein Druck – vielleicht passt es gerade.', 'Wenn du magst: kurz innehalten und beten.', 'Jedes Gebet zählt, auch ein spätes.', 'Atme durch – das Gebet ist eine Pause fürs Herz.'],
     btn: '🔔 Erinnerung', title: 'Erinnerung zur Gebetszeit', sub: 'Benachrichtigung & Kalender',
     on: 'Benachrichtigung', onSub: 'solange NamazVR geöffnet ist oder im Hintergrund läuft',
     before: 'Wie früh?', min: (n) => (n ? `${n} Min. vorher` : 'zur Zeit'),

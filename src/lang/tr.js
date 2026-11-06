@@ -543,6 +543,8 @@ export default {
     note: 'Her şey bu cihazda kalır. Quest’te ismi normal tarayıcı görünümünde (VR dışında) değiştirebilirsin.',
   },
   rem: {
+    which: 'Hangi namazlar için hatırlatma?',
+    gentle: ['Kendin ve Allah için birkaç sakin dakika.', 'Baskı yok – belki şimdi uygundur.', 'İstersen: biraz dur ve namaz kıl.', 'Her namaz değerlidir, geç kalsa bile.', 'Derin bir nefes al – namaz kalp için bir moladır.'],
     btn: '🔔 Hatırlatma', title: 'Namaz vakti hatırlatması', sub: 'bildirim ve takvim',
     on: 'Bildirim', onSub: 'NamazVR açıkken veya arka planda çalışırken',
     before: 'Ne kadar önce?', min: (n) => (n ? `${n} dk önce` : 'vaktinde'),
