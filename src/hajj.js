@@ -3,6 +3,7 @@
 import { t } from './i18n.js';
 import { IHRAM_PRAYER, TAWAF_PRAYER, buildSteps, text } from './prayer.js';
 import { JAMARAT, MAQAM, SAY_L, GREEN, TAWAF_R } from './hajjworld.js';
+import { buildAlevi, circleAt } from './alevi.js';
 
 const TAU = Math.PI * 2;
 const polar = (r, a) => ({ x: r * Math.cos(a), z: -r * Math.sin(a) });
@@ -37,6 +38,7 @@ function step(id, { scene, place = PLACES.origin, pose = 'stand', dur = 12, txt 
 export function pathLength(m) {
   if (m.type === 'tawaf') return TAU * TAWAF_R * m.rounds;
   if (m.type === 'say') return SAY_L * m.laps;
+  if (m.type === 'circle') return TAU * m.r * m.rounds;
   return 0;
 }
 const withDur = (s) => {
@@ -51,6 +53,7 @@ function prayerAt(p, madhab, gender, sura, scene, place) {
 }
 
 export function buildPilgrimage(kind, madhab = 'hanafi', gender = 'm', sura = 'ikhlas') {
+  if (kind === 'cem' || kind === 'semah') return buildAlevi(kind);
   const f = gender === 'f';
   const out = [];
   const add = (id, o) => out.push(withDur(step(id, { f, ...o })));
@@ -104,6 +107,7 @@ export function buildPilgrimage(kind, madhab = 'hanafi', gender = 'm', sura = 'i
 
 // Position und Blickrichtung (in Ortskoordinaten) nach d Metern Weg
 export function pathAt(m, d) {
+  if (m.type === 'circle') return circleAt(m, d);
   if (m.type === 'tawaf') {
     const a = m.from + d / TAWAF_R;
     return { x: TAWAF_R * Math.cos(a), z: -TAWAF_R * Math.sin(a), hx: -Math.sin(a), hz: -Math.cos(a) };
@@ -118,6 +122,7 @@ export function pathAt(m, d) {
 
 // Tempo (m/s): beim Raml und zwischen den grünen Lichtern gehen Männer schneller
 export function speedAt(m, d) {
+  if (m.type === 'circle') return m.fast ? 1.5 : 0.8;
   if (m.type === 'tawaf') return m.raml && d / (TAU * TAWAF_R) < 3 ? 2.8 : 2.2;
   if (m.type === 'say') {
     const u = (d % SAY_L) / SAY_L;
@@ -137,8 +142,10 @@ export function statusOf(m, d, thrown) {
     return `${t('hajj.lapOf', lap + 1, 7)} · ${lap % 2 === 0 ? t('hajj.toMarwa') : t('hajj.toSafa')}${green}`;
   }
   if (m.type === 'throw') return t('hajj.stoneOf', Math.min(m.count, thrown), m.count);
+  if (m.type === 'circle') return t('alevi.roundOf', Math.min(m.rounds, Math.floor(d / (TAU * m.r)) + 1), m.rounds);
   return '';
 }
 
 // Welche Orte gibt es (für die Auswahl der Umgebung)
-export const isPilgrimage = (p) => p?.kind === 'umre' || p?.kind === 'hajj';
+export const isPilgrimage = (p) => ['umre', 'hajj', 'cem', 'semah'].includes(p?.kind);
+export const isHajj = (p) => p?.kind === 'umre' || p?.kind === 'hajj';

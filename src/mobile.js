@@ -55,7 +55,7 @@ export class MobileUI {
       }).join('')}</div>
       <p class="gold">${esc(t('ui.next', v.times.next.name, v.times.next.time, v.times.next.inText))}</p>
       <p class="muted">${esc(v.qibla)} · ${esc(v.madhab)}</p>
-      ${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary wide' })}
+      <div class="grid2">${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary' })}${btn(t('alevi.menu'), 'alevi', { cls: 'primary' })}</div>
       <div class="grid2">
         ${btn(t('ui.menuTimes'), 'times')}${btn(t('ui.menuMore'), 'more')}
         ${btn(t('ui.menuWudu'), 'wudu', { cls: v.wuduDone ? '' : 'primary' })}${btn(t('ui.menuLearn'), 'learn')}
@@ -172,6 +172,11 @@ export class MobileUI {
   }
 
   v_done(v) {
+    if (v.prayer.kind === 'cem' || v.prayer.kind === 'semah') {
+      return `${head(t(`alevi.done.${v.prayer.kind}`), v.prayer.name)}
+        ${t('alevi.doneText').map((p) => `<p>${esc(p)}</p>`).join('')}
+        <div class="grid3">${btn(t('ui.again'), 'again')}${btn(t('alevi.title'), 'alevi', { cls: 'primary' })}${btn(t('ui.menu'), 'menu')}</div>`;
+    }
     if (v.prayer.kind === 'umre' || v.prayer.kind === 'hajj') {
       return `${head(t(`hajj.done.${v.prayer.kind}`), v.prayer.name)}
         <p class="ar big center" dir="rtl">تَقَبَّلَ اللَّهُ مِنَّا وَمِنكُم</p>
@@ -391,6 +396,42 @@ export class MobileUI {
       <div class="grid2">${btn(t('gal.screen'), 'women:screen', { cls: v.womenPlace !== 'gallery' ? 'active' : '' })}${btn(t('gal.gallery'), 'women:gallery', { cls: v.womenPlace === 'gallery' ? 'active' : '' })}</div>
       <p class="gold small">${esc(t('ui.cemaatTip'))}</p>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_alevi(v) {
+    const toggle = (l, sub, a, on) => `<div class="setting"><div><b>${esc(l)}</b><small>${esc(sub)}</small></div>${btn(on ? t('ui.on') : t('ui.off'), a, { cls: on ? 'active' : '' })}</div>`;
+    return `${head(t('alevi.title'), t('alevi.sub'))}
+      ${t('alevi.intro').map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
+      <div class="list">
+        ${btn(`🕯️ ${v.list[0].name}`, `prayer:${v.list[0].id}`, { cls: 'primary', sub: v.list[0].de })}
+        ${btn(`🌀 ${v.list[1].name}`, `prayer:${v.list[1].id}`, { cls: 'primary', sub: v.list[1].de })}
+        ${btn(t('alevi.muharremBtn'), 'muharrem', { sub: t('alevi.muharremSub') })}
+        ${btn(t('alevi.valuesBtn'), 'alevival', { sub: t('alevi.valuesSub') })}
+      </div>
+      ${toggle(t('hajj.walk'), t('hajj.walkSub'), 'walkalong', v.walkAlong)}${toggle(t('hajj.sounds'), t('alevi.soundsSub'), 'sounds', v.sounds)}
+      <p class="gold small">${esc(t('alevi.note'))}</p>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_muharrem(v) {
+    const big = v.inFast ? t('alevi.fastDay', v.day) : v.days != null ? t('ram.days', v.days) : '';
+    const tabs = [['about', t('alevi.tabAbout')], ['kerbela', t('alevi.tabKerbela')], ['asure', t('alevi.tabAsure')], ['hizir', t('alevi.tabHizir')]];
+    return `${head(t('alevi.muharremTitle'), v.hijriYear ? `${v.hijriYear}` : '')}
+      <p class="count">${esc(big)}</p>
+      ${!v.inFast && v.dateText ? `<p class="center">${esc(t('alevi.untilMuharrem', v.dateText))}</p>` : ''}
+      <div class="grid2">${tabs.map(([id, l]) => btn(l, `muharrem:${id}`, { cls: v.part === id ? 'active' : '' })).join('')}</div>
+      ${t(`alevi.${v.part}`).map((p) => `<p>${esc(p)}</p>`).join('')}
+      <div class="grid2">${btn(t('alevi.title'), 'alevi')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_alevival(v) {
+    const [tr, mean, who] = t('alevi.sayings')[v.index];
+    return `${head(t('alevi.valuesTitle'), `${v.index + 1} / ${v.total}`)}
+      <p class="gold center" style="font-size:28px;font-weight:700">„${esc(tr)}“</p>
+      <p class="center">${esc(mean)}</p>
+      <p class="muted small center">${esc(who)}</p>
+      <div class="grid2">${btn('←', 'sayprev')}${btn('→', 'saynext', { cls: 'primary' })}</div>
+      <div class="grid2">${btn(t('alevi.title'), 'alevi')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   v_pilgrim(v) {

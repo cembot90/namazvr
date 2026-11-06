@@ -390,15 +390,127 @@ function jamarat(scene, night) {
   pilgrims(scene, Array.from({ length: 16 }, () => ({ mode: 'throw', x: rand(-10, 10), z: rand(-4, 2) + JAMARAT[Math.floor(Math.random() * 3)].z, female: Math.random() < 0.3 })));
 }
 
-export const HAJJ_SCENES = { haram, masa, mina, arafat, muzdalifa, jamarat };
+// --- Cemevi (Alevilik): Saal mit Meydan in der Mitte, Post des Dede, Çerağ, Zakir mit Bağlama, Gemeinde im Kreis ---
+export const MEYDAN = { x: 0, z: -3.5, r: 2.2 };
+let semahMode = 0; // 0 = alle sitzen, 1 = Semah langsam, 2 = Semah schnell
+export const setSemah = (mode) => { semahMode = mode; };
+let flame = null;
+
+function baglama(scene, x, z, ry) {
+  const wood = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, roughness: 0.5 });
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 12), wood);
+  body.scale.set(1, 0.55, 1.4);
+  const neck = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.75), wood);
+  neck.position.z = 0.55;
+  g.add(body, neck);
+  g.position.set(x, 0.42, z);
+  g.rotation.set(-0.7, ry, 0);
+  scene.add(g);
+}
+
+function cemevi(scene, night) {
+  scene.add(new THREE.HemisphereLight(0xfff0dc, 0x5a3a26, night ? 1.4 : 2.0));
+  const W = 16, D = 20, H = 5, cz = 0;
+  const kilim = canvasTex(512, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#8c2a22'; ctx.fillRect(0, 0, w, h);
+    for (let y = 0; y < h; y += 64) for (let x = 0; x < w; x += 64) {
+      ctx.fillStyle = (x + y) % 128 ? '#c9853a' : '#2f4f6b';
+      ctx.beginPath(); ctx.moveTo(x + 32, y + 8); ctx.lineTo(x + 56, y + 32); ctx.lineTo(x + 32, y + 56); ctx.lineTo(x + 8, y + 32); ctx.fill();
+      ctx.fillStyle = '#f1e2c0'; ctx.fillRect(x + 29, y + 29, 6, 6);
+    }
+  });
+  kilim.wrapS = kilim.wrapT = THREE.RepeatWrapping;
+  kilim.repeat.set(W / 2, D / 2);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ map: kilim, roughness: 1 }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.z = cz;
+  scene.add(floor);
+  // Meydan: runder, heller Platz in der Mitte
+  const meydan = new THREE.Mesh(new THREE.CircleGeometry(MEYDAN.r + 1.1, 48), new THREE.MeshStandardMaterial({ color: 0xe9dcc0, roughness: 1 }));
+  meydan.rotation.x = -Math.PI / 2;
+  meydan.position.set(MEYDAN.x, 0.005, MEYDAN.z);
+  scene.add(meydan);
+  // Wände mit Holzvertäfelung, Decke mit Balken
+  const wall = new THREE.MeshStandardMaterial({ color: 0xf4efe4, roughness: 0.9 });
+  const wood = new THREE.MeshStandardMaterial({ color: 0x6b4426, roughness: 0.7 });
+  for (const [len, x, z, ry] of [[W, 0, -D / 2, 0], [W, 0, D / 2, Math.PI], [D, -W / 2, 0, Math.PI / 2], [D, W / 2, 0, -Math.PI / 2]]) {
+    const w = new THREE.Mesh(new THREE.PlaneGeometry(len, H), wall);
+    w.position.set(x, H / 2, z); w.rotation.y = ry;
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(len, 1.1), wood);
+    panel.position.set(x * 0.999, 0.55, z * 0.999); panel.rotation.y = ry;
+    scene.add(w, panel);
+  }
+  const ceil = new THREE.Mesh(new THREE.PlaneGeometry(W, D), new THREE.MeshStandardMaterial({ color: 0xeadfca, side: THREE.DoubleSide }));
+  ceil.rotation.x = Math.PI / 2; ceil.position.y = H;
+  scene.add(ceil);
+  for (let z = -D / 2 + 1.5; z < D / 2; z += 3) { const b = new THREE.Mesh(new THREE.BoxGeometry(W, 0.25, 0.3), wood); b.position.set(0, H - 0.15, z); scene.add(b); }
+  // Schriftbänder an der Stirnwand: „Allah – Muhammad – ʿAlī“ und ein Leitspruch
+  const plate = (txt, font, w, h, y) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: canvasTex(1024, Math.round(1024 * h / w), (ctx, cw, ch) => {
+      ctx.fillStyle = '#123f36'; ctx.fillRect(0, 0, cw, ch);
+      ctx.strokeStyle = '#c9a85c'; ctx.lineWidth = 8; ctx.strokeRect(6, 6, cw - 12, ch - 12);
+      ctx.fillStyle = '#e6c77f'; ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(txt, cw / 2, ch / 2 + 4);
+    }) }));
+    m.position.set(0, y, -D / 2 + 0.02);
+    scene.add(m);
+  };
+  plate('الله  ·  محمد  ·  علي', '110px Amiri, serif', 5, 0.9, 3.7);
+  plate('Eline, beline, diline sahip ol', '600 70px Inter, sans-serif', 5, 0.55, 2.6);
+  // Post des Dede: erhöhtes Polster mit Schaffell, daneben das Çerağ (Öllampe)
+  const post = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.18, 1.0), new THREE.MeshStandardMaterial({ color: 0x7a2e2e, roughness: 1 }));
+  post.position.set(0, 0.09, MEYDAN.z - 4.2);
+  const fleece = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 8), new THREE.MeshStandardMaterial({ color: 0xf3efe6, roughness: 1 }));
+  fleece.scale.set(1.2, 0.15, 0.8);
+  fleece.position.set(0, 0.2, MEYDAN.z - 4.2);
+  scene.add(post, fleece);
+  const brass = new THREE.MeshStandardMaterial({ color: 0xc9a85c, metalness: 0.8, roughness: 0.3 });
+  const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 0.6, 12), brass);
+  stand.position.set(1.3, 0.3, MEYDAN.z - 3.4);
+  flame = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 10), new THREE.MeshBasicMaterial({ color: 0xffc85a }));
+  flame.position.set(1.3, 0.72, MEYDAN.z - 3.4);
+  const glow = new THREE.PointLight(0xffb24a, 2.2, 6);
+  glow.position.set(1.3, 0.9, MEYDAN.z - 3.4);
+  flame.userData.light = glow;
+  scene.add(stand, flame, glow);
+  baglama(scene, -1.6, MEYDAN.z - 3.6, 0.6);
+  // Lampen
+  const lamp = new THREE.MeshStandardMaterial({ color: 0xfff0c8, emissive: 0xffd48a, emissiveIntensity: night ? 2 : 1.2 });
+  for (const [x, z] of [[-4, -6], [4, -6], [-4, 2], [4, 2], [0, -1]]) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 8), lamp); l.position.set(x, H - 0.8, z); scene.add(l); }
+  // Gemeinde: Männer und Frauen gemeinsam im Kreis um den Meydan, Blick zur Mitte; Dede und Zakir vorn
+  const list = [{ mode: 'sit', x: 0, z: MEYDAN.z - 4.2, face: true, dede: true }, { mode: 'sit', x: -1.6, z: MEYDAN.z - 4.0, face: true }];
+  const n = 18;
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI * 0.62 + (i / (n - 1)) * Math.PI * 1.76; // offener Kreis, vorn sitzen Dede und Zakir
+    list.push({ mode: 'sit', x: MEYDAN.x + Math.cos(a) * 4.6, z: MEYDAN.z - Math.sin(a) * 4.6, face: true, female: i % 2 === 1 });
+  }
+  // Semah-Gruppe: sitzt zunächst innen am Rand und steht zum Semah auf
+  for (let i = 0; i < 8; i++) list.push({ mode: 'semah', a: (i / 8) * Math.PI * 2, female: i % 2 === 0 });
+  for (const p of list) {
+    const g = new Guide({ robe: p.dede ? 0xf3f0e8 : [0xf3f0e8, 0x2b2d33, 0x5f7f86, 0x7a2e2e, 0x4f6b4a, 0xd9cdb4][Math.floor(Math.random() * 6)], skin: [0xe2c2a2, 0xc9a988, 0xa77b58][Math.floor(Math.random() * 3)], scarf: [0xf3f0e8, 0x8a2a2a, 0x2f5d50][Math.floor(Math.random() * 3)], cap: false, scale: rand(0.94, 1.05) });
+    g.setGender(p.female ? 'f' : 'm');
+    g.speed = rand(3, 4.5);
+    scene.add(g.group);
+    crowd.push({ g, ...p, t: rand(0, 10) });
+  }
+}
+
+export const HAJJ_SCENES = { haram, masa, mina, arafat, muzdalifa, jamarat, cemevi };
 
 export function buildHajjScene(group, id, night) {
   crowd = [];
+  flame = null;
   HAJJ_SCENES[id](group, night || id === 'muzdalifa');
 }
 
 // Pilger bewegen: Tavaf gegen den Uhrzeigersinn, Sa'y hin und her, Werfen, Stehen
 export function updateCrowd(dt) {
+  if (flame) {
+    const k = 0.85 + Math.sin(performance.now() / 90) * 0.08 + Math.random() * 0.07;
+    flame.scale.set(1, k, 1);
+    flame.userData.light.intensity = 2 * k;
+  }
   for (const p of crowd) {
     p.t += dt;
     const g = p.g;
@@ -414,6 +526,32 @@ export function updateCrowd(dt) {
       g.group.position.set(p.x + (fwd ? 2 : -2), 0, fwd ? -p.s : -(SAY_L * 2 - p.s));
       g.group.rotation.y = fwd ? Math.PI : 0;
       walkSwing(g, p.t);
+    } else if (p.mode === 'sit') {
+      g.group.position.set(p.x, 0, p.z);
+      // Zur Mitte des Meydan blicken
+      g.group.rotation.y = Math.atan2(MEYDAN.x - p.x, MEYDAN.z - p.z);
+      g.setPose('sit');
+      g.update(dt);
+    } else if (p.mode === 'semah') {
+      if (!semahMode) {
+        // Sitzen innen am Rand des Meydan
+        const x = MEYDAN.x + Math.cos(p.a) * (MEYDAN.r + 1.5), z = MEYDAN.z - Math.sin(p.a) * (MEYDAN.r + 1.5);
+        g.group.position.set(x, 0, z);
+        g.group.rotation.y = Math.atan2(MEYDAN.x - x, MEYDAN.z - z);
+        g.setPose('sit');
+        g.update(dt);
+      } else {
+        // Im Kreis gegen den Uhrzeigersinn, Arme wie Flügel
+        p.a += (semahMode === 2 ? 0.55 : 0.28) * dt;
+        const x = MEYDAN.x + Math.cos(p.a) * MEYDAN.r, z = MEYDAN.z - Math.sin(p.a) * MEYDAN.r;
+        g.group.position.set(x, 0, z);
+        g.group.rotation.y = Math.atan2(-Math.sin(p.a), -Math.cos(p.a));
+        g.setPose(semahMode === 2 ? 'semahFast' : 'semah');
+        g.update(dt);
+        const swing = Math.sin(p.t * (semahMode === 2 ? 6 : 3.5)) * 0.25;
+        g.legs[0].hip.rotation.x = swing;
+        g.legs[1].hip.rotation.x = -swing;
+      }
     } else {
       g.group.position.set(p.x, 0, p.z);
       g.group.rotation.y = Math.PI;

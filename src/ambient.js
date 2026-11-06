@@ -12,7 +12,11 @@ const PROFILES = {
   muzdalifa: [0.1, 0.18, 0.5, 0.1],
   jamarat: [0.55, 0.1, 0, 0.3],
   wudu: [0, 0, 0, 0.4],
+  cemevi: [0.06, 0, 0, 0.45],
 };
+
+// Angedeutete Bağlama: gezupfte Saite (Karplus-Strong), Töne nahe der Hüseynî-Leiter über dem Grundton A
+const NOTES = [220, 247.5, 264, 293.3, 330, 371, 396, 440];
 
 export class Ambience {
   constructor(getCtx) {
@@ -115,6 +119,18 @@ export class Ambience {
       this.stepT += dt * speed * 0.9;
       if (this.stepT >= 1) { this.stepT = 0; this.burst(160, 0.07, 0.35, 'lowpass'); }
     }
+    // Bağlama: Grundton als Bordun, darüber eine ruhig wandernde Melodie
+    if (this.musicMode) {
+      const beat = this.musicMode === 2 ? 0.26 : 0.52;
+      this.beatT = (this.beatT || 0) + dt;
+      if (this.beatT >= beat) {
+        this.beatT = 0;
+        this.noteI = Math.max(0, Math.min(NOTES.length - 1, (this.noteI ?? 4) + [-1, -1, 0, 1, 1, 2, -2][Math.floor(Math.random() * 7)]));
+        this.bar = ((this.bar || 0) + 1) % 4;
+        if (this.bar === 0) this.pluck(110, 0.14);
+        this.pluck(NOTES[this.noteI], 0.16);
+      }
+    }
     // Grillen: kurze, hohe Zirpfolgen
     if (L.crickets && Math.random() < dt * 1.2) this.chirp(L.crickets);
     // Entfernter Chor der Talbiya, etwa alle 10 Sekunden
@@ -155,6 +171,30 @@ export class Ambience {
   }
 
   // Steinchen trifft die Wand
+  // Bağlama-Klänge: 0 = aus, 1 = ruhig (Ağırlama, Zakir), 2 = lebhaft (Yeldirme)
+  music(mode) { this.musicMode = this.on ? mode : 0; }
+
+  pluck(freq, gain = 0.18) {
+    const ctx = this.ctx;
+    this.plucks ??= new Map();
+    let buf = this.plucks.get(freq);
+    if (!buf) {
+      const sr = ctx.sampleRate, len = Math.floor(sr * 1.6), period = Math.round(sr / freq);
+      buf = ctx.createBuffer(1, len, sr);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < period; i++) d[i] = Math.random() * 2 - 1;
+      // Saite: Mittelwert benachbarter Werte, leicht gedämpft – klingt hell und metallisch wie eine Bağlama
+      for (let i = period; i < len; i++) d[i] = 0.498 * (d[i - period] + d[i - period + 1]);
+      this.plucks.set(freq, buf);
+    }
+    const s = ctx.createBufferSource();
+    s.buffer = buf;
+    const g = ctx.createGain();
+    g.gain.value = gain;
+    s.connect(g); g.connect(this.nodes.master);
+    s.start();
+  }
+
   pebble() {
     if (!this.on) return;
     this.burst(2800, 0.05, 0.5);

@@ -8,21 +8,22 @@ import { Guide } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
-import { EXTRA_PRAYERS, MADHABS, PILGRIMAGES, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
+import { ALEVI, EXTRA_PRAYERS, MADHABS, PILGRIMAGES, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
 import { LANGS, deviceLang, getLang, isRTL, langInfo, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
 import { CALM_BREATHS, PEACE, kidLine } from './peace.js';
 import { DUA_CATS, duasOf } from './duas.js';
+import { SAYINGS, muharremInfo } from './alevi.js';
 import { SURAS, findSura, verses } from './suras.js';
 import { MobileUI } from './mobile.js';
 import { checkHands, indexRaised, readHand } from './hands.js';
 import { CITIES, qiblaBearing } from './qibla.js';
 import { ASR, METHODS, TIME_NAMES, formatCountdown, formatTime, prayerStatus } from './prayertimes.js';
 import { PIPER, SAMPLES, Voices } from './voice.js';
-import { buildPilgrimage, isPilgrimage, pathAt, pathLength, speedAt, statusOf } from './hajj.js';
-import { JAMARAT, updateCrowd } from './hajjworld.js';
+import { buildPilgrimage, isHajj, isPilgrimage, pathAt, pathLength, speedAt, statusOf } from './hajj.js';
+import { JAMARAT, setSemah, updateCrowd } from './hajjworld.js';
 import { Ambience } from './ambient.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
 import { formatDay, ramadanInfo } from './ramadan.js';
@@ -152,6 +153,7 @@ const state = {
   kids: !!profile().kids,
   peace: 0,
   dua: { cat: 'protect', i: 0, msg: '' },
+  saying: 0,
   // Suren lernen: gewählte Sure, Modus (read | verse | test), aktueller Vers, aufgedeckt?
   sura: { id: 'fatiha', mode: 'read', v: 0, reveal: false, msg: '' },
   prayerSura: store.get('prayerSura', 'ikhlas'),
@@ -366,10 +368,15 @@ function updatePilgrim(dt) {
   }
   // Mitgehen: Vorbeter und Ghost machen Schritte
   pg.moving = moving;
+  // Semah: die Gruppe steht auf und dreht sich; du, der Rehber und der Ghost drehen mit
+  const semah = (st && st.semah) || 0;
+  setSemah(semah);
+  ambience.music(state.scene === 'cemevi' ? (semah || (st && st.id === 'zakir' ? 1 : 0)) : 0);
   if (moving) for (const fig of [guide, ghost]) {
-    const swing = Math.sin(clock.elapsedTime * 7) * 0.35;
+    const swing = Math.sin(clock.elapsedTime * (semah ? (semah === 2 ? 6 : 3.5) : 7)) * (semah ? 0.25 : 0.35);
     fig.legs[0].hip.rotation.x = swing;
     fig.legs[1].hip.rotation.x = -swing;
+    if (semah) continue; // Arme bleiben in der Semah-Bewegung
     fig.arms[0].sh.rotation.x = -swing * 0.6;
     fig.arms[1].sh.rotation.x = swing * 0.6;
   }
@@ -504,6 +511,14 @@ function view() {
             today: prayedOn(pr, keyFor(0)).length, streak: fullStreak(pr), stars: pr.stars || 0, suras: Object.values(pr.suras || {}).filter(Boolean).length };
         }),
       };
+    case 'alevi':
+      return { type: 'alevi', list: ALEVI, walkAlong: state.walkAlong, sounds: state.sounds };
+    case 'muharrem': {
+      const m = muharremInfo(new Date(), state.location.timeZone || deviceZone);
+      return { type: 'muharrem', ...m, dateText: m.date && formatDay(m.date), part: state.muharremPart || 'about' };
+    }
+    case 'alevival':
+      return { type: 'alevival', index: state.saying, total: SAYINGS };
     case 'pilgrim':
       return { type: 'pilgrim', list: PILGRIMAGES, walkAlong: state.walkAlong, sounds: state.sounds, madhab: madhab().name, gender: state.gender };
     case 'remind':
@@ -596,7 +611,7 @@ function refresh() {
   }
   if (wantsWuduRoom() !== state.wuduRoom || wantsScene() !== state.scene) rebuildEnv();
   // Im Iḥrām: Männer in Weiß ohne Kappe
-  const ihram = pilgrimActive();
+  const ihram = pilgrimActive() && isHajj(state.prayer);
   if (!!guide.ihram !== ihram) { guide.setIhram(ihram); ghost.setIhram(ihram); }
   if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
   const cur = state.view === 'step' && state.steps[state.i];
@@ -794,6 +809,11 @@ function act(action) {
       break;
     case 'remind': state.remFrom = state.view; state.view = 'remind'; state.remMsg = ''; break;
     case 'pilgrim': state.view = 'pilgrim'; break;
+    case 'alevi': state.view = 'alevi'; break;
+    case 'muharrem': state.view = 'muharrem'; state.muharremPart = arg || 'about'; break;
+    case 'alevival': state.view = 'alevival'; break;
+    case 'saynext': state.saying = (state.saying + 1) % SAYINGS; break;
+    case 'sayprev': state.saying = (state.saying + SAYINGS - 1) % SAYINGS; break;
     case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
     case 'sounds': state.sounds = !state.sounds; store.set('sounds', state.sounds); break;
     case 'remon':

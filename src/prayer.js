@@ -29,10 +29,12 @@ export const EXTRA_PRAYERS = [
 
 // Umre und Hac (Simulator); die 2 Rakʿāt im Iḥrām und nach dem Tavaf werden wie Sunnah-Gebete geführt
 export const PILGRIMAGES = [{ id: 'umre', kind: 'umre' }, { id: 'hajj', kind: 'hajj' }].map(named);
+// Alevilik: Rundgang durch das Cemevi und Semah
+export const ALEVI = [{ id: 'cem', kind: 'cem' }, { id: 'semah', kind: 'semah' }].map(named);
 export const IHRAM_PRAYER = named({ id: 'ihramp', rakat: 2, kind: 'sunnah' });
 export const TAWAF_PRAYER = named({ id: 'tawafp', rakat: 2, kind: 'sunnah' });
 
-export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PILGRIMAGES].find((p) => p.id === id);
+export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PILGRIMAGES, ...ALEVI].find((p) => p.id === id);
 
 // Vereinfachte Unterschiede der vier sunnitischen Rechtsschulen (für Männer; Details bei Gelehrten erfragen).
 // Texte (hands, takbir, notes) stehen in der Sprachdatei unter madhab.<id>.

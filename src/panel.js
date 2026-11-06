@@ -185,11 +185,9 @@ export class Panel extends CanvasPlane {
       [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
       [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('track.menu', v.tracked), 'tracker'], [t('ram.menu'), 'ramadan']],
-      [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles'], [t('hajj.menu'), 'pilgrim']],
+      [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles'], [t('hajj.menu'), 'pilgrim'], [t('alevi.menu'), 'alevi']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      // Letzte Reihe: Kinder-Modus über zwei Spalten, dann Profil und Umre & Hac
-      const wide = row.length === 3, col = wide && i > 0 ? i + 1 : i;
-      const w = wide && i === 0 ? 2 * bw + gap : bw;
+      const col = i, w = bw;
       this.btn(label, 60 + col * (bw + gap), 612 + ri * 84, w, 72, action, { primary: (action === 'wudu' && !v.wuduDone) || action === 'pilgrim', active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
     }));
   }
@@ -318,6 +316,15 @@ export class Panel extends CanvasPlane {
 
   v_done(v) {
     const { W, H } = this;
+    if (v.prayer.kind === 'cem' || v.prayer.kind === 'semah') {
+      this.heading(t(`alevi.done.${v.prayer.kind}`), v.prayer.name);
+      this.paragraphs(t('alevi.doneText'), 250, { size: 32, gap: 20 });
+      const by = H - 140, gap = 20, w = (W - 120 - 2 * gap) / 3;
+      this.btn(t('ui.again'), 60, by, w, 96, 'again');
+      this.btn(t('alevi.title'), 60 + w + gap, by, w, 96, 'alevi', { primary: true });
+      this.btn(t('ui.menu'), 60 + 2 * (w + gap), by, w, 96, 'menu');
+      return;
+    }
     if (v.prayer.kind === 'umre' || v.prayer.kind === 'hajj') {
       this.heading(t(`hajj.done.${v.prayer.kind}`), v.prayer.name);
       this.text('تَقَبَّلَ اللَّهُ مِنَّا وَمِنكُم', W / 2, 290, { size: 64, font: AR, align: 'center', rtl: true, color: C.gold });
@@ -720,6 +727,51 @@ export class Panel extends CanvasPlane {
     this.btn(t('ram.iftarDua'), 60, by, bw, 96, 'rdua:iftar', { size: 27, active: v.dua === 'iftar' });
     this.btn(t('ram.niyyaBtn'), 60 + bw + gap, by, bw, 96, 'rdua:niyya', { size: 27, active: v.dua === 'niyya' });
     this.btn(t('ui.menu'), 60 + 2 * (bw + gap), by, bw, 96, 'menu');
+  }
+
+  // Alevilik: Übersicht
+  v_alevi(v) {
+    const { W, H } = this;
+    this.heading(t('alevi.title'), t('alevi.sub'));
+    let y = this.paragraphs(t('alevi.intro'), 155, { size: 24, color: C.muted, gap: 6 });
+    const gap = 20, w = (W - 120 - gap) / 2;
+    const items = [[`🕯️ ${v.list[0].name}`, `prayer:${v.list[0].id}`, v.list[0].de], [`🌀 ${v.list[1].name}`, `prayer:${v.list[1].id}`, v.list[1].de], [t('alevi.muharremBtn'), 'muharrem', t('alevi.muharremSub')], [t('alevi.valuesBtn'), 'alevival', t('alevi.valuesSub')]];
+    items.forEach(([label, action, sub], i) => this.btn(label, 60 + (i % 2) * (w + gap), y + 10 + Math.floor(i / 2) * 140, w, 124, action, { primary: i < 2, size: 34, sub, subSize: 21 }));
+    y += 300;
+    this.switchRow(y, t('hajj.walk'), t('hajj.walkSub'), [[v.walkAlong ? t('ui.on') : t('ui.off'), 'walkalong', v.walkAlong]]);
+    this.switchRow(y + 82, t('hajj.sounds'), t('alevi.soundsSub'), [[v.sounds ? t('ui.on') : t('ui.off'), 'sounds', v.sounds]]);
+    this.paragraphs([t('alevi.note')], H - 205, { size: 20, color: C.gold, gap: 0 });
+    this.btn(t('ui.menu'), 60, H - 128, W - 120, 96, 'menu');
+  }
+
+  // Muharrem, Aşure, Hızır-Fasten
+  v_muharrem(v) {
+    const { W, H } = this;
+    this.heading(t('alevi.muharremTitle'), v.hijriYear ? `${v.hijriYear}` : '');
+    const big = v.inFast ? t('alevi.fastDay', v.day) : v.days != null ? t('ram.days', v.days) : '';
+    this.text(big, W / 2, 210, { size: 66, weight: 700, color: C.gold, align: 'center' });
+    if (!v.inFast && v.dateText) this.text(t('alevi.untilMuharrem', v.dateText), W / 2, 260, { size: 28, align: 'center' });
+    const tabs = [['about', t('alevi.tabAbout')], ['kerbela', t('alevi.tabKerbela')], ['asure', t('alevi.tabAsure')], ['hizir', t('alevi.tabHizir')]];
+    const gap = 14, w = (W - 120 - 3 * gap) / 4;
+    tabs.forEach(([id, label], i) => this.btn(label, 60 + i * (w + gap), 290, w, 62, `muharrem:${id}`, { active: v.part === id, size: 24 }));
+    this.paragraphs(t(`alevi.${v.part}`), 400, { size: 25, gap: 10 });
+    this.btn(t('alevi.title'), 60, H - 128, (W - 140) / 2, 96, 'alevi');
+    this.btn(t('ui.menu'), 80 + (W - 140) / 2, H - 128, (W - 140) / 2, 96, 'menu');
+  }
+
+  // Werte: Sätze aus der alevitisch-bektaşischen Überlieferung
+  v_alevival(v) {
+    const { W, H } = this;
+    this.heading(t('alevi.valuesTitle'), `${v.index + 1} / ${v.total}`);
+    const [tr, mean, who] = t('alevi.sayings')[v.index];
+    this.text(`„${tr}“`, W / 2, 330, { size: 54, weight: 700, color: C.gold, align: 'center' });
+    this.paragraphs([mean], 420, { size: 30, gap: 0 });
+    this.text(who, W / 2, 620, { size: 26, color: C.muted, align: 'center' });
+    const by = H - 128, gap = 16, w = (W - 120 - 3 * gap) / 4;
+    this.btn('←', 60, by, w, 96, 'sayprev', { size: 44 });
+    this.btn('→', 60 + (w + gap), by, w, 96, 'saynext', { size: 44, primary: true });
+    this.btn(t('alevi.title'), 60 + 2 * (w + gap), by, w, 96, 'alevi', { size: 26 });
+    this.btn(t('ui.menu'), 60 + 3 * (w + gap), by, w, 96, 'menu', { size: 28 });
   }
 
   // Umre & Hac: Auswahl
