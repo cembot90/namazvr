@@ -35,6 +35,7 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Familie & Profile: bis zu 6 Profile auf einem Gerät, jedes mit eigenen Sternen, Tracker, Suren, Quiz und Kinder-Modus
 - Erinnerung zur Gebetszeit: Benachrichtigung (solange die Web-App läuft) und Kalender-Export (.ics, 30 Tage mit Alarm) – funktioniert ohne Server auf allen Handys
 - Weitere Lerninhalte: Fīl, Quraisch, Māʿūn, Kāfirūn, Naṣr, Masad; Ezan und Ikamet; Totengebet (Janāza) und Festgebet (ʿĪd) je Rechtsschule
+- Umre- und Hac-Simulator: Mīqāt-Moschee, Masjid al-Ḥarām mit Kaaba, Ḥijr, Maqām Ibrāhīm und Zamzam, Saʿy-Gang mit grünen Lichtern, Mina, ʿArafāt, Muzdalifa und Jamarāt (vereinfacht, Wege verkürzt); Tavaf mit Rundenzähler und Raml, Saʿy mit schnellerem Abschnitt, Steinwürfe, Iḥrām-Kleidung, Pilger, Mitgehen (fließend oder in Sprüngen); Hac als Tamattuʿ mit allen Tagen
 - Durch die Moschee gehen: W A S D am Computer, Stick auf der Quest
 - Handy-Version: Figur oben, Bedienung unten, Qibla-Kompass über den Handy-Sensor, installierbar und offline nutzbar
 
@@ -84,6 +85,8 @@ WebXR braucht HTTPS. Am einfachsten:
 - `vendor/ort/` – ONNX Runtime Web 1.18 (MIT), `vendor/piper/` – espeak-ng-Lautschrift für Piper (piper-wasm, MIT; espeak-ng GPL-3.0)
 - `src/tracker.js` – Gebets-Tracker
 - `src/remind.js` – Erinnerung (Benachrichtigung, Kalender-Export)
+- `src/hajj.js` – Ablauf von Umre und Hac (Schritte, Wege, Würfe)
+- `src/hajjworld.js` – Orte von Umre und Hac (Haram, Masʿā, Mina, ʿArafāt, Muzdalifa, Jamarāt) und Pilger
 - `src/ramadan.js` – islamischer Kalender, Ramadan-Countdown, Sahur/Iftar
 - `src/main.js` – Szene, Eingabe (Maus, Touch, Controller, Hand-Tracking), Zustand
 - `manifest.webmanifest`, `sw.js`, `icons/` – installierbare App (PWA), offline

@@ -185,14 +185,13 @@ export class Panel extends CanvasPlane {
       [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
       [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('track.menu', v.tracked), 'tracker'], [t('ram.menu'), 'ramadan']],
-      [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles']],
+      [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles'], [t('hajj.menu'), 'pilgrim']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      // Letzte Reihe: Kinder-Modus über zwei Spalten, dann das Profil
-      const wide = row.length === 2, col = wide && i === 1 ? 2 : i;
+      // Letzte Reihe: Kinder-Modus über zwei Spalten, dann Profil und Umre & Hac
+      const wide = row.length === 3, col = wide && i > 0 ? i + 1 : i;
       const w = wide && i === 0 ? 2 * bw + gap : bw;
-      this.btn(label, 60 + col * (bw + gap), 612 + ri * 84, w, 72, action, { primary: action === 'wudu' && !v.wuduDone, active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
+      this.btn(label, 60 + col * (bw + gap), 612 + ri * 84, w, 72, action, { primary: (action === 'wudu' && !v.wuduDone) || action === 'pilgrim', active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
     }));
-    this.text('السَّلَامُ عَلَيْكُمْ', 60 + 3 * (bw + gap) + bw / 2, 612 + 3 * 84 + 50, { size: 42, font: AR, color: C.gold, align: 'center', rtl: true, fixed: true });
   }
 
   v_times(v) {
@@ -287,7 +286,8 @@ export class Panel extends CanvasPlane {
     const step = v.step;
     const m = step.wudu
       ? { cue: step.cue, how: `${step.count}×${step.count > 1 && step.fard ? t('wudu.oneFard') : ''} · ${step.fard ? t('wudu.fard') : t('wudu.sunnah')}`, arrow: null }
-      : { ...moveFor(v.prevPose, step.pose), ...(step.how ? { how: step.how } : {}) };
+      : step.hajj ? { cue: step.cue, how: t(`hajj.where.${step.scene}`), arrow: null }
+        : { ...moveFor(v.prevPose, step.pose), ...(step.how ? { how: step.how } : {}) };
     const ok = v.posture === 'ok';
     ctx.beginPath();
     ctx.roundRect(60, top, W - 120, h, 22);
@@ -311,12 +311,22 @@ export class Panel extends CanvasPlane {
       wait: [v.handHint ? t(`hands.${v.handHint}`) : t('ui.postureWait'), C.gold],
       off: [t('ui.postureOff'), C.muted],
       wudu: [t('wudu.stepOf', v.index + 1, v.total), C.muted],
+      hajj: [step.status || '', C.gold],
     }[v.posture] || ['', C.muted];
     this.text(status[0], x, top + h - 22, { size: 26, weight: v.posture === 'off' ? '' : 600, color: status[1] });
   }
 
   v_done(v) {
     const { W, H } = this;
+    if (v.prayer.kind === 'umre' || v.prayer.kind === 'hajj') {
+      this.heading(t(`hajj.done.${v.prayer.kind}`), v.prayer.name);
+      this.text('تَقَبَّلَ اللَّهُ مِنَّا وَمِنكُم', W / 2, 290, { size: 64, font: AR, align: 'center', rtl: true, color: C.gold });
+      this.paragraphs(t('hajj.doneText'), 380, { size: 30, gap: 18 });
+      const by = H - 140, gap = 20, w = (W - 120 - gap) / 2;
+      this.btn(t('ui.again'), 60, by, w, 96, 'again');
+      this.btn(t('ui.menu'), 60 + w + gap, by, w, 96, 'menu', { primary: true });
+      return;
+    }
     if (v.prayer.kind === 'wudu') {
       this.heading(t('ui.wuduDone'), t('ui.wuduSub'));
       this.paragraphs([t('ui.wuduWell'), t('ui.wuduBreak')], 200, { size: 32, gap: 26 });
@@ -689,6 +699,19 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.menu'), 60 + 2 * (bw + gap), by, bw, 96, 'menu');
   }
 
+  // Umre & Hac: Auswahl
+  v_pilgrim(v) {
+    const { W, H } = this;
+    this.heading(t('hajj.title'), `${v.madhab} · ${v.gender === 'f' ? t('ui.women') : t('ui.men')}`);
+    let y = this.paragraphs(t('hajj.intro'), 160, { size: 25, color: C.muted, gap: 8 });
+    const gap = 20, w = (W - 120 - gap) / 2;
+    v.list.forEach((p, i) => this.btn(`${i ? '🕋' : '🤍'} ${p.name}`, 60 + i * (w + gap), y + 10, w, 150, `prayer:${p.id}`, { primary: true, size: 40, sub: p.de, subSize: 22 }));
+    y += 190;
+    this.switchRow(y, t('hajj.walk'), t('hajj.walkSub'), [[v.walkAlong ? t('ui.on') : t('ui.off'), 'walkalong', v.walkAlong]]);
+    this.paragraphs([t('hajj.note')], y + 110, { size: 21, color: C.muted, gap: 0 });
+    this.btn(t('ui.menu'), 60, H - 128, W - 120, 96, 'menu');
+  }
+
   // Familie: Profile wechseln, hinzufügen, umbenennen, löschen
   v_profiles(v) {
     const { W, H, ctx } = this;
@@ -748,7 +771,7 @@ export class FloorCard extends CanvasPlane {
     this.frame(28);
     if (v.type === 'step') {
       const s = v.step;
-      const m = s.wudu ? { cue: `${s.cue} · ${s.count}×` } : moveFor(v.prevPose, s.pose);
+      const m = s.wudu ? { cue: `${s.cue} · ${s.count}×` } : s.hajj ? { cue: s.status ? `${s.cue} · ${s.status.split(' · ')[0]}` : s.cue } : moveFor(v.prevPose, s.pose);
       // links das Piktogramm, rechts Ansage und Text
       if (s.wudu) drawBody(this.ctx, s.wudu, 24, 60, 260);
       else drawPictogram(this.ctx, v.prevPose, s.pose, 24, 60, 260);

@@ -8,7 +8,7 @@ import { Guide } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
-import { EXTRA_PRAYERS, MADHABS, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
+import { EXTRA_PRAYERS, MADHABS, PILGRIMAGES, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
 import { LANGS, deviceLang, getLang, isRTL, langInfo, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
@@ -20,6 +20,8 @@ import { checkHands, indexRaised, readHand } from './hands.js';
 import { CITIES, qiblaBearing } from './qibla.js';
 import { ASR, METHODS, TIME_NAMES, formatCountdown, formatTime, prayerStatus } from './prayertimes.js';
 import { PIPER, SAMPLES, Voices } from './voice.js';
+import { buildPilgrimage, isPilgrimage, pathAt, pathLength, speedAt, statusOf } from './hajj.js';
+import { JAMARAT, updateCrowd } from './hajjworld.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
 import { formatDay, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
@@ -53,7 +55,7 @@ scene.background = ROOM_BG;
 const arLight = new THREE.HemisphereLight(0xfff6e8, 0x8a7a66, 2.4);
 arLight.visible = false;
 scene.add(arLight);
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 150);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 1000);
 camera.position.set(0, 1.6, 0);
 
 // `world` enthält den ganzen Gebetsraum; seine -Z-Achse ist die Qibla.
@@ -166,6 +168,10 @@ const state = {
   // Ghost-Modus: 'off' | 'front' (vor dir) | 'side' (neben dir)
   ghost: store.get('ghost', 'front'),
   wuduRoom: false,
+  scene: null,
+  pilgrim: { d: 0, thrown: 0, tt: 0, snap: null },
+  // Beim Tavaf und Sa'y fließend mitgehen (aus: in kurzen Sprüngen)
+  walkAlong: store.get('walkAlong', true),
   progress: loadProgress(profileId),
   pDel: null,
   // Erinnerung: an/aus und wie viele Minuten vorher
@@ -226,11 +232,22 @@ function isNight() {
 // Die Gebetswaschung findet im Waschraum statt, nicht im Gebetssaal
 const wantsWuduRoom = () => state.prayer?.kind === 'wudu' && (state.view === 'step' || state.view === 'done');
 
+// Umre und Hac: Ort des aktuellen Schritts (Mīqāt-Moschee, Haram, Sa'y-Gang, Mina, ʿArafāt, Muzdalifa, Jamarāt)
+const pilgrimActive = () => isPilgrimage(state.prayer) && (state.view === 'step' || state.view === 'done');
+const pilgrimStep = () => (state.view === 'done' ? state.steps[state.steps.length - 1] : state.steps[state.i]);
+const wantsScene = () => (pilgrimActive() ? pilgrimStep()?.scene || 'haram' : null);
+
 function rebuildEnv() {
   state.night = isNight();
   state.wuduRoom = wantsWuduRoom();
+  state.scene = wantsScene();
   clearEnvironment(env);
-  buildEnvironment(env, state.wuduRoom ? 'wudu' : state.style, { night: state.night });
+  env.rotation.set(0, 0, 0);
+  env.position.set(0, 0, 0);
+  const sc = state.scene;
+  const night = sc === 'arafat' ? false : sc === 'muzdalifa' ? true : state.night;
+  buildEnvironment(env, state.wuduRoom ? 'wudu' : sc && sc !== 'miqat' ? sc : sc === 'miqat' ? 'klassisch' : state.style, { night });
+  if (sc) placePilgrim(true);
   layoutRoom();
 }
 
@@ -257,9 +274,10 @@ function layoutRoom() {
     panel.mesh.rotation.set(-0.05, 0.32, 0, 'YXZ');
     panel.mesh.scale.setScalar(1);
   }
-  userRug.visible = compass.visible = !w;
+  const outdoor = state.scene && state.scene !== 'miqat';
+  userRug.visible = compass.visible = !w && !outdoor;
   card.mesh.visible = !w && !mobileUI;
-  if (!w) guideRug.visible = guide.group.visible;
+  if (!w) guideRug.visible = guide.group.visible && !outdoor;
   else guideRug.visible = false;
   placeGhost();
   if (mobileUI) aimAtGuide();
@@ -270,6 +288,82 @@ function layoutRoom() {
     yaw = Math.atan2(-d.x, -d.z);
     pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
     camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  }
+}
+
+// --- Umre und Hac: den Ort so verschieben, dass du an der Stelle des Schritts stehst ---
+// p = { x, z, hx, hz } in Ortskoordinaten (Position und Blickrichtung)
+const UPV = new THREE.Vector3(0, 1, 0);
+function setEnvPose(p) {
+  const yaw = Math.atan2(-p.hx, -p.hz);
+  env.rotation.set(0, -yaw, 0);
+  env.position.copy(new THREE.Vector3(p.x, 0, p.z).applyAxisAngle(UPV, -yaw).negate());
+}
+function placePilgrim(snap = false) {
+  if (!state.scene) return;
+  const st = pilgrimStep();
+  const m = st?.motion;
+  let p = m && m.type !== 'throw' ? pathAt(m, state.view === 'done' ? pathLength(m) : state.pilgrim?.d || 0) : st?.place;
+  if (!p) p = { x: 0, z: 0, hx: 0, hz: -1 };
+  // Mitgehen aus (angenehmer für manche in VR): in kurzen Sprüngen statt fließend
+  if (!snap && !state.walkAlong && m && m.type !== 'throw') {
+    const stepLen = m.type === 'tawaf' ? 6 : 10;
+    const d = Math.floor((state.pilgrim.d || 0) / stepLen) * stepLen;
+    if (state.pilgrim.snap === d) return;
+    state.pilgrim.snap = d;
+    p = pathAt(m, d);
+  }
+  setEnvPose(p);
+}
+
+// Ein Steinchen fliegt von dir zur Säule
+const pebble = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshStandardMaterial({ color: 0x8a8478 }));
+pebble.visible = false;
+world.add(pebble);
+const throwAnim = { t: -1, from: new THREE.Vector3(), to: new THREE.Vector3() };
+function throwPebble(target) {
+  throwAnim.t = 0;
+  throwAnim.from.set(0.25, 1.55, -0.3);
+  const w = env.localToWorld(new THREE.Vector3(0, 2.6, JAMARAT[target].z - 8));
+  throwAnim.to.copy(world.worldToLocal(w));
+  pebble.visible = true;
+}
+
+function updatePilgrim(dt) {
+  const st = state.view === 'step' && state.steps[state.i];
+  const m = st?.motion, pg = state.pilgrim;
+  let moving = false;
+  if (st && m && (m.type === 'tawaf' || m.type === 'say')) {
+    const len = pathLength(m);
+    if (pg.d < len) { pg.d = Math.min(len, pg.d + speedAt(m, pg.d) * dt * (state.beginner || state.kids ? 0.8 : 1)); moving = true; }
+    placePilgrim();
+  } else if (st && m?.type === 'throw') {
+    pg.tt += dt;
+    // Alle 2,4 Sekunden ein Wurf: Hand hoch, Stein fliegt
+    const due = Math.min(m.count, Math.floor(pg.tt / 2.4));
+    if (due > pg.thrown) { pg.thrown = due; throwPebble(m.target); }
+    const up = pg.tt % 2.4 < 0.9 && pg.thrown < m.count;
+    posePerson(guide, up ? 'throw' : 'stand');
+    posePerson(ghost, up ? 'throw' : 'stand');
+  }
+  if (throwAnim.t >= 0) {
+    throwAnim.t += dt / 0.8;
+    const k = Math.min(1, throwAnim.t);
+    pebble.position.lerpVectors(throwAnim.from, throwAnim.to, k);
+    pebble.position.y += Math.sin(Math.PI * k) * 1.2;
+    if (k >= 1) { throwAnim.t = -1; pebble.visible = false; }
+  }
+  // Mitgehen: Vorbeter und Ghost machen Schritte
+  if (moving) for (const fig of [guide, ghost]) {
+    const swing = Math.sin(clock.elapsedTime * 7) * 0.35;
+    fig.legs[0].hip.rotation.x = swing;
+    fig.legs[1].hip.rotation.x = -swing;
+    fig.arms[0].sh.rotation.x = -swing * 0.6;
+    fig.arms[1].sh.rotation.x = swing * 0.6;
+  }
+  if (st) {
+    const s = statusOf(m, pg.d, pg.thrown);
+    if (s !== st.status) { st.status = s; refresh(); }
   }
 }
 
@@ -334,7 +428,7 @@ function placeGhost() {
   g.rotation.y = Math.PI;
   if (state.ghost === 'side' && !(state.cemaat && cong.group.visible)) g.position.set(0.85, 0, 0);
   // Mit Cemaat steht neben dir schon jemand: dann vor dir; auf der Empore dicht vor der Brüstung
-  else g.position.set(0, 0, onGallery() ? -0.6 : -1.3);
+  else g.position.set(0, 0, onGallery() ? -0.6 : pilgrimActive() && state.scene !== 'miqat' ? -2.2 : -1.3);
 }
 
 function rebuildCong() {
@@ -345,11 +439,11 @@ function rebuildCong() {
 // Mit Cemaat beten Imam und Gemeinde; bei der Gebetswaschung zeigt weiter die Vorbeter-Figur.
 function updateCast(force = false) {
   const wudu = state.view === 'step' && state.prayer?.kind === 'wudu';
-  const show = state.cemaat && !wudu;
+  const show = state.cemaat && !wudu && !pilgrimActive();
   if (show === cong.group.visible && !force) return;
   cong.group.visible = show;
   guide.group.visible = !show;
-  guideRug.visible = !show && !state.wuduRoom;
+  guideRug.visible = !show && !state.wuduRoom && !(state.scene && state.scene !== 'miqat');
   const g = onGallery() ? gallery() : null;
   env.position.set(0, g ? -g.top : 0, g ? -g.z : 0);
   // Handy: Kamera auf Imam und Reihen bzw. zurück auf die Vorbeter-Figur
@@ -374,7 +468,7 @@ function view() {
         type: 'step', prayer: state.prayer, step: state.steps[state.i], index: state.i, total: state.steps.length, auto: state.auto,
         prevPose: state.steps[state.i - 1]?.pose ?? null,
         inner: state.kids ? kidLine(state.steps[state.i]) : state.spiritual ? innerMeaning(state.steps[state.i]) : '',
-        posture: state.steps[state.i].wudu ? 'wudu' : !renderer.xr.isPresenting ? 'off' : state.posture.ok ? 'ok' : 'wait',
+        posture: state.steps[state.i].wudu ? 'wudu' : state.steps[state.i].hajj ? 'hajj' : !renderer.xr.isPresenting ? 'off' : state.posture.ok ? 'ok' : 'wait',
         handHint: renderer.xr.isPresenting ? state.posture.handHint : null,
         finger: renderer.xr.isPresenting && state.posture.finger,
         voice: state.voice,
@@ -398,6 +492,8 @@ function view() {
             today: prayedOn(pr, keyFor(0)).length, streak: fullStreak(pr), stars: pr.stars || 0, suras: Object.values(pr.suras || {}).filter(Boolean).length };
         }),
       };
+    case 'pilgrim':
+      return { type: 'pilgrim', list: PILGRIMAGES, walkAlong: state.walkAlong, madhab: madhab().name, gender: state.gender };
     case 'remind':
       return { type: 'remind', ...state.remind, msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
         ios: /iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone, next: timesInfo().next };
@@ -482,7 +578,11 @@ function refresh() {
     panel.render(v);
     card.render(v);
   }
-  if (wantsWuduRoom() !== state.wuduRoom) rebuildEnv();
+  if (wantsWuduRoom() !== state.wuduRoom || wantsScene() !== state.scene) rebuildEnv();
+  // Im Iḥrām: Männer in Weiß ohne Kappe
+  const ihram = pilgrimActive();
+  if (!!guide.ihram !== ihram) { guide.setIhram(ihram); ghost.setIhram(ihram); }
+  if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
   const pose = v.type === 'step' ? v.step.pose : 'stand';
   posePerson(guide, pose);
   posePerson(ghost, pose);
@@ -505,19 +605,22 @@ function onStep() {
   p.ok = false;
   p.held = 0;
   const step = state.steps[state.i];
-  const m = step.wudu ? { arrow: null, cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
+  const m = step.wudu || step.hajj ? { arrow: null, cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
+  state.pilgrim = { d: 0, thrown: 0, tt: 0, snap: null };
   // Mit Cemaat spricht der Imam; sonst wird der Schritt vorgelesen (Anfänger-Modus immer)
   const imamLeads = state.cemaat && state.prayer?.kind !== 'wudu';
   if (state.beginner || (state.voice && !imamLeads)) speak();
   else imamCall(step, state.steps[state.i - 1]);
-  if (m.arrow || step.wudu) {
+  if (m.arrow || step.wudu || step.hajj) {
     banner.render(m);
     p.cueT = 3.5;
     placeBanner(true);
   }
 }
 
-const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab) : buildSteps(prayer, state.madhab, state.gender, state.prayerSura));
+const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab)
+  : isPilgrimage(prayer) ? buildPilgrimage(prayer.kind, state.madhab, state.gender, state.prayerSura)
+    : buildSteps(prayer, state.madhab, state.gender, state.prayerSura));
 
 function start(prayer) {
   state.prayer = prayer;
@@ -529,7 +632,7 @@ function start(prayer) {
   // Zurück auf den Gebetsplatz; mit Cemaat gibt der Imam den Takt vor
   goHome();
   cong.reset();
-  if (state.cemaat && prayer.kind !== 'wudu') state.auto = true;
+  if ((state.cemaat && prayer.kind !== 'wudu') || isPilgrimage(prayer)) state.auto = true;
   onStep();
 }
 
@@ -558,7 +661,7 @@ if ('speechSynthesis' in window) window.speechSynthesis.addEventListener?.('voic
 function speak() {
   const step = state.view === 'step' && state.steps[state.i];
   if (!step) return;
-  const m = step.wudu ? { cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
+  const m = step.wudu || step.hajj ? { cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
   // Arabisch: Anleitung und Rezitation in einem Zug mit derselben Stimme
   const lang = langInfo().speech;
   if (lang === 'ar') { voices.say([{ text: [`${m.cue}.`, step.instr, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
@@ -672,6 +775,8 @@ function act(action) {
       state.pDel = null;
       break;
     case 'remind': state.view = 'remind'; state.remMsg = ''; break;
+    case 'pilgrim': state.view = 'pilgrim'; break;
+    case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
     case 'remon':
       if (state.remind.on) { state.remind.on = false; store.set('remind', state.remind); break; }
       askPermission().then((perm) => {
@@ -1012,7 +1117,13 @@ function aimAtGuide() {
   camera.position.copy(eye ? world.localToWorld(eye) : new THREE.Vector3(0, 1.6, 0));
   const target = new THREE.Vector3(0, 0.85, 0);
   // Im Waschraum auf dein Becken: links der Ghost, rechts der Vorbeter
-  if (state.wuduRoom && state.atStools) {
+  if (state.scene && state.scene !== 'miqat') {
+    // Umre & Hac: hinter dir, Blick nach vorn (zur Kaaba bzw. den Weg entlang)
+    // Beim Tavaf etwas nach links, damit die Kaaba im Bild ist
+    const tawaf = state.view === 'step' && state.steps[state.i]?.motion?.type === 'tawaf';
+    camera.position.copy(world.localToWorld(new THREE.Vector3(0.3, 2.0, 2.6)));
+    world.localToWorld(target.set(tawaf ? -5 : 0, 1.4, -8));
+  } else if (state.wuduRoom && state.atStools) {
     // Beim Füßewaschen: auf die Hocker rechts
     camera.position.copy(world.localToWorld(new THREE.Vector3(1.0, 1.8, 3.0)));
     world.localToWorld(target.set(3.4, 0.5, 1.0));
@@ -1094,7 +1205,7 @@ function insideMosque(scenePos) {
 }
 
 function walk(dt) {
-  if (state.ar || mobileUI) return;
+  if (state.ar || mobileUI || pilgrimActive()) return;
   const dir = new THREE.Vector3();
   let speed = 1.6;
   if (renderer.xr.isPresenting) {
@@ -1183,7 +1294,7 @@ renderer.setAnimationLoop(() => {
     }
     updateHover(hover);
   }
-  const wudu = state.view === 'step' && !!state.steps[state.i].wudu;
+  const wudu = state.view === 'step' && (!!state.steps[state.i].wudu || !!state.steps[state.i].hajj);
   if (state.view === 'step' && renderer.xr.isPresenting && !wudu) updatePosture(dt);
   // Auto-Modus wartet in VR, bis die Haltung eingenommen ist; im Anfänger-Modus langsamer.
   if (state.view === 'step' && state.auto && (state.posture.ok || !renderer.xr.isPresenting || wudu)) {
@@ -1225,6 +1336,7 @@ renderer.setAnimationLoop(() => {
   guide.update(dt);
   ghost.update(dt);
   updateMovers(dt);
+  if (state.scene) { updatePilgrim(dt); updateCrowd(dt); }
   cong.update(dt);
   // Im Waschraum läuft das Wasser bei den Waschschritten (nicht bei Absicht und Bittgebet), bei den Füßen an den Hockern
   if (state.wuduRoom) {

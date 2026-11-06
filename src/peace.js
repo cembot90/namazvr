@@ -37,6 +37,7 @@ export const CALM_BREATHS = 5;
 
 // Ein einfacher Satz für Kinder zum aktuellen Schritt
 export function kidLine(step) {
+  if (step.hajj) return step.kid || '';
   if (step.key === 'shahada') return t('kids.shahada');
   if (step.wudu) return t('kids.wudu');
   return step.key ? t(`kids.${step.key}`) : '';

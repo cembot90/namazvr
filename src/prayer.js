@@ -27,7 +27,12 @@ export const EXTRA_PRAYERS = [
   { id: 'janaza', rakat: 0, kind: 'janaza' },
 ].map(named);
 
-export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS].find((p) => p.id === id);
+// Umre und Hac (Simulator); die 2 Rakʿāt im Iḥrām und nach dem Tavaf werden wie Sunnah-Gebete geführt
+export const PILGRIMAGES = [{ id: 'umre', kind: 'umre' }, { id: 'hajj', kind: 'hajj' }].map(named);
+export const IHRAM_PRAYER = named({ id: 'ihramp', rakat: 2, kind: 'sunnah' });
+export const TAWAF_PRAYER = named({ id: 'tawafp', rakat: 2, kind: 'sunnah' });
+
+export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PILGRIMAGES].find((p) => p.id === id);
 
 // Vereinfachte Unterschiede der vier sunnitischen Rechtsschulen (für Männer; Details bei Gelehrten erfragen).
 // Texte (hands, takbir, notes) stehen in der Sprachdatei unter madhab.<id>.
@@ -309,6 +314,54 @@ Object.assign(TXT, {
   janazaDua: {
     ar: ['اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ'],
     tr: ['Allāhumma ghfir lahū wa-rḥamhu, wa ʿāfihī wa-ʿfu ʿanh'],
+  },
+});
+
+// Umre und Hac
+Object.assign(TXT, {
+  talbiya: {
+    ar: ['لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ', 'إِنَّ الْحَمْدَ وَالنِّعْمَةَ لَكَ وَالْمُلْكَ، لَا شَرِيكَ لَكَ'],
+    tr: ['Labbayka llāhumma labbayk, labbayka lā sharīka laka labbayk', 'Inna l-ḥamda wa n-niʿmata laka wa l-mulk, lā sharīka lak'],
+  },
+  niyyaUmre: {
+    ar: ['اللَّهُمَّ إِنِّي أُرِيدُ الْعُمْرَةَ فَيَسِّرْهَا لِي وَتَقَبَّلْهَا مِنِّي'],
+    tr: ['Allāhumma innī urīdu l-ʿumrata fa-yassirhā lī wa taqabbalhā minnī'],
+  },
+  niyyaHajj: {
+    ar: ['اللَّهُمَّ إِنِّي أُرِيدُ الْحَجَّ فَيَسِّرْهُ لِي وَتَقَبَّلْهُ مِنِّي'],
+    tr: ['Allāhumma innī urīdu l-ḥajja fa-yassirhu lī wa taqabbalhu minnī'],
+  },
+  istilam: {
+    ar: ['بِسْمِ اللَّهِ، وَاللَّهُ أَكْبَرُ'],
+    tr: ['Bismi llāh, wa llāhu akbar'],
+  },
+  maqam: {
+    ar: ['وَاتَّخِذُوا مِن مَّقَامِ إِبْرَاهِيمَ مُصَلًّى'],
+    tr: ['Wa-ttakhidhū min maqāmi Ibrāhīma muṣallā'],
+  },
+  zamzam: {
+    ar: ['اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا وَاسِعًا، وَشِفَاءً مِنْ كُلِّ دَاءٍ'],
+    tr: ['Allāhumma innī asʾaluka ʿilman nāfiʿā, wa rizqan wāsiʿā, wa shifāʾan min kulli dāʾ'],
+  },
+  safa: {
+    ar: ['إِنَّ الصَّفَا وَالْمَرْوَةَ مِن شَعَائِرِ اللَّهِ', 'أَبْدَأُ بِمَا بَدَأَ اللَّهُ بِهِ'],
+    tr: ['Inna ṣ-ṣafā wa l-marwata min shaʿāʾiri llāh', 'Abdaʾu bi-mā badaʾa llāhu bih'],
+  },
+  tahlil: {
+    ar: ['لَا إِلَٰهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ'],
+    tr: ['Lā ilāha illa llāhu waḥdahū lā sharīka lah, lahu l-mulku wa lahu l-ḥamd, wa huwa ʿalā kulli shayʾin qadīr'],
+  },
+  sayDua: {
+    ar: ['رَبِّ اغْفِرْ وَارْحَمْ، إِنَّكَ أَنْتَ الْأَعَزُّ الْأَكْرَمُ'],
+    tr: ['Rabbi ghfir wa-rḥam, innaka anta l-aʿazzu l-akram'],
+  },
+  jamra: {
+    ar: ['بِسْمِ اللَّهِ، اللَّهُ أَكْبَرُ'],
+    tr: ['Bismi llāh, Allāhu akbar'],
+  },
+  tashriq: {
+    ar: ['اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ، لَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ وَلِلَّهِ الْحَمْدُ'],
+    tr: ['Allāhu akbar, Allāhu akbar, lā ilāha illa llāhu wa llāhu akbar, Allāhu akbar wa li-llāhi l-ḥamd'],
   },
 });
 

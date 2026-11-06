@@ -12,6 +12,11 @@ export const POSES = {
   sit:     { y: 0.24, spine: 0.05, headX: 0.25, headY: 0,    shX: -0.5,  shZ: 0.05, elX: -0.9,  elZ: 0,    hip: -1.25, knee: 2.82 },
   taslimR: { y: 0.24, spine: 0.05, headX: 0.1,  headY: -1.1, shX: -0.5,  shZ: 0.05, elX: -0.9,  elZ: 0,    hip: -1.25, knee: 2.82 },
   taslimL: { y: 0.24, spine: 0.05, headX: 0.1,  headY: 1.1,  shX: -0.5,  shZ: 0.05, elX: -0.9,  elZ: 0,    hip: -1.25, knee: 2.82 },
+  // Umre und Hac: Istilām (Hände zum Schwarzen Stein), Werfen (rechte Hand), Trinken, Steinchen aufheben
+  istilam: { y: 0.95, spine: 0, headX: 0.1, headY: 0, shX: -1.25, shZ: 0.3, elX: -1.1, elZ: 0, hip: 0, knee: 0 },
+  throw:   { y: 0.95, spine: -0.05, headX: 0, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: -2.7, elX: -0.5 } },
+  drink:   { y: 0.95, spine: 0, headX: -0.15, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: -0.75, elX: -2.1 } },
+  pick:    { y: 0.72, spine: 1.25, headX: 0.2, headY: 0, shX: -1.1, shZ: 0.1, elX: -0.2, elZ: 0, hip: -0.6, knee: 1.0 },
   // Salām im Stehen (Totengebet)
   salamStandR: { y: 0.95, spine: 0, headX: 0.15, headY: -1.1, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0 },
   salamStandL: { y: 0.95, spine: 0, headX: 0.15, headY: 1.1,  shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0 },
@@ -27,6 +32,7 @@ export const POSES = {
   feet:    { y: 0.82, spine: 1.15, headX: -0.2, headY: 0,    shX: -1.0,  shZ: 0.1,  elX: -0.2,  elZ: 0,    hip: -0.35, knee: 0.6 },
 };
 const KEYS = Object.keys(POSES.stand);
+const IHRAM = new THREE.MeshStandardMaterial({ color: 0xfdfdfb, roughness: 0.9 });
 
 // Bewegung in den Wasch-Haltungen: [Gelenk, Ausschlag, Tempo] – Hände reiben, Gesicht waschen, über den Kopf wischen
 const MOTION = {
@@ -135,14 +141,28 @@ export class Guide {
 
     this.t = 0;
     this.shown = {};
+    this.robeMat = robe;
+    this.robeMeshes = [];
+    this.group.traverse((o) => { if (o.isMesh && o.material === robe) this.robeMeshes.push(o); });
     this.cur = { ...POSES.stand };
     this.target = POSES.stand;
     this.apply(this.cur);
   }
 
   setGender(g) {
+    this.gender = g;
     this.scarf.visible = g === 'f';
-    this.cap.visible = g !== 'f' && this.capOn;
+    this.cap.visible = g !== 'f' && this.capOn && !this.ihram;
+  }
+
+  // Iḥrām: Männer in zwei weißen Tüchern ohne Kopfbedeckung (Frauen bleiben in ihrer bedeckten Kleidung)
+  setIhram(on) {
+    this.ihram = on;
+    if (!this.ghostMat) {
+      const white = on && this.gender !== 'f';
+      for (const m of this.robeMeshes) m.material = white ? IHRAM : this.robeMat;
+    }
+    this.setGender(this.gender || 'm');
   }
 
   setPose(name) {
@@ -177,9 +197,12 @@ export class Guide {
     this.root.position.y = p.y;
     this.spine.rotation.x = p.spine;
     this.head.rotation.set(p.headX, p.headY, 0);
+    // Eine Haltung kann den rechten Arm (side −1, die Figur blickt nach +Z) eigens festlegen
+    const right = (POSES[this.pose] || {}).right;
     for (const a of this.arms) {
-      a.sh.rotation.set(p.shX, 0, p.shZ * a.side);
-      a.el.rotation.set(p.elX, 0, p.elZ * a.side);
+      const r = a.side < 0 && right;
+      a.sh.rotation.set(r ? right.shX : p.shX, 0, p.shZ * a.side);
+      a.el.rotation.set(r ? right.elX : p.elX, 0, p.elZ * a.side);
     }
     for (const l of this.legs) {
       l.hip.rotation.x = p.hip;

@@ -3,7 +3,7 @@
 import { t } from './i18n.js';
 
 // Haltung → Körperlage, die in VR erkannt werden kann.
-const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit', salamStandR: 'stand', salamStandL: 'stand' };
+const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit', salamStandR: 'stand', salamStandL: 'stand', istilam: 'stand', throw: 'stand', drink: 'stand', pick: 'ruku' };
 
 /**
  * Bewegung von der vorherigen zur aktuellen Haltung.
@@ -70,6 +70,10 @@ FIG.taslimR = FIG.sit;
 FIG.taslimL = FIG.sit;
 FIG.salamStandR = FIG.stand;
 FIG.salamStandL = FIG.stand;
+FIG.istilam = { ...FIG.stand, elbow: [0.6, 0.36], hand: [0.74, 0.3] };
+FIG.throw = { ...FIG.stand, elbow: [0.56, 0.16], hand: [0.66, 0.04] };
+FIG.drink = { ...FIG.stand, elbow: [0.6, 0.32], hand: [0.56, 0.16] };
+FIG.pick = { ...FIG.ruku, hand: [0.6, 0.93] };
 
 function figure(ctx, f, x, y, s, color, width) {
   const P = (k) => [x + f[k][0] * s, y + f[k][1] * s];

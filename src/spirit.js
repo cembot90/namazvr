@@ -4,6 +4,7 @@
 import { t } from './i18n.js';
 
 export function innerMeaning(step) {
+  if (step.hajj) return step.inner || '';
   if (step.key === 'shahada') return t('inner.shahada');
   if (step.wudu) return t(`inner.wudu.${step.wudu}`);
   return step.key ? t(`inner.${step.key}`) : '';

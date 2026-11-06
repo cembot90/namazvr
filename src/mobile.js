@@ -63,6 +63,7 @@ export class MobileUI {
         ${btn(t('ui.menuSuras'), 'suras', { cls: 'primary' })}${btn(t('ui.menuPeace'), 'peace')}
         ${btn(t('track.menu', v.tracked), 'tracker', { cls: v.tracked === 5 ? 'active' : '' })}${btn(t('ram.menu'), 'ramadan')}
         ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: v.kids ? 'active' : '' })}${btn(t('prof.btn', v.profile.icon, v.profile.name), 'profiles')}
+        ${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary wide' })}
       </div>`;
   }
 
@@ -145,6 +146,7 @@ export class MobileUI {
     const status = s.rakah ? `${v.prayer.name}${unit} · ${t('ui.rakaShort', s.rakah, s.of || v.prayer.rakat)}` : `${v.prayer.name}${unit}`;
     const m = s.wudu
       ? { cue: s.cue, how: `${s.count}× · ${s.fard ? t('wudu.fard') : t('wudu.sunnah')}` }
+      : s.hajj ? { cue: s.cue, how: [t(`hajj.where.${s.scene}`), s.status].filter(Boolean).join(' · ') }
       : { ...moveFor(v.prevPose, s.pose), ...(s.how ? { how: s.how } : {}) };
     return `
       ${head(s.title, status)}
@@ -169,6 +171,12 @@ export class MobileUI {
   }
 
   v_done(v) {
+    if (v.prayer.kind === 'umre' || v.prayer.kind === 'hajj') {
+      return `${head(t(`hajj.done.${v.prayer.kind}`), v.prayer.name)}
+        <p class="ar big center" dir="rtl">تَقَبَّلَ اللَّهُ مِنَّا وَمِنكُم</p>
+        ${t('hajj.doneText').map((p) => `<p>${esc(p)}</p>`).join('')}
+        <div class="grid2">${btn(t('ui.again'), 'again')}${btn(t('ui.menu'), 'menu', { cls: 'primary' })}</div>`;
+    }
     if (v.prayer.kind === 'wudu') {
       return `${head(t('ui.wuduDone'))}
         <p>${esc(t('ui.wuduWell'))}</p>
@@ -368,6 +376,16 @@ export class MobileUI {
       <div class="grid2">${btn(t('gal.screen'), 'women:screen', { cls: v.womenPlace !== 'gallery' ? 'active' : '' })}${btn(t('gal.gallery'), 'women:gallery', { cls: v.womenPlace === 'gallery' ? 'active' : '' })}</div>
       <p class="gold small">${esc(t('ui.cemaatTip'))}</p>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_pilgrim(v) {
+    const toggle = `<div class="setting"><div><b>${esc(t('hajj.walk'))}</b><small>${esc(t('hajj.walkSub'))}</small></div>${btn(v.walkAlong ? t('ui.on') : t('ui.off'), 'walkalong', { cls: v.walkAlong ? 'active' : '' })}</div>`;
+    return `${head(t('hajj.title'), `${v.madhab} · ${v.gender === 'f' ? t('ui.women') : t('ui.men')}`)}
+      ${t('hajj.intro').map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
+      <div class="list">${v.list.map((p, i) => btn(`${i ? '🕋' : '🤍'} ${p.name}`, `prayer:${p.id}`, { cls: 'primary', sub: p.de })).join('')}</div>
+      ${toggle}
+      <p class="muted small">${esc(t('hajj.note'))}</p>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
   v_profiles(v) {
