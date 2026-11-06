@@ -23,6 +23,8 @@ export const EXTRA_PRAYERS = [
   { id: 'witr', rakat: 3, kind: 'witr' },
   { id: 'jumua', rakat: 2, kind: 'jumua' },
   { id: 'tahiyya', rakat: 2, kind: 'sunnah' },
+  { id: 'eid', rakat: 2, kind: 'eid' },
+  { id: 'janaza', rakat: 0, kind: 'janaza' },
 ].map(named);
 
 export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS].find((p) => p.id === id);
@@ -216,6 +218,100 @@ Object.assign(TXT, {
   },
 });
 
+// Weitere kurze Suren (Juzʾ ʿAmma), Ezan und Ikamet, Gebet für Verstorbene
+Object.assign(TXT, {
+  fil: {
+    ar: [
+      'أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ',
+      'أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ',
+      'وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ',
+      'تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ',
+      'فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ',
+    ],
+    tr: ['Alam tara kayfa faʿala rabbuka bi-aṣḥābi l-fīl', 'Alam yajʿal kaydahum fī taḍlīl', 'Wa arsala ʿalayhim ṭayran abābīl', 'Tarmīhim bi-ḥijāratin min sijjīl', 'Fa-jaʿalahum ka-ʿaṣfin maʾkūl'],
+  },
+  quraysh: {
+    ar: [
+      'لِإِيلَافِ قُرَيْشٍ',
+      'إِيلَافِهِمْ رِحْلَةَ الشِّتَاءِ وَالصَّيْفِ',
+      'فَلْيَعْبُدُوا رَبَّ هَٰذَا الْبَيْتِ',
+      'الَّذِي أَطْعَمَهُم مِّن جُوعٍ وَآمَنَهُم مِّنْ خَوْفٍ',
+    ],
+    tr: ['Li-īlāfi Quraysh', 'Īlāfihim riḥlata sh-shitāʾi wa ṣ-ṣayf', 'Fa-l-yaʿbudū rabba hādha l-bayt', 'Alladhī aṭʿamahum min jūʿin wa āmanahum min khawf'],
+  },
+  maun: {
+    ar: [
+      'أَرَأَيْتَ الَّذِي يُكَذِّبُ بِالدِّينِ',
+      'فَذَٰلِكَ الَّذِي يَدُعُّ الْيَتِيمَ',
+      'وَلَا يَحُضُّ عَلَىٰ طَعَامِ الْمِسْكِينِ',
+      'فَوَيْلٌ لِّلْمُصَلِّينَ',
+      'الَّذِينَ هُمْ عَن صَلَاتِهِمْ سَاهُونَ',
+      'الَّذِينَ هُمْ يُرَاءُونَ',
+      'وَيَمْنَعُونَ الْمَاعُونَ',
+    ],
+    tr: ['Araʾayta lladhī yukadhdhibu bi-d-dīn', 'Fa-dhālika lladhī yaduʿʿu l-yatīm', 'Wa lā yaḥuḍḍu ʿalā ṭaʿāmi l-miskīn', 'Fa-waylun li-l-muṣallīn', 'Alladhīna hum ʿan ṣalātihim sāhūn', 'Alladhīna hum yurāʾūn', 'Wa yamnaʿūna l-māʿūn'],
+  },
+  kafirun: {
+    ar: [
+      'قُلْ يَا أَيُّهَا الْكَافِرُونَ',
+      'لَا أَعْبُدُ مَا تَعْبُدُونَ',
+      'وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ',
+      'وَلَا أَنَا عَابِدٌ مَّا عَبَدتُّمْ',
+      'وَلَا أَنتُمْ عَابِدُونَ مَا أَعْبُدُ',
+      'لَكُمْ دِينُكُمْ وَلِيَ دِينِ',
+    ],
+    tr: ['Qul yā ayyuha l-kāfirūn', 'Lā aʿbudu mā taʿbudūn', 'Wa lā antum ʿābidūna mā aʿbud', 'Wa lā ana ʿābidun mā ʿabadtum', 'Wa lā antum ʿābidūna mā aʿbud', 'Lakum dīnukum wa liya dīn'],
+  },
+  nasr: {
+    ar: [
+      'إِذَا جَاءَ نَصْرُ اللَّهِ وَالْفَتْحُ',
+      'وَرَأَيْتَ النَّاسَ يَدْخُلُونَ فِي دِينِ اللَّهِ أَفْوَاجًا',
+      'فَسَبِّحْ بِحَمْدِ رَبِّكَ وَاسْتَغْفِرْهُ إِنَّهُ كَانَ تَوَّابًا',
+    ],
+    tr: ['Idhā jāʾa naṣru llāhi wa l-fatḥ', 'Wa raʾayta n-nāsa yadkhulūna fī dīni llāhi afwājā', 'Fa-sabbiḥ bi-ḥamdi rabbika wa-staghfirh, innahū kāna tawwābā'],
+  },
+  masad: {
+    ar: [
+      'تَبَّتْ يَدَا أَبِي لَهَبٍ وَتَبَّ',
+      'مَا أَغْنَىٰ عَنْهُ مَالُهُ وَمَا كَسَبَ',
+      'سَيَصْلَىٰ نَارًا ذَاتَ لَهَبٍ',
+      'وَامْرَأَتُهُ حَمَّالَةَ الْحَطَبِ',
+      'فِي جِيدِهَا حَبْلٌ مِّن مَّسَدٍ',
+    ],
+    tr: ['Tabbat yadā Abī Lahabin wa tabb', 'Mā aghnā ʿanhu māluhū wa mā kasab', 'Sa-yaṣlā nāran dhāta lahab', 'Wa-mraʾatuhū ḥammālata l-ḥaṭab', 'Fī jīdihā ḥablun min masad'],
+  },
+  ezan: {
+    ar: [
+      'اللهُ أَكْبَرُ، اللهُ أَكْبَرُ',
+      'أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللهُ',
+      'أَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللهِ',
+      'حَيَّ عَلَى الصَّلَاةِ',
+      'حَيَّ عَلَى الْفَلَاحِ',
+      'الصَّلَاةُ خَيْرٌ مِنَ النَّوْمِ',
+      'اللهُ أَكْبَرُ، اللهُ أَكْبَرُ',
+      'لَا إِلَٰهَ إِلَّا اللهُ',
+    ],
+    tr: ['Allāhu akbar, Allāhu akbar  (2×)', 'Ashhadu an lā ilāha illa llāh  (2×)', 'Ashhadu anna Muḥammadan rasūlu llāh  (2×)', 'Ḥayya ʿala ṣ-ṣalāh  (2×)', 'Ḥayya ʿala l-falāḥ  (2×)', 'Aṣ-ṣalātu khayrun mina n-nawm  (2×, Fajr)', 'Allāhu akbar, Allāhu akbar', 'Lā ilāha illa llāh'],
+  },
+  ikamet: {
+    ar: [
+      'اللهُ أَكْبَرُ، اللهُ أَكْبَرُ',
+      'أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا اللهُ',
+      'أَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ اللهِ',
+      'حَيَّ عَلَى الصَّلَاةِ',
+      'حَيَّ عَلَى الْفَلَاحِ',
+      'قَدْ قَامَتِ الصَّلَاةُ',
+      'اللهُ أَكْبَرُ، اللهُ أَكْبَرُ',
+      'لَا إِلَٰهَ إِلَّا اللهُ',
+    ],
+    tr: ['Allāhu akbar, Allāhu akbar  (2×)', 'Ashhadu an lā ilāha illa llāh  (2×)', 'Ashhadu anna Muḥammadan rasūlu llāh  (2×)', 'Ḥayya ʿala ṣ-ṣalāh  (2×)', 'Ḥayya ʿala l-falāḥ  (2×)', 'Qad qāmati ṣ-ṣalāh  (2×)', 'Allāhu akbar, Allāhu akbar', 'Lā ilāha illa llāh'],
+  },
+  janazaDua: {
+    ar: ['اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ'],
+    tr: ['Allāhumma ghfir lahū wa-rḥamhu, wa ʿāfihī wa-ʿfu ʿanh'],
+  },
+});
+
 // Textgruppe in der gewählten Sprache; mehrere Schlüssel werden aneinandergehängt.
 // Umschrift: eigene Fassung der Sprache (z. B. türkisch), sonst die wissenschaftliche; Arabisch zeigt keine.
 export function text(...keys) {
@@ -243,8 +339,31 @@ export const TASBIH = TASBIH_AR.map(([ar, tr, target], i) => ({
 // Erzeugt die Schrittfolge für ein Gebet nach der gewählten Rechtsschule, in der aktuellen Sprache.
 // key benennt die Art des Schritts (für den spirituellen Modus).
 // suraKey: Zusatzsure nach der Fātiḥa (in der Suren-Ansicht wählbar)
+// Zusätzliche Takbīre im Festgebet: [erste Rakʿa, zweite Rakʿa]
+const EID_TAKBIRS = { hanafi: [3, 3], shafii: [7, 5], maliki: [6, 5], hanbali: [6, 5] };
+
+// Totengebet (Ṣalāt al-Janāza): im Stehen, vier Takbīre, ohne Rukūʿ und Sujūd, dann Salām.
+function buildJanaza(m, gender) {
+  const steps = [];
+  const add = (step) => steps.push({ ar: [], tr: [], de: [], rakah: 0, ...step });
+  const raisePose = m.raise ? 'takbir' : m.qiyam;
+  const opening = m.id === 'hanafi' ? ['thana'] : m.id === 'maliki' ? ['janazaDua'] : ['fatiha1', 'fatiha2'];
+  add({ key: 'niyya', title: t('title.niyya'), pose: 'stand', dur: 10, instr: t('instr.niyya', t('niyya.janaza')), de: [t('ext.janazaNote'), t(`awra.${gender}`) || t('awra.m')] });
+  add({ key: 'takbir', title: t('ext.janTakbir', 1), pose: 'takbir', dur: 6, instr: t('ext.janTakbir1', m.hands), ...text('takbir') });
+  add({ key: 'opening', title: t('ext.janAfter1'), pose: m.qiyam, how: m.hands, dur: 14, instr: t('ext.janOpening', m.id), ...text(...opening) });
+  add({ key: 'takbir', title: t('ext.janTakbir', 2), pose: raisePose, dur: 5, instr: t('ext.janTakbirN', m.raise), ...text('takbir') });
+  add({ key: 'salawat', title: t('title.salawat'), pose: m.qiyam, how: m.hands, dur: 22, instr: t('ext.janSalawat'), ...text('salawat') });
+  add({ key: 'takbir', title: t('ext.janTakbir', 3), pose: raisePose, dur: 5, instr: t('ext.janTakbirN', m.raise), ...text('takbir') });
+  add({ key: 'dua', title: t('ext.janDua'), pose: m.qiyam, how: m.hands, dur: 16, instr: t('ext.janDuaInstr'), ...text('janazaDua') });
+  add({ key: 'takbir', title: t('ext.janTakbir', 4), pose: raisePose, dur: 5, instr: t('ext.janTakbir4'), ...text('takbir') });
+  add({ key: 'salam', title: t('title.salamR'), pose: 'salamStandR', dur: 5, instr: t('ext.janSalamR'), ...text('salam') });
+  add({ key: 'salam', title: t('title.salamL'), pose: 'salamStandL', dur: 5, instr: t('ext.janSalamL', m.id), ...text('salam') });
+  return steps;
+}
+
 export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 'ikhlas') {
   const m = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
+  if (prayer.kind === 'janaza') return buildJanaza(m, gender);
   const f = gender === 'f';
   const pick = (table) => (table && (table[m.id] ?? table.default)) || '';
   // Für Frauen: Hände, Takbīr und Sitzen je nach Schule anpassen.
@@ -276,7 +395,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
       ...base, key: 'niyya', title: t('title.niyya'), pose: 'stand', rakah: 0, dur: 10,
       instr: t('instr.niyya', unit.niyya),
       de: [
-        kind === 'jumua' ? t('instr.jumua', f) : t('instr.heart'),
+        kind === 'jumua' ? t('instr.jumua', f) : kind === 'eid' ? t('ext.eidNote') : t('instr.heart'),
         ...(ui === 0 ? [t(`awra.${gender}`) || t('awra.m')] : []),
       ],
     });
@@ -290,6 +409,10 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
           add({ ...base, ...qiyam, key: 'opening', title: t('title.opening'), rakah: r, dur: 12, instr: t('instr.opening', hands), ...text(m.opening) });
         }
       }
+      // Festgebet: zusätzliche Takbīre – in der 1. Rakʿa vor der Fātiḥa, in der 2. je nach Schule davor oder (Ḥanafī) vor dem Rukūʿ
+      const eidN = kind === 'eid' ? EID_TAKBIRS[m.id][r - 1] : 0;
+      const zawaid = () => add({ ...base, key: 'takbir', title: t('ext.zawaid', eidN), pose: 'takbir', rakah: r, dur: 4 + eidN * 3, instr: t('ext.zawaidInstr', eidN, m.id), ...text('takbir') });
+      if (eidN && (r === 1 || m.id !== 'hanafi')) zawaid();
       add({
         ...base, ...qiyam, key: 'fatiha', title: t('title.fatiha1'), rakah: r, dur: 16,
         instr: (r === 1 && !m.opening ? `${hands} ` : '') + (r === 1 ? t('instr.fatiha1First') : t('instr.fatiha1')),
@@ -299,6 +422,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
       if (r <= 2 || kind !== 'fard') {
         add({ ...base, ...qiyam, key: 'sura', title: t('title.sura'), rakah: r, dur: 14, instr: kind === 'fard' ? t('instr.suraFard') : t('instr.suraNafl'), ...text(suraKey) });
       }
+      if (eidN && r === 2 && m.id === 'hanafi') zawaid();
       // Qunūt vor dem Rukūʿ: Ḥanafī im Witr, Mālikī leise im Fajr
       const qunutBefore = (witrUnit && last && m.qunutWitr === 'before') || (prayer.id === 'fajr' && r === 2 && m.qunutFajr === 'before');
       if (qunutBefore && m.id === 'hanafi') {

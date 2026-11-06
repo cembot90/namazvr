@@ -185,12 +185,14 @@ export class Panel extends CanvasPlane {
       [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
       [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('track.menu', v.tracked), 'tracker'], [t('ram.menu'), 'ramadan']],
-      [[t('ui.kidsBtn', v.kids), 'kids']],
+      [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      const w = row.length === 1 ? 2 * bw + gap : bw;
-      this.btn(label, 60 + i * (bw + gap), 612 + ri * 84, w, 72, action, { primary: action === 'wudu' && !v.wuduDone, active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
+      // Letzte Reihe: Kinder-Modus über zwei Spalten, dann das Profil
+      const wide = row.length === 2, col = wide && i === 1 ? 2 : i;
+      const w = wide && i === 0 ? 2 * bw + gap : bw;
+      this.btn(label, 60 + col * (bw + gap), 612 + ri * 84, w, 72, action, { primary: action === 'wudu' && !v.wuduDone, active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
     }));
-    this.text('السَّلَامُ عَلَيْكُمْ', (60 + 2 * bw + 2 * gap + W - 60) / 2, 612 + 3 * 84 + 50, { size: 42, font: AR, color: C.gold, align: 'center', rtl: true, fixed: true });
+    this.text('السَّلَامُ عَلَيْكُمْ', 60 + 3 * (bw + gap) + bw / 2, 612 + 3 * 84 + 50, { size: 42, font: AR, color: C.gold, align: 'center', rtl: true, fixed: true });
   }
 
   v_times(v) {
@@ -216,10 +218,11 @@ export class Panel extends CanvasPlane {
     });
     const note = v.highLatitude ? t('ui.highLat') : t('ui.sunCalc');
     this.text(note, 60, 720, { size: 24, color: C.muted });
-    const by = H - 140, bw = (W - 120 - 40) / 3;
-    this.btn(t('ui.method'), 60, by, bw, 96, 'method', { size: 26, sub: v.method, subSize: 22 });
-    this.btn(t('ui.asrCalc'), 60 + bw + 20, by, bw, 96, 'asr', { size: 26, sub: v.asr.split(' (')[0], subSize: 22 });
-    this.btn(t('ui.back'), 60 + 2 * (bw + 20), by, bw, 96, 'menu');
+    const by = H - 140, bw = (W - 120 - 60) / 4;
+    this.btn(t('ui.method'), 60, by, bw, 96, 'method', { size: 26, sub: v.method, subSize: 20 });
+    this.btn(t('ui.asrCalc'), 60 + bw + 20, by, bw, 96, 'asr', { size: 26, sub: v.asr.split(' (')[0], subSize: 20 });
+    this.btn(t('rem.btn'), 60 + 2 * (bw + 20), by, bw, 96, 'remind', { size: 26, primary: true });
+    this.btn(t('ui.back'), 60 + 3 * (bw + 20), by, bw, 96, 'menu');
   }
 
   v_qibla(v) {
@@ -337,11 +340,15 @@ export class Panel extends CanvasPlane {
     const { W, H } = this;
     this.heading(t('ui.surasTitle'));
     this.text(t('ui.surasSub'), 60, 160, { size: 28, color: C.muted });
-    const gap = 20, w = (W - 120 - gap) / 2;
+    const gap = 16, cols = 3, w = (W - 120 - gap * (cols - 1)) / cols;
     v.suras.forEach((s, i) => {
-      const x = 60 + (i % 2) * (w + gap), y = 200 + Math.floor(i / 2) * 165;
-      const name = `${s.name}${s.learned ? '  ✓' : ''}${s.inPrayer ? '  ★' : ''}`;
-      this.btn(name, x, y, w, 145, `sura:${s.id}`, { size: 38, sub: s.about, subSize: 23, active: s.learned });
+      const x = 60 + (i % cols) * (w + gap), y = 190 + Math.floor(i / cols) * 128;
+      const name = `${s.call ? '📣 ' : ''}${s.name}${s.learned ? '  ✓' : ''}${s.inPrayer ? '  ★' : ''}`;
+      // Unterzeile kürzen, damit sie in den Knopf passt
+      this.ctx.font = `19px ${UI}`;
+      let sub = s.about;
+      while (sub.length > 8 && this.ctx.measureText(sub).width > w - 24) sub = `${sub.slice(0, -2).trimEnd()}…`;
+      this.btn(name, x, y, w, 114, `sura:${s.id}`, { size: 31, sub, subSize: 19, active: s.learned });
     });
     this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
   }
@@ -379,11 +386,11 @@ export class Panel extends CanvasPlane {
   v_sura(v) {
     const { W, H } = this;
     const n = v.verses.length, cur = v.verses[v.v];
-    this.heading(v.name, v.mode === 'read' ? `${v.n} · ${t('ui.verses', n)}` : t('ui.verseOf', v.v + 1, n));
+    this.heading(v.name, v.mode === 'read' ? `${v.n ? `${v.n} · ` : ''}${t('ui.verses', n)}` : t('ui.verseOf', v.v + 1, n));
     [['read', t('ui.modeRead')], ['verse', t('ui.modeVerse')], ['test', t('ui.modeTest')]].forEach(([m, label], i) => {
       this.btn(label, 60 + i * 250, 125, 240, 64, `smode:${m}`, { size: 26, active: v.mode === m });
     });
-    if (v.id !== 'fatiha') this.btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), W - 60 - 320, 125, 320, 64, 'sprayer', { size: 26, active: v.inPrayer });
+    if (v.id !== 'fatiha' && !v.call) this.btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), W - 60 - 320, 125, 320, 64, 'sprayer', { size: 26, active: v.inPrayer });
     const top = 225, bottom = H - 175;
     if (v.mode === 'read') {
       this.verseRows(v.verses, top, bottom);
@@ -472,8 +479,8 @@ export class Panel extends CanvasPlane {
     this.heading(t('ui.menuMore'), v.madhab);
     const gap = 20, w = (W - 120 - gap) / 2, h = 112;
     v.prayers.forEach((p, i) => {
-      const x = 60 + (i % 2) * (w + gap), y = 140 + Math.floor(i / 2) * (h + 18);
-      this.btn(p.name, x, y, w, h, `prayer:${p.id}`, { size: 34, sub: `${t('ui.rakat', p.rakat)} · ${p.de}`, subSize: 24 });
+      const x = 60 + (i % 2) * (w + gap), y = 130 + Math.floor(i / 2) * (h + 12);
+      this.btn(p.name, x, y, w, h, `prayer:${p.id}`, { size: 34, sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de, subSize: 24 });
     });
     this.text(t('ui.moreNote'), 60, H - 170, { size: 24, color: C.muted });
     this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
@@ -680,6 +687,46 @@ export class Panel extends CanvasPlane {
     this.btn(t('ram.iftarDua'), 60, by, bw, 96, 'rdua:iftar', { size: 27, active: v.dua === 'iftar' });
     this.btn(t('ram.niyyaBtn'), 60 + bw + gap, by, bw, 96, 'rdua:niyya', { size: 27, active: v.dua === 'niyya' });
     this.btn(t('ui.menu'), 60 + 2 * (bw + gap), by, bw, 96, 'menu');
+  }
+
+  // Familie: Profile wechseln, hinzufügen, umbenennen, löschen
+  v_profiles(v) {
+    const { W, H, ctx } = this;
+    this.heading(t('prof.title'), t('prof.sub'));
+    v.list.forEach((p, i) => {
+      const y = 130 + i * 104;
+      ctx.beginPath(); ctx.roundRect(60, y, W - 120, 92, 18);
+      ctx.fillStyle = p.active ? 'rgba(122,95,34,0.45)' : 'rgba(29,43,69,0.7)'; ctx.fill();
+      this.btn(p.icon, 72, y + 10, 72, 72, `picon:${p.id}`, { size: 40 });
+      this.text(p.name, 164, y + 40, { size: 32, weight: 700 });
+      const stats = [p.kids ? `🧒 ${t('prof.kids')}` : '', t('prof.today', p.today), t('prof.streak', p.streak), t('prof.stars', p.stars), t('prof.suras', p.suras)].filter(Boolean).join(' · ');
+      this.text(stats, 164, y + 76, { size: 21, color: C.muted });
+      const b = (label, action, k, opt) => this.btn(label, W - 72 - (k + 1) * 170 + 10, y + 14, 160, 64, action, { size: 24, ...opt });
+      b(p.active ? t('prof.active') : t('prof.use'), p.active ? 'noop' : `puse:${p.id}`, 0, { primary: !p.active, active: p.active });
+      b(t('prof.rename'), `pren:${p.id}`, 1);
+      if (p.id !== 'main') b(v.pDel === p.id ? t('prof.delSure') : t('prof.del'), `pdel:${p.id}`, 2, { size: v.pDel === p.id ? 19 : 24 });
+    });
+    this.text(t('prof.note'), 60, H - 160, { size: 20, color: C.muted });
+    const half = (W - 120 - 20) / 2;
+    this.btn(v.list.length < v.max ? t('prof.add') : t('prof.max'), 60, H - 128, half, 96, v.list.length < v.max ? 'padd' : 'noop', { primary: v.list.length < v.max });
+    this.btn(t('ui.menu'), 60 + half + 20, H - 128, half, 96, 'menu');
+  }
+
+  // Erinnerung: Benachrichtigung und Kalender
+  v_remind(v) {
+    const { W, H } = this;
+    this.heading(t('rem.title'), t('rem.sub'));
+    this.text(t('ui.next', v.next.name, v.next.time, v.next.inText), 60, 170, { size: 28, weight: 600, color: C.gold });
+    this.switchRow(205, t('rem.on'), t('rem.onSub'), [[v.on ? t('ui.on') : t('ui.off'), 'remon', v.on]]);
+    this.text(t('rem.before'), 60, 330, { size: 28, weight: 600 });
+    this.btn(t('rem.min', v.before), isRTL() ? 60 : W - 60 - 660, 295, 300, 70, 'rembefore', { active: true, size: 26 });
+    this.btn(t('rem.test'), isRTL() ? 380 : W - 60 - 340, 295, 340, 70, 'remtest', { size: 24 });
+    let y = 400;
+    if (v.ios) y = this.paragraphs([t('rem.ios')], y, { size: 23, color: C.muted, gap: 6 });
+    this.btn(t('rem.cal'), 60, y + 10, W - 120, 100, 'remcal', { primary: true, size: 34 });
+    y = this.paragraphs([t('rem.calSub')], y + 150, { size: 24, color: C.muted, gap: 0 });
+    if (v.msg) this.paragraphs([v.msg], y + 10, { size: 26, color: C.gold, gap: 0 });
+    this.btn(t('ui.back'), 60, H - 128, W - 120, 96, 'times');
   }
 
   v_info() {

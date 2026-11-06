@@ -11,6 +11,15 @@ export const SURAS = [
   { id: 'asr', n: 103 },
   { id: 'falaq', n: 113 },
   { id: 'nas', n: 114 },
+  { id: 'fil', n: 105 },
+  { id: 'quraysh', n: 106 },
+  { id: 'maun', n: 107 },
+  { id: 'kafirun', n: 109 },
+  { id: 'nasr', n: 110 },
+  { id: 'masad', n: 111 },
+  // Gebetsruf und Ruf zum Aufstehen – zum Lernen, nicht als Sure im Gebet
+  { id: 'ezan', n: '', call: true },
+  { id: 'ikamet', n: '', call: true },
 ].map((s) => ({
   ...s,
   get name() { return t(`suras.names.${s.id}`); },

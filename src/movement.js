@@ -3,7 +3,7 @@
 import { t } from './i18n.js';
 
 // Haltung → Körperlage, die in VR erkannt werden kann.
-const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit' };
+const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit', salamStandR: 'stand', salamStandL: 'stand' };
 
 /**
  * Bewegung von der vorherigen zur aktuellen Haltung.
@@ -12,10 +12,10 @@ const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ru
 export function moveFor(prev, pose) {
   const body = BODY[pose];
   const from = prev ? BODY[prev] : null;
-  const how = t(`how.${pose}`);
+  const how = t(`how.${pose.replace('salamStand', 'taslim')}`);
   const r = (arrow, cue) => ({ arrow, cue: t(`cue.${cue}`), how, body });
-  if (pose === 'taslimR') return r('right', 'taslimR');
-  if (pose === 'taslimL') return r('left', 'taslimL');
+  if (pose === 'taslimR' || pose === 'salamStandR') return r('right', 'taslimR');
+  if (pose === 'taslimL' || pose === 'salamStandL') return r('left', 'taslimL');
   if (!prev) return r(null, 'start');
   if (pose === 'dua') return r('up', 'dua');
   if (pose === 'takbir') return r('up', 'takbir');
@@ -51,8 +51,8 @@ export function classifyHead(height, standHeight, pitch) {
 /** Erfüllt die Kopfhaltung die verlangte Haltung? yawRel = Kopfdrehung gegenüber der Qibla (positiv = links). */
 export function matchesPose(pose, body, yawRel) {
   if (body !== BODY[pose]) return false;
-  if (pose === 'taslimR') return yawRel < -0.5;
-  if (pose === 'taslimL') return yawRel > 0.5;
+  if (pose === 'taslimR' || pose === 'salamStandR') return yawRel < -0.5;
+  if (pose === 'taslimL' || pose === 'salamStandL') return yawRel > 0.5;
   return true;
 }
 
@@ -68,6 +68,8 @@ const FIG = {
 FIG.dua = { ...FIG.stand, elbow: [0.56, 0.42], hand: [0.68, 0.34] };
 FIG.taslimR = FIG.sit;
 FIG.taslimL = FIG.sit;
+FIG.salamStandR = FIG.stand;
+FIG.salamStandL = FIG.stand;
 
 function figure(ctx, f, x, y, s, color, width) {
   const P = (k) => [x + f[k][0] * s, y + f[k][1] * s];

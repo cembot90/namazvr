@@ -62,7 +62,7 @@ export class MobileUI {
         ${btn(t('ui.menuMosque'), 'mosque')}${btn(t('ui.menuSettings'), 'settings')}
         ${btn(t('ui.menuSuras'), 'suras', { cls: 'primary' })}${btn(t('ui.menuPeace'), 'peace')}
         ${btn(t('track.menu', v.tracked), 'tracker', { cls: v.tracked === 5 ? 'active' : '' })}${btn(t('ram.menu'), 'ramadan')}
-        ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: `wide ${v.kids ? 'active' : ''}` })}
+        ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: v.kids ? 'active' : '' })}${btn(t('prof.btn', v.profile.icon, v.profile.name), 'profiles')}
       </div>`;
   }
 
@@ -78,6 +78,7 @@ export class MobileUI {
       }).join('')}</div>
       <p class="muted small">${esc(v.highLatitude ? t('ui.highLatShort') : t('ui.sunCalcShort'))} ${esc(t('ui.mayDiffer'))}</p>
       <div class="grid2">${btn(t('ui.method'), 'method', { sub: v.method })}${btn(t('ui.asr'), 'asr', { sub: v.asr.split(' (')[0] })}</div>
+      ${btn(t('rem.btn'), 'remind', { cls: 'primary wide' })}
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
   }
 
@@ -184,7 +185,7 @@ export class MobileUI {
   v_suras(v) {
     return `${head(t('ui.surasTitle'))}
       <p class="muted small">${esc(t('ui.surasSub'))}</p>
-      <div class="list">${v.suras.map((s) => btn(`${s.name}${s.learned ? ' ✓' : ''}${s.inPrayer ? ' ★' : ''}`, `sura:${s.id}`, { cls: s.learned ? 'active' : '', sub: `${s.about} · ${t('ui.verses', s.count)}` })).join('')}</div>
+      <div class="list">${v.suras.map((s) => btn(`${s.call ? '📣 ' : ''}${s.name}${s.learned ? ' ✓' : ''}${s.inPrayer ? ' ★' : ''}`, `sura:${s.id}`, { cls: s.learned ? 'active' : '', sub: s.call ? s.about : `${s.about} · ${t('ui.verses', s.count)}` })).join('')}</div>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
   }
 
@@ -197,13 +198,13 @@ export class MobileUI {
       body = `<p class="ar big center gold" dir="rtl">${esc(cur.ar.split(' ')[0])} …</p>${cur.de ? `<p class="center">${esc(cur.de)}</p>` : ''}<p class="muted small center">${esc(t('ui.testHint'))}</p>`;
     } else body = verse(cur);
     const nav = v.mode === 'read' ? '' : `<div class="grid2">${btn('←', 'sprev')}${v.mode === 'test' && !v.reveal ? btn(t('ui.reveal'), 'sreveal', { cls: 'primary' }) : btn('→', 'snext', { cls: 'primary' })}</div>`;
-    return `${head(v.name, v.mode === 'read' ? `${v.n} · ${t('ui.verses', n)}` : t('ui.verseOf', v.v + 1, n))}
+    return `${head(v.name, v.mode === 'read' ? `${v.n ? `${v.n} · ` : ''}${t('ui.verses', n)}` : t('ui.verseOf', v.v + 1, n))}
       <div class="grid3">${[['read', t('ui.modeRead')], ['verse', t('ui.modeVerse')], ['test', t('ui.modeTest')]].map(([m, label]) => btn(label, `smode:${m}`, { cls: v.mode === m ? 'active' : '' })).join('')}</div>
       ${body}
       ${v.msg ? `<p class="gold small center">${esc(v.msg)}</p>` : ''}
       ${nav}
       <div class="grid2">${btn(t('ui.listen'), 'sspeak')}${btn(v.learned ? t('ui.isLearned') : t('ui.markLearned'), 'slearned', { cls: v.learned ? 'active' : '' })}</div>
-      ${v.id !== 'fatiha' ? btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), 'sprayer', { cls: `wide ${v.inPrayer ? 'active' : ''}` }) : ''}
+      ${v.id !== 'fatiha' && !v.call ? btn(v.inPrayer ? t('ui.inPrayer') : t('ui.usePrayer'), 'sprayer', { cls: `wide ${v.inPrayer ? 'active' : ''}` }) : ''}
       ${btn(t('ui.back'), 'suras', { cls: 'wide' })}`;
   }
 
@@ -241,7 +242,7 @@ export class MobileUI {
 
   v_more(v) {
     return `${head(t('ui.menuMore'), v.madhab)}
-      <div class="list">${v.prayers.map((p) => btn(p.name, `prayer:${p.id}`, { sub: `${t('ui.rakat', p.rakat)} · ${p.de}` })).join('')}</div>
+      <div class="list">${v.prayers.map((p) => btn(p.name, `prayer:${p.id}`, { sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de })).join('')}</div>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
   }
 
@@ -367,6 +368,31 @@ export class MobileUI {
       <div class="grid2">${btn(t('gal.screen'), 'women:screen', { cls: v.womenPlace !== 'gallery' ? 'active' : '' })}${btn(t('gal.gallery'), 'women:gallery', { cls: v.womenPlace === 'gallery' ? 'active' : '' })}</div>
       <p class="gold small">${esc(t('ui.cemaatTip'))}</p>
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_profiles(v) {
+    return `${head(t('prof.title'), t('prof.sub'))}
+      ${v.list.map((p) => `<div class="voice ${p.active ? 'cur' : ''}">
+        <b><button class="icon" data-a="picon:${p.id}">${p.icon}</button> ${esc(p.name)}</b>
+        <small>${esc([p.kids ? `🧒 ${t('prof.kids')}` : '', t('prof.today', p.today), t('prof.streak', p.streak), t('prof.stars', p.stars), t('prof.suras', p.suras)].filter(Boolean).join(' · '))}</small>
+        <div class="grid3">${btn(p.active ? t('prof.active') : t('prof.use'), p.active ? 'noop' : `puse:${p.id}`, { cls: p.active ? 'active' : 'primary' })}${btn(t('prof.rename'), `pren:${p.id}`)}${p.id !== 'main' ? btn(v.pDel === p.id ? t('prof.delSure') : t('prof.del'), `pdel:${p.id}`) : ''}</div>
+      </div>`).join('')}
+      ${v.list.length < v.max ? btn(t('prof.add'), 'padd', { cls: 'primary wide' }) : `<p class="muted small">${esc(t('prof.max'))}</p>`}
+      <p class="muted small">${esc(t('prof.note'))}</p>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_remind(v) {
+    const toggle = `<div class="setting"><div><b>${esc(t('rem.on'))}</b><small>${esc(t('rem.onSub'))}</small></div>${btn(v.on ? t('ui.on') : t('ui.off'), 'remon', { cls: v.on ? 'active' : '' })}</div>`;
+    return `${head(t('rem.title'), t('rem.sub'))}
+      <p class="gold">${esc(t('ui.next', v.next.name, v.next.time, v.next.inText))}</p>
+      ${toggle}
+      <div class="grid2">${btn(t('rem.min', v.before), 'rembefore', { cls: 'active' })}${btn(t('rem.test'), 'remtest')}</div>
+      ${v.ios ? `<p class="muted small">${esc(t('rem.ios'))}</p>` : ''}
+      ${btn(t('rem.cal'), 'remcal', { cls: 'primary wide' })}
+      <p class="muted small">${esc(t('rem.calSub'))}</p>
+      ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
+      ${btn(t('ui.back'), 'times', { cls: 'wide' })}`;
   }
 
   v_info() {

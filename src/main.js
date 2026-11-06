@@ -23,6 +23,7 @@ import { PIPER, SAMPLES, Voices } from './voice.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
 import { formatDay, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
+import { BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
 
 const store = {
   get(key, fallback) {
@@ -105,6 +106,18 @@ const banner = new CueBanner();
 scene.add(banner.mesh);
 
 // --- Zustand ---
+// Profile: jedes Kind mit eigenem Fortschritt (Sterne, Tracker, Suren, Quiz) und eigenem Kinder-Modus.
+// Das erste Profil („Ich“) nutzt den bisherigen Speicherplatz, damit nichts verloren geht.
+const ICONS = ['🌙', '⭐', '🌸', '🦁', '🐢', '🚀', '🌳', '🐝', '🦋', '🐬'];
+const MAX_PROFILES = 6;
+const progKey = (id) => (id === 'main' ? 'progress' : `progress.${id}`);
+const loadProgress = (id) => ({ ...emptyProgress(), ...store.get(progKey(id), {}) });
+const profiles = store.get('profiles', null) || [{ id: 'main', name: null, icon: '🌙', kids: store.get('kids', false) }];
+let profileId = store.get('profileId', 'main');
+if (!profiles.some((p) => p.id === profileId)) profileId = profiles[0].id;
+const profile = () => profiles.find((p) => p.id === profileId) || profiles[0];
+const saveProfiles = () => { store.set('profiles', profiles); store.set('profileId', profileId); };
+
 // Sprache vor allem anderen setzen, damit alle Texte schon passen.
 setLang(store.get('lang', deviceLang()));
 
@@ -132,7 +145,7 @@ const state = {
   voice: store.get('voice', true),
   spiritual: store.get('spiritual', false),
   // Kinder-Modus: einfache Erklärung je Schritt, langsamer, Sterne als Belohnung
-  kids: store.get('kids', false),
+  kids: !!profile().kids,
   peace: 0,
   // Suren lernen: gewählte Sure, Modus (read | verse | test), aktueller Vers, aufgedeckt?
   sura: { id: 'fatiha', mode: 'read', v: 0, reveal: false, msg: '' },
@@ -153,7 +166,11 @@ const state = {
   // Ghost-Modus: 'off' | 'front' (vor dir) | 'side' (neben dir)
   ghost: store.get('ghost', 'front'),
   wuduRoom: false,
-  progress: { ...emptyProgress(), ...store.get('progress', {}) },
+  progress: loadProgress(profileId),
+  pDel: null,
+  // Erinnerung: an/aus und wie viele Minuten vorher
+  remind: { on: false, before: 10, ...store.get('remind', {}) },
+  remMsg: '',
   quiz: null,
   // Haltungserkennung in VR: Stehhöhe des Kopfes, erkannte Haltung, wie lange schon gehalten
   // dazu in Mixed Reality/VR mit Hand-Erkennung: Hinweis zur Handhaltung und erhobener Zeigefinger
@@ -162,6 +179,9 @@ const state = {
 
 // Sprachausgabe: freie Piper-Stimmen, sonst die Stimme des Geräts
 const voices = new Voices({ enabled: store.get('piper', true), onChange: () => refresh() });
+
+const saveProgress = () => store.set(progKey(profileId), state.progress);
+const profName = (p) => p.name || (p.id === 'main' ? t('prof.me') : t('prof.child', Math.max(1, profiles.indexOf(p))));
 
 const madhab = () => MADHABS.find((m) => m.id === state.madhab) || MADHABS[0];
 const bearing = () => qiblaBearing(state.location.lat, state.location.lon);
@@ -369,6 +389,18 @@ function view() {
         type: 'voice', enabled: voices.enabled, supported: voices.supported, lang: langInfo().speech,
         voices: Object.entries(PIPER).map(([id, v]) => ({ ...v, id, model: v.id, langName: LANGS.find((l) => l.id === id).name, status: voices.status(id), progress: voices.progress(id), error: voices.state[id]?.error })),
       };
+    case 'profiles':
+      return {
+        type: 'profiles', pDel: state.pDel, max: MAX_PROFILES,
+        list: profiles.map((p) => {
+          const pr = p.id === profileId ? state.progress : loadProgress(p.id);
+          return { id: p.id, name: profName(p), icon: p.icon, kids: !!p.kids, active: p.id === profileId,
+            today: prayedOn(pr, keyFor(0)).length, streak: fullStreak(pr), stars: pr.stars || 0, suras: Object.values(pr.suras || {}).filter(Boolean).length };
+        }),
+      };
+    case 'remind':
+      return { type: 'remind', ...state.remind, msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
+        ios: /iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone, next: timesInfo().next };
     case 'tracker': {
       const p = state.progress, key = keyFor(state.trackBack);
       return {
@@ -408,11 +440,11 @@ function view() {
     case 'suras':
       return {
         type: 'suras',
-        suras: SURAS.map((s) => ({ id: s.id, n: s.n, name: s.name, about: s.about, count: verses(s.id).length, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura })),
+        suras: SURAS.map((s) => ({ id: s.id, n: s.n, name: s.name, about: s.about, call: !!s.call, count: verses(s.id).length, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura })),
       };
     case 'sura': {
       const s = state.sura;
-      return { type: 'sura', id: s.id, name: findSura(s.id).name, n: findSura(s.id).n, verses: verses(s.id), mode: s.mode, v: s.v, reveal: s.reveal, msg: s.msg, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura };
+      return { type: 'sura', id: s.id, call: !!findSura(s.id).call, name: findSura(s.id).name, n: findSura(s.id).n, verses: verses(s.id), mode: s.mode, v: s.v, reveal: s.reveal, msg: s.msg, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura };
     }
     case 'peace':
       return { type: 'peace', item: PEACE[state.peace], index: state.peace, total: PEACE.length };
@@ -438,6 +470,7 @@ function view() {
         wuduDone: state.progress.wudu > 0,
         kids: state.kids,
         tracked: prayedOn(state.progress, dayKey()).length,
+        profile: { icon: profile().icon, name: profName(profile()), many: profiles.length > 1 },
       };
   }
 }
@@ -603,7 +636,67 @@ function act(action) {
     case 'spiritual': state.spiritual = !state.spiritual; store.set('spiritual', state.spiritual); break;
     case 'breath': state.breath = { on: !state.breath.on, t: 0, phase: 'in' }; break;
     case 'beginner': state.beginner = !state.beginner; store.set('beginner', state.beginner); break;
-    case 'kids': state.kids = !state.kids; store.set('kids', state.kids); break;
+    case 'kids': state.kids = !state.kids; profile().kids = state.kids; saveProfiles(); break;
+    case 'profiles': state.view = 'profiles'; state.pDel = null; break;
+    case 'puse':
+      saveProgress();
+      profileId = arg;
+      state.progress = loadProgress(arg);
+      state.kids = !!profile().kids;
+      saveProfiles();
+      break;
+    case 'padd': {
+      if (profiles.length >= MAX_PROFILES) break;
+      const id = `p${Date.now().toString(36)}`;
+      profiles.push({ id, name: null, icon: ICONS[profiles.length % ICONS.length], kids: true });
+      saveProfiles();
+      break;
+    }
+    case 'picon': { const p = profiles.find((x) => x.id === arg); if (p) { p.icon = ICONS[(ICONS.indexOf(p.icon) + 1) % ICONS.length]; saveProfiles(); } break; }
+    case 'pren': {
+      const p = profiles.find((x) => x.id === arg);
+      // In VR gibt es kein Eingabefeld; dann bleibt der Name
+      let name = null;
+      try { name = window.prompt(t('prof.ask'), profName(p)); } catch { /* kein Dialog möglich */ }
+      if (p && name && name.trim()) { p.name = name.trim().slice(0, 18); saveProfiles(); }
+      break;
+    }
+    case 'pdel':
+      if (state.pDel !== arg) { state.pDel = arg; break; }
+      if (arg !== 'main' && profiles.length > 1) {
+        profiles.splice(profiles.findIndex((x) => x.id === arg), 1);
+        try { localStorage.removeItem(`salahvr.${progKey(arg)}`); } catch { /* egal */ }
+        if (profileId === arg) { profileId = profiles[0].id; state.progress = loadProgress(profileId); state.kids = !!profile().kids; }
+        saveProfiles();
+      }
+      state.pDel = null;
+      break;
+    case 'remind': state.view = 'remind'; state.remMsg = ''; break;
+    case 'remon':
+      if (state.remind.on) { state.remind.on = false; store.set('remind', state.remind); break; }
+      askPermission().then((perm) => {
+        state.remind.on = perm === 'granted';
+        state.remMsg = perm === 'granted' ? '' : perm === 'unsupported' ? t('rem.unsupported') : t('rem.denied');
+        store.set('remind', state.remind);
+        refresh();
+      });
+      break;
+    case 'rembefore': state.remind.before = BEFORE[(BEFORE.indexOf(state.remind.before) + 1) % BEFORE.length]; store.set('remind', state.remind); break;
+    case 'remtest': {
+      const n = timesInfo().next;
+      askPermission().then(async (perm) => {
+        const ok = perm === 'granted' && await notify(t('rem.title2', n.name, n.time), t('rem.body', state.remind.before));
+        state.remMsg = ok ? '' : perm === 'unsupported' ? t('rem.unsupported') : t('rem.denied');
+        refresh();
+      });
+      break;
+    }
+    case 'remcal': {
+      const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
+      downloadIcs(buildIcs(loc, state.method, state.asr, state.remind.before, 30));
+      state.remMsg = t('rem.calDone');
+      break;
+    }
     case 'peace': state.view = 'peace'; break;
     case 'suras': state.view = 'suras'; break;
     case 'sura': state.sura = { id: arg, mode: 'read', v: 0, reveal: false, msg: '' }; state.view = 'sura'; break;
@@ -626,10 +719,10 @@ function act(action) {
       p.suras = { ...(p.suras || {}), [id]: !p.suras?.[id] };
       // Kinder bekommen einen Stern für jede gelernte Sure
       if (p.suras[id] && state.kids) p.stars = (p.stars || 0) + 1;
-      store.set('progress', p);
+      saveProgress();
       break;
     }
-    case 'sprayer': state.prayerSura = state.sura.id; store.set('prayerSura', state.prayerSura); break;
+    case 'sprayer': if (findSura(state.sura.id).call) break; state.prayerSura = state.sura.id; store.set('prayerSura', state.prayerSura); break;
     case 'peacenext': state.peace = (state.peace + 1) % PEACE.length; break;
     case 'peaceprev': state.peace = (state.peace + PEACE.length - 1) % PEACE.length; break;
     case 'calm': state.view = 'calm'; state.calm = { count: 0 }; state.breath = { on: true, t: 0, phase: 'in' }; break;
@@ -649,11 +742,11 @@ function act(action) {
       if (z.i >= z.questions.length) {
         state.progress.quizBest = Math.max(state.progress.quizBest, z.score);
         state.progress.quizRuns++;
-        store.set('progress', state.progress);
+        saveProgress();
       }
       break;
     }
-    case 'resetprogress': state.progress = emptyProgress(); store.set('progress', state.progress); break;
+    case 'resetprogress': state.progress = emptyProgress(); saveProgress(); break;
     case 'again': start(state.prayer); break;
     case 'next':
       if (state.view !== 'step') break;
@@ -666,7 +759,7 @@ function act(action) {
         if (markPrayed(state.progress, state.prayer.id)) fullDayStar(dayKey());
         // Kinder bekommen für jedes geschaffte Gebet einen Stern
         if (state.kids) state.progress.stars = (state.progress.stars || 0) + 1;
-        store.set('progress', state.progress);
+        saveProgress();
       }
       state.autoT = 0;
       break;
@@ -693,7 +786,7 @@ function act(action) {
       const p = state.progress, key = keyFor(state.trackBack);
       const was = dayDone(p, key);
       if (toggleTrack(p, arg, state.trackBack) && !was) fullDayStar(key);
-      store.set('progress', p);
+      saveProgress();
       break;
     }
     case 'ramadan': state.view = 'ramadan'; state.ramadanDua = null; break;
@@ -1051,6 +1144,21 @@ function placeBanner(snap) {
   banner.mesh.lookAt(headPos);
 }
 
+// Erinnerung zur Gebetszeit (einmal pro Minute, solange die App läuft)
+const sentReminders = new Set(store.get('remindSent', []));
+function checkReminder() {
+  if (!state.remind.on || !canNotify() || Notification.permission !== 'granted') return;
+  const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
+  const due = dueReminder(loc, new Date(), state.method, state.asr, state.remind.before, sentReminders);
+  if (!due) return;
+  sentReminders.add(due.key);
+  store.set('remindSent', [...sentReminders].slice(-20));
+  const { title, body } = reminderText(due.id, due.at, state.remind.before, loc.timeZone);
+  notify(title, body);
+}
+// Auch wenn der Bildschirm still steht (keine Animation, z. B. Tab im Hintergrund)
+setInterval(checkReminder, 30000);
+
 // --- Loop ---
 const clock = new THREE.Clock();
 let lastMinute = Math.floor(Date.now() / 60000);
@@ -1111,6 +1219,7 @@ renderer.setAnimationLoop(() => {
   // Countdown im Menü und in der Zeiten-Ansicht einmal pro Minute auffrischen.
   const minute = Math.floor(Date.now() / 60000);
   if (minute !== lastMinute && (state.view === 'menu' || state.view === 'times')) refresh();
+  if (minute !== lastMinute) checkReminder();
   if (minute !== lastMinute && isNight() !== state.night) rebuildEnv();
   lastMinute = minute;
   guide.update(dt);

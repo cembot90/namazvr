@@ -3,16 +3,19 @@ export default {
   showTranslit: true,
 
   pn: {
+    eid: 'Eid prayer', janaza: 'Funeral prayer (Janāza)',
     fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha',
     sfajr: 'Sunnah before Fajr', sdhuhr1: 'Sunnah before Dhuhr', sdhuhr2: 'Sunnah after Dhuhr', smaghrib: 'Sunnah after Maghrib',
     sisha: 'Sunnah after Isha', witr: 'Witr', jumua: 'Jumuʿa', tahiyya: 'Taḥiyyat al-Masjid', wudu: 'Wuḍūʾ',
   },
   pd: {
+    eid: 'Eid al-Fitr and Eid al-Adha, morning', janaza: 'for the deceased, standing',
     fajr: 'dawn prayer', dhuhr: 'midday prayer', asr: 'afternoon', maghrib: 'sunset prayer', isha: 'night prayer',
     sfajr: 'strongly emphasised Sunnah', sdhuhr1: 'before the obligatory prayer', sdhuhr2: 'after the obligatory prayer', smaghrib: 'after the obligatory prayer',
     sisha: 'after the obligatory prayer', witr: 'after Isha until before Fajr', jumua: 'Friday, instead of Dhuhr', tahiyya: 'on entering the mosque',
   },
   niyya: {
+    eid: 'the 2 rakʿahs of the Eid prayer behind the imam', janaza: 'the funeral prayer for Allah and the supplication for the deceased, behind the imam',
     fard: (n, name) => `the ${n} rakʿahs of the ${name} prayer`,
     sfajr: 'the 2 rakʿahs Sunnah before Fajr', sdhuhr1: 'the 4 rakʿahs Sunnah before Dhuhr',
     sdhuhr2: 'the 2 rakʿahs Sunnah after Dhuhr', smaghrib: 'the 2 rakʿahs Sunnah after Maghrib',
@@ -67,6 +70,15 @@ export default {
   tawarruk: 'Tawarruk: sit on the floor, the left foot comes out under the right shin, the right foot stays upright.',
 
   mean: {
+    fil: ['Have you not seen how your Lord dealt with the people of the elephant?', 'Did He not make their plan go astray', 'and send against them birds in flocks,', 'striking them with stones of baked clay,', 'and make them like eaten straw?'],
+    quraysh: ['For the familiarity of the Quraysh,', 'their familiarity with the journey of winter and summer,', 'let them worship the Lord of this House,', 'who fed them against hunger and made them safe from fear.'],
+    maun: ['Have you seen the one who denies the Judgement?', 'That is the one who drives away the orphan', 'and does not encourage feeding the poor.', 'So woe to those who pray', 'but are heedless of their prayer,', 'those who only want to be seen', 'and refuse even small kindnesses.'],
+    kafirun: ['Say: O disbelievers,', 'I do not worship what you worship,', 'nor do you worship what I worship.', 'Nor will I worship what you have worshipped,', 'nor will you worship what I worship.', 'To you your religion, and to me mine.'],
+    nasr: ['When the help of Allah comes, and the victory,', 'and you see the people entering the religion of Allah in crowds,', 'then glorify the praise of your Lord and ask His forgiveness. He always accepts repentance.'],
+    masad: ['May the hands of Abū Lahab perish, and may he perish!', 'His wealth and what he earned will not help him.', 'He will burn in a blazing fire,', 'and his wife too, the carrier of firewood,', 'around her neck a rope of palm fibre.'],
+    ezan: ['Allah is greater, Allah is greater.', 'I bear witness that there is no god but Allah.', 'I bear witness that Muhammad is the Messenger of Allah.', 'Come to prayer.', 'Come to success.', 'Prayer is better than sleep. (only in the Fajr adhan)', 'Allah is greater, Allah is greater.', 'There is no god but Allah.'],
+    ikamet: ['Allah is greater, Allah is greater.', 'I bear witness that there is no god but Allah.', 'I bear witness that Muhammad is the Messenger of Allah.', 'Come to prayer.', 'Come to success.', 'The prayer is beginning.', 'Allah is greater, Allah is greater.', 'There is no god but Allah.'],
+    janazaDua: ['O Allah, forgive him, have mercy on him, grant him well-being and pardon him. (Muslim) – For a woman: lahā, rḥamhā, ʿāfihā, ʿanhā.'],
     asr: ['By time!', 'Indeed, mankind is in loss,', 'except those who believe and do good deeds, and urge one another to truth and urge one another to patience.'],
     kawthar: ['Indeed, We have given you al-Kawthar (abundant good).', 'So pray to your Lord and sacrifice.', 'Indeed, it is your enemy who is cut off.'],
     falaq: ['Say: I seek refuge in the Lord of daybreak', 'from the evil of what He has created,', 'from the evil of darkness when it settles,', 'from the evil of those who blow on knots,', 'and from the evil of an envier when he envies.'],
@@ -304,8 +316,16 @@ export default {
     wudu: 'With water you make yourself clean – on the outside, and your heart becomes calm too.',
   },
   suras: {
-    names: { fatiha: 'Al-Fātiḥa', ikhlas: 'Al-Ikhlāṣ', kawthar: 'Al-Kawthar', asr: 'Al-ʿAṣr', falaq: 'Al-Falaq', nas: 'An-Nās' },
+    names: { fil: 'Al-Fīl', quraysh: 'Quraysh', maun: 'Al-Māʿūn', kafirun: 'Al-Kāfirūn', nasr: 'An-Naṣr', masad: 'Al-Masad', ezan: 'Adhān', ikamet: 'Iqāma', fatiha: 'Al-Fātiḥa', ikhlas: 'Al-Ikhlāṣ', kawthar: 'Al-Kawthar', asr: 'Al-ʿAṣr', falaq: 'Al-Falaq', nas: 'An-Nās' },
     about: {
+      fil: 'The Elephant – Allah protects His House.',
+      quraysh: 'Quraysh – thanks for food and safety.',
+      maun: 'Small Kindnesses – be good to orphans and the poor.',
+      kafirun: 'The Disbelievers – to each their religion.',
+      nasr: 'The Help – give thanks and ask forgiveness.',
+      masad: 'The Palm Fibre – arrogance does not help.',
+      ezan: 'The call to prayer – each line 2×, one extra line at Fajr.',
+      ikamet: 'The call right before prayer – with “Qad qāmati ṣ-ṣalāh”.',
       fatiha: 'The Opening – you recite it in every rakʿa.',
       ikhlas: 'Sincerity – Allah is the One.',
       kawthar: 'The shortest sura – Allah gives abundance.',
@@ -430,4 +450,39 @@ export default {
   },
   gal: { title: 'Women’s section', sub: 'behind the lattice or on the gallery (great mosque)', screen: 'Lattice', gallery: 'Gallery' },
   ghost: { btn: '👤 Ghost', front: 'in front', side: 'beside you', off: 'off' },
+  ext: {
+    eidNote: 'Eid prayer: in the morning after sunrise, in congregation, without adhan or iqama. Afterwards the imam gives the sermon (khuṭba).',
+    zawaid: (n) => `Extra takbīrs (${n}×)`,
+    zawaidInstr: (n, m) => (m === 'hanafi'
+      ? `Say “Allāhu akbar” ${n}× and raise your hands to your ears each time. After the first ones let them hang; after the last, fold them again.`
+      : `Say “Allāhu akbar” ${n}× and raise your hands each time. In between, quietly: Subḥāna llāh, wa l-ḥamdu li-llāh, wa lā ilāha illa llāh, wa llāhu akbar.`),
+    janazaNote: 'Funeral prayer: a communal obligation (farḍ kifāya), standing behind the imam, without rukūʿ or sujūd. The deceased lies in front of the imam.',
+    janTakbir: (n) => `Takbīr ${n}`,
+    janTakbir1: (hands) => `Raise your hands and say “Allāhu akbar”. ${hands}`,
+    janAfter1: 'After the 1st takbīr',
+    janOpening: (m) => (m === 'hanafi' ? 'Quietly say the opening supplication (Subḥānaka).' : m === 'maliki' ? 'Praise Allah and pray for the deceased.' : 'Quietly recite al-Fātiḥa.'),
+    janTakbirN: (raise) => (raise ? 'Raise your hands and say “Allāhu akbar”.' : 'Say “Allāhu akbar” without raising your hands.'),
+    janSalawat: 'Quietly say the ṣalawāt (as in the final sitting of the prayer).',
+    janDua: 'Supplication for the deceased',
+    janDuaInstr: 'Quietly pray for the deceased – with these words or your own.',
+    janTakbir4: 'Say “Allāhu akbar” – no further supplication follows.',
+    janSalamR: 'Turn your head to the right – standing: “As-salāmu ʿalaykum wa raḥmatu llāh”.',
+    janSalamL: (m) => (m === 'hanafi' ? 'Then to the left. The funeral prayer is complete.' : 'Many end with one salām to the right; to the left is allowed. The funeral prayer is complete.'),
+  },
+  prof: {
+    btn: (icon, name) => `${icon} ${name}`, title: 'Family & profiles', sub: 'each child with their own progress',
+    me: 'Me', child: (n) => `Child ${n}`, active: '✓ active', use: 'Switch', rename: '✎ Name', del: 'Delete', delSure: 'Really delete?',
+    add: '+ Add child', kids: 'Kids mode', today: (n) => `today ${n}/5`, streak: (n) => `${n} days all 5`,
+    stars: (n) => `⭐ ${n}`, suras: (n) => `${n} suras`, ask: 'Name for the profile:', max: 'At most 6 profiles.',
+    note: 'Everything stays on this device. On the Quest you can change the name in the normal browser view (outside VR).',
+  },
+  rem: {
+    btn: '🔔 Reminder', title: 'Prayer time reminder', sub: 'notification & calendar',
+    on: 'Notification', onSub: 'while NamazVR is open or running in the background',
+    before: 'How early?', min: (n) => (n ? `${n} min before` : 'on time'),
+    test: 'Test notification', denied: 'Notifications are blocked – please allow them in the browser settings.', unsupported: 'This browser cannot show notifications – use the calendar.',
+    cal: '📅 Add to calendar (30 days)', calSub: 'Reliable on every phone, even when the app is closed: the prayer times of the next 30 days with reminders in your calendar.',
+    calDone: '✓ Calendar file created – open or import it.', ios: 'iPhone: first add NamazVR to the Home Screen, then notifications are possible.',
+    title2: (name, time) => `🕌 ${name} at ${time}`, body: (n) => (n ? `Prayer time in ${n} minutes.` : 'It is prayer time now.'), calTitle: (name) => `🕌 ${name}`,
+  },
 };

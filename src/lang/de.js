@@ -4,16 +4,19 @@ export default {
 
   // Gebetsnamen und Untertitel
   pn: {
+    eid: 'Festgebet (ʿĪd)', janaza: 'Totengebet (Janāza)',
     fajr: 'Fajr', sunrise: 'Sonnenaufgang', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha',
     sfajr: 'Sunnah vor Fajr', sdhuhr1: 'Sunnah vor Dhuhr', sdhuhr2: 'Sunnah nach Dhuhr', smaghrib: 'Sunnah nach Maghrib',
     sisha: 'Sunnah nach Isha', witr: 'Witr', jumua: 'Jumuʿa', tahiyya: 'Taḥiyyat al-Masjid', wudu: 'Wuḍūʾ',
   },
   pd: {
+    eid: 'Ramadan- und Opferfest, morgens', janaza: 'für Verstorbene, im Stehen',
     fajr: 'Morgengebet', dhuhr: 'Mittagsgebet', asr: 'Nachmittag', maghrib: 'Abendgebet', isha: 'Nachtgebet',
     sfajr: 'stark betonte Sunnah', sdhuhr1: 'vor dem Pflichtgebet', sdhuhr2: 'nach dem Pflichtgebet', smaghrib: 'nach dem Pflichtgebet',
     sisha: 'nach dem Pflichtgebet', witr: 'nach Isha bis vor Fajr', jumua: 'Freitag, statt Dhuhr', tahiyya: 'beim Betreten der Moschee',
   },
   niyya: {
+    eid: 'die 2 Rakʿāt des Festgebets hinter dem Imam', janaza: 'das Totengebet für Allah und das Bittgebet für den Verstorbenen, hinter dem Imam',
     fard: (n, name) => `die ${n} Rakʿāt des ${name}-Gebets`,
     sfajr: 'die 2 Rakʿāt Sunnah vor dem Fajr-Gebet', sdhuhr1: 'die 4 Rakʿāt Sunnah vor dem Dhuhr-Gebet',
     sdhuhr2: 'die 2 Rakʿāt Sunnah nach dem Dhuhr-Gebet', smaghrib: 'die 2 Rakʿāt Sunnah nach dem Maghrib-Gebet',
@@ -70,6 +73,15 @@ export default {
 
   // Bedeutung der arabischen Texte, Zeile für Zeile
   mean: {
+    fil: ['Hast du nicht gesehen, wie dein Herr mit den Leuten des Elefanten verfuhr?', 'Hat Er nicht ihre List fehlgehen lassen', 'und Vögel in Scharen über sie gesandt,', 'die sie mit Steinen aus gebranntem Lehm bewarfen,', 'und sie wie abgefressene Halme gemacht?'],
+    quraysh: ['Für die Vertrautheit der Quraisch,', 'ihre Vertrautheit mit der Reise im Winter und im Sommer,', 'sollen sie dem Herrn dieses Hauses dienen,', 'der ihnen Speise gab gegen den Hunger und Sicherheit gegen die Angst.'],
+    maun: ['Hast du den gesehen, der das Gericht leugnet?', 'Das ist der, der die Waise verstößt', 'und nicht zur Speisung des Armen anhält.', 'Wehe den Betenden,', 'die ihr Gebet vernachlässigen,', 'die nur gesehen werden wollen', 'und die kleine Hilfe verweigern.'],
+    kafirun: ['Sprich: O ihr Ungläubigen,', 'ich diene nicht dem, dem ihr dient,', 'und ihr dient nicht dem, dem ich diene.', 'Und ich werde nicht dem dienen, dem ihr gedient habt,', 'und ihr werdet nicht dem dienen, dem ich diene.', 'Euch eure Religion und mir meine Religion.'],
+    nasr: ['Wenn die Hilfe Allahs kommt und der Sieg', 'und du die Menschen in Scharen in die Religion Allahs eintreten siehst,', 'dann lobpreise deinen Herrn und bitte Ihn um Vergebung. Er nimmt die Reue immer an.'],
+    masad: ['Verderben sollen die Hände Abū Lahabs, und verderben soll er!', 'Nicht nützt ihm sein Vermögen und was er erworben hat.', 'Er wird einem lodernden Feuer ausgesetzt sein,', 'und auch seine Frau, die Brennholzträgerin,', 'um ihren Hals ein Strick aus Palmfasern.'],
+    ezan: ['Allah ist größer, Allah ist größer.', 'Ich bezeuge, dass es keinen Gott gibt außer Allah.', 'Ich bezeuge, dass Muhammad der Gesandte Allahs ist.', 'Kommt zum Gebet.', 'Kommt zum Erfolg.', 'Das Gebet ist besser als der Schlaf. (nur beim Fajr-Ezan)', 'Allah ist größer, Allah ist größer.', 'Es gibt keinen Gott außer Allah.'],
+    ikamet: ['Allah ist größer, Allah ist größer.', 'Ich bezeuge, dass es keinen Gott gibt außer Allah.', 'Ich bezeuge, dass Muhammad der Gesandte Allahs ist.', 'Kommt zum Gebet.', 'Kommt zum Erfolg.', 'Das Gebet beginnt jetzt.', 'Allah ist größer, Allah ist größer.', 'Es gibt keinen Gott außer Allah.'],
+    janazaDua: ['O Allah, vergib ihm, erbarme Dich seiner, gewähre ihm Wohlergehen und verzeih ihm. (Muslim) – Für eine Frau: lahā, rḥamhā, ʿāfihā, ʿanhā.'],
     asr: ['Bei der Zeit!', 'Der Mensch ist wahrlich im Verlust,', 'außer denen, die glauben und Gutes tun, einander zur Wahrheit raten und einander zur Geduld raten.'],
     kawthar: ['Wir haben dir den Kauṯar (die Fülle des Guten) gegeben.', 'So bete zu deinem Herrn und opfere.', 'Wer dich hasst, der ist es, der von allem Guten abgeschnitten ist.'],
     falaq: ['Sprich: Ich suche Zuflucht beim Herrn des Morgengrauens', 'vor dem Übel dessen, was Er erschaffen hat,', 'vor dem Übel der Dunkelheit, wenn sie hereinbricht,', 'vor dem Übel derer, die auf Knoten blasen,', 'und vor dem Übel eines Neiders, wenn er neidet.'],
@@ -313,8 +325,16 @@ export default {
     wudu: 'Mit Wasser machst du dich sauber – außen, und auch dein Herz wird ruhig.',
   },
   suras: {
-    names: { fatiha: 'Al-Fātiḥa', ikhlas: 'Al-Ikhlāṣ', kawthar: 'Al-Kauṯar', asr: 'Al-ʿAṣr', falaq: 'Al-Falaq', nas: 'An-Nās' },
+    names: { fil: 'Al-Fīl', quraysh: 'Quraisch', maun: 'Al-Māʿūn', kafirun: 'Al-Kāfirūn', nasr: 'An-Naṣr', masad: 'Al-Masad', ezan: 'Ezan (Adhān)', ikamet: 'Ikamet (Iqāma)', fatiha: 'Al-Fātiḥa', ikhlas: 'Al-Ikhlāṣ', kawthar: 'Al-Kauṯar', asr: 'Al-ʿAṣr', falaq: 'Al-Falaq', nas: 'An-Nās' },
     about: {
+      fil: 'Der Elefant – Allah beschützt Sein Haus.',
+      quraysh: 'Quraisch – Dank für Essen und Sicherheit.',
+      maun: 'Die Hilfe – sei gut zu Waisen und Armen.',
+      kafirun: 'Die Ungläubigen – jedem seine Religion.',
+      nasr: 'Die Hilfe Allahs – danken und um Vergebung bitten.',
+      masad: 'Die Palmfaser – Hochmut bringt keinen Nutzen.',
+      ezan: 'Der Gebetsruf – jeder Satz 2×, beim Fajr ein Satz mehr.',
+      ikamet: 'Ruf direkt vor dem Gebet – mit „Qad qāmati ṣ-ṣalāh“.',
       fatiha: 'Die Eröffnende – du sprichst sie in jeder Rakʿa.',
       ikhlas: 'Die Aufrichtigkeit – Allah ist der Eine.',
       kawthar: 'Die kürzeste Sure – Allah schenkt Fülle.',
@@ -439,4 +459,39 @@ export default {
   },
   gal: { title: 'Frauenbereich', sub: 'hinter dem Holzgitter oder auf der Empore (Großmoschee)', screen: 'Holzgitter', gallery: 'Empore' },
   ghost: { btn: '👤 Ghost', front: 'vor dir', side: 'neben dir', off: 'aus' },
+  ext: {
+    eidNote: 'Festgebet: morgens nach Sonnenaufgang, in Gemeinschaft, ohne Ezan und Ikamet. Danach hält der Imam die Predigt (Khuṭba).',
+    zawaid: (n) => `Zusätzliche Takbīre (${n}×)`,
+    zawaidInstr: (n, m) => (m === 'hanafi'
+      ? `Sprich ${n}× „Allāhu akbar“ und hebe jedes Mal die Hände bis zu den Ohren. Nach den ersten lässt du sie hängen, nach dem letzten legst du sie wieder übereinander.`
+      : `Sprich ${n}× „Allāhu akbar“ und hebe jedes Mal die Hände. Dazwischen leise: Subḥāna llāh, wa l-ḥamdu li-llāh, wa lā ilāha illa llāh, wa llāhu akbar.`),
+    janazaNote: 'Totengebet: Gemeinschaftspflicht (Farḍ kifāya), im Stehen hinter dem Imam, ohne Rukūʿ und Sujūd. Der Verstorbene liegt vor dem Imam.',
+    janTakbir: (n) => `${n}. Takbīr`,
+    janTakbir1: (hands) => `Hebe die Hände und sprich „Allāhu akbar“. ${hands}`,
+    janAfter1: 'Nach dem 1. Takbīr',
+    janOpening: (m) => (m === 'hanafi' ? 'Sprich leise das Eröffnungs-Bittgebet (Subḥānaka).' : m === 'maliki' ? 'Lobe Allah und bitte für den Verstorbenen.' : 'Rezitiere leise die Fātiḥa.'),
+    janTakbirN: (raise) => (raise ? 'Hebe die Hände und sprich „Allāhu akbar“.' : 'Sprich „Allāhu akbar“, ohne die Hände zu heben.'),
+    janSalawat: 'Sprich leise die Salawāt (wie im Sitzen am Ende des Gebets).',
+    janDua: 'Bittgebet für den Verstorbenen',
+    janDuaInstr: 'Bitte leise für den Verstorbenen – mit diesen Worten oder eigenen.',
+    janTakbir4: 'Sprich „Allāhu akbar“ – danach gibt es kein weiteres Bittgebet.',
+    janSalamR: 'Wende den Kopf nach rechts – im Stehen: „As-salāmu ʿalaykum wa raḥmatu llāh“.',
+    janSalamL: (m) => (m === 'hanafi' ? 'Dann nach links. Das Totengebet ist beendet.' : 'Viele beenden mit einem Salām nach rechts; nach links ist erlaubt. Das Totengebet ist beendet.'),
+  },
+  prof: {
+    btn: (icon, name) => `${icon} ${name}`, title: 'Familie & Profile', sub: 'jedes Kind mit eigenem Fortschritt',
+    me: 'Ich', child: (n) => `Kind ${n}`, active: '✓ aktiv', use: 'Wechseln', rename: '✎ Name', del: 'Löschen', delSure: 'Wirklich löschen?',
+    add: '+ Kind hinzufügen', kids: 'Kinder-Modus', today: (n) => `heute ${n}/5`, streak: (n) => `${n} Tage alle 5`,
+    stars: (n) => `⭐ ${n}`, suras: (n) => `${n} Suren`, ask: 'Name für das Profil:', max: 'Höchstens 6 Profile.',
+    note: 'Alles bleibt auf diesem Gerät. Auf der Quest kann man den Namen in der normalen Browser-Ansicht (außerhalb von VR) ändern.',
+  },
+  rem: {
+    btn: '🔔 Erinnerung', title: 'Erinnerung zur Gebetszeit', sub: 'Benachrichtigung & Kalender',
+    on: 'Benachrichtigung', onSub: 'solange NamazVR geöffnet ist oder im Hintergrund läuft',
+    before: 'Wie früh?', min: (n) => (n ? `${n} Min. vorher` : 'zur Zeit'),
+    test: 'Test-Benachrichtigung', denied: 'Benachrichtigungen sind blockiert – bitte in den Browser-Einstellungen erlauben.', unsupported: 'Dieser Browser kann keine Benachrichtigungen zeigen – nimm den Kalender.',
+    cal: '📅 In den Kalender (30 Tage)', calSub: 'Zuverlässig auf jedem Handy, auch wenn die App zu ist: die Gebetszeiten der nächsten 30 Tage mit Erinnerung in deinen Kalender.',
+    calDone: '✓ Kalender-Datei erstellt – öffnen bzw. importieren.', ios: 'iPhone: NamazVR zuerst „Zum Home-Bildschirm“ hinzufügen, dann sind Benachrichtigungen möglich.',
+    title2: (name, time) => `🕌 ${name} um ${time}`, body: (n) => (n ? `In ${n} Minuten ist Gebetszeit.` : 'Jetzt ist Gebetszeit.'), calTitle: (name) => `🕌 ${name}`,
+  },
 };
