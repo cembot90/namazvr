@@ -510,6 +510,7 @@ export default {
     title2: (name, time) => `🕌 ${name} um ${time}`, body: (n) => (n ? `In ${n} Minuten ist Gebetszeit.` : 'Jetzt ist Gebetszeit.'), calTitle: (name) => `🕌 ${name}`,
   },
   hajj: {
+    sounds: 'Klänge', soundsSub: 'Pilger, Schritte, Wind, Grillen, Wasser – mit freier arabischer Stimme auch die Talbiya im Chor',
     menu: '🕋 Umre & Hac', title: 'Umre & Hac',
     intro: ['Übe die Umre und den Hac Schritt für Schritt: Iḥrām, Tavaf um die Kaaba, Saʿy zwischen Ṣafā und Marwa, ʿArafāt, Muzdalifa und die Steinwürfe in Mina.', 'Die Orte sind vereinfacht dargestellt und die Wege verkürzt. Die Anleitung folgt deiner Rechtsschule und gilt für Männer bzw. Frauen (Einstellungen).'],
     walk: 'Mitgehen', walkSub: 'beim Tavaf und Saʿy fließend gehen (aus: in kurzen Sprüngen, angenehmer für manche in VR)',

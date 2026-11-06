@@ -708,7 +708,8 @@ export class Panel extends CanvasPlane {
     v.list.forEach((p, i) => this.btn(`${i ? '🕋' : '🤍'} ${p.name}`, 60 + i * (w + gap), y + 10, w, 150, `prayer:${p.id}`, { primary: true, size: 40, sub: p.de, subSize: 22 }));
     y += 190;
     this.switchRow(y, t('hajj.walk'), t('hajj.walkSub'), [[v.walkAlong ? t('ui.on') : t('ui.off'), 'walkalong', v.walkAlong]]);
-    this.paragraphs([t('hajj.note')], y + 110, { size: 21, color: C.muted, gap: 0 });
+    this.switchRow(y + 90, t('hajj.sounds'), t('hajj.soundsSub'), [[v.sounds ? t('ui.on') : t('ui.off'), 'sounds', v.sounds]]);
+    this.paragraphs([t('hajj.note')], y + 200, { size: 21, color: C.muted, gap: 0 });
     this.btn(t('ui.menu'), 60, H - 128, W - 120, 96, 'menu');
   }
 

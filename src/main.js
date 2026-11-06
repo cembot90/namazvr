@@ -22,6 +22,7 @@ import { ASR, METHODS, TIME_NAMES, formatCountdown, formatTime, prayerStatus } f
 import { PIPER, SAMPLES, Voices } from './voice.js';
 import { buildPilgrimage, isPilgrimage, pathAt, pathLength, speedAt, statusOf } from './hajj.js';
 import { JAMARAT, updateCrowd } from './hajjworld.js';
+import { Ambience } from './ambient.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
 import { formatDay, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
@@ -172,6 +173,7 @@ const state = {
   pilgrim: { d: 0, thrown: 0, tt: 0, snap: null },
   // Beim Tavaf und Sa'y fließend mitgehen (aus: in kurzen Sprüngen)
   walkAlong: store.get('walkAlong', true),
+  sounds: store.get('sounds', true),
   progress: loadProgress(profileId),
   pDel: null,
   // Erinnerung: an/aus und wie viele Minuten vorher
@@ -188,6 +190,12 @@ const voices = new Voices({ enabled: store.get('piper', true), onChange: () => r
 
 const saveProgress = () => store.set(progKey(profileId), state.progress);
 const profName = (p) => p.name || (p.id === 'main' ? t('prof.me') : t('prof.child', Math.max(1, profiles.indexOf(p))));
+
+// Klänge für Umre & Hac und den Waschraum (im Browser erzeugt)
+const ambience = new Ambience(() => voices.audioCtx());
+// Bei diesen Schritten hört man die Talbiya der Pilger von fern (bis zum ersten Steinwurf)
+const CHORUS = new Set(['talbiya', 'arrive', 'ihramH', 'mina8', 'arafat', 'wuquf', 'muzdalifa', 'pebbles', 'muzWuquf']);
+const TALBIYA_AR = 'لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ، لَبَّيْكَ لَا شَرِيكَ لَكَ لَبَّيْكَ';
 
 const madhab = () => MADHABS.find((m) => m.id === state.madhab) || MADHABS[0];
 const bearing = () => qiblaBearing(state.location.lat, state.location.lon);
@@ -322,6 +330,7 @@ pebble.visible = false;
 world.add(pebble);
 const throwAnim = { t: -1, from: new THREE.Vector3(), to: new THREE.Vector3() };
 function throwPebble(target) {
+  setTimeout(() => ambience.pebble(), 800);
   throwAnim.t = 0;
   throwAnim.from.set(0.25, 1.55, -0.3);
   const w = env.localToWorld(new THREE.Vector3(0, 2.6, JAMARAT[target].z - 8));
@@ -335,7 +344,7 @@ function updatePilgrim(dt) {
   let moving = false;
   if (st && m && (m.type === 'tawaf' || m.type === 'say')) {
     const len = pathLength(m);
-    if (pg.d < len) { pg.d = Math.min(len, pg.d + speedAt(m, pg.d) * dt * (state.beginner || state.kids ? 0.8 : 1)); moving = true; }
+    if (pg.d < len) { pg.d = Math.min(len, pg.d + speedAt(m, pg.d) * dt * (state.beginner || state.kids ? 0.8 : 1)); moving = true; pg.speed = speedAt(m, pg.d); }
     placePilgrim();
   } else if (st && m?.type === 'throw') {
     pg.tt += dt;
@@ -354,6 +363,7 @@ function updatePilgrim(dt) {
     if (k >= 1) { throwAnim.t = -1; pebble.visible = false; }
   }
   // Mitgehen: Vorbeter und Ghost machen Schritte
+  pg.moving = moving;
   if (moving) for (const fig of [guide, ghost]) {
     const swing = Math.sin(clock.elapsedTime * 7) * 0.35;
     fig.legs[0].hip.rotation.x = swing;
@@ -493,7 +503,7 @@ function view() {
         }),
       };
     case 'pilgrim':
-      return { type: 'pilgrim', list: PILGRIMAGES, walkAlong: state.walkAlong, madhab: madhab().name, gender: state.gender };
+      return { type: 'pilgrim', list: PILGRIMAGES, walkAlong: state.walkAlong, sounds: state.sounds, madhab: madhab().name, gender: state.gender };
     case 'remind':
       return { type: 'remind', ...state.remind, msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
         ios: /iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone, next: timesInfo().next };
@@ -583,6 +593,8 @@ function refresh() {
   const ihram = pilgrimActive();
   if (!!guide.ihram !== ihram) { guide.setIhram(ihram); ghost.setIhram(ihram); }
   if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
+  const cur = state.view === 'step' && state.steps[state.i];
+  ambience.set({ scene: state.wuduRoom ? 'wudu' : state.scene, enabled: state.sounds, chorus: pilgrimActive() && !!cur && CHORUS.has(cur.id), chorusText: TALBIYA_AR, voices });
   const pose = v.type === 'step' ? v.step.pose : 'stand';
   posePerson(guide, pose);
   posePerson(ghost, pose);
@@ -777,6 +789,7 @@ function act(action) {
     case 'remind': state.view = 'remind'; state.remMsg = ''; break;
     case 'pilgrim': state.view = 'pilgrim'; break;
     case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
+    case 'sounds': state.sounds = !state.sounds; store.set('sounds', state.sounds); break;
     case 'remon':
       if (state.remind.on) { state.remind.on = false; store.set('remind', state.remind); break; }
       askPermission().then((perm) => {
@@ -1350,6 +1363,11 @@ renderer.setAnimationLoop(() => {
   ghost.update(dt);
   updateMovers(dt);
   if (state.scene) { updatePilgrim(dt); updateCrowd(dt); }
+  {
+    const st = state.view === 'step' && state.steps[state.i];
+    const water = (state.wuduRoom && !!st && st.wudu !== 'heart') || (!!st && st.id === 'zamzam');
+    ambience.update(dt, { walking: !!(state.scene && state.pilgrim.moving), speed: state.pilgrim.speed || 2, water });
+  }
   cong.update(dt);
   // Im Waschraum läuft das Wasser bei den Waschschritten (nicht bei Absicht und Bittgebet), bei den Füßen an den Hockern
   if (state.wuduRoom) {
@@ -1362,7 +1380,7 @@ renderer.setAnimationLoop(() => {
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
-if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, setAR, view, voices };
+if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, setAR, view, voices, ambience };
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);

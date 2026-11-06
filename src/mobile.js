@@ -55,6 +55,7 @@ export class MobileUI {
       }).join('')}</div>
       <p class="gold">${esc(t('ui.next', v.times.next.name, v.times.next.time, v.times.next.inText))}</p>
       <p class="muted">${esc(v.qibla)} · ${esc(v.madhab)}</p>
+      ${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary wide' })}
       <div class="grid2">
         ${btn(t('ui.menuTimes'), 'times')}${btn(t('ui.menuMore'), 'more')}
         ${btn(t('ui.menuWudu'), 'wudu', { cls: v.wuduDone ? '' : 'primary' })}${btn(t('ui.menuLearn'), 'learn')}
@@ -63,7 +64,7 @@ export class MobileUI {
         ${btn(t('ui.menuSuras'), 'suras', { cls: 'primary' })}${btn(t('ui.menuPeace'), 'peace')}
         ${btn(t('track.menu', v.tracked), 'tracker', { cls: v.tracked === 5 ? 'active' : '' })}${btn(t('ram.menu'), 'ramadan')}
         ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: v.kids ? 'active' : '' })}${btn(t('prof.btn', v.profile.icon, v.profile.name), 'profiles')}
-        ${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary wide' })}
+
       </div>`;
   }
 
@@ -380,10 +381,11 @@ export class MobileUI {
 
   v_pilgrim(v) {
     const toggle = `<div class="setting"><div><b>${esc(t('hajj.walk'))}</b><small>${esc(t('hajj.walkSub'))}</small></div>${btn(v.walkAlong ? t('ui.on') : t('ui.off'), 'walkalong', { cls: v.walkAlong ? 'active' : '' })}</div>`;
+    const sounds = `<div class="setting"><div><b>${esc(t('hajj.sounds'))}</b><small>${esc(t('hajj.soundsSub'))}</small></div>${btn(v.sounds ? t('ui.on') : t('ui.off'), 'sounds', { cls: v.sounds ? 'active' : '' })}</div>`;
     return `${head(t('hajj.title'), `${v.madhab} · ${v.gender === 'f' ? t('ui.women') : t('ui.men')}`)}
       ${t('hajj.intro').map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
       <div class="list">${v.list.map((p, i) => btn(`${i ? '🕋' : '🤍'} ${p.name}`, `prayer:${p.id}`, { cls: 'primary', sub: p.de })).join('')}</div>
-      ${toggle}
+      ${toggle}${sounds}
       <p class="muted small">${esc(t('hajj.note'))}</p>
       ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }

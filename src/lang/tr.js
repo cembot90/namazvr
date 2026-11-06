@@ -552,6 +552,7 @@ export default {
     title2: (name, time) => `🕌 ${name} ${time}`, body: (n) => (n ? `${n} dakika sonra namaz vakti.` : 'Namaz vakti girdi.'), calTitle: (name) => `🕌 ${name}`,
   },
   hajj: {
+    sounds: 'Sesler', soundsSub: 'hacılar, adımlar, rüzgâr, cırcır böcekleri, su – ücretsiz Arapça sesle telbiye korosu da',
     menu: '🕋 Umre ve Hac', title: 'Umre ve Hac',
     intro: ['Umreyi ve haccı adım adım öğren: ihram, Kâbe’nin etrafında tavaf, Safâ ile Merve arasında sa’y, Arafat, Müzdelife ve Mina’da şeytan taşlama.', 'Mekânlar sade gösterilmiş, yollar kısaltılmıştır. Anlatım mezhebine ve erkek/kadın ayarına göredir (Ayarlar).'],
     walk: 'Birlikte yürü', walkSub: 'tavaf ve sa’yde akıcı yürü (kapalı: kısa sıçramalarla, VR’da bazıları için daha rahat)',

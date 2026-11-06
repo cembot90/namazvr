@@ -501,6 +501,7 @@ export default {
     title2: (name, time) => `🕌 ${name} at ${time}`, body: (n) => (n ? `Prayer time in ${n} minutes.` : 'It is prayer time now.'), calTitle: (name) => `🕌 ${name}`,
   },
   hajj: {
+    sounds: 'Sounds', soundsSub: 'pilgrims, footsteps, wind, crickets, water – with the free Arabic voice also the talbiya chorus',
     menu: '🕋 Umrah & Hajj', title: 'Umrah & Hajj',
     intro: ['Practise Umrah and Hajj step by step: iḥrām, ṭawāf around the Kaaba, saʿy between Ṣafā and Marwa, ʿArafāt, Muzdalifa and the stoning in Mina.', 'The places are simplified and the distances shortened. The guidance follows your school and your men/women setting (Settings).'],
     walk: 'Walk along', walkSub: 'move smoothly during ṭawāf and saʿy (off: in short jumps, more comfortable for some in VR)',
