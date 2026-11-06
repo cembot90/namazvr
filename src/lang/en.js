@@ -349,6 +349,7 @@ export default {
     },
   },
   ui: {
+    vrQiblaFirst: 'Welcome! First set the qibla – then the mihrab and every prayer face the right direction.',
     noVoiceLang: 'This device has no English voice – reading aloud does not work here.',
     menuSuras: 'Learn suras', surasTitle: 'Learn suras', surasSub: 'Short suras for the prayer – memorise them step by step', verses: (n) => `${n} verses`, learned: '✓ learned', modeRead: 'Read', modeVerse: 'Verse by verse', modeTest: 'Test yourself', verseOf: (i, n) => `Verse ${i} / ${n}`, reveal: 'Reveal', hide: 'Hide', listen: '🔊 Listen', markLearned: '✓ Learned', isLearned: '✓ Learned!', usePrayer: 'Use in prayer', inPrayer: '★ In prayer', testHint: 'Recite the verse from memory – then reveal it.', noVoice: 'There is no Arabic voice on this device.',
     menuPeace: 'Peace & heart', kidsBtn: (on) => (on ? 'Kids mode: on' : 'Kids mode'), kidsStars: (n) => `⭐ ${n} ${n === 1 ? "star" : "stars"} collected – Māshāʾallāh, well done!`, peaceTitle: 'Peace & a good heart', calm: 'Calm down', breathCount: (n, total) => `Breath ${n} / ${total}`, calmOut: 'Breathe out slowly …',

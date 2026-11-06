@@ -938,6 +938,7 @@ function act(action) {
       store.set('qiblaYaw', null);
       state.msg = t('ui.calDone');
       applyQibla();
+      faceQibla();
       break;
     case 'qiblahere':
       // Blickrichtung ist die Qibla (z. B. vorher mit dem Handy-Kompass bestimmt); der Teppich kommt unter die Füße
@@ -1097,6 +1098,8 @@ renderer.xr.addEventListener('sessionstart', () => {
   setAR(!!mode && mode !== 'opaque');
   // Kopfposition gibt es erst im ersten Frame
   state.placePending = state.ar;
+  // In VR ohne Kompass: zuerst die Qibla einstellen, damit der Mihrab in die richtige Richtung zeigt
+  if (!state.ar && !isCalibrated()) { state.view = 'qibla'; state.msg = t('ui.vrQiblaFirst'); }
   refresh();
 });
 renderer.xr.addEventListener('sessionend', () => {
@@ -1113,8 +1116,9 @@ const mobileUI = isMobile ? new MobileUI(document.getElementById('ui'), act) : n
 // Auf dem Handy blickt die Kamera auf die Vorbeter-Figur; mit Cemaat von schräg hinten über die Reihen.
 function aimAtGuide() {
   // Waschraum: von hinten auf die Becken, Vorbeter und Ghost
-  const eye = state.wuduRoom ? new THREE.Vector3(0.2, 1.75, 2.2) : cong.group.visible ? new THREE.Vector3(0, 2.3, 3.2) : null;
-  camera.position.copy(eye ? world.localToWorld(eye) : new THREE.Vector3(0, 1.6, 0));
+  // Im Gebetsraum: hinter dir, Blick zur Qibla (Mihrab) – Vorbeter und Ghost stehen vor dir
+  const eye = state.wuduRoom ? new THREE.Vector3(0.2, 1.75, 2.2) : cong.group.visible ? new THREE.Vector3(0, 2.3, 3.2) : new THREE.Vector3(0.5, 1.9, 2.4);
+  camera.position.copy(world.localToWorld(eye));
   const target = new THREE.Vector3(0, 0.85, 0);
   // Im Waschraum auf dein Becken: links der Ghost, rechts der Vorbeter
   if (state.scene && state.scene !== 'miqat') {
@@ -1128,7 +1132,8 @@ function aimAtGuide() {
     camera.position.copy(world.localToWorld(new THREE.Vector3(1.0, 1.8, 3.0)));
     world.localToWorld(target.set(3.4, 0.5, 1.0));
   } else if (state.wuduRoom) world.localToWorld(target.set(0, 0.95, -0.4));
-  else leader().group.localToWorld(target);
+  else if (cong.group.visible) leader().group.localToWorld(target);
+  else world.localToWorld(target.set(0.6, 1.0, -3));
   const d = target.sub(camera.position);
   yaw = Math.atan2(-d.x, -d.z);
   pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
@@ -1234,8 +1239,16 @@ function walk(dt) {
 }
 
 // Zurück auf den Gebetsteppich
+// Am Computer zur Qibla schauen (das Panel ist links davon noch im Bild)
+function faceQibla() {
+  if (renderer.xr.isPresenting || mobileUI) return;
+  yaw = world.rotation.y + 0.18;
+  pitch = -0.12;
+  camera.rotation.set(pitch, yaw, 0, 'YXZ');
+}
+
 function goHome() {
-  if (renderer.xr.isPresenting) { if (!state.ar) world.position.set(0, 0, 0); } else if (!mobileUI) camera.position.set(0, 1.6, 0);
+  if (renderer.xr.isPresenting) { if (!state.ar) world.position.set(0, 0, 0); } else if (!mobileUI) { camera.position.set(0, 1.6, 0); faceQibla(); }
 }
 
 // Kurzes Vibrieren der Controller, wenn die Haltung erreicht ist.
@@ -1357,8 +1370,8 @@ ghost.setGender(state.gender);
 rebuildEnv();
 rebuildCong();
 applyQibla();
-// Am Desktop zuerst aufs Panel schauen, auch wenn der Raum zur Qibla gedreht ist.
-if (!mobileUI) { yaw += world.rotation.y; camera.rotation.set(pitch, yaw, 0, 'YXZ'); }
+// Am Desktop von Anfang an zur Qibla schauen
+faceQibla();
 layout();
 // Installierbar und offline nutzbar (PWA)
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
