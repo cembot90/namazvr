@@ -445,10 +445,11 @@ export class Panel extends CanvasPlane {
   v_duas(v) {
     const { W, H } = this;
     this.heading(t('duas.title'), `${t(`duas.cats.${v.cat}`)} · ${v.index + 1} / ${v.total}`);
-    const gap = 12, w = (W - 120 - gap * (v.cats.length - 1)) / v.cats.length;
-    v.cats.forEach((c, i) => this.btn(t(`duas.cats.${c}`), 60 + i * (w + gap), 125, w, 62, `duacat:${c}`, { size: 22, active: c === v.cat }));
-    let y = 212;
-    if (v.cat === 'protect' && v.index === 0) y = this.paragraphs([t('duas.nazarNote')], 220, { size: 22, color: C.muted, gap: 0 }) - 10;
+    // Bereiche in zwei Reihen
+    const per = Math.ceil(v.cats.length / 2), gap = 12, w = (W - 120 - gap * (per - 1)) / per;
+    v.cats.forEach((c, i) => this.btn(t(`duas.cats.${c}`), 60 + (i % per) * (w + gap), 122 + Math.floor(i / per) * 62, w, 54, `duacat:${c}`, { size: 21, active: c === v.cat }));
+    let y = 250;
+    if (v.cat === 'protect' && v.index === 0) y = this.paragraphs([t('duas.nazarNote')], 258, { size: 21, color: C.muted, gap: 0 }) - 10;
     this.text(v.dua.when, W / 2, y + 24, { size: 26, weight: 600, color: C.gold, align: 'center' });
     const end = this.recitation({ ar: [v.dua.ar], tr: [v.dua.translit].filter(Boolean), de: [v.dua.mean].filter(Boolean) }, y + 50, H - 200, true);
     this.text(v.dua.source, W / 2, Math.min(end + 22, H - 160), { size: 24, color: C.muted, align: 'center', weight: 600 });

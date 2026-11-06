@@ -507,9 +507,13 @@ export default {
   },
   duas: {
     btn: '🤲 الأدعية', title: 'أدعية لمن تحب', abudawud: 'أبو داود', ibnmajah: 'ابن ماجه',
-    cats: { protect: 'التحصين والعين', family: 'الأسرة', parents: 'الوالدان', sick: 'المرضى', worry: 'الهموم', travel: 'في الطريق' },
+    cats: { protect: 'التحصين والعين', family: 'الأسرة', parents: 'الوالدان', sick: 'المرضى', worry: 'الهموم', travel: 'في الطريق', day: 'اليوم والليلة', deceased: 'الأموات', learn: 'العلم والاختبار' },
     nazarNote: '«العين حق» (البخاري ٥٧٤٠). والتحصين يكون بالله: بهذه الأدعية وبالمعوذتين ثلاثًا صباحًا ومساءً.',
     when: {
+      sleep: 'قبل النوم', wake: 'عند الاستيقاظ', eatBefore: 'قبل الطعام – ومن نسي قال الشطر الثاني',
+      eatAfter: 'بعد الطعام', home: 'عند دخول البيت – ثم سلّم على أهلك', mosqueIn: 'عند دخول المسجد (باليمنى)',
+      mosqueOut: 'عند الخروج من المسجد (باليسرى)', dead: 'للميت – وللمرأة: لها، وارحمها …', inna: 'عند الموت أو المصيبة',
+      knowledge: 'قبل المذاكرة أو القراءة أو الاختبار', sharh: 'قبل اختبار أو عرض أو حديث صعب',
       kids: 'للأطفال – كان النبي ﷺ يعوّذ بها الحسن والحسين', mashallah: 'إذا أعجبك شيء أو أحد – للوقاية من العين',
       barik: 'إذا رأيت عند غيرك ما يسرّ – ادعُ بالبركة لا بالحسد', bismillah: 'ثلاثًا صباحًا ومساءً', kalimat: 'مساءً وعند نزول مكان جديد',
       kursi: 'آية الكرسي – قبل النوم وبعد الصلاة', spouses: 'للأزواج والأولاد', wedding: 'للعروسين',
@@ -519,6 +523,7 @@ export default {
       leaveHome: 'عند الخروج من البيت', farewell: 'عند توديع المسافر',
     },
     mean: {
+      sleep: '', wake: '', eatBefore: '', eatAfter: '', home: '', mosqueIn: '', mosqueOut: '', dead: '', inna: '', knowledge: '', sharh: '',
       kids: '(وللطفل الواحد: أُعِيذُكَ …)', mashallah: '', barik: '', bismillah: '', kalimat: '', kursi: '', spouses: '', wedding: '', prayerful: '', atina: '',
       mercyParents: '', forgiveParents: '', heal: '', worry: '', hasbuna: '', leaveHome: '', farewell: '',
     },

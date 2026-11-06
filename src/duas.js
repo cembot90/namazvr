@@ -2,7 +2,7 @@
 // Arabisch und wissenschaftliche Umschrift hier; Bedeutung, Anlass und türkische Umschrift in der Sprachdatei (duas.*).
 import { t } from './i18n.js';
 
-export const DUA_CATS = ['protect', 'family', 'parents', 'sick', 'worry', 'travel'];
+export const DUA_CATS = ['protect', 'family', 'parents', 'sick', 'worry', 'travel', 'day', 'deceased', 'learn'];
 
 // src: q = [Sure, Vers], b = Bukhārī, m = Muslim, ad = Abū Dāwūd, ti = Tirmidhī, im = Ibn Māja
 const LIST = [
@@ -57,6 +57,39 @@ const LIST = [
   { id: 'farewell', cat: 'travel', src: { ad: 2600, ti: 3443 },
     ar: 'أَسْتَوْدِعُ اللَّهَ دِينَكَ وَأَمَانَتَكَ وَخَوَاتِيمَ عَمَلِكَ',
     tr: 'Astawdiʿu llāha dīnaka wa amānataka wa khawātīma ʿamalik' },
+  { id: 'sleep', cat: 'day', src: { b: 6324 },
+    ar: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا',
+    tr: 'Bi-smika llāhumma amūtu wa aḥyā' },
+  { id: 'wake', cat: 'day', src: { b: 6312 },
+    ar: 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',
+    tr: 'Al-ḥamdu li-llāhi lladhī aḥyānā baʿda mā amātanā wa ilayhi n-nushūr' },
+  { id: 'eatBefore', cat: 'day', src: { ad: 3767, ti: 1858 },
+    ar: 'بِسْمِ اللَّهِ، بِسْمِ اللَّهِ أَوَّلَهُ وَآخِرَهُ',
+    tr: 'Bismi llāh – bismi llāhi awwalahū wa ākhirah' },
+  { id: 'eatAfter', cat: 'day', src: { ad: 4023, ti: 3458 },
+    ar: 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَٰذَا وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلَا قُوَّةٍ',
+    tr: 'Al-ḥamdu li-llāhi lladhī aṭʿamanī hādhā wa razaqanīhi min ghayri ḥawlin minnī wa lā quwwah' },
+  { id: 'home', cat: 'day', src: { ad: 5096 },
+    ar: 'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَىٰ رَبِّنَا تَوَكَّلْنَا',
+    tr: 'Bismi llāhi walajnā, wa bismi llāhi kharajnā, wa ʿalā rabbinā tawakkalnā' },
+  { id: 'mosqueIn', cat: 'day', src: { m: 713 },
+    ar: 'اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ',
+    tr: 'Allāhumma ftaḥ lī abwāba raḥmatik' },
+  { id: 'mosqueOut', cat: 'day', src: { m: 713 },
+    ar: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ',
+    tr: 'Allāhumma innī asʾaluka min faḍlik' },
+  { id: 'dead', cat: 'deceased', src: { m: 963 },
+    ar: 'اللَّهُمَّ اغْفِرْ لَهُ وَارْحَمْهُ، وَعَافِهِ وَاعْفُ عَنْهُ، وَأَكْرِمْ نُزُلَهُ، وَوَسِّعْ مُدْخَلَهُ',
+    tr: 'Allāhumma ghfir lahū wa-rḥamhu, wa ʿāfihī wa-ʿfu ʿanh, wa akrim nuzulahū, wa wassiʿ mudkhalah' },
+  { id: 'inna', cat: 'deceased', src: { q: [2, 156] },
+    ar: 'إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ',
+    tr: 'Innā li-llāhi wa innā ilayhi rājiʿūn' },
+  { id: 'knowledge', cat: 'learn', src: { q: [20, 114] },
+    ar: 'رَّبِّ زِدْنِي عِلْمًا',
+    tr: 'Rabbi zidnī ʿilmā' },
+  { id: 'sharh', cat: 'learn', src: { q: [20, '25–28'] },
+    ar: 'رَبِّ اشْرَحْ لِي صَدْرِي، وَيَسِّرْ لِي أَمْرِي، وَاحْلُلْ عُقْدَةً مِّن لِّسَانِي، يَفْقَهُوا قَوْلِي',
+    tr: 'Rabbi shraḥ lī ṣadrī, wa yassir lī amrī, wa-ḥlul ʿuqdatan min lisānī, yafqahū qawlī' },
 ];
 
 const BOOK = { b: 'peace.bukhari', m: 'peace.muslim', ti: 'peace.tirmidhi', ad: 'duas.abudawud', im: 'duas.ibnmajah' };
