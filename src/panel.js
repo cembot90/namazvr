@@ -433,11 +433,32 @@ export class Panel extends CanvasPlane {
     const y = this.paragraphs([t('peace.intro')], 150, { size: 24, color: C.muted, gap: 0 });
     const end = this.recitation({ ar: [v.item.ar], tr: [], de: [v.item.text].filter(Boolean) }, y + 30, H - 240, true);
     this.text(v.item.source, W / 2, end + 24, { size: 28, color: C.gold, align: 'center', weight: 600 });
-    const by = H - 140, gap = 20, w = (W - 120 - 3 * gap) / 4;
+    const by = H - 140, gap = 16, w = (W - 120 - 4 * gap) / 5;
     this.btn('←', 60, by, w, 96, 'peaceprev', { size: 44 });
     this.btn('→', 60 + (w + gap), by, w, 96, 'peacenext', { size: 44, primary: true });
-    this.btn(t('ui.calm'), 60 + 2 * (w + gap), by, w, 96, 'calm', { size: 28 });
-    this.btn(t('ui.menu'), 60 + 3 * (w + gap), by, w, 96, 'menu', { size: 28 });
+    this.btn(t('duas.btn'), 60 + 2 * (w + gap), by, w, 96, 'duas', { size: 28, primary: true });
+    this.btn(t('ui.calm'), 60 + 3 * (w + gap), by, w, 96, 'calm', { size: 26 });
+    this.btn(t('ui.menu'), 60 + 4 * (w + gap), by, w, 96, 'menu', { size: 28 });
+  }
+
+  // Duas für sich, die Familie und die Menschen, die man liebt
+  v_duas(v) {
+    const { W, H } = this;
+    this.heading(t('duas.title'), `${t(`duas.cats.${v.cat}`)} · ${v.index + 1} / ${v.total}`);
+    const gap = 12, w = (W - 120 - gap * (v.cats.length - 1)) / v.cats.length;
+    v.cats.forEach((c, i) => this.btn(t(`duas.cats.${c}`), 60 + i * (w + gap), 125, w, 62, `duacat:${c}`, { size: 22, active: c === v.cat }));
+    let y = 212;
+    if (v.cat === 'protect' && v.index === 0) y = this.paragraphs([t('duas.nazarNote')], 220, { size: 22, color: C.muted, gap: 0 }) - 10;
+    this.text(v.dua.when, W / 2, y + 24, { size: 26, weight: 600, color: C.gold, align: 'center' });
+    const end = this.recitation({ ar: [v.dua.ar], tr: [v.dua.translit].filter(Boolean), de: [v.dua.mean].filter(Boolean) }, y + 50, H - 200, true);
+    this.text(v.dua.source, W / 2, Math.min(end + 22, H - 160), { size: 24, color: C.muted, align: 'center', weight: 600 });
+    const by = H - 128, bw = (W - 120 - 4 * 16) / 5, x = (i) => 60 + i * (bw + 16);
+    this.btn('←', x(0), by, bw, 96, 'duaprev', { size: 44 });
+    this.btn('→', x(1), by, bw, 96, 'duanext', { size: 44, primary: true });
+    this.btn(t('ui.listen'), x(2), by, bw, 96, 'duaspeak', { size: 28 });
+    this.btn(t('ui.menuPeace'), x(3), by, bw, 96, 'peace', { size: 24 });
+    this.btn(t('ui.menu'), x(4), by, bw, 96, 'menu', { size: 28 });
+    if (v.msg) this.text(v.msg, W / 2, by - 14, { size: 21, color: C.gold, align: 'center' });
   }
 
   // Ruhig werden: Schritte gegen die Wut, dazu Atemzüge mit der Kugel

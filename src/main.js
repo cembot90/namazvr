@@ -14,6 +14,7 @@ import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
 import { CALM_BREATHS, PEACE, kidLine } from './peace.js';
+import { DUA_CATS, duasOf } from './duas.js';
 import { SURAS, findSura, verses } from './suras.js';
 import { MobileUI } from './mobile.js';
 import { checkHands, indexRaised, readHand } from './hands.js';
@@ -150,6 +151,7 @@ const state = {
   // Kinder-Modus: einfache Erklärung je Schritt, langsamer, Sterne als Belohnung
   kids: !!profile().kids,
   peace: 0,
+  dua: { cat: 'protect', i: 0, msg: '' },
   // Suren lernen: gewählte Sure, Modus (read | verse | test), aktueller Vers, aufgedeckt?
   sura: { id: 'fatiha', mode: 'read', v: 0, reveal: false, msg: '' },
   prayerSura: store.get('prayerSura', 'ikhlas'),
@@ -552,6 +554,10 @@ function view() {
       const s = state.sura;
       return { type: 'sura', id: s.id, call: !!findSura(s.id).call, name: findSura(s.id).name, n: findSura(s.id).n, verses: verses(s.id), mode: s.mode, v: s.v, reveal: s.reveal, msg: s.msg, learned: !!state.progress.suras?.[s.id], inPrayer: s.id === state.prayerSura };
     }
+    case 'duas': {
+      const list = duasOf(state.dua.cat);
+      return { type: 'duas', cats: DUA_CATS, cat: state.dua.cat, index: state.dua.i, total: list.length, dua: list[state.dua.i], msg: state.dua.msg };
+    }
     case 'peace':
       return { type: 'peace', item: PEACE[state.peace], index: state.peace, total: PEACE.length };
     case 'calm':
@@ -824,6 +830,21 @@ function act(action) {
       break;
     }
     case 'peace': state.view = 'peace'; break;
+    case 'duas': state.view = 'duas'; state.dua.msg = ''; break;
+    case 'duacat': state.dua = { cat: arg, i: 0, msg: '' }; break;
+    case 'duanext': case 'duaprev': {
+      const n = duasOf(state.dua.cat).length;
+      state.dua.i = (state.dua.i + (key === 'duanext' ? 1 : n - 1)) % n;
+      state.dua.msg = '';
+      break;
+    }
+    case 'duaspeak': {
+      const d = duasOf(state.dua.cat)[state.dua.i];
+      const lang = langInfo().speech;
+      if (!voices.has('ar')) { state.dua.msg = t('ui.noVoice'); break; }
+      voices.say([{ text: d.ar, lang: 'ar', rate: 0.8 }, ...(lang !== 'ar' && d.mean ? [{ text: d.mean, lang }] : [])]);
+      break;
+    }
     case 'suras': state.view = 'suras'; break;
     case 'sura': state.sura = { id: arg, mode: 'read', v: 0, reveal: false, msg: '' }; state.view = 'sura'; break;
     case 'smode': Object.assign(state.sura, { mode: arg, v: 0, reveal: false }); break;

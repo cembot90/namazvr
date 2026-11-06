@@ -224,7 +224,21 @@ export class MobileUI {
       ${v.item.text ? `<p class="center">${esc(v.item.text)}</p>` : ''}
       <p class="gold center">${esc(v.item.source)}</p>
       <div class="grid2">${btn('←', 'peaceprev')}${btn('→', 'peacenext', { cls: 'primary' })}</div>
+      ${btn(t('duas.btn'), 'duas', { cls: 'primary wide' })}
       <div class="grid2">${btn(t('ui.calm'), 'calm')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_duas(v) {
+    const d = v.dua;
+    return `${head(t('duas.title'), `${v.index + 1} / ${v.total}`)}
+      <div class="grid3">${v.cats.map((c) => btn(t(`duas.cats.${c}`), `duacat:${c}`, { cls: c === v.cat ? 'active' : '' })).join('')}</div>
+      ${v.cat === 'protect' && v.index === 0 ? `<p class="muted small">${esc(t('duas.nazarNote'))}</p>` : ''}
+      <p class="gold center"><b>${esc(d.when)}</b></p>
+      ${recitation({ ar: [d.ar], tr: [d.translit].filter(Boolean), de: [d.mean].filter(Boolean) })}
+      <p class="muted small center">${esc(d.source)}</p>
+      ${v.msg ? `<p class="gold small center">${esc(v.msg)}</p>` : ''}
+      <div class="grid3">${btn('←', 'duaprev')}${btn(t('ui.listen'), 'duaspeak')}${btn('→', 'duanext', { cls: 'primary' })}</div>
+      <div class="grid2">${btn(t('ui.menuPeace'), 'peace')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   v_calm(v) {

@@ -77,6 +77,7 @@ WebXR braucht HTTPS. Am einfachsten:
 - `src/movement.js` – Bewegungsansagen, Piktogramme, Haltungserkennung
 - `src/environment.js` – Gebetsräume in vier Stilen
 - `src/suras.js` – Suren zum Auswendiglernen
+- `src/duas.js` – Bittgebete für Familie und Liebste (Schutz & Nazar, Familie, Eltern, Kranke, Sorgen, Unterwegs)
 - `src/peace.js` – Verse und Hadithe zum Frieden, Ruhig-werden-Übung, Kinder-Sätze
 - `src/congregation.js` – Imam und Gemeinde für das Gemeinschaftsgebet
 - `src/qibla.js` – Qibla-Berechnung und Städte
