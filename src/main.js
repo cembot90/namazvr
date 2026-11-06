@@ -25,6 +25,7 @@ import { PIPER, SAMPLES, Voices } from './voice.js';
 import { buildPilgrimage, isHajj, isPilgrimage, pathAt, pathLength, speedAt, statusOf } from './hajj.js';
 import { JAMARAT, setSemah, updateCrowd } from './hajjworld.js';
 import { Ambience } from './ambient.js';
+import { Graphics, envFor } from './graphics.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
 import { formatDay, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
@@ -71,6 +72,10 @@ const compass = makeFloorCompass();
 const guideRug = makeRug(1.5, -1.95);
 const userRug = makeRug(0, -0.5);
 world.add(compass, userRug, guideRug);
+
+// Bildqualität: auf der Quest „Normal“ (ohne Schatten), sonst „Hoch“
+const onQuest = /OculusBrowser|Quest/i.test(navigator.userAgent);
+const graphics = new Graphics(renderer, scene, world, store.get('gfxHigh', !onQuest));
 
 const guide = new Guide();
 guide.group.position.set(1.5, 0, -1.5);
@@ -259,6 +264,9 @@ function rebuildEnv() {
   const sc = state.scene;
   const night = sc === 'arafat' ? false : sc === 'muzdalifa' ? true : state.night;
   buildEnvironment(env, state.wuduRoom ? 'wudu' : sc && sc !== 'miqat' ? sc : sc === 'miqat' ? 'klassisch' : state.style, { night });
+  graphics.afterBuild(env);
+  graphics.casters(env);
+  graphics.setEnv(envFor(state.wuduRoom ? 'wudu' : sc, night));
   if (sc) placePilgrim(true);
   layoutRoom();
 }
@@ -452,6 +460,7 @@ function placeGhost() {
 
 function rebuildCong() {
   cong.build({ size: state.cemaatSize, gender: state.gender, natural: state.cemaatNatural, blocked, gallery: gallery() });
+  graphics.casters(cong.group);
   updateCast(true);
 }
 
@@ -547,7 +556,7 @@ function view() {
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'settings':
-      return { type: 'settings', langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
+      return { type: 'settings', gfxHigh: graphics.high, langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
     case 'learn': {
       const p = state.progress;
       return {
@@ -815,6 +824,7 @@ function act(action) {
     case 'saynext': state.saying = (state.saying + 1) % SAYINGS; break;
     case 'sayprev': state.saying = (state.saying + SAYINGS - 1) % SAYINGS; break;
     case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
+    case 'gfx': graphics.setQuality(!graphics.high); store.set('gfxHigh', graphics.high); break;
     case 'sounds': state.sounds = !state.sounds; store.set('sounds', state.sounds); break;
     case 'remon':
       if (state.remind.on) { state.remind.on = false; store.set('remind', state.remind); break; }
@@ -1434,6 +1444,7 @@ if (new URLSearchParams(location.search).has('debug')) window.salah = { act, gui
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);
 ghost.setGender(state.gender);
+graphics.casters(guide.group);
 rebuildEnv();
 rebuildCong();
 applyQibla();

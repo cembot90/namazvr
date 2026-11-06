@@ -665,4 +665,5 @@ export default {
       semahEnd: ['Ende des Semah', 'Niyaz', 'Zum Ende verneigen sich alle mit Niyaz. Es gibt viele Semahs, z. B. den Kırklar-Semahı oder den Turna-Semahı – jede Region hat ihre eigenen.'],
     },
   },
+  gfx: { btn: '✨ Grafik', high: 'Hoch', normal: 'Normal' },
 };

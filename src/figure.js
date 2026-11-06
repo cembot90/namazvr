@@ -73,8 +73,18 @@ export class Guide {
 
     // Gliedmaße: hängt am Gelenk (Ursprung) nach unten.
     const limb = (len, r, m) => {
-      const mesh = new THREE.Mesh(geo(`limb${len}/${r}`, () => new THREE.CapsuleGeometry(r, Math.max(len - 2 * r, 0.01), 6, 12)), m);
+      const mesh = new THREE.Mesh(geo(`limb${len}/${r}`, () => new THREE.CapsuleGeometry(r, Math.max(len - 2 * r, 0.01), 8, 16)), m);
       mesh.position.y = -len / 2;
+      return mesh;
+    };
+    // Gewandteil: weite Röhre, unten etwas breiter (Ärmel, Hosenbein des Gewands), oben abgerundet
+    const garment = (len, r0, r1, m) => {
+      const mesh = new THREE.Mesh(geo(`garment${len}/${r0}/${r1}`, () => {
+        const pts = [new THREE.Vector2(0, 0), new THREE.Vector2(r0 * 0.7, -0.01), new THREE.Vector2(r0, -0.04)];
+        for (let i = 1; i <= 8; i++) { const k = i / 8; pts.push(new THREE.Vector2(r0 + (r1 - r0) * k, -0.04 - (len - 0.04) * k)); }
+        pts.push(new THREE.Vector2(r1 * 0.85, -len), new THREE.Vector2(0, -len));
+        return new THREE.LatheGeometry(pts, 20);
+      }), m);
       return mesh;
     };
 
@@ -86,10 +96,28 @@ export class Guide {
 
     this.spine = new THREE.Group();
     this.root.add(this.spine);
-    const torso = new THREE.Mesh(geo('torso', () => new THREE.CapsuleGeometry(0.15, 0.3, 6, 16)), robe);
-    torso.position.y = 0.27;
-    torso.scale.set(1.15, 1, 0.75);
+    // Oberkörper als gedrehtes Profil: Taille, Brust, runde Schultern
+    const torso = new THREE.Mesh(geo('torso2', () => {
+      const prof = [[0, -0.02], [0.14, 0], [0.15, 0.08], [0.165, 0.2], [0.175, 0.3], [0.17, 0.38], [0.14, 0.45], [0.08, 0.5], [0, 0.51]];
+      return new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 28);
+    }), robe);
+    torso.position.y = 0.0;
+    torso.scale.set(1.18, 1, 0.78);
     this.spine.add(torso);
+    // Schultern (dezent, gehen in den Oberkörper über)
+    for (const sx of [-1, 1]) {
+      const shoulder = new THREE.Mesh(geo('shoulder2', () => new THREE.SphereGeometry(0.055, 16, 12)), robe);
+      shoulder.position.set(0.185 * sx, 0.45, 0);
+      shoulder.scale.set(1, 0.8, 1.1);
+      this.spine.add(shoulder);
+    }
+    // Langes Gewand (Cübbe) von der Hüfte bis zu den Knöcheln – sichtbar, solange die Beine gestreckt sind
+    this.skirt = new THREE.Mesh(geo('skirt', () => {
+      const prof = [[0, 0.04], [0.16, 0.04], [0.175, -0.1], [0.2, -0.35], [0.23, -0.65], [0.25, -0.86], [0.24, -0.88], [0, -0.88]];
+      return new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 32);
+    }), robe);
+    this.skirt.scale.set(1.05, 1, 0.82);
+    this.root.add(this.skirt);
 
     this.head = new THREE.Group();
     this.head.position.y = 0.53;
@@ -118,28 +146,38 @@ export class Guide {
     this.arms = [1, -1].map((side) => {
       const sh = new THREE.Group();
       sh.position.set(0.21 * side, 0.46, 0);
-      sh.add(limb(0.3, 0.05, robe));
+      sh.add(garment(0.3, 0.052, 0.058, robe));
       const el = new THREE.Group();
       el.position.y = -0.3;
-      el.add(limb(0.27, 0.045, robe));
-      const hand = new THREE.Mesh(geo('hand', () => new THREE.SphereGeometry(0.045, 12, 10)), skin);
-      hand.position.y = -0.29;
-      hand.scale.set(0.8, 1.2, 0.5);
-      el.add(hand);
+      el.add(garment(0.26, 0.05, 0.062, robe));
+      // Hand: Handfläche mit Daumen
+      const hand = new THREE.Mesh(geo('hand2', () => new THREE.CapsuleGeometry(0.035, 0.06, 6, 12)), skin);
+      hand.position.y = -0.31;
+      hand.scale.set(1.15, 1, 0.55);
+      const thumb = new THREE.Mesh(geo('thumb', () => new THREE.CapsuleGeometry(0.013, 0.035, 4, 8)), skin);
+      thumb.position.set(-0.035 * side, -0.29, 0.015);
+      thumb.rotation.z = 0.5 * side;
+      el.add(hand, thumb);
       sh.add(el);
       this.spine.add(sh);
       return { side, sh, el };
     });
 
+    this.legParts = [];
     this.legs = [1, -1].map((side) => {
       const hip = new THREE.Group();
       hip.position.set(0.1 * side, -0.02, 0);
-      hip.add(limb(0.45, 0.075, robe));
+      const thigh = garment(0.47, 0.095, 0.105, robe), shin = garment(0.42, 0.09, 0.1, robe);
+      hip.add(thigh);
       const knee = new THREE.Group();
       knee.position.y = -0.45;
-      knee.add(limb(0.45, 0.06, robe));
-      const foot = new THREE.Mesh(geo('foot', () => new THREE.BoxGeometry(0.09, 0.05, 0.22)), skin);
-      foot.position.set(0, -0.45, 0.06);
+      knee.add(shin);
+      this.legParts.push(thigh, shin);
+      const foot = new THREE.Mesh(geo('foot2', () => new THREE.CapsuleGeometry(0.042, 0.14, 6, 12)), skin);
+      foot.rotation.x = Math.PI / 2;
+      foot.scale.set(1, 1, 0.6);
+      foot.position.set(0, -0.455, 0.06);
+      foot.userData.figure = true;
       knee.add(foot);
       hip.add(knee);
       this.root.add(hip);
@@ -148,6 +186,7 @@ export class Guide {
 
     this.t = 0;
     this.shown = {};
+    this.group.traverse((o) => { if (o.isMesh) o.userData.figure = true; });
     this.robeMat = robe;
     this.robeMeshes = [];
     this.group.traverse((o) => { if (o.isMesh && o.material === robe) this.robeMeshes.push(o); });
@@ -202,6 +241,9 @@ export class Guide {
 
   apply(p) {
     this.root.position.y = p.y;
+    // Beim Sitzen und Niederwerfen folgt das Gewand den Beinen (dann zeigen die Beinteile das Gewand)
+    this.skirt.visible = p.hip > -0.3 && p.knee < 0.4 && p.y > 0.7;
+    for (const m of this.legParts) m.visible = !this.skirt.visible;
     this.spine.rotation.x = p.spine;
     this.head.rotation.set(p.headX, p.headY, 0);
     // Eine Haltung kann den rechten Arm (side −1, die Figur blickt nach +Z) eigens festlegen

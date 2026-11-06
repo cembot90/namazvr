@@ -550,11 +550,12 @@ export class Panel extends CanvasPlane {
     row(645, t('ui.guideFor'), '', [[t('ui.men'), 'gender:m', v.gender !== 'f'], [t('ui.women'), 'gender:f', v.gender === 'f']]);
     row(728, t('ui.beginner'), t('ui.beginnerSub'), [[v.beginner ? t('ui.on') : t('ui.off'), 'beginner', v.beginner]]);
     row(811, t('ui.spiritual'), t('ui.spiritualSub'), [[v.spiritual ? t('ui.on') : t('ui.off'), 'spiritual', v.spiritual]]);
-    const q = (W - 120 - 60) / 4;
-    this.btn(t('voice.btn'), 60, H - 98, q, 80, 'voice', { primary: true, size: 28 });
-    this.btn(t('rem.btn'), 60 + q + 20, H - 98, q, 80, 'remind', { primary: true, size: 28 });
-    this.btn(t('ui.info'), 60 + 2 * (q + 20), H - 98, q, 80, 'info', { size: 28 });
-    this.btn(t('ui.back'), 60 + 3 * (q + 20), H - 98, q, 80, 'menu', { size: 28 });
+    const q = (W - 120 - 64) / 5, x = (i) => 60 + i * (q + 16);
+    this.btn(t('voice.btn'), x(0), H - 98, q, 80, 'voice', { primary: true, size: 26 });
+    this.btn(t('rem.btn'), x(1), H - 98, q, 80, 'remind', { primary: true, size: 26 });
+    this.btn(t('gfx.btn'), x(2), H - 98, q, 80, 'gfx', { size: 24, active: v.gfxHigh, sub: v.gfxHigh ? t('gfx.high') : t('gfx.normal'), subSize: 19 });
+    this.btn(t('ui.info'), x(3), H - 98, q, 80, 'info', { size: 26 });
+    this.btn(t('ui.back'), x(4), H - 98, q, 80, 'menu', { size: 26 });
   }
 
   v_mosque(v) {

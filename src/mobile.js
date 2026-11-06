@@ -287,6 +287,7 @@ export class MobileUI {
       ${toggle(t('ui.beginner'), t('ui.beginnerSubShort'), 'beginner', v.beginner)}
       ${toggle(t('ui.spiritual'), t('ui.spiritualSubShort'), 'spiritual', v.spiritual)}
       <div class="grid2">${btn(t('voice.btn'), 'voice', { cls: 'primary' })}${btn(t('rem.btn'), 'remind', { cls: 'primary' })}</div>
+      ${btn(`${t('gfx.btn')}: ${v.gfxHigh ? t('gfx.high') : t('gfx.normal')}`, 'gfx', { cls: `wide ${v.gfxHigh ? 'active' : ''}` })}
       <div class="grid2">${btn(t('ui.info'), 'info')}${btn(t('ui.back'), 'menu')}</div>`;
   }
 
