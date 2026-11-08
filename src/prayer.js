@@ -1,6 +1,7 @@
 // Gebetsablauf nach verbreiteter sunnitischer Praxis.
 // Jede Textgruppe: ar = arabische Zeilen, tr = Umschrift, de = Bedeutung in der gewählten Sprache.
 import { t } from './i18n.js';
+import { STORY_LIST } from './stories.js';
 
 // Name und Untertitel kommen aus der Sprachdatei, als Getter, damit ein Sprachwechsel sofort wirkt.
 const named = (p) => ({ ...p, get name() { return t(`pn.${p.id}`); }, get de() { return t(`pd.${p.id}`); } });
@@ -34,7 +35,7 @@ export const ALEVI = [{ id: 'cem', kind: 'cem' }, { id: 'semah', kind: 'semah' }
 export const IHRAM_PRAYER = named({ id: 'ihramp', rakat: 2, kind: 'sunnah' });
 export const TAWAF_PRAYER = named({ id: 'tawafp', rakat: 2, kind: 'sunnah' });
 
-export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PILGRIMAGES, ...ALEVI].find((p) => p.id === id);
+export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PILGRIMAGES, ...ALEVI, ...STORY_LIST].find((p) => p.id === id);
 
 // Vereinfachte Unterschiede der vier sunnitischen Rechtsschulen (für Männer; Details bei Gelehrten erfragen).
 // Texte (hands, takbir, notes) stehen in der Sprachdatei unter madhab.<id>.

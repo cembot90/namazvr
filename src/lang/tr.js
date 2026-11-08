@@ -1,4 +1,6 @@
 // Türkçe – terimler ve okunuşlar Türkiye'deki ilmihal geleneğine göre (Sübhâneke, Tahiyyât, Salli-Bârik, Rabbenâ).
+import stories from './story.tr.js';
+
 export default {
   showTranslit: true,
 
@@ -731,4 +733,5 @@ export default {
     },
   },
   gfx: { btn: '✨ Grafik', high: 'Yüksek', normal: 'Normal' },
+  ...stories,
 };

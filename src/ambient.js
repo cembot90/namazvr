@@ -13,6 +13,9 @@ const PROFILES = {
   jamarat: [0.55, 0.1, 0, 0.3],
   wudu: [0, 0, 0, 0.4],
   cemevi: [0.06, 0, 0, 0.45],
+  // Geschichten der Propheten und Sternenhimmel
+  ark: [0, 0.3, 0, 0.05], fire: [0.04, 0.14, 0.35, 0], nile: [0, 0.1, 0, 0], sea: [0, 0.45, 0, 0.05],
+  valley: [0, 0.12, 0.12, 0], cave: [0, 0.16, 0.45, 0.3], starsky: [0, 0.07, 0.4, 0],
 };
 
 // Angedeutete Bağlama: gezupfte Saite (Karplus-Strong), Töne nahe der Hüseynî-Leiter über dem Grundton A

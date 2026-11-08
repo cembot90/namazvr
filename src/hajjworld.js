@@ -18,7 +18,7 @@ export const MAQAM = { x: 9.5, z: -9.5 };
 let crowd = [];
 const rand = (a, b) => a + Math.random() * (b - a);
 
-function canvasTex(w, h, draw) {
+export function canvasTex(w, h, draw) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
   draw(c.getContext('2d'), w, h);
@@ -51,14 +51,14 @@ function sky(scene, night) {
   }
 }
 
-function ground(scene, color, size = 800, map = null) {
+export function ground(scene, color, size = 800, map = null) {
   const g = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshStandardMaterial({ color, roughness: 0.95, map }));
   g.rotation.x = -Math.PI / 2;
   scene.add(g);
   return g;
 }
 
-function mountains(scene, n = 14, r = 260, color = 0x8a6a4a) {
+export function mountains(scene, n = 14, r = 260, color = 0x8a6a4a) {
   const mat = new THREE.MeshStandardMaterial({ color, roughness: 1, flatShading: true });
   for (let i = 0; i < n; i++) {
     const a = (i / n) * Math.PI * 2 + rand(-0.1, 0.1);

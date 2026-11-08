@@ -1,4 +1,6 @@
 // English
+import stories from './story.en.js';
+
 export default {
   showTranslit: true,
 
@@ -657,4 +659,5 @@ export default {
     },
   },
   gfx: { btn: '✨ Graphics', high: 'High', normal: 'Normal' },
+  ...stories,
 };

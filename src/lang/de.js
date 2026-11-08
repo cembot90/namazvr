@@ -1,4 +1,6 @@
 // Deutsch – Ausgangssprache; fehlende Einträge anderer Sprachen fallen hierauf zurück.
+import stories from './story.de.js';
+
 export default {
   showTranslit: true,
 
@@ -666,4 +668,5 @@ export default {
     },
   },
   gfx: { btn: '✨ Grafik', high: 'Hoch', normal: 'Normal' },
+  ...stories,
 };

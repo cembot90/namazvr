@@ -8,6 +8,9 @@ const BASE = new URL('../vendor/hdri/', import.meta.url).href;
 const INDOOR = 'lobby';
 export function envFor(scene, night) {
   if (!scene || ['miqat', 'cemevi', 'wudu'].includes(scene)) return INDOOR;
+  if (['fire', 'cave', 'starsky'].includes(scene)) return 'night';
+  if (scene === 'sea') return 'sunset';
+  if (['ark', 'nile', 'valley'].includes(scene)) return 'sky';
   if (scene === 'muzdalifa' || night) return 'night';
   if (scene === 'arafat') return 'sunset';
   return 'sky';

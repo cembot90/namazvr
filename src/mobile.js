@@ -55,6 +55,7 @@ export class MobileUI {
       }).join('')}</div>
       <p class="gold">${esc(t('ui.next', v.times.next.name, v.times.next.time, v.times.next.inText))}</p>
       <p class="muted">${esc(v.qibla)} · ${esc(v.madhab)}</p>
+      <div class="grid2">${btn(t('story.menu'), 'stories', { cls: 'primary' })}${btn(t('sky.menu'), 'sky', { cls: 'primary' })}</div>
       <div class="grid2">${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary' })}${btn(t('alevi.menu'), 'alevi', { cls: 'primary' })}</div>
       <div class="grid2">
         ${btn(t('ui.menuTimes'), 'times')}${btn(t('ui.menuMore'), 'more')}
@@ -147,6 +148,7 @@ export class MobileUI {
     const status = s.rakah ? `${v.prayer.name}${unit} · ${t('ui.rakaShort', s.rakah, s.of || v.prayer.rakat)}` : `${v.prayer.name}${unit}`;
     const m = s.wudu
       ? { cue: s.cue, how: `${s.count}× · ${s.fard ? t('wudu.fard') : t('wudu.sunnah')}` }
+      : s.story ? { cue: s.cue, how: s.where }
       : s.hajj ? { cue: s.cue, how: [t(`hajj.where.${s.scene}`), s.status].filter(Boolean).join(' · ') }
       : { ...moveFor(v.prevPose, s.pose), ...(s.how ? { how: s.how } : {}) };
     return `
@@ -167,11 +169,25 @@ export class MobileUI {
     const c = this.root.querySelector('#pict');
     if (!c) return;
     const ctx = c.getContext('2d');
+    if (v.step.story) { ctx.clearRect(0, 0, 240, 240); ctx.font = '150px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(v.step.icon, 120, 128); return; }
     if (v.step.wudu) drawBody(ctx, v.step.wudu, 10, 10, 220);
     else drawPictogram(ctx, v.prevPose, v.step.pose, 10, 10, 220);
   }
 
   v_done(v) {
+    if (v.story) {
+      const q = v.story.q;
+      const fb = q.answer == null ? '' : `<p class="${q.answer === q.correct ? 'ok' : 'gold'}">${esc(q.answer === q.correct ? (q.star ? t('story.rightStar', v.stars) : t('story.right')) : t('story.wrong'))}</p>`;
+      return `${head(`${v.story.icon} ${t('story.done')}`, v.prayer.name)}
+        <p class="inner">✦ ${esc(v.story.lesson)}</p>
+        <h3>${esc(q.q)}</h3>
+        <div class="list">${q.options.map((o, i) => {
+          const ok = q.answer != null && i === q.correct, bad = q.answer === i && i !== q.correct;
+          return btn(`${ok ? '✓ ' : bad ? '✗ ' : ''}${o}`, q.answer == null ? `sans:${i}` : 'noop', { cls: ok ? 'primary' : bad ? 'active' : '' });
+        }).join('')}</div>
+        ${fb}
+        <div class="grid2">${btn(t('story.listen'), 'storylesson')}${btn(t('ui.again'), 'again')}${btn(t('story.more'), 'stories', { cls: 'primary' })}${btn(t('sky.menu'), 'sky')}</div>`;
+    }
     if (v.prayer.kind === 'cem' || v.prayer.kind === 'semah') {
       return `${head(t(`alevi.done.${v.prayer.kind}`), v.prayer.name)}
         ${t('alevi.doneText').map((p) => `<p>${esc(p)}</p>`).join('')}
@@ -433,6 +449,24 @@ export class MobileUI {
       <p class="muted small center">${esc(who)}</p>
       <div class="grid2">${btn('←', 'sayprev')}${btn('→', 'saynext', { cls: 'primary' })}</div>
       <div class="grid2">${btn(t('alevi.title'), 'alevi')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_stories(v) {
+    const sounds = `<div class="setting"><div><b>${esc(t('hajj.sounds'))}</b><small>${esc(t('story.soundsSub'))}</small></div>${btn(v.sounds ? t('ui.on') : t('ui.off'), 'sounds', { cls: v.sounds ? 'active' : '' })}</div>`;
+    return `${head(t('story.title'), t('story.sub'))}
+      ${t('story.intro').map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
+      <div class="list">${v.list.map((s) => btn(`${s.icon} ${s.name}${s.done ? ' ⭐' : ''}`, `prayer:${s.id}`, { cls: s.done ? 'active' : 'primary', sub: s.sub })).join('')}</div>
+      ${sounds}
+      <div class="grid2">${btn(t('sky.menu'), 'sky', { cls: 'primary' })}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  v_sky(v) {
+    return `${head(t('sky.title'), t('sky.count', v.lit, v.all))}
+      <p class="muted small">${esc(t('sky.lookUpMobile'))}</p>
+      ${v.groups.map((g) => `<div class="voice"><b>${esc(`${g.icon} ${g.name}`)} <span class="gold">${g.on} / ${g.total}</span></b>
+        <div class="stars">${g.items.slice(0, 30).map((it) => `<i class="${it.on ? 'on' : ''}" title="${esc(it.label)}">${it.on ? '★' : '☆'}</i>`).join('')}</div></div>`).join('')}
+      ${v.next ? `<p class="muted small">${esc(t('sky.next'))}</p>${btn(`☆ ${v.next.label}`, v.next.action, { cls: 'primary wide', sub: v.next.group })}` : `<p class="gold center">${esc(t('sky.allDone'))}</p>`}
+      <div class="grid2">${btn(t('story.menu'), 'stories')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   v_pilgrim(v) {

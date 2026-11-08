@@ -30,6 +30,8 @@ import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle a
 import { formatDay, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
 import { ALL_PRAYERS, BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
+import { STORY_LIST, buildStory, findStory, storyQuestion } from './stories.js';
+import { setSkyData, setStoryPhase, storyLift, updateStory } from './storyworld.js';
 
 const store = {
   get(key, fallback) {
@@ -252,7 +254,9 @@ const wantsWuduRoom = () => state.prayer?.kind === 'wudu' && (state.view === 'st
 // Umre und Hac: Ort des aktuellen Schritts (Mīqāt-Moschee, Haram, Sa'y-Gang, Mina, ʿArafāt, Muzdalifa, Jamarāt)
 const pilgrimActive = () => isPilgrimage(state.prayer) && (state.view === 'step' || state.view === 'done');
 const pilgrimStep = () => (state.view === 'done' ? state.steps[state.steps.length - 1] : state.steps[state.i]);
-const wantsScene = () => (pilgrimActive() ? pilgrimStep()?.scene || 'haram' : null);
+const wantsScene = () => (state.view === 'sky' ? 'starsky' : pilgrimActive() ? pilgrimStep()?.scene || 'haram' : null);
+// Geschichten der Propheten (laufen wie Umre & Hac über Orte und Schritte, aber ohne Vorbeter und Ghost)
+const storyActive = () => pilgrimActive() && state.prayer.kind === 'story';
 
 function rebuildEnv() {
   state.night = isNight();
@@ -318,10 +322,14 @@ function setEnvPose(p) {
   const yaw = Math.atan2(-p.hx, -p.hz);
   env.rotation.set(0, -yaw, 0);
   env.position.copy(new THREE.Vector3(p.x, 0, p.z).applyAxisAngle(UPV, -yaw).negate());
+  // Höhe: an Deck stehen (y > 0) oder ganz klein bei den Ameisen (y < 0)
+  env.position.y = -(p.y || 0);
 }
 function placePilgrim(snap = false) {
   if (!state.scene) return;
+  if (state.scene === 'starsky') { setEnvPose({ x: 0, z: 0, hx: 0, hz: -1 }); return; }
   const st = pilgrimStep();
+  if (st?.story) { setEnvPose({ ...st.place, y: (st.place.y || 0) + storyLift() }); return; }
   const m = st?.motion;
   let p = m && m.type !== 'throw' ? pathAt(m, state.view === 'done' ? pathLength(m) : state.pilgrim?.d || 0) : st?.place;
   if (!p) p = { x: 0, z: 0, hx: 0, hz: -1 };
@@ -449,7 +457,7 @@ function updateMovers(dt) {
 // Ghost vor dir (Blick zur Qibla wie du) oder neben dir; im Waschraum am Becken links neben dir
 function placeGhost() {
   const g = ghost.group;
-  g.visible = state.ghost !== 'off' && (state.view === 'step' || (state.wuduRoom && state.view === 'done'));
+  g.visible = state.ghost !== 'off' && !storyActive() && (state.view === 'step' || (state.wuduRoom && state.view === 'done'));
   if (state.wuduRoom) return;
   movers.delete(ghost);
   g.rotation.y = Math.PI;
@@ -568,7 +576,18 @@ function view() {
     case 'quiz':
       return { type: 'quiz', quiz: state.quiz, progress: state.progress };
     case 'done':
-      return { type: 'done', prayer: state.prayer, kids: state.kids, stars: state.progress.stars || 0 };
+      return { type: 'done', prayer: state.prayer, kids: state.kids, stars: state.progress.stars || 0, story: state.prayer.kind === 'story' ? { ...findStory(state.prayer.id), lesson: t(`story.list.${state.prayer.id}.lesson`), q: state.storyQ } : null };
+    case 'stories':
+      return { type: 'stories', list: STORY_LIST.map((s) => ({ id: s.id, icon: s.icon, name: s.name, sub: s.de, done: !!state.progress.stories?.[s.id] })), sounds: state.sounds };
+    case 'sky': {
+      const groups = skyGroups();
+      const lit = groups.reduce((a, g) => a + g.items.filter((x) => x.on).length, 0), all = groups.reduce((a, g) => a + g.items.length, 0);
+      // Vorschlag für den nächsten Stern: zuerst eine Geschichte, dann eine Sure, dann ein Gebet
+      const order = [2, 1, 0, 3];
+      let next = null;
+      for (const gi of order) { const it = groups[gi].items.find((x) => !x.on && x.action); if (it) { next = { ...it, group: groups[gi].name }; break; } }
+      return { type: 'sky', groups: groups.map((g) => ({ icon: g.icon, name: g.name, on: g.items.filter((x) => x.on).length, total: g.items.length, items: g.items })), lit, all, next, kids: state.kids };
+    }
     case 'suras':
       return {
         type: 'suras',
@@ -611,6 +630,20 @@ function view() {
   }
 }
 
+// Sternenhimmel: jede gelernte Sache ist ein Stern – Gebete, Suren, Geschichten, Abzeichen und Tage mit allen 5 Gebeten
+function skyGroups() {
+  const p = state.progress;
+  const fullDays = Object.keys(p.log || {}).filter((k) => dayDone(p, k)).length;
+  const nDays = Math.min(30, Math.max(10, Math.ceil((fullDays + 1) / 10) * 10));
+  return [
+    { icon: '🕌', name: t('sky.prayers'), items: [WUDU, ...PRAYERS, ...EXTRA_PRAYERS].map((x) => ({ label: x.name, on: x.id === 'wudu' ? p.wudu > 0 : !!p.done[x.id], action: x.id === 'wudu' ? 'wudu' : `prayer:${x.id}` })) },
+    { icon: '📖', name: t('sky.suras'), items: SURAS.map((x) => ({ label: x.name, on: !!p.suras?.[x.id], action: `sura:${x.id}` })) },
+    { icon: '🌙', name: t('sky.stories'), items: STORY_LIST.map((x) => ({ label: x.name, on: !!p.stories?.[x.id], action: `prayer:${x.id}` })) },
+    { icon: '🏅', name: t('sky.badges'), items: BADGES.map((b) => ({ label: b.name, on: b.test(p) })) },
+    { icon: '✨', name: t('sky.days'), items: Array.from({ length: nDays }, (_, i) => ({ label: `${i + 1}`, on: i < fullDays })) },
+  ];
+}
+
 function refresh() {
   const v = view();
   if (mobileUI) mobileUI.render(v);
@@ -642,6 +675,10 @@ function refresh() {
   ghost.setGhostColor(v.type === 'step' && v.posture === 'ok' ? GHOST_OK : GHOST_WAIT);
   updateCast();
   if (cong.group.visible && v.type === 'step') cong.lead(v.step.pose, v.step.rakah);
+  // Geschichten und Sternenhimmel: keine Figur (Propheten werden nicht gezeigt); Szene zeigt den Abschnitt des Schritts
+  const noGuide = storyActive() || state.scene === 'starsky';
+  if (noGuide) { guide.group.visible = false; guideRug.visible = false; } else if (!guide.group.visible && !cong.group.visible) guide.group.visible = true;
+  if (storyActive()) setStoryPhase(pilgrimStep().phase);
 }
 
 // Neuer Schritt: Erkennung zurücksetzen und bei einem Haltungswechsel die Ansage zeigen.
@@ -664,6 +701,7 @@ function onStep() {
 }
 
 const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab)
+  : prayer.kind === 'story' ? buildStory(prayer.id)
   : isPilgrimage(prayer) ? buildPilgrimage(prayer.kind, state.madhab, state.gender, state.prayerSura)
     : buildSteps(prayer, state.madhab, state.gender, state.prayerSura));
 
@@ -709,6 +747,13 @@ function speak() {
   const m = step.wudu || step.hajj ? { cue: step.cue } : moveFor(state.steps[state.i - 1]?.pose ?? null, step.pose);
   // Arabisch: Anleitung und Rezitation in einem Zug mit derselben Stimme
   const lang = langInfo().speech;
+  // Geschichte: einfach erzählen, danach der Koranvers auf Arabisch
+  if (step.story) {
+    const parts = [{ text: `${step.title}. ${step.instr}`, lang, rate: state.kids ? 0.92 : 1 }];
+    if (step.ar.length && voices.has('ar') && lang !== 'ar') parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
+    voices.say(parts);
+    return;
+  }
   if (lang === 'ar') { voices.say([{ text: [`${m.cue}.`, step.instr, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
   const parts = [{ text: [`${m.cue}.`, step.instr, ...step.de].join(' '), lang }];
   if (step.ar.length && voices.has('ar')) parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
@@ -821,6 +866,27 @@ function act(action) {
       break;
     case 'remind': state.remFrom = state.view; state.view = 'remind'; state.remMsg = ''; break;
     case 'pilgrim': state.view = 'pilgrim'; break;
+    case 'stories': state.view = 'stories'; voices.cancel(); break;
+    case 'sky': setSkyData(skyGroups()); state.view = 'sky'; voices.cancel(); break;
+    case 'sans': {
+      const q = state.storyQ, i = Number(arg);
+      if (!q || q.answer != null) break;
+      q.answer = i;
+      // Richtig beantwortet: ein Stern (einmal je Geschichte)
+      const p = state.progress;
+      if (i === q.correct && !p.storyStars?.[state.prayer.id]) {
+        p.storyStars = { ...(p.storyStars || {}), [state.prayer.id]: true };
+        p.stars = (p.stars || 0) + 1;
+        q.star = true;
+        saveProgress();
+      }
+      break;
+    }
+    case 'storylesson': {
+      const lesson = t(`story.list.${state.prayer?.id}.lesson`);
+      voices.say([{ text: lesson, lang: langInfo().speech }]);
+      break;
+    }
     case 'alevi': state.view = 'alevi'; break;
     case 'muharrem': state.view = 'muharrem'; state.muharremPart = arg || 'about'; break;
     case 'alevival': state.view = 'alevival'; break;
@@ -930,7 +996,17 @@ function act(action) {
     case 'again': start(state.prayer); break;
     case 'next':
       if (state.view !== 'step') break;
-      if (state.i < state.steps.length - 1) { state.i++; onStep(); } else {
+      if (state.i < state.steps.length - 1) { state.i++; onStep(); } else if (state.prayer.kind === 'story') {
+        // Geschichte zu Ende: ein Stern am Himmel leuchtet, dann die Frage „Was lernen wir?“
+        state.view = 'done';
+        state.auto = false;
+        const p = state.progress;
+        p.stories = { ...(p.stories || {}), [state.prayer.id]: true };
+        if (!p.days.includes(dayKey())) p.days = [...p.days, dayKey()].slice(-60);
+        saveProgress();
+        state.storyQ = storyQuestion(state.prayer.id);
+        voices.cancel();
+      } else {
         state.view = 'done';
         state.auto = false;
         if (cong.group.visible) cong.finish();
@@ -1196,7 +1272,16 @@ function aimAtGuide() {
   camera.position.copy(world.localToWorld(eye));
   const target = new THREE.Vector3(0, 0.85, 0);
   // Im Waschraum auf dein Becken: links der Ghost, rechts der Vorbeter
-  if (state.scene && state.scene !== 'miqat') {
+  const sst = state.view === 'step' || state.view === 'done' ? pilgrimStep() : null;
+  if (state.scene === 'starsky') {
+    // Sternenhimmel: nach oben zu den Sternbildern schauen
+    camera.position.copy(world.localToWorld(new THREE.Vector3(0, 1.4, 1.5)));
+    world.localToWorld(target.set(0, 28, -60));
+  } else if (sst?.story) {
+    const c = sst.cam || { x: 0.3, y: 2.0, z: 2.6 }, l = sst.look || { x: 0, y: 1.4, z: -8 };
+    camera.position.copy(world.localToWorld(new THREE.Vector3(c.x, c.y, c.z)));
+    world.localToWorld(target.set(l.x, l.y, l.z));
+  } else if (state.scene && state.scene !== 'miqat') {
     // Umre & Hac: hinter dir, Blick nach vorn (zur Kaaba bzw. den Weg entlang)
     // Beim Tavaf etwas nach links, damit die Kaaba im Bild ist
     const tawaf = state.view === 'step' && state.steps[state.i]?.motion?.type === 'tawaf';
@@ -1387,7 +1472,9 @@ renderer.setAnimationLoop(() => {
   // Auto-Modus wartet in VR, bis die Haltung eingenommen ist; im Anfänger-Modus langsamer.
   if (state.view === 'step' && state.auto && (state.posture.ok || !renderer.xr.isPresenting || wudu)) {
     state.autoT += dt;
-    if (state.autoT >= state.steps[state.i].dur * (state.beginner || state.kids ? 1.6 : 1)) act('next');
+    const cur = state.steps[state.i];
+    // Geschichten: die Dauer passt sich der Länge des Textes an, Kinder bekommen nur etwas mehr Zeit
+    if (state.autoT >= cur.dur * (cur.story ? (state.kids ? 1.2 : 1) : state.beginner || state.kids ? 1.6 : 1)) act('next');
   }
   // Atem-Dhikr: einatmen (Kugel wächst), ausatmen (schrumpft); nach jedem Atemzug +1.
   const br = state.breath;
@@ -1424,10 +1511,12 @@ renderer.setAnimationLoop(() => {
   guide.update(dt);
   ghost.update(dt);
   updateMovers(dt);
-  if (state.scene) { updatePilgrim(dt); updateCrowd(dt); }
+  if (state.scene) { updatePilgrim(dt); updateCrowd(dt); updateStory(dt); if (storyActive()) placePilgrim(true); }
   {
     const st = state.view === 'step' && state.steps[state.i];
-    const water = (state.wuduRoom && !!st && st.wudu !== 'heart') || (!!st && st.id === 'zamzam');
+    const ph = st?.story ? st.phase : null;
+    const water = (state.wuduRoom && !!st && st.wudu !== 'heart') || (!!st && st.id === 'zamzam')
+      || state.scene === 'nile' || (state.scene === 'sea' && ph !== 'dark') || (state.scene === 'ark' && ['rain', 'sea', 'cudi'].includes(ph));
     ambience.update(dt, { walking: !!(state.scene && state.pilgrim.moving), speed: state.pilgrim.speed || 2, water });
   }
   cong.update(dt);
@@ -1442,7 +1531,7 @@ renderer.setAnimationLoop(() => {
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
-if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, setAR, view, voices, ambience };
+if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, env, setAR, view, voices, ambience };
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);

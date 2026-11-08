@@ -186,9 +186,11 @@ export class Panel extends CanvasPlane {
       [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
       [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('track.menu', v.tracked), 'tracker'], [t('ram.menu'), 'ramadan']],
       [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles'], [t('hajj.menu'), 'pilgrim'], [t('alevi.menu'), 'alevi']],
+      [[t('story.menu'), 'stories'], [t('sky.menu'), 'sky']],
     ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      const col = i, w = bw;
-      this.btn(label, 60 + col * (bw + gap), 612 + ri * 84, w, 72, action, { primary: (action === 'wudu' && !v.wuduDone) || action === 'pilgrim', active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 29 });
+      // letzte Reihe: zwei breite Knöpfe (Geschichten, Sternenhimmel)
+      const wide = row.length === 2, w = wide ? (W - 120 - gap) / 2 : bw, x = 60 + i * (w + gap);
+      this.btn(label, x, 606 + ri * 74, w, 64, action, { primary: (action === 'wudu' && !v.wuduDone) || action === 'pilgrim' || action === 'stories' || action === 'sky', active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 27 });
     }));
   }
 
@@ -284,6 +286,7 @@ export class Panel extends CanvasPlane {
     const step = v.step;
     const m = step.wudu
       ? { cue: step.cue, how: `${step.count}×${step.count > 1 && step.fard ? t('wudu.oneFard') : ''} · ${step.fard ? t('wudu.fard') : t('wudu.sunnah')}`, arrow: null }
+      : step.story ? { cue: step.cue, how: step.where, arrow: null }
       : step.hajj ? { cue: step.cue, how: t(`hajj.where.${step.scene}`), arrow: null }
         : { ...moveFor(v.prevPose, step.pose), ...(step.how ? { how: step.how } : {}) };
     const ok = v.posture === 'ok';
@@ -295,6 +298,7 @@ export class Panel extends CanvasPlane {
     ctx.strokeStyle = ok ? '#7fd1a8' : 'rgba(201,168,92,0.45)';
     ctx.stroke();
     if (step.wudu) drawBody(ctx, step.wudu, 80, top + 10, h - 20);
+    else if (step.story) this.text(step.icon, 80 + (h - 20) / 2, top + h / 2 + 4, { size: Math.round(h * 0.55), align: 'center', base: 'middle', fixed: true });
     else drawPictogram(ctx, v.prevPose, step.pose, 80, top + 10, h - 20);
     const x = 80 + h + 10;
     this.text(m.cue, x, top + 62, { size: 46, weight: 700, color: m.arrow ? C.gold : C.text });
@@ -316,6 +320,25 @@ export class Panel extends CanvasPlane {
 
   v_done(v) {
     const { W, H } = this;
+    if (v.story) {
+      // Geschichte zu Ende: Lehre und Frage „Was lernen wir?“
+      const q = v.story.q;
+      this.heading(`${v.story.icon} ${t('story.done')}`, v.prayer.name);
+      let y = this.paragraphs([`✦  ${v.story.lesson}`], 150, { size: 29, color: C.gold, gap: 10 });
+      this.text(q.q, 60, y + 30, { size: 32, weight: 700 });
+      q.options.forEach((o, i) => {
+        const ok = q.answer != null && i === q.correct, bad = q.answer === i && i !== q.correct;
+        this.btn(`${ok ? '✓ ' : bad ? '✗ ' : ''}${o}`, 60, y + 60 + i * 92, W - 120, 80, q.answer == null ? `sans:${i}` : 'noop', { size: 28, primary: ok, active: bad });
+      });
+      y += 60 + 3 * 92 + 20;
+      if (q.answer != null) this.paragraphs([q.answer === q.correct ? (q.star ? t('story.rightStar', v.stars) : t('story.right')) : t('story.wrong')], y, { size: 28, color: q.answer === q.correct ? '#7fd1a8' : C.gold, gap: 0 });
+      const by = H - 120, gap = 20, w = (W - 120 - 3 * gap) / 4;
+      this.btn(t('story.listen'), 60, by, w, 90, 'storylesson', { size: 26 });
+      this.btn(t('ui.again'), 60 + w + gap, by, w, 90, 'again', { size: 26 });
+      this.btn(t('story.more'), 60 + 2 * (w + gap), by, w, 90, 'stories', { primary: true, size: 26 });
+      this.btn(t('sky.menu'), 60 + 3 * (w + gap), by, w, 90, 'sky', { size: 26 });
+      return;
+    }
     if (v.prayer.kind === 'cem' || v.prayer.kind === 'semah') {
       this.heading(t(`alevi.done.${v.prayer.kind}`), v.prayer.name);
       this.paragraphs(t('alevi.doneText'), 250, { size: 32, gap: 20 });
@@ -776,6 +799,46 @@ export class Panel extends CanvasPlane {
   }
 
   // Umre & Hac: Auswahl
+  // Geschichten der Propheten: Auswahl
+  v_stories(v) {
+    const { W, H } = this;
+    this.heading(t('story.title'), t('story.sub'));
+    let y = this.paragraphs(t('story.intro'), 140, { size: 23, color: C.muted, gap: 4 });
+    const gap = 20, w = (W - 120 - gap) / 2, h = 112;
+    v.list.forEach((s, i) => {
+      this.btn(`${s.icon} ${s.name}${s.done ? '  ⭐' : ''}`, 60 + (i % 2) * (w + gap), y + 6 + Math.floor(i / 2) * (h + 14), w, h, `prayer:${s.id}`, { size: 30, sub: s.sub, subSize: 21, active: s.done });
+    });
+    y += 6 + 3 * (h + 14);
+    this.switchRow(y, t('hajj.sounds'), t('story.soundsSub'), [[v.sounds ? t('ui.on') : t('ui.off'), 'sounds', v.sounds]]);
+    const by = H - 118, w2 = (W - 120 - gap) / 2;
+    this.btn(t('sky.menu'), 60, by, w2, 90, 'sky', { primary: true });
+    this.btn(t('ui.menu'), 60 + w2 + gap, by, w2, 90, 'menu');
+  }
+
+  // Sternenhimmel: was schon leuchtet und was als Nächstes kommt
+  v_sky(v) {
+    const { W, H, ctx } = this;
+    this.heading(t('sky.title'), t('sky.count', v.lit, v.all));
+    this.text(t('sky.lookUp'), 60, 150, { size: 25, color: C.muted });
+    v.groups.forEach((g, i) => {
+      const y = 180 + i * 104;
+      ctx.beginPath(); ctx.roundRect(60, y, W - 120, 92, 18); ctx.fillStyle = 'rgba(29,43,69,0.7)'; ctx.fill();
+      this.text(`${g.icon}  ${g.name}`, 90, y + 40, { size: 30, weight: 700 });
+      this.text(`${g.on} / ${g.total}`, W - 90, y + 40, { size: 30, weight: 700, color: C.gold, align: 'right' });
+      // Sterne als Reihe (höchstens 30)
+      const n = Math.min(30, g.items.length), sw = Math.min(36, (W - 200) / n);
+      g.items.slice(0, n).forEach((it, k) => this.text(it.on ? '★' : '☆', 92 + k * sw, y + 78, { size: 26, color: it.on ? C.gold : '#4a5a78', fixed: true }));
+    });
+    const y = 180 + v.groups.length * 104 + 10;
+    if (v.next) {
+      this.text(t('sky.next'), 60, y + 26, { size: 26, color: C.muted });
+      this.btn(`☆ ${v.next.label}`, 60, y + 40, W - 120, 72, v.next.action, { primary: true, size: 28, sub: v.next.group, subSize: 20 });
+    } else this.text(t('sky.allDone'), W / 2, y + 50, { size: 30, color: C.gold, align: 'center' });
+    const by = H - 104, gap = 20, w = (W - 120 - gap) / 2;
+    this.btn(t('story.menu'), 60, by, w, 80, 'stories');
+    this.btn(t('ui.menu'), 60 + w + gap, by, w, 80, 'menu');
+  }
+
   v_pilgrim(v) {
     const { W, H } = this;
     this.heading(t('hajj.title'), `${v.madhab} · ${v.gender === 'f' ? t('ui.women') : t('ui.men')}`);

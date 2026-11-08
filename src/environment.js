@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { t } from './i18n.js';
 import { HAJJ_SCENES, buildHajjScene } from './hajjworld.js';
+import { STORY_SCENES, buildStoryScene, clearStory } from './storyworld.js';
 
 // Gebetsraum. Alles hängt an `group`; dessen -Z-Achse ist die Qibla.
 // Die Mihrab-Wand liegt immer FRONT Meter vor dem Gebetsplatz (Ursprung), der Raum erstreckt sich nach hinten.
@@ -734,6 +735,12 @@ const BUILDERS = { klassisch: buildKlassisch, osmanisch: buildOsmanisch, andalus
 
 // night: nach Sonnenuntergang bzw. vor Sonnenaufgang
 export function buildEnvironment(group, style = 'klassisch', { night = false } = {}) {
+  clearStory();
+  if (STORY_SCENES[style]) {
+    OBSTACLES = []; WATER = []; FOOT_WATER = []; STOOLS = []; BOUNDS = null;
+    buildStoryScene(group, style);
+    return;
+  }
   if (HAJJ_SCENES[style]) {
     OBSTACLES = []; WATER = []; FOOT_WATER = []; STOOLS = []; BOUNDS = null;
     buildHajjScene(group, style, night);

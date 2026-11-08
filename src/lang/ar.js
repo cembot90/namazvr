@@ -1,6 +1,8 @@
 // العربية – النص العربي للأذكار يظهر كما هو، فلا حاجة إلى نقل حرفي أو ترجمة.
 const none = [];
 
+import stories from './story.ar.js';
+
 export default {
   showTranslit: false,
 
@@ -574,4 +576,5 @@ export default {
     },
   },
   gfx: { btn: '✨ الرسوميات', high: 'عالية', normal: 'عادية' },
+  ...stories,
 };

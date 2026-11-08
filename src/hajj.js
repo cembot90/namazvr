@@ -147,5 +147,5 @@ export function statusOf(m, d, thrown) {
 }
 
 // Welche Orte gibt es (für die Auswahl der Umgebung)
-export const isPilgrimage = (p) => ['umre', 'hajj', 'cem', 'semah'].includes(p?.kind);
+export const isPilgrimage = (p) => ['umre', 'hajj', 'cem', 'semah', 'story'].includes(p?.kind);
 export const isHajj = (p) => p?.kind === 'umre' || p?.kind === 'hajj';
