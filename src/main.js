@@ -4,7 +4,7 @@ import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 import { STYLES, WUDU_BASINS, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked, setWater, wuduStools } from './environment.js';
-import { Guide } from './figure.js';
+import { Guide, setFaces } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
@@ -79,7 +79,9 @@ world.add(compass, userRug, guideRug);
 const onQuest = /OculusBrowser|Quest/i.test(navigator.userAgent);
 const graphics = new Graphics(renderer, scene, world, store.get('gfxHigh', !onQuest));
 
-const guide = new Guide();
+// Gesichter der Figuren lassen sich in den Einstellungen ausblenden
+setFaces(store.get('faces', true));
+const guide = new Guide({ beard: true, build: 1, hair: 0x2b1d14 });
 guide.group.position.set(1.5, 0, -1.5);
 guide.group.rotation.y = Math.PI;
 world.add(guide.group);
@@ -89,7 +91,7 @@ const cong = new Congregation();
 world.add(cong.group);
 
 // Ghost: durchscheinende Figur vor oder neben dir, gleiche Blickrichtung wie du (nicht gespiegelt), macht jede Bewegung mit
-const ghost = new Guide().makeGhost();
+const ghost = new Guide({ build: 1 }).makeGhost();
 ghost.group.rotation.y = Math.PI;
 ghost.group.visible = false;
 world.add(ghost.group);
@@ -564,7 +566,7 @@ function view() {
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'settings':
-      return { type: 'settings', gfxHigh: graphics.high, langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
+      return { type: 'settings', gfxHigh: graphics.high, faces: store.get('faces', true), langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
     case 'learn': {
       const p = state.progress;
       return {
@@ -894,6 +896,7 @@ function act(action) {
     case 'sayprev': state.saying = (state.saying + SAYINGS - 1) % SAYINGS; break;
     case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
     case 'gfx': graphics.setQuality(!graphics.high); store.set('gfxHigh', graphics.high); break;
+    case 'faces': { const on = !store.get('faces', true); store.set('faces', on); setFaces(on); break; }
     case 'sounds': state.sounds = !state.sounds; store.set('sounds', state.sounds); break;
     case 'remon':
       if (state.remind.on) { state.remind.on = false; store.set('remind', state.remind); break; }

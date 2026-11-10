@@ -663,6 +663,6 @@ export default {
       semahEnd: ['End of the semah', 'Niyaz', 'At the end everyone bows with niyaz. There are many semahs, e.g. the Kırklar semahı or the Turna semahı – each region has its own.'],
     },
   },
-  gfx: { btn: '✨ Graphics', high: 'High', normal: 'Normal' },
+  gfx: { btn: '✨ Graphics', high: 'High', normal: 'Normal', faces: 'Faces of the figures', facesSub: 'off: the figures stay faceless', facesShort: 'Faces' },
   ...stories,
 };

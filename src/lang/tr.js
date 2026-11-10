@@ -737,6 +737,6 @@ export default {
       semahEnd: ['Semahın sonu', 'Niyaz', 'Sonunda herkes niyaz eder. Kırklar semahı, turna semahı gibi pek çok semah vardır – her yörenin kendine özgü semahı olur.'],
     },
   },
-  gfx: { btn: '✨ Grafik', high: 'Yüksek', normal: 'Normal' },
+  gfx: { btn: '✨ Grafik', high: 'Yüksek', normal: 'Normal', faces: 'Figürlerin yüzleri', facesSub: 'kapalı: figürler yüzsüz kalır', facesShort: 'Yüzler' },
   ...stories,
 };
