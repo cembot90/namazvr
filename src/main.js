@@ -1312,7 +1312,14 @@ function layout() {
 function applyLang() {
   document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
   const hint = document.getElementById('hint');
-  if (hint) hint.innerHTML = t('ui.hint');
+  if (hint) {
+    // Hinweis lässt sich einklappen (bleibt gemerkt) und wieder öffnen
+    hint.innerHTML = `<span>${t('ui.hint')}</span><button class="x" type="button" aria-label="${t('ui.back')}">×</button>`;
+    const x = hint.querySelector('.x');
+    const set = (min) => { hint.classList.toggle('min', min); x.textContent = min ? '?' : '×'; store.set('hintMin', min); };
+    x.addEventListener('click', () => set(!hint.classList.contains('min')));
+    set(store.get('hintMin', false));
+  }
 }
 applyLang();
 
@@ -1548,6 +1555,15 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 refresh();
+// Ladeanzeige ausblenden, sobald das erste Bild steht
+requestAnimationFrame(() => window.__bootDone?.());
+// VR-/AR-Knopf ausblenden, wenn das Gerät es nicht kann (statt „VR NOT SUPPORTED“)
+setTimeout(() => {
+  for (const id of ['VRButton', 'ARButton']) {
+    const b = document.getElementById(id);
+    if (b && /NOT SUPPORTED|NOT ALLOWED|NEEDS HTTPS/i.test(b.textContent)) b.classList.add('off');
+  }
+}, 1500);
 // Schriften nachladen, dann Panel neu zeichnen (Arabisch braucht Amiri).
 Promise.all(['54px Amiri', '600 32px Inter', 'italic 30px Inter'].map((f) => document.fonts.load(f)))
   .catch(() => {})

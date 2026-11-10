@@ -3,18 +3,19 @@ import { drawPictogram, moveFor } from './movement.js';
 import { drawBody } from './wudu.js';
 import { taqabbal } from './prayer.js';
 import { isRTL, t } from './i18n.js';
+import { menuGroups } from './menu.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 const btn = (label, action, { cls = '', sub = '', subAr = false } = {}) =>
   `<button class="${cls}" data-a="${esc(action)}">${esc(label)}${sub ? `<small class="${subAr ? 'ar' : ''}">${esc(sub)}</small>` : ''}</button>`;
 
-const recitation = (t) => `
+const recitation = (t) => (!t.ar.length && !t.tr.length && !t.de.length ? '' : `
   <div class="rec">
     ${t.ar.map((l) => `<p class="ar" dir="rtl">${esc(l)}</p>`).join('')}
     ${t.tr.map((l) => `<p class="tr">${esc(l)}</p>`).join('')}
     ${t.de.map((l) => `<p class="de">${esc(l)}</p>`).join('')}
-  </div>`;
+  </div>`);
 
 const head = (title, sub = '') => `<header><h2>${esc(title)}</h2>${sub ? `<span>${esc(sub)}</span>` : ''}</header>`;
 const progressBar = (k) => `<div class="bar"><i style="width:${Math.round(k * 100)}%"></i></div>`;
@@ -39,6 +40,13 @@ export class MobileUI {
     const keepScroll = v.type === this.lastType && v.type !== 'step';
     const y = this.root.scrollTop;
     this.root.innerHTML = fn.call(this, v);
+    // Zurück-Pfeil oben links in jeder Ansicht außer Menü und laufendem Ablauf (dort steht „Menü“ in der Leiste unten)
+    const h = this.root.querySelector('header');
+    if (h && v.type !== 'menu' && v.type !== 'step') {
+      h.classList.add('nav');
+      h.insertAdjacentHTML('afterbegin', `<button class="back" data-a="menu" aria-label="${esc(t('ui.menu'))}">${isRTL() ? '›' : '‹'}</button>`);
+    }
+    this.root.dataset.view = v.type;
     this.root.scrollTop = keepScroll ? y : 0;
     this.lastType = v.type;
     this.last = v;
@@ -47,26 +55,16 @@ export class MobileUI {
   }
 
   v_menu(v) {
+    const n = v.times.next;
+    const tile = (it) => `<button class="tile${it.primary ? ' primary' : ''}${it.active ? ' active' : ''}" data-a="${esc(it.action)}"><span class="ico" aria-hidden="true">${it.icon}</span><span>${esc(it.label)}</span></button>`;
     return `
       ${head('NamazVR', t('ui.sub'))}
+      <div class="next"><span class="ico" aria-hidden="true">🕌</span><div><b>${esc(t('ui.next', n.name, n.time, n.inText))}</b><small>${esc(v.qibla)} · ${esc(v.madhab)}</small></div></div>
       <div class="grid5">${v.prayers.map((p) => {
         const row = v.times.rows.find((t) => t.id === p.id);
         return btn(p.name, `prayer:${p.id}`, { cls: p.id === v.times.current ? 'active' : '', sub: `${row.time} · ${p.rakat}` });
       }).join('')}</div>
-      <p class="gold">${esc(t('ui.next', v.times.next.name, v.times.next.time, v.times.next.inText))}</p>
-      <p class="muted">${esc(v.qibla)} · ${esc(v.madhab)}</p>
-      <div class="grid2">${btn(t('story.menu'), 'stories', { cls: 'primary' })}${btn(t('sky.menu'), 'sky', { cls: 'primary' })}</div>
-      <div class="grid2">${btn(t('hajj.menu'), 'pilgrim', { cls: 'primary' })}${btn(t('alevi.menu'), 'alevi', { cls: 'primary' })}</div>
-      <div class="grid2">
-        ${btn(t('ui.menuTimes'), 'times')}${btn(t('ui.menuMore'), 'more')}
-        ${btn(t('ui.menuWudu'), 'wudu', { cls: v.wuduDone ? '' : 'primary' })}${btn(t('ui.menuLearn'), 'learn')}
-        ${btn(t('ui.menuQiblaMobile'), 'qibla')}${btn(t('ui.menuTasbih'), 'tasbih')}
-        ${btn(t('ui.menuMosque'), 'mosque')}${btn(t('ui.menuSettings'), 'settings')}
-        ${btn(t('ui.menuSuras'), 'suras', { cls: 'primary' })}${btn(t('ui.menuPeace'), 'peace')}
-        ${btn(t('track.menu', v.tracked), 'tracker', { cls: v.tracked === 5 ? 'active' : '' })}${btn(t('ram.menu'), 'ramadan')}
-        ${btn(t('ui.kidsBtn', v.kids), 'kids', { cls: v.kids ? 'active' : '' })}${btn(t('prof.btn', v.profile.icon, v.profile.name), 'profiles')}
-
-      </div>`;
+      ${menuGroups(v, { mobile: true }).map((g) => `<h4>${esc(g.label)}</h4><div class="tiles">${g.items.map(tile).join('')}</div>`).join('')}`;
   }
 
   v_times(v) {
@@ -160,7 +158,7 @@ export class MobileUI {
       ${recitation(s)}
       <div class="dock">
         ${v.noVoice ? `<p class="gold small center">${esc(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'))}</p>` : ''}
-        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn(t('ui.menu'), 'menu')}${btn(v.auto ? t('ui.autoOnShort') : t('ui.autoShort'), 'auto', { cls: v.auto ? 'active' : '' })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '' })}${btn('👤', 'ghost', { cls: v.ghost !== 'off' ? 'active' : '' })}
+        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn('☰', 'menu', { sub: t('ui.menu') })}${btn(t('ui.autoShort'), 'auto', { cls: `txt${v.auto ? ' active' : ''}`, sub: v.auto ? t('ui.on') : t('ui.off') })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '', sub: t('ui.speak') })}${btn('👤', 'ghost', { cls: v.ghost !== 'off' ? 'active' : '', sub: t(`ghost.${v.ghost}`) })}
         ${btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 'next', { cls: 'primary' })}
       </div>`;
   }

@@ -28,3 +28,10 @@ Bei jedem Push laufen die Tests auch auf GitHub (Reiter „Actions“, Ablauf �
 - **Seiten**: Anleitung und Beta-Seite, Sprungmarken, vorhandene Dateien.
 
 Nicht geprüft werden können: echte VR-Brille (Haltungserkennung, Hände), hörbarer Ton und die Stimmen-Downloads.
+
+## Bildschirmfotos zum Ansehen der Gestaltung
+
+```
+node shots.mjs <Zielordner>            # alle Ansichten, Handy und Computer
+node shots.mjs <Zielordner> handy      # nur Handy
+```

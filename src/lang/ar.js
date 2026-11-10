@@ -302,6 +302,7 @@ export default {
     },
   },
   ui: {
+    grp: { pray: 'الصلاة', learn: 'تعلّم', explore: 'اكتشف', me: 'مساحتي' }, loading: 'جارٍ التحميل …',
     vrQiblaFirst: 'أهلًا! اضبط القبلة أولًا – ليتجه المحراب وكل صلاة إلى الاتجاه الصحيح.',
     noVoiceLang: 'لا يوجد صوت عربي على هذا الجهاز – القراءة بصوت غير متاحة هنا.',
     menuSuras: 'حفظ السور', surasTitle: 'حفظ السور', surasSub: 'سور قصيرة للصلاة – احفظها خطوة بخطوة', verses: (n) => `${n} آيات`, learned: '✓ محفوظة', modeRead: 'قراءة', modeVerse: 'آية آية', modeTest: 'اختبر نفسك', verseOf: (i, n) => `الآية ${i} / ${n}`, reveal: 'إظهار', hide: 'إخفاء', listen: '🔊 استمع', markLearned: '✓ حفظتها', isLearned: '✓ محفوظة!', usePrayer: 'اقرأها في الصلاة', inPrayer: '★ في الصلاة', testHint: 'اقرأ الآية من حفظك – ثم أظهرها.', noVoice: 'لا يوجد صوت عربي على هذا الجهاز.',

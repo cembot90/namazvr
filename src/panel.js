@@ -3,10 +3,12 @@ import { taqabbal } from './prayer.js';
 import { isRTL, t } from './i18n.js';
 import { drawArrow, drawPictogram, moveFor } from './movement.js';
 import { drawBody } from './wudu.js';
+import { menuGroups } from './menu.js';
 
 const C = {
-  bg: 'rgba(10,18,32,0.94)', border: '#c9a85c', gold: '#e6c77f', text: '#eef2f7', muted: '#9fb0c6',
-  btn: '#1d2b45', btnHover: '#2c4168', primary: '#24785a', primaryHover: '#2f9670', active: '#7a5f22', track: '#24324d',
+  bg: 'rgba(11,19,34,0.95)', border: '#c9a85c', gold: '#e6c77f', text: '#f0f3f8', muted: '#a9b7cb',
+  btn: '#1a2740', btnHover: '#263a5c', primary: '#23805f', primaryHover: '#2c9a73', active: '#3a3524', activeHover: '#4a4329', track: '#22324f',
+  line: 'rgba(255,255,255,0.14)',
 };
 const AR = 'Amiri, "Noto Naskh Arabic", "Geeza Pro", serif';
 const UI = 'Inter, "Noto Sans Arabic", "Geeza Pro", system-ui, sans-serif';
@@ -96,19 +98,30 @@ export class Panel extends CanvasPlane {
     this.tex.needsUpdate = true;
   }
 
+  // Knopf: neutral, Hauptaktion (grün) oder gewählt (goldener Rand und goldene Schrift).
+  // Zu lange Beschriftungen werden verkleinert, statt über den Rand zu laufen.
   btn(label, x, y, w, h, action, opt = {}) {
     const { ctx } = this;
     const hov = this.hover === action;
     ctx.beginPath();
-    ctx.roundRect(x, y, w, h, 18);
-    ctx.fillStyle = opt.primary ? (hov ? C.primaryHover : C.primary) : opt.active ? C.active : (hov ? C.btnHover : C.btn);
+    ctx.roundRect(x, y, w, h, Math.min(18, h / 3.2));
+    ctx.fillStyle = opt.primary ? (hov ? C.primaryHover : C.primary) : opt.active ? (hov ? C.activeHover : C.active) : (hov ? C.btnHover : C.btn);
     ctx.fill();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = hov ? C.gold : 'rgba(201,168,92,0.35)';
+    ctx.lineWidth = hov || opt.active ? 3 : 2;
+    ctx.strokeStyle = hov || opt.active ? C.gold : opt.primary ? 'rgba(255,255,255,0.22)' : C.line;
     ctx.stroke();
     const cy = y + h / 2;
-    this.text(label, x + w / 2, opt.sub ? cy - 18 : cy + 2, { size: opt.size || 32, weight: 600, align: 'center', base: 'middle' });
-    if (opt.sub) this.text(opt.sub, x + w / 2, cy + 30, { size: opt.subSize || 30, font: opt.subFont || UI, color: C.gold, align: 'center', base: 'middle' });
+    let size = opt.size || 32;
+    ctx.font = `600 ${size}px ${UI}`;
+    while (size > 18 && ctx.measureText(label).width > w - 20) ctx.font = `600 ${(size -= 1)}px ${UI}`;
+    this.text(label, x + w / 2, opt.sub ? cy - 18 : cy + 2, { size, weight: 600, align: 'center', base: 'middle', color: opt.active && !opt.primary ? C.gold : C.text });
+    if (opt.sub) {
+      const font = opt.subFont || UI;
+      let sub = opt.subSize || 30;
+      ctx.font = `${sub}px ${font}`;
+      while (sub > 16 && ctx.measureText(opt.sub).width > w - 20) ctx.font = `${(sub -= 1)}px ${font}`;
+      this.text(opt.sub, x + w / 2, cy + 30, { size: sub, font, color: opt.primary ? 'rgba(255,255,255,0.85)' : C.gold, align: 'center', base: 'middle' });
+    }
     this.buttons.push({ x, y, w, h, action });
   }
 
@@ -130,9 +143,13 @@ export class Panel extends CanvasPlane {
     return y;
   }
 
-  // Arabisch + Umschrift + Deutsch, bei Bedarf verkleinert, damit alles zwischen top und bottom passt.
+  // Arabisch + Umschrift + Bedeutung zwischen top und bottom.
+  // Mehrere Verse stehen Zeile für Zeile nebeneinander (rechts Arabisch, links Umschrift und Bedeutung) –
+  // so bleibt die Schrift groß. Ein einzelner Text (center) steht untereinander in der Mitte.
   recitation(t, top, bottom, center = false) {
     const { ctx, W } = this;
+    const rows = !center && t.ar.length > 1 && t.ar.length === t.de.length && (t.tr.length === 0 || t.tr.length === t.ar.length);
+    if (rows) return this.recitationRows(t, top, bottom);
     const maxW = W - 120;
     const layout = (s, draw) => {
       let y = top;
@@ -163,35 +180,63 @@ export class Panel extends CanvasPlane {
     return layout(s, true);
   }
 
+  recitationRows(t, top, bottom) {
+    const { ctx, W } = this;
+    const leftW = (W - 120) * 0.54, rightW = (W - 120) * 0.42;
+    const layout = (s, draw) => {
+      let y = top;
+      t.ar.forEach((ar, i) => {
+        ctx.font = `${50 * s}px ${AR}`;
+        ctx.direction = 'rtl';
+        const arLines = wrap(ctx, ar, rightW);
+        ctx.direction = 'ltr';
+        ctx.font = `italic ${27 * s}px ${UI}`;
+        const trLines = t.tr[i] ? wrap(ctx, t.tr[i], leftW) : [];
+        ctx.font = `${27 * s}px ${UI}`;
+        const deLines = t.de[i] ? wrap(ctx, t.de[i], leftW) : [];
+        const hL = (trLines.length + deLines.length) * 36 * s, hR = arLines.length * 78 * s;
+        const h = Math.max(hL, hR);
+        if (draw) {
+          // feine Trennlinie zwischen den Versen
+          if (i) { ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(60, y - 5 * s, W - 120, 2); }
+          let ya = y + (h - hR) / 2;
+          for (const l of arLines) { this.text(l, W - 60, ya + 52 * s, { size: 50 * s, font: AR, rtl: true, align: 'right' }); ya += 78 * s; }
+          let yl = y + (h - hL) / 2;
+          for (const l of trLines) { this.text(l, 60, yl + 27 * s, { size: 27 * s, color: C.gold, weight: 'italic' }); yl += 36 * s; }
+          for (const l of deLines) { this.text(l, 60, yl + 27 * s, { size: 27 * s, color: C.text }); yl += 36 * s; }
+        }
+        y += h + 12 * s;
+      });
+      return y;
+    };
+    let s = 1;
+    while (s > 0.55 && layout(s, false) > bottom) s -= 0.02;
+    return layout(s, true);
+  }
+
   v_menu(v) {
     const { W } = this;
     this.heading('NamazVR', t('ui.sub'));
-    this.text(t('ui.choose'), 60, 160, { size: 32, color: C.muted });
-    const gap = 20, w = (W - 120 - gap * 4) / 5;
+    this.text(t('ui.choose'), 60, 146, { size: 28, color: C.muted });
+    const gap = 16, w = (W - 120 - gap * 4) / 5, top = 170, h = 172;
     v.prayers.forEach((p, i) => {
-      this.btn(p.name, 60 + i * (w + gap), 210, w, 200, `prayer:${p.id}`, {
-        size: 40, sub: isRTL() ? '' : p.ar, subFont: AR, subSize: 46, active: p.id === v.times.current,
-      });
-      const cx = 60 + i * (w + gap) + w / 2;
-      const row = v.times.rows.find((t) => t.id === p.id);
-      this.text(`${t('ui.clock', row.time)} · ${t('ui.rakat', p.rakat)}`, cx, 450, { size: 26, color: C.text, align: 'center' });
-      this.text(p.id === v.times.current ? t('ui.now') : p.de, cx, 484, { size: 22, color: p.id === v.times.current ? C.gold : C.muted, align: 'center' });
+      const x = 60 + i * (w + gap), cx = x + w / 2, now = p.id === v.times.current;
+      const row = v.times.rows.find((r) => r.id === p.id);
+      this.btn('', x, top, w, h, `prayer:${p.id}`, { active: now });
+      this.text(p.name, cx, top + 50, { size: 38, weight: 700, align: 'center', color: now ? C.gold : C.text });
+      if (!isRTL()) this.text(p.ar, cx, top + 104, { size: 42, font: AR, align: 'center', color: C.gold });
+      this.text(`${row.time} · ${now ? t('ui.now') : t('ui.rakat', p.rakat)}`, cx, top + (isRTL() ? 110 : 148), { size: 23, color: now ? C.gold : C.muted, align: 'center' });
     });
     const n = v.times.next;
-    this.text(t('ui.next', n.name, n.time, n.inText), 60, 545, { size: 32, weight: 600, color: C.gold });
-    this.text(`${v.qibla} · ${v.calibrated ? t('ui.calibrated') : t('ui.notCalibrated')} · ${v.madhab}`, 60, 588, { size: 26, color: v.calibrated ? '#7fd1a8' : C.muted });
-    const bw = (W - 120 - gap * 3) / 4;
-    [
-      [[t('ui.menuTimes'), 'times'], [t('ui.menuMore'), 'more'], [t('ui.menuWudu'), 'wudu'], [t('ui.menuLearn'), 'learn']],
-      [[t('ui.menuQibla'), 'qibla'], [t('ui.menuTasbih'), 'tasbih'], [t('ui.menuMosque'), 'mosque'], [t('ui.menuSettings'), 'settings']],
-      [[t('ui.menuSuras'), 'suras'], [t('ui.menuPeace'), 'peace'], [t('track.menu', v.tracked), 'tracker'], [t('ram.menu'), 'ramadan']],
-      [[t('ui.kidsBtn', v.kids), 'kids'], [t('prof.btn', v.profile.icon, v.profile.name), 'profiles'], [t('hajj.menu'), 'pilgrim'], [t('alevi.menu'), 'alevi']],
-      [[t('story.menu'), 'stories'], [t('sky.menu'), 'sky']],
-    ].forEach((row, ri) => row.forEach(([label, action], i) => {
-      // letzte Reihe: zwei breite Knöpfe (Geschichten, Sternenhimmel)
-      const wide = row.length === 2, w = wide ? (W - 120 - gap) / 2 : bw, x = 60 + i * (w + gap);
-      this.btn(label, x, 606 + ri * 74, w, 64, action, { primary: (action === 'wudu' && !v.wuduDone) || action === 'pilgrim' || action === 'stories' || action === 'sky', active: (action === 'kids' && v.kids) || (action === 'tracker' && v.tracked === 5), size: 27 });
-    }));
+    this.text(t('ui.next', n.name, n.time, n.inText), 60, 392, { size: 30, weight: 600, color: C.gold });
+    this.text(`${v.qibla} · ${v.calibrated ? t('ui.calibrated') : t('ui.notCalibrated')} · ${v.madhab}`, 60, 428, { size: 23, color: v.calibrated ? '#7fd1a8' : C.muted });
+    // Vier Gruppen, jede mit Überschrift und einer Reihe Knöpfe
+    menuGroups(v).forEach((g, gi) => {
+      const y = 452 + gi * 124;
+      this.text(g.label.toUpperCase(), 62, y + 22, { size: 20, weight: 600, color: C.muted });
+      const bw = (W - 120 - 14 * (g.items.length - 1)) / g.items.length;
+      g.items.forEach((it, i) => this.btn(`${it.icon} ${it.label}`, 60 + i * (bw + 14), y + 34, bw, 76, it.action, { primary: it.primary, active: it.active, size: 25 }));
+    });
   }
 
   v_times(v) {
@@ -264,9 +309,9 @@ export class Panel extends CanvasPlane {
     ctx.fillStyle = C.gold;
     ctx.beginPath(); ctx.roundRect(60, 120, (W - 120) * (v.index + 1) / v.total, 10, 5); ctx.fill();
 
-    this.movement(v, 150, 230);
-    let y = 430;
-    if (v.inner) y = this.paragraphs([`✦  ${v.inner}`], 425, { size: 27, color: C.gold, gap: 8 });
+    this.movement(v, 150, 204);
+    let y = 404;
+    if (v.inner) y = this.paragraphs([`✦  ${v.inner}`], 399, { size: 27, color: C.gold, gap: 8 });
     y = this.paragraphs([step.instr], y, { size: 28, color: C.muted, gap: 10 });
     this.recitation(step, y, H - 150);
 
@@ -477,9 +522,9 @@ export class Panel extends CanvasPlane {
     this.heading(t('duas.title'), `${t(`duas.cats.${v.cat}`)} · ${v.index + 1} / ${v.total}`);
     // Bereiche in zwei Reihen
     const per = Math.ceil(v.cats.length / 2), gap = 12, w = (W - 120 - gap * (per - 1)) / per;
-    v.cats.forEach((c, i) => this.btn(t(`duas.cats.${c}`), 60 + (i % per) * (w + gap), 122 + Math.floor(i / per) * 62, w, 54, `duacat:${c}`, { size: 21, active: c === v.cat }));
-    let y = 250;
-    if (v.cat === 'protect' && v.index === 0) y = this.paragraphs([t('duas.nazarNote')], 258, { size: 21, color: C.muted, gap: 0 }) - 10;
+    v.cats.forEach((c, i) => this.btn(t(`duas.cats.${c}`), 60 + (i % per) * (w + gap), 122 + Math.floor(i / per) * 68, w, 60, `duacat:${c}`, { size: 25, active: c === v.cat }));
+    let y = 262;
+    if (v.cat === 'protect' && v.index === 0) y = this.paragraphs([t('duas.nazarNote')], 272, { size: 21, color: C.muted, gap: 0 }) - 10;
     this.text(v.dua.when, W / 2, y + 24, { size: 26, weight: 600, color: C.gold, align: 'center' });
     const end = this.recitation({ ar: [v.dua.ar], tr: [v.dua.translit].filter(Boolean), de: [v.dua.mean].filter(Boolean) }, y + 50, H - 200, true);
     this.text(v.dua.source, W / 2, Math.min(end + 22, H - 160), { size: 24, color: C.muted, align: 'center', weight: 600 });

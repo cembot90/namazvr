@@ -407,6 +407,7 @@ export default {
     },
   },
   ui: {
+    grp: { pray: 'Namaz', learn: 'Öğren', explore: 'Keşfet', me: 'Bana özel' }, loading: 'Yükleniyor …',
     vrQiblaFirst: 'Hoş geldin! Önce kıbleyi ayarla – böylece mihrap ve her namaz doğru yöne bakar.',
     noVoiceLang: 'Bu cihazda Türkçe ses yok – sesli okuma burada çalışmıyor.',
     menuSuras: 'Sure öğren', surasTitle: 'Sure öğren', surasSub: 'Namaz için kısa sureler – adım adım ezberle', verses: (n) => `${n} âyet`, learned: '✓ ezberlendi', modeRead: 'Oku', modeVerse: 'Âyet âyet', modeTest: 'Kendini dene', verseOf: (i, n) => `Âyet ${i} / ${n}`, reveal: 'Göster', hide: 'Gizle', listen: '🔊 Dinle', markLearned: '✓ Ezberledim', isLearned: '✓ Ezberlendi!', usePrayer: 'Namazda oku', inPrayer: '★ Namazda', testHint: 'Âyeti ezberden oku – sonra göster.', noVoice: 'Bu cihazda Arapça ses yok.',

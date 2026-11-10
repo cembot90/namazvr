@@ -365,6 +365,7 @@ export default {
     },
   },
   ui: {
+    grp: { pray: 'Beten', learn: 'Lernen', explore: 'Entdecken', me: 'Mein Bereich' }, loading: 'Wird geladen …',
     vrQiblaFirst: 'Willkommen! Stell zuerst die Qibla ein – dann zeigt der Mihrab und jedes Gebet in die richtige Richtung.',
     noVoiceLang: 'Dieses Gerät hat keine deutsche Stimme – Vorlesen geht hier leider nicht.',
     menuSuras: 'Suren lernen', surasTitle: 'Suren lernen', surasSub: 'Kurze Suren für das Gebet – Schritt für Schritt auswendig lernen', verses: (n) => `${n} Verse`, learned: '✓ gelernt', modeRead: 'Lesen', modeVerse: 'Vers für Vers', modeTest: 'Abfragen', verseOf: (i, n) => `Vers ${i} / ${n}`, reveal: 'Aufdecken', hide: 'Verdecken', listen: '🔊 Hören', markLearned: '✓ Gelernt', isLearned: '✓ Gelernt!', usePrayer: 'Im Gebet beten', inPrayer: '★ Im Gebet', testHint: 'Sprich den Vers aus dem Gedächtnis – dann aufdecken.', noVoice: 'Auf diesem Gerät gibt es keine arabische Stimme.',
