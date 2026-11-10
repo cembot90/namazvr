@@ -59,6 +59,10 @@ Für VR-Simulation im Browser: Chrome-Erweiterung **Immersive Web Emulator** (vo
 
 Im Ordner `tests/` liegen Tests, die die App im unsichtbaren Browser durchspielen (Inhalte in allen Sprachen, jede Ansicht, jedes Gebet, Umre und Hac, Geschichten). Sie laufen bei jedem Push auf GitHub („Actions“ → „Tests“) und lokal mit `cd tests && npm install && npx playwright install chromium && npm test`. Einzelheiten: [tests/README.md](tests/README.md).
 
+## Inhaltliche Prüfung
+
+Was an den religiösen Texten geprüft und korrigiert wurde und was ein Hoca bzw. Dede noch bestätigen sollte, steht in [docs/inhaltspruefung.md](docs/inhaltspruefung.md).
+
 ## Auf die Meta Quest bringen
 WebXR braucht HTTPS. Am einfachsten:
 1. Ordner auf **GitHub Pages**, **Netlify** oder **Vercel** hochladen (kostenlos).

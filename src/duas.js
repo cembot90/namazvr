@@ -6,7 +6,7 @@ export const DUA_CATS = ['protect', 'family', 'parents', 'sick', 'worry', 'trave
 
 // src: q = [Sure, Vers], b = Bukhārī, m = Muslim, ad = Abū Dāwūd, ti = Tirmidhī, im = Ibn Māja
 const LIST = [
-  { id: 'kids', cat: 'protect', src: { b: 3371 },
+  { id: 'kids', cat: 'protect', src: { b: 3371, ti: 2060 },
     ar: 'أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ',
     tr: 'Uʿīdhukumā bi-kalimāti llāhi t-tāmmah, min kulli shayṭānin wa hāmmah, wa min kulli ʿaynin lāmmah' },
   { id: 'mashallah', cat: 'protect', src: { q: [18, 39] },

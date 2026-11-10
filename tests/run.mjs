@@ -177,6 +177,45 @@ test('inhalte: Rakʿāt der Pflichtgebete und feste Zahlen', async () => {
   if (Object.keys(r.verses).length < 12) throw new Error(`nur ${Object.keys(r.verses).length} Suren`);
 });
 
+test('inhalte: Unterschiede der Rechtsschulen', async () => {
+  const { ctx, page } = await open('mobile');
+  const r = await page.evaluate(async () => {
+    const { PRAYERS, EXTRA_PRAYERS, buildSteps } = await import('/src/prayer.js');
+    const P = (id) => [...PRAYERS, ...EXTRA_PRAYERS].find((p) => p.id === id);
+    const steps = (id, m, g = 'm') => buildSteps(P(id), m, g, 'ikhlas');
+    const first = (list, key) => list.find((s) => s.key === key);
+    const out = {};
+    for (const m of ['hanafi', 'shafii', 'maliki', 'hanbali']) {
+      const fajr = steps('fajr', m), witr = steps('witr', m), eid = steps('eid', m), jan = steps('janaza', m);
+      const q = fajr.find((s) => s.key === 'qunut'), wq = witr.find((s) => s.key === 'qunut');
+      const idx = (list, key, rakah) => list.findIndex((s) => s.key === key && s.rakah === rakah);
+      out[m] = {
+        fatihaStart: first(fajr, 'fatiha').ar[0].slice(0, 8), fatihaLines: first(fajr, 'fatiha').ar.length,
+        opening: first(fajr, 'opening')?.ar[0].slice(0, 12) || null,
+        fajrQunut: q ? [q.ar[0].includes('نَسْتَعِينُكَ') ? 'nastaʿīnuka' : 'ihdinī', fajr.indexOf(q) < idx(fajr, 'ruku', 2) ? 'vor' : 'nach'] : null,
+        witrUnits: [...new Set(witr.map((s) => s.unit))].length, witrQunut: wq ? (witr.indexOf(wq) < witr.findLastIndex((s) => s.key === 'ruku') ? 'vor' : 'nach') : null,
+        eid: eid.filter((s) => s.key === 'takbir' && s.dur > 6).map((s) => (s.dur - 4) / 3),
+        janTakbirs: jan.filter((s) => s.key === 'takbir').length, janRuku: jan.some((s) => s.pose === 'ruku' || s.pose === 'sujud'),
+        sdhuhrUnits: [...new Set(steps('sdhuhr1', m).map((s) => s.unit))].length,
+        thirdRakaSura: steps('maghrib', m).some((s) => s.key === 'sura' && s.rakah === 3),
+      };
+    }
+    return out;
+  });
+  await ctx.close();
+  const want = {
+    hanafi: { fatihaStart: 'بِسْمِ ا', fatihaLines: 4, fajrQunut: null, witrUnits: 1, witrQunut: 'vor', eid: [3, 3], sdhuhrUnits: 1 },
+    shafii: { fatihaStart: 'بِسْمِ ا', fatihaLines: 4, fajrQunut: ['ihdinī', 'nach'], witrUnits: 2, witrQunut: 'nach', eid: [7, 5], sdhuhrUnits: 2 },
+    maliki: { fatihaStart: 'الْحَمْد', fatihaLines: 3, opening: null, fajrQunut: ['nastaʿīnuka', 'vor'], witrUnits: 2, witrQunut: null, eid: [6, 5], sdhuhrUnits: 2 },
+    hanbali: { fatihaStart: 'بِسْمِ ا', fatihaLines: 4, fajrQunut: null, witrUnits: 2, witrQunut: 'nach', eid: [6, 5], sdhuhrUnits: 2 },
+  };
+  for (const [m, w] of Object.entries(want)) {
+    for (const [k, v] of Object.entries(w)) if (JSON.stringify(r[m][k]) !== JSON.stringify(v)) throw new Error(`${m}: ${k} = ${JSON.stringify(r[m][k])}, erwartet ${JSON.stringify(v)}`);
+    if (r[m].janTakbirs !== 4 || r[m].janRuku) throw new Error(`${m}: Totengebet mit ${r[m].janTakbirs} Takbīren, Rukūʿ/Sujūd: ${r[m].janRuku}`);
+    if (r[m].thirdRakaSura) throw new Error(`${m}: Zusatzsure in der 3. Rakʿa des Pflichtgebets`);
+  }
+});
+
 test('inhalte: Gebetszeiten, Qibla und islamischer Kalender', async () => {
   const { ctx, page } = await open('mobile');
   const r = await page.evaluate(async () => {

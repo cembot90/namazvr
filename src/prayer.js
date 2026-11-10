@@ -411,7 +411,7 @@ function buildJanaza(m, gender) {
   add({ key: 'salawat', title: t('title.salawat'), pose: m.qiyam, how: m.hands, dur: 22, instr: t('ext.janSalawat'), ...text('salawat') });
   add({ key: 'takbir', title: t('ext.janTakbir', 3), pose: raisePose, dur: 5, instr: t('ext.janTakbirN', m.raise), ...text('takbir') });
   add({ key: 'dua', title: t('ext.janDua'), pose: m.qiyam, how: m.hands, dur: 16, instr: t('ext.janDuaInstr'), ...text('janazaDua') });
-  add({ key: 'takbir', title: t('ext.janTakbir', 4), pose: raisePose, dur: 5, instr: t('ext.janTakbir4'), ...text('takbir') });
+  add({ key: 'takbir', title: t('ext.janTakbir', 4), pose: raisePose, dur: 5, instr: t('ext.janTakbir4', m.id), ...text('takbir') });
   add({ key: 'salam', title: t('title.salamR'), pose: 'salamStandR', dur: 5, instr: t('ext.janSalamR'), ...text('salam') });
   add({ key: 'salam', title: t('title.salamL'), pose: 'salamStandL', dur: 5, instr: t('ext.janSalamL', m.id), ...text('salam') });
   return steps;
@@ -469,10 +469,14 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
       const eidN = kind === 'eid' ? EID_TAKBIRS[m.id][r - 1] : 0;
       const zawaid = () => add({ ...base, key: 'takbir', title: t('ext.zawaid', eidN), pose: 'takbir', rakah: r, dur: 4 + eidN * 3, instr: t('ext.zawaidInstr', eidN, m.id), ...text('takbir') });
       if (eidN && (r === 1 || m.id !== 'hanafi')) zawaid();
+      // Mālikī: im Pflichtgebet ohne Aʿūdhu und ohne Basmala (die erste Zeile entfällt)
+      const noBasmala = m.id === 'maliki' && (kind === 'fard' || kind === 'jumua');
+      const f1 = text('fatiha1');
+      if (noBasmala) for (const k of ['ar', 'tr', 'de']) f1[k] = f1[k].slice(1);
       add({
         ...base, ...qiyam, key: 'fatiha', title: t('title.fatiha1'), rakah: r, dur: 16,
-        instr: (r === 1 && !m.opening ? `${hands} ` : '') + (r === 1 ? t('instr.fatiha1First') : t('instr.fatiha1')),
-        ...text('fatiha1'),
+        instr: (r === 1 && !m.opening ? `${hands} ` : '') + (r === 1 && !noBasmala ? t('instr.fatiha1First') : t('instr.fatiha1')) + (noBasmala ? t('instr.malikiFatiha') : ''),
+        ...f1,
       });
       add({ ...base, ...qiyam, key: 'fatiha', title: t('title.fatiha2'), rakah: r, dur: 16, instr: t('instr.fatiha2'), ...text('fatiha2') });
       if (r <= 2 || kind !== 'fard') {
@@ -485,7 +489,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
         add({ ...base, key: 'takbir', title: t('title.qunutTakbir'), pose: 'takbir', rakah: r, dur: 5, instr: t('instr.qunutTakbir'), ...text('takbir') });
         add({ ...base, ...qiyam, key: 'qunut', title: t('title.qunut'), rakah: r, dur: 16, instr: t('instr.qunutHanafi'), ...text('qunutHanafi') });
       } else if (qunutBefore) {
-        add({ ...base, ...qiyam, key: 'qunut', title: t('title.qunutQuiet'), rakah: r, dur: 14, instr: t('instr.qunutQuiet'), ...text('qunut') });
+        add({ ...base, ...qiyam, key: 'qunut', title: t('title.qunutQuiet'), rakah: r, dur: 14, instr: t('instr.qunutQuiet'), ...text(m.id === 'maliki' ? 'qunutHanafi' : 'qunut') });
       }
       add({ ...base, key: 'ruku', title: t('title.ruku'), pose: 'ruku', rakah: r, dur: 9, instr: t('instr.ruku', extraRuku + (m.raise ? raiseNote : '')), ...text('ruku') });
       add({ ...base, key: 'itidal', title: t('title.itidal'), pose: 'stand', rakah: r, dur: 8, instr: t('instr.itidal', m.raise ? raiseNote : ''), ...text('itidal') });
@@ -509,8 +513,8 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
         // Ḥanafī (z. B. in der Türkei): nach „Rabbanā ātinā“ auch „Rabbana ghfir lī“
         const duas = m.id === 'hanafi' ? text('dua', 'dua2') : text('dua');
         add({ ...base, key: 'dua', title: t('title.dua'), pose: 'sit', how: finalSit, rakah: r, dur: m.id === 'hanafi' ? 16 : 10, instr: t('instr.dua'), ...duas });
-        add({ ...base, key: 'salam', title: t('title.salamR'), pose: 'taslimR', rakah: r, dur: 5, instr: t('instr.salamR'), ...text('salam') });
-        add({ ...base, key: 'salam', title: t('title.salamL'), pose: 'taslimL', rakah: r, dur: 5, instr: ui < units.length - 1 ? t('instr.salamLNext') : t('instr.salamL'), ...text('salam') });
+        add({ ...base, key: 'salam', title: t('title.salamR'), pose: 'taslimR', rakah: r, dur: 5, instr: t('instr.salamR') + (m.id === 'maliki' ? t('instr.malikiSalamR') : ''), ...text('salam') });
+        add({ ...base, key: 'salam', title: t('title.salamL'), pose: 'taslimL', rakah: r, dur: 5, instr: m.id === 'maliki' ? t('instr.malikiSalamL') : ui < units.length - 1 ? t('instr.salamLNext') : t('instr.salamL'), ...text('salam') });
       }
     }
   }
