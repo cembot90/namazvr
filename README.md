@@ -55,6 +55,10 @@ Handy-Ansicht am Computer testen: http://localhost:8080/?mobile (oder das Browse
 
 Für VR-Simulation im Browser: Chrome-Erweiterung **Immersive Web Emulator** (von Meta) installieren.
 
+## Automatische Tests
+
+Im Ordner `tests/` liegen Tests, die die App im unsichtbaren Browser durchspielen (Inhalte in allen Sprachen, jede Ansicht, jedes Gebet, Umre und Hac, Geschichten). Sie laufen bei jedem Push auf GitHub („Actions“ → „Tests“) und lokal mit `cd tests && npm install && npx playwright install chromium && npm test`. Einzelheiten: [tests/README.md](tests/README.md).
+
 ## Auf die Meta Quest bringen
 WebXR braucht HTTPS. Am einfachsten:
 1. Ordner auf **GitHub Pages**, **Netlify** oder **Vercel** hochladen (kostenlos).
