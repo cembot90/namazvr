@@ -213,7 +213,7 @@ function remoteFlash() {
 }
 function remoteNext() { if (state.view === 'step') { act('next'); remoteFlash(); } }
 function remotePrev() { if (state.view === 'step') { act('prev'); remoteFlash(); } }
-const mediaRemote = new MediaRemote({ next: remoteNext, prev: remotePrev });
+const mediaRemote = new MediaRemote({ next: remoteNext, prev: remotePrev, busy: () => voices.busy, edge: () => voices.edgeAt ?? -1e9 });
 let camState = 'off';
 const handWave = new HandWave({ onTrigger: remoteNext, onState: (st) => { camState = st; showRemoteInd(); if (st === 'denied') { state.remoteCam = false; store.set('remoteCam', false); refresh(); } } });
 function showRemoteInd() {
@@ -1576,7 +1576,9 @@ renderer.setAnimationLoop(() => {
     state.autoT += dt;
     const cur = state.steps[state.i];
     // Geschichten: die Dauer passt sich der Länge des Textes an, Kinder bekommen nur etwas mehr Zeit
-    if (state.autoT >= cur.dur * (cur.story ? (state.kids ? 1.2 : 1) : state.beginner || state.kids ? 1.6 : 1)) act('next');
+    const need = cur.dur * (cur.story ? (state.kids ? 1.2 : 1) : state.beginner || state.kids ? 1.6 : 1);
+    // Erst weiter, wenn die Ansage zu Ende ist (sonst wird die Stimme mitten im Satz abgeschnitten); höchstens 3× so lange warten
+    if (state.autoT >= need && (!voices.busy || state.autoT >= need * 3)) act('next');
   }
   // Atem-Dhikr: einatmen (Kugel wächst), ausatmen (schrumpft); nach jedem Atemzug +1.
   const br = state.breath;

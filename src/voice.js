@@ -217,9 +217,20 @@ export class Voices {
   }
 
   // Abschnitte nacheinander vorlesen. Ergebnis: false, wenn für einen Abschnitt keine Stimme da war.
+  // Läuft gerade eine Ansage? (Auto-Modus wartet, bis sie fertig ist)
+  get busy() { return this.busyGen === this.gen; }
+
   async say(segments) {
     this.cancel();
     const gen = this.gen;
+    this.busyGen = gen;
+    try { return await this.sayParts(segments, gen); } finally {
+      if (this.busyGen === gen) this.busyGen = -1;
+      this.edgeAt = performance.now();
+    }
+  }
+
+  async sayParts(segments, gen) {
     const parts = [];
     for (const s of segments) {
       const text = cleanText(s.text, s.lang);
@@ -238,6 +249,7 @@ export class Voices {
     for (let i = 0; i < parts.length; i++) {
       if (gen !== this.gen) return ok;
       const p = parts[i];
+      this.edgeAt = performance.now(); // Beginn eines Abschnitts (für die Fernbedienung)
       if (p.piper) {
         try {
           const audio = await pending[i];

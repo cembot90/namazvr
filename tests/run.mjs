@@ -496,7 +496,8 @@ test('funktionen: Weiter ohne Tippen – Uhr/Kopfhörer und Hand über der Kamer
     const i0 = salah.state.i;
     window.__media.nexttrack();
     out.next = salah.state.i - i0;
-    await new Promise((res) => setTimeout(res, 800));
+    // Direkt nach Beginn der Ansage wird „Pause“ ignoriert (das meldet das iPhone selbst); danach zählt es
+    await new Promise((res) => setTimeout(res, 1300));
     window.__media.pause(); // Doppeltippen auf der Uhr / Druck auf AirPods
     out.pause = salah.state.i - i0;
     await new Promise((res) => setTimeout(res, 800));

@@ -21,9 +21,12 @@ function quietLoopUrl() {
 }
 
 export class MediaRemote {
-  constructor({ next, prev }) {
+  // busy(): spricht die App gerade? edge(): Zeitpunkt, an dem zuletzt eine Ansage begann oder endete
+  constructor({ next, prev, busy = () => false, edge = () => -1e9 }) {
     this.next = next;
     this.prev = prev;
+    this.busy = busy;
+    this.edge = edge;
     this.on = false;
     this.last = 0;
     this.supported = typeof navigator !== 'undefined' && 'mediaSession' in navigator;
@@ -40,17 +43,19 @@ export class MediaRemote {
     }
     this.audio.play().catch(() => {});
     const ms = navigator.mediaSession;
-    const go = (fn) => () => {
+    const go = (fn, toggle) => () => {
       // Doppelte Meldungen (z. B. Pause + Play kurz hintereinander) nur einmal zählen
       const now = performance.now();
+      // Wenn das Vorlesen beginnt oder endet, meldet das iPhone manchmal selbst „Pause“/„Play“ – das ist kein Tippen
+      if (toggle && now - this.edge() < 900) { ms.playbackState = 'playing'; return; }
       if (now - this.last < 700) return;
       this.last = now;
       fn();
-      this.audio.play().catch(() => {});
+      if (!this.busy()) this.audio.play().catch(() => {});
       ms.playbackState = 'playing';
     };
     for (const [a, fn] of [['nexttrack', this.next], ['previoustrack', this.prev], ['play', this.next], ['pause', this.next], ['seekforward', this.next], ['seekbackward', this.prev]]) {
-      try { ms.setActionHandler(a, go(fn)); } catch { /* vom Browser nicht unterstützt */ }
+      try { ms.setActionHandler(a, go(fn, a === 'play' || a === 'pause')); } catch { /* vom Browser nicht unterstützt */ }
     }
     ms.playbackState = 'playing';
     this.on = true;
@@ -63,6 +68,8 @@ export class MediaRemote {
 
   resume() {
     if (!this.on || !this.audio) return;
+    // Nie während einer Ansage – sonst schneidet das iPhone die Stimme ab. Kurz danach erst weiter.
+    if (this.busy() || performance.now() - this.edge() < 1200) return;
     if (this.audio.paused && !(typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking)) this.audio.play().catch(() => {});
     navigator.mediaSession.playbackState = 'playing';
   }
