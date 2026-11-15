@@ -738,6 +738,13 @@ export default {
       semahEnd: ['Semahın sonu', 'Niyaz', 'Sonunda herkes niyaz eder. Kırklar semahı, turna semahı gibi pek çok semah vardır – her yörenin kendine özgü semahı olur.'],
     },
   },
+  remote: {
+    title: 'Dokunmadan ilerle',
+    media: 'Apple Watch ve kulaklık', mediaSub: 'Saatte „Şimdi Çalıyor“ ekranında: ⏭ ileri, ⏮ geri. Parmaklarla çift dokunma (Series 9 / Ultra 2) veya AirPods’a bir basış = ileri.',
+    cam: 'Elini kameranın üstüne tut', camSub: 'Telefonu önüne koy veya yere bırak, sonra elini kısaca ön kameranın üstüne tut = ileri. Hiçbir görüntü kaydedilmez veya gönderilmez.',
+    keys: 'Ayrıca: Bluetooth sayfa çevirici veya klavye (→, boşluk, Page Down).',
+    mediaOn: '⌚ Saat ve kulaklık', camOn: '✋ Elini kameranın üstüne tut = ileri', camDark: '✋ kamera için çok karanlık', finished: 'Tamam',
+  },
   gfx: { btn: '✨ Grafik', high: 'Yüksek', normal: 'Normal', faces: 'Figürlerin yüzleri', facesSub: 'kapalı: figürler yüzsüz kalır', facesShort: 'Yüzler' },
   ...stories,
 };

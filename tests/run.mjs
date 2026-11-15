@@ -23,10 +23,10 @@ await new Promise((r) => server.listen(0, '127.0.0.1', r));
 const BASE = `http://127.0.0.1:${server.address().port}`;
 
 // CHROMIUM_PATH: einen schon installierten Chromium nutzen (sonst den von „npx playwright install chromium“)
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'] });
+const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined, args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'] });
 
 // Seite öffnen: three.js aus node_modules (statt CDN), Schriften leer, keine Stimmen-Downloads – läuft ohne Internet
-async function open(mode, query = '') {
+async function open(mode, query = '', init = null) {
   const ctx = await browser.newContext({ viewport: mode === 'mobile' ? { width: 430, height: 900 } : { width: 1400, height: 900 }, serviceWorkers: 'block', locale: 'de-DE' });
   await ctx.route('https://cdn.jsdelivr.net/npm/three@0.160.0/**', (r) => {
     const rel = new URL(r.request().url()).pathname.replace('/npm/three@0.160.0/', '');
@@ -36,6 +36,7 @@ async function open(mode, query = '') {
   await ctx.route('https://fonts.gstatic.com/**', (r) => r.abort());
   await ctx.route('https://huggingface.co/**', (r) => r.abort());
   const page = await ctx.newPage();
+  if (init) await page.addInitScript(init);
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => { if (m.type() === 'error' && !/Failed to load resource|net::ERR/.test(m.text())) errors.push(m.text()); });
@@ -474,6 +475,63 @@ test('funktionen: Erinnerung und Kalender-Export', async () => {
   if (r.d2 !== null) throw new Error('Erinnerung kommt eine Stunde zu früh');
   if (r.d3 !== null) throw new Error('Erinnerung für ein abgewähltes Gebet');
   if (r.d4 !== null) throw new Error('Erinnerung kommt doppelt');
+});
+
+test('funktionen: Weiter ohne Tippen – Uhr/Kopfhörer und Hand über der Kamera', async () => {
+  // Die Tasten von Uhr und Kopfhörern kommen über die Media Session: Handler mitschreiben und selbst auslösen
+  const { ctx, page, errors } = await open('mobile', '', () => {
+    window.__media = {};
+    const ms = navigator.mediaSession;
+    if (ms) { const orig = ms.setActionHandler.bind(ms); ms.setActionHandler = (a, h) => { window.__media[a] = h; try { orig(a, h); } catch { /* egal */ } }; }
+  });
+  const r = await page.evaluate(async () => {
+    const out = {};
+    salah.act('settings');
+    out.settings = /Apple Watch/.test(document.querySelector('#ui').innerText) && /Kamera/.test(document.querySelector('#ui').innerText);
+    salah.act('rmedia'); salah.act('rcam');
+    salah.act('menu'); salah.act('prayer:fajr'); salah.state.auto = false;
+    await new Promise((res) => setTimeout(res, 1500));
+    out.handlers = ['nexttrack', 'previoustrack', 'play', 'pause'].every((a) => typeof window.__media[a] === 'function');
+    out.meta = navigator.mediaSession.metadata?.title;
+    const i0 = salah.state.i;
+    window.__media.nexttrack();
+    out.next = salah.state.i - i0;
+    await new Promise((res) => setTimeout(res, 800));
+    window.__media.pause(); // Doppeltippen auf der Uhr / Druck auf AirPods
+    out.pause = salah.state.i - i0;
+    await new Promise((res) => setTimeout(res, 800));
+    window.__media.previoustrack();
+    out.prev = salah.state.i - i0;
+    out.metaAfter = navigator.mediaSession.metadata?.title;
+    out.ind = document.getElementById('rind').textContent;
+    salah.act('menu');
+    await new Promise((res) => setTimeout(res, 300));
+    out.indOff = document.getElementById('rind').classList.contains('show');
+    out.handlersOff = window.__media.nexttrack === null;
+    return out;
+  });
+  await ctx.close();
+  if (!r.settings) throw new Error('Einstellungen zeigen die Schalter nicht');
+  if (!r.handlers) throw new Error('Tasten von Uhr/Kopfhörern nicht angemeldet');
+  if (r.next !== 1 || r.pause !== 2 || r.prev !== 1) throw new Error(`Weiter/Zurück: ${JSON.stringify(r)}`);
+  if (!r.meta || r.meta === r.metaAfter && r.prev === r.next) throw new Error(`Anzeige auf der Uhr: ${JSON.stringify(r)}`);
+  if (!/Uhr/.test(r.ind) || !/Kamera/.test(r.ind)) throw new Error(`Anzeige oben: „${r.ind}“`);
+  if (r.indOff || !r.handlersOff) throw new Error('Nach dem Menü läuft die Fernbedienung weiter');
+  if (errors.length) throw new Error(errors.join('\n'));
+});
+
+test('funktionen: Handgeste erkennt kurzes Abdecken, aber kein Flackern oder umgedrehtes Handy', async () => {
+  const { waveDetector } = await import(path.join(ROOT, 'src/remote.js'));
+  const run = (seq) => { const d = waveDetector(); return seq.map((m, i) => d(m, i * 70)).filter((x) => x === 'trigger').length; };
+  const B = Array(20).fill(120);
+  const cases = {
+    'Hand 0,5 s': [[...B, ...Array(7).fill(15), ...B], 1],
+    'Flackern': [[...B, 15, ...B], 0],
+    'Handy umgedreht': [[...B, ...Array(75).fill(5), ...B], 0],
+    'langsam dunkler': [Array.from({ length: 60 }, (_, i) => 120 - i), 0],
+    'zweimal mit Pause': [[...B, ...Array(6).fill(12), ...Array(25).fill(120), ...Array(6).fill(12), ...B], 2],
+  };
+  for (const [name, [seq, want]] of Object.entries(cases)) if (run(seq) !== want) throw new Error(`${name}: ${run(seq)} statt ${want}`);
 });
 
 test('seiten: Anleitung und Beta-Seite laden, nichts steht seitlich über', async () => {

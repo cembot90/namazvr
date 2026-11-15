@@ -664,6 +664,13 @@ export default {
       semahEnd: ['End of the semah', 'Niyaz', 'At the end everyone bows with niyaz. There are many semahs, e.g. the Kırklar semahı or the Turna semahı – each region has its own.'],
     },
   },
+  remote: {
+    title: 'Next step without tapping',
+    media: 'Apple Watch & headphones', mediaSub: 'On the watch under “Now Playing”: ⏭ next, ⏮ back. Double Tap with your fingers (Series 9 / Ultra 2) or one press on AirPods = next.',
+    cam: 'Hand over the camera', camSub: 'Stand the phone in front of you or lay it down, then briefly hold your hand over the front camera = next. No image is stored or sent.',
+    keys: 'Also possible: Bluetooth page turner or keyboard (→, space, Page Down).',
+    mediaOn: '⌚ Watch & headphones', camOn: '✋ Hand over the camera = next', camDark: '✋ too dark for the camera', finished: 'Finished',
+  },
   gfx: { btn: '✨ Graphics', high: 'High', normal: 'Normal', faces: 'Faces of the figures', facesSub: 'off: the figures stay faceless', facesShort: 'Faces' },
   ...stories,
 };

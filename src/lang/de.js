@@ -673,6 +673,13 @@ export default {
       semahEnd: ['Ende des Semah', 'Niyaz', 'Zum Ende verneigen sich alle mit Niyaz. Es gibt viele Semahs, z. B. den Kırklar-Semahı oder den Turna-Semahı – jede Region hat ihre eigenen.'],
     },
   },
+  remote: {
+    title: 'Weiter ohne Tippen',
+    media: 'Apple Watch & Kopfhörer', mediaSub: 'Auf der Uhr unter „Jetzt läuft“: ⏭ weiter, ⏮ zurück. Doppeltippen mit den Fingern (Series 9 / Ultra 2) oder ein Druck auf AirPods = weiter.',
+    cam: 'Hand über die Kamera', camSub: 'Handy vor dir hinstellen oder hinlegen, dann kurz die Hand über die Frontkamera halten = weiter. Es wird kein Bild gespeichert oder verschickt.',
+    keys: 'Auch möglich: Bluetooth-Seitenwender oder Tastatur (→, Leertaste, Bild ab).',
+    mediaOn: '⌚ Uhr & Kopfhörer', camOn: '✋ Hand über die Kamera = weiter', camDark: '✋ zu dunkel für die Kamera', finished: 'Fertig',
+  },
   gfx: { btn: '✨ Grafik', high: 'Hoch', normal: 'Normal', faces: 'Gesichter der Figuren', facesSub: 'aus: die Figuren bleiben ohne Gesicht', facesShort: 'Gesichter' },
   ...stories,
 };

@@ -1,5 +1,5 @@
 // Offline-Unterstützung: erst das Netz, bei Fehlschlag die gespeicherte Kopie.
-const CACHE = 'salah-v8';
+const CACHE = 'salah-v9';
 
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));

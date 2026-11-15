@@ -32,6 +32,7 @@ import { dayKey } from './learn.js';
 import { ALL_PRAYERS, BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
 import { STORY_LIST, buildStory, findStory, storyQuestion } from './stories.js';
 import { setSkyData, setStoryPhase, storyLift, updateStory } from './storyworld.js';
+import { HandWave, MediaRemote } from './remote.js';
 
 const store = {
   get(key, fallback) {
@@ -194,6 +195,9 @@ const state = {
   // Erinnerung: an/aus und wie viele Minuten vorher
   remind: { on: false, before: 10, prayers: ALL_PRAYERS, ...store.get('remind', {}) },
   remMsg: '',
+  // Weiter ohne Tippen: Apple Watch / Kopfhörer bzw. Hand über die Kamera
+  remoteMedia: store.get('remoteMedia', false),
+  remoteCam: store.get('remoteCam', false),
   quiz: null,
   // Haltungserkennung in VR: Stehhöhe des Kopfes, erkannte Haltung, wie lange schon gehalten
   // dazu in Mixed Reality/VR mit Hand-Erkennung: Hinweis zur Handhaltung und erhobener Zeigefinger
@@ -205,6 +209,41 @@ const voices = new Voices({ enabled: store.get('piper', true), onChange: () => r
 
 const saveProgress = () => store.set(progKey(profileId), state.progress);
 const profName = (p) => p.name || (p.id === 'main' ? t('prof.me') : t('prof.child', Math.max(1, profiles.indexOf(p))));
+
+// Weiter ohne Tippen (siehe remote.js); Anzeige oben links, solange etwas aktiv ist
+const remoteInd = document.createElement('div');
+remoteInd.id = 'rind';
+document.body.appendChild(remoteInd);
+let remoteFlashT = null;
+function remoteFlash() {
+  remoteInd.classList.add('flash');
+  clearTimeout(remoteFlashT);
+  remoteFlashT = setTimeout(() => remoteInd.classList.remove('flash'), 600);
+}
+function remoteNext() { if (state.view === 'step') { act('next'); remoteFlash(); } }
+function remotePrev() { if (state.view === 'step') { act('prev'); remoteFlash(); } }
+const mediaRemote = new MediaRemote({ next: remoteNext, prev: remotePrev });
+let camState = 'off';
+const handWave = new HandWave({ onTrigger: remoteNext, onState: (st) => { camState = st; showRemoteInd(); if (st === 'denied') { state.remoteCam = false; store.set('remoteCam', false); refresh(); } } });
+function showRemoteInd() {
+  const parts = [];
+  if (mediaRemote.on) parts.push(t('remote.mediaOn'));
+  if (camState === 'on') parts.push(t('remote.camOn'));
+  else if (camState === 'dark') parts.push(t('remote.camDark'));
+  remoteInd.textContent = parts.join(' · ');
+  remoteInd.classList.toggle('show', parts.length > 0);
+}
+// Ein- und ausschalten passend zur Ansicht: nur während eines Ablaufs
+function syncRemote() {
+  const active = state.view === 'step' || state.view === 'done';
+  if (state.remoteMedia && active) {
+    if (!mediaRemote.on) mediaRemote.start();
+    const st = state.steps[state.i];
+    mediaRemote.show(state.view === 'done' ? t('remote.finished') : st?.title || '', state.prayer?.name || '');
+  } else mediaRemote.stop();
+  if (state.remoteCam && state.view === 'step') { if (!handWave.on) handWave.start(); } else if (handWave.on) handWave.stop();
+  showRemoteInd();
+}
 
 // Klänge für Umre & Hac und den Waschraum (im Browser erzeugt)
 const ambience = new Ambience(() => voices.audioCtx());
@@ -568,7 +607,8 @@ function view() {
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'settings':
-      return { type: 'settings', gfxHigh: graphics.high, faces: store.get('faces', true), langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
+      return { type: 'settings', gfxHigh: graphics.high, faces: store.get('faces', true),
+        remoteMedia: state.remoteMedia, remoteCam: state.remoteCam, mediaOk: mediaRemote.supported, camOk: handWave.supported, langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
     case 'learn': {
       const p = state.progress;
       return {
@@ -679,6 +719,7 @@ function refresh() {
   ghost.setGhostColor(v.type === 'step' && v.posture === 'ok' ? GHOST_OK : GHOST_WAIT);
   updateCast();
   if (cong.group.visible && v.type === 'step') cong.lead(v.step.pose, v.step.rakah);
+  syncRemote();
   // Geschichten und Sternenhimmel: keine Figur (Propheten werden nicht gezeigt); Szene zeigt den Abschnitt des Schritts
   const noGuide = storyActive() || state.scene === 'starsky';
   if (noGuide) { guide.group.visible = false; guideRug.visible = false; } else if (!guide.group.visible && !cong.group.visible) guide.group.visible = true;
@@ -898,6 +939,8 @@ function act(action) {
     case 'sayprev': state.saying = (state.saying + SAYINGS - 1) % SAYINGS; break;
     case 'walkalong': state.walkAlong = !state.walkAlong; store.set('walkAlong', state.walkAlong); break;
     case 'gfx': graphics.setQuality(!graphics.high); store.set('gfxHigh', graphics.high); break;
+    case 'rmedia': state.remoteMedia = !state.remoteMedia; store.set('remoteMedia', state.remoteMedia); break;
+    case 'rcam': state.remoteCam = !state.remoteCam; store.set('remoteCam', state.remoteCam); break;
     case 'faces': { const on = !store.get('faces', true); store.set('faces', on); setFaces(on); break; }
     case 'sounds': state.sounds = !state.sounds; store.set('sounds', state.sounds); break;
     case 'remon':
@@ -1212,8 +1255,9 @@ window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
   if (['w', 'a', 's', 'd'].includes(k)) { keys.add(k); return; }
   if (e.key === 'Shift') keys.add('shift');
-  if (e.key === 'ArrowRight' || e.key === ' ') act('next');
-  else if (e.key === 'ArrowLeft') act('prev');
+  // Pfeiltasten, Leertaste und Bluetooth-Seitenwender (Bild auf/ab)
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') act('next');
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') act('prev');
   else if (k === 'm') act('menu');
 });
 

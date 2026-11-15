@@ -303,6 +303,10 @@ export class MobileUI {
       <div class="grid2">${btn(t('voice.btn'), 'voice', { cls: 'primary' })}${btn(t('rem.btn'), 'remind', { cls: 'primary' })}</div>
       ${btn(`${t('gfx.btn')}: ${v.gfxHigh ? t('gfx.high') : t('gfx.normal')}`, 'gfx', { cls: `wide ${v.gfxHigh ? 'active' : ''}` })}
       ${toggle(t('gfx.faces'), t('gfx.facesSub'), 'faces', v.faces)}
+      <h3>${esc(t('remote.title'))}</h3>
+      ${v.mediaOk ? toggle(t('remote.media'), t('remote.mediaSub'), 'rmedia', v.remoteMedia) : ''}
+      ${v.camOk ? toggle(t('remote.cam'), t('remote.camSub'), 'rcam', v.remoteCam) : ''}
+      <p class="muted small">${esc(t('remote.keys'))}</p>
       <div class="grid2">${btn(t('ui.info'), 'info')}${btn(t('ui.back'), 'menu')}</div>`;
   }
 
