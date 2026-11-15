@@ -394,6 +394,14 @@ function jamarat(scene, night) {
 export const MEYDAN = { x: 0, z: -3.5, r: 2.2 };
 let semahMode = 0; // 0 = alle sitzen, 1 = Semah langsam, 2 = Semah schnell
 export const setSemah = (mode) => { semahMode = mode; };
+// Cem: welcher Schritt gerade gezeigt wird (die Gemeinde und die Dienste reagieren darauf) und ob das Çerağ brennt
+let cemStep = '', cemLit = true, cemT = 0, baglamaObj = null;
+export function setCemStep(id, lit) {
+  if (id !== cemStep) cemT = 0;
+  cemStep = id;
+  cemLit = lit;
+}
+const NIYAZ_STEPS = new Set(['niyaz', 'cemEnd', 'semahIntro', 'semahEnd']);
 let flame = null;
 
 function baglama(scene, x, z, ry) {
@@ -406,7 +414,9 @@ function baglama(scene, x, z, ry) {
   g.add(body, neck);
   g.position.set(x, 0.42, z);
   g.rotation.set(-0.7, ry, 0);
+  g.userData.rest = { p: g.position.clone(), r: g.rotation.clone() };
   scene.add(g);
+  return g;
 }
 
 function cemevi(scene, night) {
@@ -474,12 +484,20 @@ function cemevi(scene, night) {
   glow.position.set(1.3, 0.9, MEYDAN.z - 3.4);
   flame.userData.light = glow;
   scene.add(stand, flame, glow);
-  baglama(scene, -1.6, MEYDAN.z - 3.6, 0.6);
+  baglamaObj = baglama(scene, -1.6, MEYDAN.z - 3.6, 0.6);
   // Lampen
   const lamp = new THREE.MeshStandardMaterial({ color: 0xfff0c8, emissive: 0xffd48a, emissiveIntensity: night ? 2 : 1.2 });
   for (const [x, z] of [[-4, -6], [4, -6], [-4, 2], [4, 2], [0, -1]]) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 8), lamp); l.position.set(x, H - 0.8, z); scene.add(l); }
   // Gemeinde: Männer und Frauen gemeinsam im Kreis um den Meydan, Blick zur Mitte; Dede und Zakir vorn
-  const list = [{ mode: 'sit', x: 0, z: MEYDAN.z - 4.2, face: true, dede: true }, { mode: 'sit', x: -1.6, z: MEYDAN.z - 4.0, face: true }];
+  const list = [{ mode: 'sit', x: 0, z: MEYDAN.z - 4.2, face: true, dede: true }, { mode: 'sit', x: -1.6, z: MEYDAN.z - 4.0, face: true, zakir: true }];
+  // Dienste (Hizmet): erscheinen nur in ihrem Schritt
+  list.push({ mode: 'role', role: 'cerag', x: 1.75, z: MEYDAN.z - 3.0 });
+  list.push({ mode: 'role', role: 'sweep', a: 0 });
+  list.push({ mode: 'role', role: 'sakka', a: Math.PI });
+  list.push({ mode: 'role', role: 'gorgu', x: -0.45, z: MEYDAN.z - 0.6, female: true });
+  list.push({ mode: 'role', role: 'gorgu', x: 0.45, z: MEYDAN.z - 0.6 });
+  list.push({ mode: 'role', role: 'lokma', a: 0.5 });
+  list.push({ mode: 'role', role: 'lokma', a: 0.5 + Math.PI, female: true });
   const n = 18;
   for (let i = 0; i < n; i++) {
     const a = Math.PI * 0.62 + (i / (n - 1)) * Math.PI * 1.76; // offener Kreis, vorn sitzen Dede und Zakir
@@ -494,6 +512,30 @@ function cemevi(scene, night) {
     g.setGender(p.female ? 'f' : 'm', { scarf: false });
     g.speed = rand(3, 4.5);
     scene.add(g.group);
+    if (p.role === 'lokma' || p.role === 'sakka') {
+      // Tablett mit Lokma bzw. Krug mit Wasser vor dem Körper
+      const item = p.role === 'lokma'
+        ? new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.02, 20), new THREE.MeshStandardMaterial({ color: 0xc9a85c, metalness: 0.7, roughness: 0.35 }))
+        : new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.1, 0.26, 14), new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: 0.6, roughness: 0.4 }));
+      item.position.set(0, p.role === 'lokma' ? 1.12 : 1.05, 0.32);
+      if (p.role === 'lokma') for (let k = 0; k < 6; k++) {
+        const bread = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd9a35a, roughness: 0.9 }));
+        bread.position.set(Math.cos(k) * 0.11, 0.025, Math.sin(k) * 0.11);
+        item.add(bread);
+      }
+      g.group.add(item);
+    }
+    if (p.role === 'sweep') {
+      const broom = new THREE.Group();
+      const stick = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1.0, 6), new THREE.MeshStandardMaterial({ color: 0x8a5a2b }));
+      stick.position.y = 0.5;
+      const brush = new THREE.Mesh(new THREE.ConeGeometry(0.09, 0.22, 10), new THREE.MeshStandardMaterial({ color: 0xc9a86a, roughness: 1 }));
+      brush.position.y = 0.05;
+      broom.add(stick, brush);
+      broom.position.set(0, 0, 0.55);
+      broom.rotation.x = -0.35;
+      g.group.add(broom);
+    }
     crowd.push({ g, ...p, t: rand(0, 10) });
   }
 }
@@ -508,10 +550,25 @@ export function buildHajjScene(group, id, night) {
 
 // Pilger bewegen: Tavaf gegen den Uhrzeigersinn, Sa'y hin und her, Werfen, Stehen
 export function updateCrowd(dt) {
+  cemT += dt;
   if (flame) {
-    const k = 0.85 + Math.sin(performance.now() / 90) * 0.08 + Math.random() * 0.07;
-    flame.scale.set(1, k, 1);
+    // Das Çerağ wird im Rundgang erst beim Schritt „Çerağ“ angezündet – die Flamme wächst langsam
+    const lit = !cemLit ? 0 : cemStep === 'cerag' ? Math.min(1, Math.max(0, (cemT - 1.6) / 1.5)) : 1;
+    const k = (0.85 + Math.sin(performance.now() / 90) * 0.08 + Math.random() * 0.07) * lit;
+    flame.visible = lit > 0.01;
+    flame.scale.set(Math.max(0.01, lit), Math.max(0.01, k), Math.max(0.01, lit));
     flame.userData.light.intensity = 2 * k;
+  }
+  if (baglamaObj) {
+    // Der Zakir nimmt die Bağlama zum Spielen in die Hände
+    const z = baglamaObj.userData.rest;
+    if (cemStep === 'zakir' || semahMode) {
+      baglamaObj.position.set(z.p.x - 0.15, 0.6, z.p.z - 0.08);
+      baglamaObj.rotation.set(-0.55, Math.PI / 2 + 0.25, 0, 'YXZ');
+    } else {
+      baglamaObj.position.copy(z.p);
+      baglamaObj.rotation.copy(z.r);
+    }
   }
   for (const p of crowd) {
     p.t += dt;
@@ -532,8 +589,17 @@ export function updateCrowd(dt) {
       g.group.position.set(p.x, 0, p.z);
       // Zur Mitte des Meydan blicken
       g.group.rotation.y = Math.atan2(MEYDAN.x - p.x, MEYDAN.z - p.z);
-      g.setPose('sit');
+      const playing = p.zakir && (cemStep === 'zakir' || semahMode);
+      // Beim Niyaz verneigen sich alle nacheinander, die Hand auf dem Herzen; der Dede spricht den Gülbank
+      const bow = NIYAZ_STEPS.has(cemStep) && cemT > 0.8 + (p.t % 1) * 0.6;
+      const pose = playing ? 'sitPlay'
+        : p.dede && ['dede', 'gorgu', 'lokma', 'cemEnd'].includes(cemStep) ? 'sitDua'
+        : bow || (cemStep === 'gorgu' && !p.dede) ? 'sitNiyaz' : 'sit';
+      g.setPose(pose);
       g.update(dt);
+      if (playing) g.arms[1].el.rotation.x += Math.sin(p.t * (semahMode === 2 ? 16 : 11)) * 0.18; // Anschlagen der Saiten
+    } else if (p.mode === 'role') {
+      cemRole(p, g, dt);
     } else if (p.mode === 'semah') {
       if (!semahMode) {
         // Sitzen innen am Rand des Meydan
@@ -543,16 +609,29 @@ export function updateCrowd(dt) {
         g.setPose('sit');
         g.update(dt);
       } else {
-        // Im Kreis gegen den Uhrzeigersinn, Arme wie Flügel
-        p.a += (semahMode === 2 ? 0.55 : 0.28) * dt;
+        // Im Kreis gegen den Uhrzeigersinn um den Meydan – und dabei um sich selbst (wie die Planeten um die Sonne).
+        // Arme wie Flügel: die rechte Handfläche zeigt nach oben (nimmt vom Himmel), die linke nach unten (gibt an die Erde).
+        const fast = semahMode === 2;
+        p.a += (fast ? 0.55 : 0.28) * dt;
+        p.spin = (p.spin || 0) + (fast ? 2.6 : 0.9) * dt;
         const x = MEYDAN.x + Math.cos(p.a) * MEYDAN.r, z = MEYDAN.z - Math.sin(p.a) * MEYDAN.r;
         g.group.position.set(x, 0, z);
-        g.group.rotation.y = Math.atan2(-Math.sin(p.a), -Math.cos(p.a));
-        g.setPose(semahMode === 2 ? 'semahFast' : 'semah');
+        // Langsamer Teil: hin und her wiegen; schneller Teil: ganze Drehungen
+        const turn = fast ? p.spin : Math.sin(p.spin) * 0.9;
+        g.group.rotation.y = Math.atan2(-Math.sin(p.a), -Math.cos(p.a)) + turn;
+        g.setPose(fast ? 'semahFast' : 'semah');
         g.update(dt);
-        const swing = Math.sin(p.t * (semahMode === 2 ? 6 : 3.5)) * 0.25;
+        const ph = p.t * (fast ? 6 : 3.5);
+        const swing = Math.sin(ph) * 0.25;
         g.legs[0].hip.rotation.x = swing;
         g.legs[1].hip.rotation.x = -swing;
+        g.legs[0].knee.rotation.x = Math.max(0, -Math.sin(ph)) * 0.45;
+        g.legs[1].knee.rotation.x = Math.max(0, Math.sin(ph)) * 0.45;
+        g.arms[1].el.rotation.y = -1.4; // rechts: Handfläche nach oben
+        g.arms[0].el.rotation.y = -1.4; // links: Handfläche nach unten
+        // Die Arme heben und senken sich wie Flügel
+        g.arms[0].sh.rotation.z += Math.sin(ph * 0.5) * 0.12;
+        g.arms[1].sh.rotation.z -= Math.sin(ph * 0.5 + 1) * 0.12;
       }
     } else {
       g.group.position.set(p.x, 0, p.z);
@@ -561,6 +640,47 @@ export function updateCrowd(dt) {
       g.update(dt);
     }
   }
+}
+
+// Dienste im Cem: nur in ihrem Schritt zu sehen
+function cemRole(p, g, dt) {
+  const on = (p.role === 'cerag' && cemStep === 'cerag') || ((p.role === 'sweep' || p.role === 'sakka') && cemStep === 'hizmet')
+    || (p.role === 'gorgu' && cemStep === 'gorgu') || (p.role === 'lokma' && cemStep === 'lokma');
+  g.group.visible = on;
+  if (!on) return;
+  if (p.role === 'cerag') {
+    // Der Çerağcı beugt sich zur Lampe und zündet sie an, dann Niyaz
+    g.group.position.set(p.x, 0, p.z);
+    g.group.rotation.y = -Math.PI / 2 - 0.4;
+    g.setPose(cemT < 1.4 ? 'stand' : cemT < 3.4 ? 'pick' : 'niyaz');
+    g.update(dt);
+    return;
+  }
+  if (p.role === 'gorgu') {
+    // „Dara durmak“: vor dem Dede stehen, Hand auf dem Herzen, Blick nach unten
+    g.group.position.set(p.x, 0, p.z);
+    g.group.rotation.y = Math.PI;
+    g.setPose('niyaz');
+    g.update(dt);
+    return;
+  }
+  // Kehren (Süpürgeci), Wasser (Sakka) und Lokma verteilen: langsam im Kreis
+  const r = p.role === 'lokma' ? 3.7 : p.role === 'sakka' ? 3.4 : MEYDAN.r * 0.75;
+  const v = p.role === 'sweep' ? 0.35 : 0.45;
+  // Lokma und Sakka bleiben kurz bei jedem Platz stehen
+  const pause = p.role !== 'sweep' && Math.sin(p.t * 1.3) > 0.3;
+  if (!pause) p.a += (v / r) * dt;
+  const x = MEYDAN.x + Math.cos(p.a) * r, z = MEYDAN.z - Math.sin(p.a) * r;
+  g.group.position.set(x, 0, z);
+  g.group.rotation.y = Math.atan2(-Math.sin(p.a), -Math.cos(p.a)) + (pause ? Math.PI / 2 : 0);
+  g.setPose(p.role === 'sweep' ? 'sweep' : p.role === 'lokma' ? 'tray' : 'drink');
+  g.update(dt);
+  if (!pause) {
+    const swing = Math.sin(p.t * 6) * 0.3;
+    g.legs[0].hip.rotation.x += swing;
+    g.legs[1].hip.rotation.x -= swing;
+  }
+  if (p.role === 'sweep') g.arms.forEach((a, i) => { a.sh.rotation.x += Math.sin(p.t * 3 + i) * 0.2; });
 }
 
 // Gehbewegung: Beine und Arme schwingen (nach update(), damit es die Haltung überlagert)

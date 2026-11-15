@@ -23,7 +23,7 @@ import { CITIES, qiblaBearing } from './qibla.js';
 import { ASR, METHODS, TIME_NAMES, formatCountdown, formatTime, prayerStatus } from './prayertimes.js';
 import { PIPER, SAMPLES, Voices } from './voice.js';
 import { buildPilgrimage, isHajj, isPilgrimage, pathAt, pathLength, speedAt, statusOf } from './hajj.js';
-import { JAMARAT, setSemah, updateCrowd } from './hajjworld.js';
+import { JAMARAT, setCemStep, setSemah, updateCrowd } from './hajjworld.js';
 import { Ambience } from './ambient.js';
 import { Graphics, envFor } from './graphics.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
@@ -419,6 +419,10 @@ function updatePilgrim(dt) {
   // Semah: die Gruppe steht auf und dreht sich; du und der Rehber drehen mit
   const semah = (st && st.semah) || 0;
   setSemah(semah);
+  if (state.scene === 'cemevi') {
+    const ci = state.steps.findIndex((x) => x.id === 'cerag');
+    setCemStep(state.view === 'step' ? st?.id || '' : '', ci < 0 || state.view !== 'step' || state.i >= ci);
+  }
   ambience.music(state.scene === 'cemevi' ? (semah || (st && st.id === 'zakir' ? 1 : 0)) : 0);
   if (moving) for (const fig of [guide]) {
     const swing = Math.sin(clock.elapsedTime * (semah ? (semah === 2 ? 6 : 3.5) : 7)) * (semah ? 0.25 : 0.35);

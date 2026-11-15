@@ -24,6 +24,11 @@ export const POSES = {
   niyaz:   { y: 0.95, spine: 0.35, headX: 0.35, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: -0.55, elX: -1.9 } },
   semah:   { y: 0.95, spine: 0.05, headX: 0.1, headY: 0, shX: -0.55, shZ: 1.0, elX: -0.55, elZ: 0.2, hip: 0, knee: 0 },
   semahFast: { y: 0.95, spine: 0.1, headX: 0.05, headY: 0, shX: -0.45, shZ: 1.25, elX: -0.35, elZ: 0.2, hip: 0, knee: 0 },
+  // Cem: Niyaz im Sitzen (Verneigung, rechte Hand auf dem Herzen), Bağlama spielen, Tablett tragen, Kehren
+  sitNiyaz: { y: 0.24, spine: 0.5, headX: 0.45, headY: 0, shX: -0.55, shZ: 0.05, elX: -0.7, elZ: 0, hip: -1.25, knee: 2.82, right: { shX: -0.5, elX: -1.95 } },
+  sitPlay: { y: 0.24, spine: 0.12, headX: 0.35, headY: 0, shX: -0.95, shZ: 0.35, elX: -1.25, elZ: 0, hip: -1.25, knee: 2.82, right: { shX: -0.45, elX: -1.35 } },
+  tray:    { y: 0.95, spine: 0.05, headX: 0.3, headY: 0, shX: -0.3, shZ: 0.12, elX: -1.45, elZ: 0, hip: 0, knee: 0 },
+  sweep:   { y: 0.9, spine: 0.55, headX: 0.35, headY: 0, shX: -0.75, shZ: 0.1, elX: -0.35, elZ: 0, hip: -0.15, knee: 0.25 },
   // Salām im Stehen (Totengebet)
   salamStandR: { y: 0.95, spine: 0, headX: 0.15, headY: -1.1, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0 },
   salamStandL: { y: 0.95, spine: 0, headX: 0.15, headY: 1.1,  shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0 },
@@ -50,7 +55,7 @@ const full = (p) => { const { right, ...rest } = p; return { ...rest, rshX: righ
 for (const k of Object.keys(POSES)) POSES[k] = full(POSES[k]);
 for (const k of Object.keys(VIA)) VIA[k] = full(VIA[k]);
 const KEYS = Object.keys(POSES.stand);
-const SIT = new Set(['sit', 'taslimR', 'taslimL', 'sitDua']);
+const SIT = new Set(['sit', 'taslimR', 'taslimL', 'sitDua', 'sitNiyaz', 'sitPlay']);
 const kind = (name, p) => (name === 'sujud' ? 'sujud' : SIT.has(name) ? 'sit' : p.y > 0.8 && p.hip > -0.4 ? 'stand' : 'other');
 // Reihenfolge wie beim Beten: zur Niederwerfung erst die Knie, dann die Hände, dann die Stirn – beim Aufstehen umgekehrt
 const PATHS = {
