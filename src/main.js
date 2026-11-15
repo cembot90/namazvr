@@ -50,9 +50,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType('local-floor');
 document.body.appendChild(renderer.domElement);
-document.body.appendChild(VRButton.createButton(renderer));
+// VR-/AR-Knopf: eigene Klasse, damit er am Handy und ohne WebXR ausgeblendet werden kann
+const xrButton = (b) => { b.classList.add('xrbtn'); document.body.appendChild(b); return b; };
+xrButton(VRButton.createButton(renderer));
 // Mixed Reality: Gebetsplatz im eigenen Zimmer, mit Handerkennung
-document.body.appendChild(ARButton.createButton(renderer, { optionalFeatures: ['local-floor', 'hand-tracking'] }));
+xrButton(ARButton.createButton(renderer, { optionalFeatures: ['local-floor', 'hand-tracking'] }));
 
 const scene = new THREE.Scene();
 const ROOM_BG = new THREE.Color(0x1a1410);
@@ -1147,11 +1149,37 @@ function setNdc(e) {
   ndc.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
   raycaster.setFromCamera(ndc, camera);
 }
+const touches = new Map();
+let pinch = null, lastTap = 0;
 el.addEventListener('pointerdown', (e) => {
   drag = { x: e.clientX, y: e.clientY, moved: 0 };
   el.setPointerCapture(e.pointerId);
+  if (!mobileUI) return;
+  touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), zoom: mobileCam.zoom }; }
+  // Doppelt tippen: Grundansicht
+  const now = performance.now();
+  if (touches.size === 1 && now - lastTap < 320) resetOrbit();
+  lastTap = now;
 });
 el.addEventListener('pointermove', (e) => {
+  if (mobileUI) {
+    if (!touches.has(e.pointerId) || !drag) return;
+    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (touches.size >= 2 && pinch) {
+      const [a, b] = [...touches.values()];
+      mobileCam.zoom = THREE.MathUtils.clamp(pinch.zoom * pinch.d / Math.max(20, Math.hypot(a.x - b.x, a.y - b.y)), 0.35, 2.6);
+    } else {
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      drag.moved += Math.abs(dx) + Math.abs(dy);
+      mobileCam.yaw -= dx * 0.008;
+      mobileCam.pitch = THREE.MathUtils.clamp(mobileCam.pitch + dy * 0.006, -1.2, 0.9);
+    }
+    drag.x = e.clientX; drag.y = e.clientY;
+    applyOrbit();
+    if (drag.moved > 10) orbitUI?.hint.classList.add('gone');
+    return;
+  }
   if (drag) {
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     drag.moved += Math.abs(dx) + Math.abs(dy);
@@ -1165,7 +1193,10 @@ el.addEventListener('pointermove', (e) => {
   updateHover(h?.button?.action ?? null);
   el.style.cursor = h?.button ? 'pointer' : 'grab';
 });
+const endTouch = (e) => { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; if (!touches.size) drag = null; };
+el.addEventListener('pointercancel', endTouch);
 el.addEventListener('pointerup', (e) => {
+  if (mobileUI) { endTouch(e); return; }
   if (drag && drag.moved < 6 && !mobileUI) {
     setNdc(e);
     const b = panelHit()?.button;
@@ -1266,6 +1297,18 @@ renderer.xr.addEventListener('sessionend', () => {
 const params = new URLSearchParams(location.search);
 const isMobile = params.has('mobile') || (!params.has('desktop') && window.innerWidth <= 820 && !/OculusBrowser|Quest/i.test(navigator.userAgent));
 const mobileUI = isMobile ? new MobileUI(document.getElementById('ui'), act) : null;
+// Bedienhilfe über der 3D-Ansicht am Handy: Hinweis (verschwindet nach dem ersten Drehen) und Knopf zurück zur Grundansicht
+const orbitUI = mobileUI ? (() => {
+  const box = document.createElement('div');
+  box.id = 'orbit';
+  box.innerHTML = `<p class="hint"></p><button type="button" class="reset"></button>`;
+  document.body.appendChild(box);
+  const hint = box.querySelector('.hint'), reset = box.querySelector('.reset');
+  reset.addEventListener('click', () => resetOrbit());
+  if (store.get('orbitHintSeen', false)) hint.classList.add('gone');
+  hint.addEventListener('transitionend', () => store.set('orbitHintSeen', true));
+  return { box, hint, reset };
+})() : null;
 
 // Auf dem Handy blickt die Kamera auf die Vorbeter-Figur; mit Cemaat von schräg hinten über die Reihen.
 function aimAtGuide() {
@@ -1297,10 +1340,31 @@ function aimAtGuide() {
   } else if (state.wuduRoom) world.localToWorld(target.set(0, 0.95, -0.4));
   else if (cong.group.visible) leader().group.localToWorld(target);
   else world.localToWorld(target.set(0.6, 1.0, -3));
-  const d = target.sub(camera.position);
-  yaw = Math.atan2(-d.x, -d.z);
-  pitch = Math.atan2(d.y, Math.hypot(d.x, d.z));
-  camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  // Grundansicht merken; die eigene Drehung und der Zoom kommen darüber (bleiben beim nächsten Schritt erhalten)
+  mobileCam.eye.copy(camera.position);
+  mobileCam.target.copy(target);
+  applyOrbit();
+}
+
+// Handy: mit einem Finger um die Figur herumgehen, mit zwei Fingern zoomen, doppelt tippen = zurück zur Grundansicht
+const mobileCam = { eye: new THREE.Vector3(), target: new THREE.Vector3(), yaw: 0, pitch: 0, zoom: 1 };
+const orbitSph = new THREE.Spherical();
+function applyOrbit() {
+  const o = mobileCam, v = o.eye.clone().sub(o.target);
+  orbitSph.setFromVector3(v);
+  orbitSph.theta += o.yaw;
+  // nicht unter den Boden und nicht senkrecht von oben
+  orbitSph.phi = THREE.MathUtils.clamp(orbitSph.phi - o.pitch, 0.25, 1.5);
+  orbitSph.radius = THREE.MathUtils.clamp(orbitSph.radius * o.zoom, 0.6, 14);
+  camera.position.copy(o.target).add(v.setFromSpherical(orbitSph));
+  if (camera.position.y < 0.25) camera.position.y = 0.25;
+  camera.lookAt(o.target);
+  const turned = Math.abs(o.yaw) > 0.02 || Math.abs(o.pitch) > 0.02 || Math.abs(o.zoom - 1) > 0.02;
+  orbitUI?.reset.classList.toggle('show', turned);
+}
+function resetOrbit() {
+  Object.assign(mobileCam, { yaw: 0, pitch: 0, zoom: 1 });
+  applyOrbit();
 }
 
 function layout() {
@@ -1315,6 +1379,11 @@ function layout() {
 function applyLang() {
   document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
   const hint = document.getElementById('hint');
+  if (orbitUI) {
+    orbitUI.hint.textContent = t('ui.orbitHint');
+    orbitUI.reset.textContent = t('ui.orbitReset');
+    orbitUI.reset.setAttribute('aria-label', t('ui.orbitReset'));
+  }
   if (hint) {
     // Hinweis lässt sich einklappen (bleibt gemerkt) und wieder öffnen
     hint.innerHTML = `<span>${t('ui.hint')}</span><button class="x" type="button" aria-label="${t('ui.back')}">×</button>`;
@@ -1562,9 +1631,8 @@ refresh();
 requestAnimationFrame(() => window.__bootDone?.());
 // VR-/AR-Knopf ausblenden, wenn das Gerät es nicht kann (statt „VR NOT SUPPORTED“)
 setTimeout(() => {
-  for (const id of ['VRButton', 'ARButton']) {
-    const b = document.getElementById(id);
-    if (b && /NOT SUPPORTED|NOT ALLOWED|NEEDS HTTPS/i.test(b.textContent)) b.classList.add('off');
+  for (const b of document.querySelectorAll('.xrbtn')) {
+    if (/NOT SUPPORTED|NOT ALLOWED|NOT AVAILABLE|NEEDS HTTPS/i.test(b.textContent)) b.classList.add('off');
   }
 }, 1500);
 // Schriften nachladen, dann Panel neu zeichnen (Arabisch braucht Amiri).

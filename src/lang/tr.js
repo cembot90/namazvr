@@ -407,6 +407,7 @@ export default {
     },
   },
   ui: {
+    orbitHint: '👆 Sürükle: figürün etrafında dolaş · iki parmak: yakınlaştır · çift dokun: geri', orbitReset: '⟲ Görünüm',
     grp: { pray: 'Namaz', learn: 'Öğren', explore: 'Keşfet', me: 'Bana özel' }, loading: 'Yükleniyor …',
     vrQiblaFirst: 'Hoş geldin! Önce kıbleyi ayarla – böylece mihrap ve her namaz doğru yöne bakar.',
     noVoiceLang: 'Bu cihazda Türkçe ses yok – sesli okuma burada çalışmıyor.',

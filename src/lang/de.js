@@ -365,6 +365,7 @@ export default {
     },
   },
   ui: {
+    orbitHint: '👆 Ziehen: um die Figur herumgehen · zwei Finger: zoomen · doppelt tippen: zurück', orbitReset: '⟲ Ansicht',
     grp: { pray: 'Beten', learn: 'Lernen', explore: 'Entdecken', me: 'Mein Bereich' }, loading: 'Wird geladen …',
     vrQiblaFirst: 'Willkommen! Stell zuerst die Qibla ein – dann zeigt der Mihrab und jedes Gebet in die richtige Richtung.',
     noVoiceLang: 'Dieses Gerät hat keine deutsche Stimme – Vorlesen geht hier leider nicht.',

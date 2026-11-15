@@ -356,6 +356,7 @@ export default {
     },
   },
   ui: {
+    orbitHint: '👆 Drag: walk around the figure · two fingers: zoom · double-tap: reset', orbitReset: '⟲ View',
     grp: { pray: 'Pray', learn: 'Learn', explore: 'Explore', me: 'My space' }, loading: 'Loading …',
     vrQiblaFirst: 'Welcome! First set the qibla – then the mihrab and every prayer face the right direction.',
     noVoiceLang: 'This device has no English voice – reading aloud does not work here.',

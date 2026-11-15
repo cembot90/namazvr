@@ -55,11 +55,25 @@
     #VRButton, #ARButton { left: auto !important; width: 170px !important; bottom: 16px !important; border-radius: var(--r) !important; border: 1px solid var(--line-gold) !important;
       background: rgba(11,19,34,.86) !important; color: var(--text) !important; font: 600 13px Inter, system-ui, sans-serif !important; opacity: 1 !important; letter-spacing: .04em; }
     #VRButton { right: 202px; } #ARButton { right: 16px; }
-    #VRButton.off, #ARButton.off { display: none !important; }
+    #VRButton.off, #ARButton.off, .xrbtn.off { display: none !important; }
+    /* Handy: Hinweis und Knopf über der 3D-Ansicht */
+    #orbit { display: none; }
+    body.mobile #orbit { display: block; position: fixed; left: 0; right: 0; top: 0; height: calc(36vh - 18px); pointer-events: none; z-index: 4; }
+    #orbit .hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; width: max-content; max-width: calc(100% - 32px);
+      padding: 7px 12px; border-radius: 999px; background: rgba(11,19,34,.72); color: #f0f3f8; font: 500 12.5px/1.35 Inter, system-ui, sans-serif; text-align: center;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: opacity .6s ease .4s; }
+    #orbit .hint.gone { opacity: 0; }
+    #orbit .reset { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; pointer-events: auto; display: none;
+      min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(230,199,127,.5); background: rgba(11,19,34,.78); color: #e6c77f;
+      font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; }
+    #orbit .reset.show { display: block; }
+    html[dir="rtl"] #orbit .reset { right: auto; left: 12px; }
+    html[dir="rtl"] #orbit .hint { font-family: "Noto Sans Arabic", Inter, sans-serif; }
 
     /* Handy: oben die 3D-Szene mit der Figur, darunter die Bedienung */
     body.mobile { overflow: hidden; }
-    body.mobile #hint, body.mobile #VRButton, body.mobile #ARButton { display: none !important; }
+    body.mobile #hint, body.mobile #VRButton, body.mobile #ARButton, body.mobile .xrbtn { display: none !important; }
+    body.mobile canvas { touch-action: none; }
     body.mobile canvas:first-of-type { display: block; }
     body.mobile #ui {
       display: block; position: fixed; left: 0; right: 0; bottom: 0; top: calc(36vh - 18px);
