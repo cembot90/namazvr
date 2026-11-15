@@ -48,6 +48,131 @@ function canvasTexture(w, h, draw) {
   return t;
 }
 
+// Feines Rauschen über eine fertige Zeichnung (Teppichflor, Putz) – macht Flächen weniger glatt
+function grain(ctx, w, h, amount, seed = 3) {
+  const img = ctx.getImageData(0, 0, w, h);
+  let s = seed;
+  const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  for (let i = 0; i < img.data.length; i += 4) {
+    const n = (rnd() - 0.5) * amount;
+    img.data[i] += n; img.data[i + 1] += n; img.data[i + 2] += n;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+// Marmor/Stein: helle Fläche mit feinen Adern, wird mit der Materialfarbe multipliziert
+let marbleTex = null;
+function marbleMap() {
+  if (marbleTex) return marbleTex;
+  marbleTex = canvasTexture(256, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+    let s = 11;
+    const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    // weiche Wolken
+    for (let i = 0; i < 40; i++) {
+      const x = rnd() * w, y = rnd() * h, r = 20 + rnd() * 60, g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(120,110,100,${0.03 + rnd() * 0.04})`); g.addColorStop(1, 'rgba(120,110,100,0)');
+      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    }
+    // Adern
+    for (let i = 0; i < 9; i++) {
+      ctx.strokeStyle = `rgba(90,82,74,${0.12 + rnd() * 0.18})`;
+      ctx.lineWidth = 0.6 + rnd() * 1.6;
+      ctx.beginPath();
+      let x = rnd() * w, y = 0;
+      ctx.moveTo(x, y);
+      while (y < h) { const nx = x + (rnd() - 0.5) * 60, ny = y + 20 + rnd() * 50; ctx.quadraticCurveTo(x + (rnd() - 0.5) * 40, (y + ny) / 2, nx, ny); x = nx; y = ny; }
+      ctx.stroke();
+    }
+    grain(ctx, w, h, 8, 5);
+  });
+  marbleTex.wrapS = marbleTex.wrapT = THREE.RepeatWrapping;
+  return marbleTex;
+}
+const stoneMat = (color, roughness) => new THREE.MeshStandardMaterial({ color, roughness, map: marbleMap() });
+
+// Weiche Schatten (Ersatz für Umgebungsverdeckung, auch ohne Schatten auf der Quest)
+let blobTex = null;
+export function softShadowMap() {
+  if (blobTex) return blobTex;
+  blobTex = canvasTexture(128, 128, (ctx, w) => {
+    const g = ctx.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    g.addColorStop(0, 'rgba(0,0,0,0.8)'); g.addColorStop(0.45, 'rgba(0,0,0,0.42)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, w);
+  });
+  return blobTex;
+}
+// Dunkler Rand an Säulen- und Pfeilerfüßen: list = [[x, y, z], …], r = Radius
+function baseShade(scene, list, r, strength = 0.55) {
+  const geo = new THREE.PlaneGeometry(1, 1);
+  geo.rotateX(-Math.PI / 2);
+  const m = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ map: softShadowMap(), transparent: true, opacity: strength, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }), list.length);
+  list.forEach(([x, , z], i) => { dummy.position.set(x, 0.008, z); dummy.rotation.set(0, 0, 0); dummy.scale.setScalar(r * 3.4); dummy.updateMatrix(); m.setMatrixAt(i, dummy.matrix); });
+  m.renderOrder = 1;
+  scene.add(m);
+}
+// Schatten in den Ecken: unten an den Wänden und am Boden entlang der Wände
+function cornerShade(scene) {
+  const tex = canvasTexture(4, 128, (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, h, 0, 0);
+    g.addColorStop(0, 'rgba(0,0,0,0.5)'); g.addColorStop(0.35, 'rgba(0,0,0,0.16)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  });
+  const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+  for (let i = 0; i < 4; i++) {
+    const len = i % 2 ? D : W, a = i * Math.PI / 2;
+    // an der Wand, 1,6 m hoch (dunkel unten)
+    const wall = new THREE.Mesh(new THREE.PlaneGeometry(len, 1.6), mat);
+    wall.position.set(-Math.sin(a) * (HW - 0.012), 0.8, -Math.cos(a) * (HD - 0.012));
+    wall.rotation.y = a;
+    // am Boden, 1,2 m breit, dunkel an der Wand
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(len, 1.2), mat);
+    floor.rotation.set(-Math.PI / 2, a + Math.PI, 0, 'YXZ');
+    floor.position.set(-Math.sin(a) * (HW - 0.6), 0.006, -Math.cos(a) * (HD - 0.6));
+    wall.renderOrder = floor.renderOrder = 1;
+    scene.add(wall, floor);
+  }
+}
+// Sonnenstrahlen durch die Fenster der einen Seite (nur am Tag): zwei gekreuzte, nach unten verblassende Flächen
+// und ein heller Fleck, wo das Licht auf den Teppich fällt
+let shaftTex = null;
+function sunShafts(scene, spots, width, winH) {
+  if (NIGHT || !spots.length) return;
+  shaftTex ||= canvasTexture(64, 256, (ctx, w, h) => {
+    const v = ctx.createLinearGradient(0, 0, 0, h);
+    v.addColorStop(0, 'rgba(255,255,255,0.9)'); v.addColorStop(0.7, 'rgba(255,255,255,0.35)'); v.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = v; ctx.fillRect(0, 0, w, h);
+    ctx.globalCompositeOperation = 'destination-in';
+    const s = ctx.createLinearGradient(0, 0, w, 0);
+    s.addColorStop(0, 'rgba(0,0,0,0)'); s.addColorStop(0.3, 'rgba(0,0,0,1)'); s.addColorStop(0.7, 'rgba(0,0,0,1)'); s.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = s; ctx.fillRect(0, 0, w, h);
+  });
+  const L = new THREE.Vector3(-0.42, -0.86, -0.29).normalize();
+  const shaft = new THREE.MeshBasicMaterial({ map: shaftTex, color: 0xffe9c2, transparent: true, opacity: 0.17, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  const patch = new THREE.MeshBasicMaterial({ map: softShadowMap(), color: 0xffe2b0, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 });
+  const along = new THREE.Vector3(0, 0, 1);
+  for (const [x, y, z] of spots) {
+    const len = y / -L.y, mid = new THREE.Vector3(x, y, z).addScaledVector(L, len / 2);
+    const up = L.clone().negate();
+    const flat = along.clone().addScaledVector(up, -along.dot(up)).normalize();
+    for (const side of [flat, new THREE.Vector3().crossVectors(up, flat).normalize()]) {
+      const g = new THREE.PlaneGeometry(width, len);
+      const nrm = new THREE.Vector3().crossVectors(side, up).normalize();
+      g.applyMatrix4(new THREE.Matrix4().makeBasis(side, up, nrm));
+      const m = new THREE.Mesh(g, shaft);
+      m.position.copy(mid);
+      m.renderOrder = 3;
+      scene.add(m);
+    }
+    const end = new THREE.Vector3(x, y, z).addScaledVector(L, len);
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(winH * 0.9, width * 1.3), patch);
+    f.rotation.x = -Math.PI / 2;
+    f.position.set(end.x, 0.01, end.z);
+    f.renderOrder = 2;
+    scene.add(f);
+  }
+}
+
 // Spitzbogen-Umriss: Breite w, Höhe der Seitenwände h.
 function archShape(w, h, y0 = 0, shape = new THREE.Shape()) {
   shape.moveTo(-w / 2, y0);
@@ -86,6 +211,11 @@ function carpetTexture([base, inner, line, accent]) {
     ctx.stroke();
     ctx.fillStyle = line;
     ctx.fillRect(0, h - 8, w, 8);
+    // Flor: feine Fasern und leichte Unregelmäßigkeit
+    ctx.globalAlpha = 0.07;
+    for (let y = 0; y < h; y += 2) { ctx.fillStyle = y % 4 ? '#000' : '#fff'; ctx.fillRect(0, y, w, 1); }
+    ctx.globalAlpha = 1;
+    grain(ctx, w, h, 22, 9);
   });
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(W / 0.9, D / 1.2);
@@ -161,6 +291,7 @@ function wallTexture(style) {
     if (style === 'osmanisch') { ctx.fillStyle = '#1f4fa0'; ctx.fillRect(0, top, w, 8); }
     ctx.fillStyle = '#c9a85c';
     ctx.fillRect(0, top - 6, w, 6);
+    grain(ctx, w, h, 7, 13);
   });
 }
 
@@ -279,6 +410,7 @@ function floorAndWalls(scene, style) {
     wall.rotation.y = a;
     scene.add(wall);
   }
+  cornerShade(scene);
 }
 
 // Flache Decke mit runden Öffnungen, darüber je eine Kuppel: domes = [{ x, z, r, mat }]
@@ -318,6 +450,8 @@ function sideWindows(scene, rows, color, zs, size = 1) {
   const list = [];
   for (const side of [-1, 1]) for (const y of rows) for (const z of zs) list.push([side * (HW - 0.02), y, z, -side * Math.PI / 2]);
   inst(scene, new THREE.ShapeGeometry(archShape(0.9 * size, 1.4 * size)), new THREE.MeshBasicMaterial({ color: glassColor(color) }), list);
+  const near = [...zs].sort((a, b) => Math.abs(a - userZ()) - Math.abs(b - userZ())).slice(0, 6);
+  sunShafts(scene, near.map((z) => [HW - 0.05, rows[0] + 0.9 * size, z]), 0.9 * size, 1.4 * size);
 }
 
 // Ornamentierte Kuppel-Innenseite (osmanisch und Großmoschee)
@@ -444,7 +578,7 @@ function buildKlassisch(scene) {
   ceilingWithDomes(scene, [{ x: 0, z: userZ(), r: 5, mat: domeMat }, { x: 0, z: userZ() + 12, r: 5, mat: domeMat }]);
   domeWindows(scene, 0, userZ(), 5, 20);
   domeWindows(scene, 0, userZ() + 12, 5, 20);
-  const stone = new THREE.MeshStandardMaterial({ color: 0xe8dcc4, roughness: 0.9 });
+  const stone = stoneMat(0xe8dcc4, 0.85);
   const g = gold();
   const xs = [-9, -4.5, 4.5, 9], zs = range(-HD + 3, HD - 2, 4);
   const cols = xs.flatMap((x) => zs.map((z) => [x, 2.1, z]));
@@ -458,6 +592,7 @@ function buildKlassisch(scene) {
   mihrab(scene, g, nicheTexture(), false, 1.3);
   minbar(scene, 1.2, woodMat(), g, 6.6);
   block(cols, 0.3);
+  baseShade(scene, cols, 0.26);
   const spots = [];
   for (const x of [-6.75, -2.25, 2.25, 6.75]) for (const z of range(-HD + 3, HD - 3, 4)) spots.push([x, z + 2, 3.6]);
   lanterns(scene, spots);
@@ -475,7 +610,7 @@ function buildOsmanisch(scene) {
   ], 0xeef0f2);
   domeWindows(scene, 0, domeZ, 13, 40, 1.8);
   // Vier mächtige Pfeiler tragen die Hauptkuppel
-  const marble = new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.6 });
+  const marble = stoneMat(0xf2efe8, 0.55);
   const piers = [-9.2, 9.2].flatMap((x) => [-9.2, 9.2].map((dz) => [x, H / 2, domeZ + dz]));
   inst(scene, new THREE.CylinderGeometry(1.1, 1.25, H, 12), marble, piers);
   inst(scene, new THREE.CylinderGeometry(1.16, 1.16, 0.3, 12), new THREE.MeshStandardMaterial({ color: 0x1f4fa0, roughness: 0.6 }), piers.map(([x, , z]) => [x, 2.8, z]));
@@ -490,6 +625,7 @@ function buildOsmanisch(scene) {
   mihrab(scene, marble, nicheMap, false, 1.5);
   minbar(scene, 1.4, marble, gold(), 6.5);
   block(piers, 1.3);
+  baseShade(scene, piers, 1.25, 0.5);
   lightRing(scene, 0, domeZ, 8, 3.4, 64);
   lightRing(scene, 0, domeZ, 5.5, 3.8, 44);
   lanterns(scene, [[-9, domeZ + 17, 4], [9, domeZ + 17, 4], [-14, domeZ + 4, 4.2], [14, domeZ + 4, 4.2], [-14, domeZ - 6, 4.2], [14, domeZ - 6, 4.2]]);
@@ -513,8 +649,8 @@ function buildAndalusisch(scene) {
   ceil.position.y = H;
   scene.add(ceil);
   // Säulenwald: doppelstöckige Hufeisenbögen in Reihen Richtung Qibla, breiter Mittelgang
-  const stone = new THREE.MeshStandardMaterial({ color: 0xd9c49c, roughness: 0.9 });
-  const marble = new THREE.MeshStandardMaterial({ color: 0x6d5a4a, roughness: 0.5 });
+  const stone = stoneMat(0xd9c49c, 0.9);
+  const marble = stoneMat(0x7d6a58, 0.45);
   const xs = range(2.8, HW - 2, 2.8).flatMap((x) => [-x, x]);
   const zs = range(-HD + 1.5, HD - 1.5, 3);
   const cols = xs.flatMap((x) => zs.map((z) => [x, 1.3, z]));
@@ -537,6 +673,7 @@ function buildAndalusisch(scene) {
   mihrab(scene, gold(), nicheMap, true, 1.2);
   minbar(scene, 1.1, woodMat(), gold(), 7);
   block(cols, 0.2);
+  baseShade(scene, cols, 0.2);
   const lamps = [];
   for (const x of range(1.4, HW - 3, 2.8).flatMap((v) => [-v, v])) for (const z of range(-HD + 3, HD - 3, 6)) lamps.push([x, z, 5.6]);
   lanterns(scene, lamps, 0xffc070);
@@ -557,7 +694,7 @@ function buildGross(scene) {
   ], 0xf1efe9);
   domeWindows(scene, 0, domeZ, 16, 48, 2.2);
   for (const [x, z, r] of [[-23, domeZ, 6], [23, domeZ, 6], [-12, domeZ + 26, 8], [12, domeZ + 26, 8]]) domeWindows(scene, x, z, r, 20, 1.2);
-  const marble = new THREE.MeshStandardMaterial({ color: 0xf3f0ea, roughness: 0.55 });
+  const marble = stoneMat(0xf3f0ea, 0.5);
   const blue = new THREE.MeshStandardMaterial({ color: 0x1f4fa0, roughness: 0.6 });
   const piers = [-11.5, 11.5].flatMap((x) => [-11.5, 11.5].map((dz) => [x, H / 2, domeZ + dz]));
   inst(scene, new THREE.CylinderGeometry(1.8, 2.0, H, 8), marble, piers);
@@ -596,6 +733,8 @@ function buildGross(scene) {
   minbar(scene, 1.9, marble, gold(), 7.5);
   block(piers, 2.0);
   block(posts, 0.35);
+  baseShade(scene, piers, 2.0, 0.5);
+  baseShade(scene, posts, 0.32);
   lightRing(scene, 0, domeZ, 11, 4.2, 96);
   lightRing(scene, 0, domeZ, 7.5, 4.7, 64);
   for (const [x, z, r] of [[-23, domeZ, 3], [23, domeZ, 3], [-12, domeZ + 26, 4], [12, domeZ + 26, 4]]) lightRing(scene, x, z, r, 4.4, 28);
