@@ -755,7 +755,7 @@ export default {
   },
   remote: {
     title: 'Dokunmadan ilerle',
-    media: 'Apple Watch ve kulaklık', mediaSub: 'Saatte „Şimdi Çalıyor“ ekranında: ⏭ ileri, ⏮ geri. Parmaklarla çift dokunma (Series 9 / Ultra 2) veya AirPods’a bir basış = ileri.',
+    media: 'Apple Watch ve kulaklık', mediaSub: 'Saatte „Şimdi Çalıyor“ ekranında: ⏭ ileri, ⏮ geri. Parmaklarla çift dokunma (Series 9 / Ultra 2) veya AirPods’a bir basış = ileri. Saatte bir şey görünmüyor mu? Saatte „Şimdi Çalıyor“ uygulamasını (daire içinde ▶) aç.',
     cam: 'Elini kameranın üstüne tut', camSub: 'Telefonu önüne koy veya yere bırak, sonra elini kısaca ön kameranın üstüne tut = ileri. Hiçbir görüntü kaydedilmez veya gönderilmez.',
     keys: 'Ayrıca: Bluetooth sayfa çevirici veya klavye (→, boşluk, Page Down).',
     mediaOn: '⌚ Saat ve kulaklık', camOn: '✋ Elini kameranın üstüne tut = ileri', camDark: '✋ kamera için çok karanlık', finished: 'Tamam',

@@ -681,7 +681,7 @@ export default {
   },
   remote: {
     title: 'Next step without tapping',
-    media: 'Apple Watch & headphones', mediaSub: 'On the watch under “Now Playing”: ⏭ next, ⏮ back. Double Tap with your fingers (Series 9 / Ultra 2) or one press on AirPods = next.',
+    media: 'Apple Watch & headphones', mediaSub: 'On the watch under “Now Playing”: ⏭ next, ⏮ back. Double Tap with your fingers (Series 9 / Ultra 2) or one press on AirPods = next. Nothing on the watch? Open the “Now Playing” app (▶ in a circle) on it.',
     cam: 'Hand over the camera', camSub: 'Stand the phone in front of you or lay it down, then briefly hold your hand over the front camera = next. No image is stored or sent.',
     keys: 'Also possible: Bluetooth page turner or keyboard (→, space, Page Down).',
     mediaOn: '⌚ Watch & headphones', camOn: '✋ Hand over the camera = next', camDark: '✋ too dark for the camera', finished: 'Finished',

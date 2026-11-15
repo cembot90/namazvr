@@ -690,7 +690,7 @@ export default {
   },
   remote: {
     title: 'Weiter ohne Tippen',
-    media: 'Apple Watch & Kopfhörer', mediaSub: 'Auf der Uhr unter „Jetzt läuft“: ⏭ weiter, ⏮ zurück. Doppeltippen mit den Fingern (Series 9 / Ultra 2) oder ein Druck auf AirPods = weiter.',
+    media: 'Apple Watch & Kopfhörer', mediaSub: 'Auf der Uhr unter „Jetzt läuft“: ⏭ weiter, ⏮ zurück. Doppeltippen mit den Fingern (Series 9 / Ultra 2) oder ein Druck auf AirPods = weiter. Zeigt die Uhr nichts? Dort die App „Jetzt läuft“ (▶ im Kreis) öffnen.',
     cam: 'Hand über die Kamera', camSub: 'Handy vor dir hinstellen oder hinlegen, dann kurz die Hand über die Frontkamera halten = weiter. Es wird kein Bild gespeichert oder verschickt.',
     keys: 'Auch möglich: Bluetooth-Seitenwender oder Tastatur (→, Leertaste, Bild ab).',
     mediaOn: '⌚ Uhr & Kopfhörer', camOn: '✋ Hand über die Kamera = weiter', camDark: '✋ zu dunkel für die Kamera', finished: 'Fertig',

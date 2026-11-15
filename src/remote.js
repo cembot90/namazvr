@@ -7,9 +7,10 @@
 // 2. Handgeste ohne Uhr: Die Frontkamera misst nur die Helligkeit; wird sie kurz mit der Hand abgedeckt und wieder
 //    frei, geht es weiter. Es wird kein Bild gespeichert oder verschickt.
 
-// Fast lautloser Ton in Schleife (ganz stumme Wiedergaben zeigt manches System nicht als „Jetzt läuft“ an)
+// Fast lautloser Ton in Schleife (ganz stumme Wiedergaben zeigt manches System nicht als „Jetzt läuft“ an).
+// 30 Sekunden lang: Sehr kurze Töne behandeln iPhone und Uhr als Signalton und zeigen dafür keine Steuerung.
 function quietLoopUrl() {
-  const rate = 8000, n = rate; // 1 Sekunde
+  const rate = 8000, n = rate * 30;
   const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
   const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
   str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVE'); str(12, 'fmt ');
@@ -53,12 +54,23 @@ export class MediaRemote {
     }
     ms.playbackState = 'playing';
     this.on = true;
+    // Vorlesen und andere Töne unterbrechen auf dem iPhone die Wiedergabe – dann verschwindet sie von der Uhr.
+    // Darum regelmäßig prüfen und weiterlaufen lassen.
+    clearInterval(this.keep);
+    this.keep = setInterval(() => this.resume(), 1500);
     return true;
+  }
+
+  resume() {
+    if (!this.on || !this.audio) return;
+    if (this.audio.paused && !(typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking)) this.audio.play().catch(() => {});
+    navigator.mediaSession.playbackState = 'playing';
   }
 
   stop() {
     if (!this.on) return;
     this.on = false;
+    clearInterval(this.keep);
     this.audio?.pause();
     const ms = navigator.mediaSession;
     for (const a of ['nexttrack', 'previoustrack', 'play', 'pause', 'seekforward', 'seekbackward']) {
@@ -74,6 +86,7 @@ export class MediaRemote {
     const key = `${title}|${sub}`;
     if (key === this.shown) return;
     this.shown = key;
+    this.resume();
     navigator.mediaSession.metadata = new MediaMetadata({
       title, artist: sub, album: 'NamazVR',
       artwork: [{ src: new URL('../icons/icon-192.png', import.meta.url).href, sizes: '192x192', type: 'image/png' }],
