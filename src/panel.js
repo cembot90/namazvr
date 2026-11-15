@@ -309,9 +309,9 @@ export class Panel extends CanvasPlane {
     ctx.fillStyle = C.gold;
     ctx.beginPath(); ctx.roundRect(60, 120, (W - 120) * (v.index + 1) / v.total, 10, 5); ctx.fill();
 
-    this.movement(v, 150, 204);
-    let y = 404;
-    if (v.inner) y = this.paragraphs([`✦  ${v.inner}`], 399, { size: 27, color: C.gold, gap: 8 });
+    this.movement(v, 150, 236);
+    let y = 434;
+    if (v.inner) y = this.paragraphs([`${v.kids ? '🧒' : '✦'}  ${v.inner}`], 429, { size: v.kids ? 29 : 27, color: v.kids ? C.text : C.gold, gap: 10 });
     y = this.paragraphs([step.instr], y, { size: 28, color: C.muted, gap: 10 });
     this.recitation(step, y, H - 150);
 
@@ -319,10 +319,9 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.prev'), 60, by, 200, bh, 'prev', { size: 30 });
     this.btn(t('ui.menu'), 280, by, 160, bh, 'menu', { size: 30 });
     this.btn(v.auto ? t('ui.autoOn') : t('ui.autoOff'), 460, by, 200, bh, 'auto', { active: v.auto, size: 30 });
-    this.btn(`${v.voice ? '🔊' : '🔇'} ${t('ui.speak')}`, 680, by, 210, bh, 'speak', { active: v.voice, size: 28 });
-    this.btn(t('ghost.btn'), 910, by, 200, bh, 'ghost', { active: v.ghost !== 'off', size: 28, sub: t(`ghost.${v.ghost}`), subSize: 22 });
+    this.btn(`${v.voice ? '🔊' : '🔇'} ${t('ui.speak')}`, 680, by, 240, bh, 'speak', { active: v.voice, size: 28 });
     if (v.noVoice) this.text(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'), W - 60, by - 12, { size: 21, color: C.gold, align: 'right' });
-    this.btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 1130, by, W - 1190, bh, 'next', { primary: true, size: 30 });
+    this.btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 940, by, W - 1000, bh, 'next', { primary: true, size: 32 });
   }
 
   // Bewegungs-Box: Piktogramm, Ansage, Ausführung und – in VR – ob die Haltung erkannt wurde.
@@ -347,11 +346,11 @@ export class Panel extends CanvasPlane {
     else drawPictogram(ctx, v.prevPose, step.pose, 80, top + 10, h - 20);
     const x = 80 + h + 10;
     this.text(m.cue, x, top + 62, { size: 46, weight: 700, color: m.arrow ? C.gold : C.text });
-    ctx.font = `26px ${UI}`;
-    let y = top + 108;
-    for (const line of wrap(ctx, m.how, W - 60 - x - 20).slice(0, 2)) {
-      this.text(line, x, y, { size: 26, color: C.muted });
-      y += 36;
+    ctx.font = `25px ${UI}`;
+    let y = top + 106;
+    for (const line of wrap(ctx, m.how, W - 60 - x - 20).slice(0, 3)) {
+      this.text(line, x, y, { size: 25, color: C.muted });
+      y += 33;
     }
     const status = {
       ok: [v.finger ? t('hands.finger') : t('ui.postureOk'), '#7fd1a8'],

@@ -63,20 +63,15 @@
     #rind.show { display: block; }
     #rind.flash { background: #23805f; color: #fff; }
     html[dir="rtl"] #rind { left: auto; right: 12px; font-family: "Noto Sans Arabic", Inter, sans-serif; }
-    body.mobile #orbit .reset { top: calc(48px + env(safe-area-inset-top)); }
-    /* Handy: Hinweis und Knopf über der 3D-Ansicht */
+    /* Handy: drei Ansichtsknöpfe über der 3D-Ansicht */
     #orbit { display: none; }
-    body.mobile #orbit { display: block; position: fixed; left: 0; right: 0; top: 0; height: calc(36vh - 18px); pointer-events: none; z-index: 4; }
-    #orbit .hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); margin: 0; width: max-content; max-width: calc(100% - 32px);
-      padding: 7px 12px; border-radius: 999px; background: rgba(11,19,34,.72); color: #f0f3f8; font: 500 12.5px/1.35 Inter, system-ui, sans-serif; text-align: center;
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: opacity .6s ease .4s; }
-    #orbit .hint.gone { opacity: 0; }
-    #orbit .reset { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; pointer-events: auto; display: none;
-      min-height: 40px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(230,199,127,.5); background: rgba(11,19,34,.78); color: #e6c77f;
-      font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; }
-    #orbit .reset.show { display: block; }
-    html[dir="rtl"] #orbit .reset { right: auto; left: 12px; }
-    html[dir="rtl"] #orbit .hint { font-family: "Noto Sans Arabic", Inter, sans-serif; }
+    body.mobile #orbit { display: flex; gap: 6px; position: fixed; left: 50%; transform: translateX(-50%); top: calc(36vh - 70px); z-index: 4; padding: 4px;
+      border-radius: 999px; background: rgba(11,19,34,.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    #orbit button { min-height: 40px; padding: 6px 14px; border-radius: 999px; border: 0; background: transparent; color: #f0f3f8;
+      font: 600 14px Inter, system-ui, sans-serif; white-space: nowrap; cursor: pointer; }
+    #orbit button.on { background: #e6c77f; color: #1a1408; }
+    #orbit button[hidden] { display: none; }
+    html[dir="rtl"] #orbit button { font-family: "Noto Sans Arabic", Inter, sans-serif; }
 
     /* Handy: oben die 3D-Szene mit der Figur, darunter die Bedienung */
     body.mobile { overflow: hidden; }
@@ -165,6 +160,11 @@
     #ui .move b { color: var(--gold); font-size: 19px; line-height: 1.25; }
     #ui .move p { margin: 4px 0 0; color: var(--muted); font-size: 14px; line-height: 1.4; }
     #ui .inner { color: var(--gold); font-style: italic; }
+    /* Kinder-Erklärung: eigene Karte, gut lesbar */
+    #ui .kid { display: flex; gap: 12px; align-items: flex-start; margin: 12px 0 4px; padding: 14px; border-radius: 16px;
+      background: linear-gradient(135deg, rgba(230,199,127,.16), rgba(35,128,95,.12)); border: 1px solid var(--line-gold); }
+    #ui .kid span { font-size: 28px; line-height: 1; flex: none; }
+    #ui .kid p { margin: 0; font-size: 17px; line-height: 1.55; color: var(--text); }
     #ui .rec { margin-top: 12px; padding: 4px 14px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
     #ui .rec:empty { display: none; }
     #ui .rec .ar { font-family: Amiri, "Geeza Pro", serif; font-size: 29px; text-align: right; margin: 8px 0; line-height: 1.85; }
@@ -173,7 +173,7 @@
     #ui .rec .tr { margin-top: 10px; }
     #ui .rec .de { color: var(--text); }
     #ui .dock {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: .8fr 1fr 1fr 1.1fr 1.1fr 1.9fr; gap: 6px;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: 1fr 1fr 1fr 1.15fr 2.1fr; gap: 8px;
       padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); background: rgba(11,19,34,.94); border-top: 1px solid var(--line);
       backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }

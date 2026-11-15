@@ -93,13 +93,6 @@ world.add(guide.group);
 const cong = new Congregation();
 world.add(cong.group);
 
-// Ghost: durchscheinende Figur vor oder neben dir, gleiche Blickrichtung wie du (nicht gespiegelt), macht jede Bewegung mit
-const ghost = new Guide({ build: 1 }).makeGhost();
-ghost.group.rotation.y = Math.PI;
-ghost.group.visible = false;
-world.add(ghost.group);
-const GHOST_OK = 0x7fe0a8, GHOST_WAIT = 0x8fd8ff;
-
 const panel = new Panel();
 panel.mesh.position.set(-0.75, 1.35, -1.5);
 panel.mesh.rotation.set(-0.05, 0.32, 0, 'YXZ');
@@ -182,8 +175,6 @@ const state = {
   trackBack: 0,
   ramadanDua: null,
   breath: { on: false, t: 0, phase: 'in' },
-  // Ghost-Modus: 'off' | 'front' (vor dir) | 'side' (neben dir)
-  ghost: store.get('ghost', 'front'),
   wuduRoom: false,
   scene: null,
   pilgrim: { d: 0, thrown: 0, tt: 0, snap: null },
@@ -298,7 +289,7 @@ const wantsWuduRoom = () => state.prayer?.kind === 'wudu' && (state.view === 'st
 const pilgrimActive = () => isPilgrimage(state.prayer) && (state.view === 'step' || state.view === 'done');
 const pilgrimStep = () => (state.view === 'done' ? state.steps[state.steps.length - 1] : state.steps[state.i]);
 const wantsScene = () => (state.view === 'sky' ? 'starsky' : pilgrimActive() ? pilgrimStep()?.scene || 'haram' : null);
-// Geschichten der Propheten (laufen wie Umre & Hac über Orte und Schritte, aber ohne Vorbeter und Ghost)
+// Geschichten der Propheten (laufen wie Umre & Hac über Orte und Schritte, aber ohne Vorbeter)
 const storyActive = () => pilgrimActive() && state.prayer.kind === 'story';
 
 function rebuildEnv() {
@@ -346,7 +337,6 @@ function layoutRoom() {
   card.mesh.visible = !w && !mobileUI;
   if (!w) guideRug.visible = guide.group.visible && !outdoor;
   else guideRug.visible = false;
-  placeGhost();
   if (mobileUI) aimAtGuide();
   // Am Computer auf das Panel schauen, wenn der Raum wechselt
   else if (!renderer.xr.isPresenting) {
@@ -416,7 +406,6 @@ function updatePilgrim(dt) {
     if (due > pg.thrown) { pg.thrown = due; throwPebble(m.target); }
     const up = pg.tt % 2.4 < 0.9 && pg.thrown < m.count;
     posePerson(guide, up ? 'throw' : 'stand');
-    posePerson(ghost, up ? 'throw' : 'stand');
   }
   if (throwAnim.t >= 0) {
     throwAnim.t += dt / 0.8;
@@ -425,13 +414,13 @@ function updatePilgrim(dt) {
     pebble.position.y += Math.sin(Math.PI * k) * 1.2;
     if (k >= 1) { throwAnim.t = -1; pebble.visible = false; }
   }
-  // Mitgehen: Vorbeter und Ghost machen Schritte
+  // Mitgehen: der Vorbeter macht Schritte
   pg.moving = moving;
-  // Semah: die Gruppe steht auf und dreht sich; du, der Rehber und der Ghost drehen mit
+  // Semah: die Gruppe steht auf und dreht sich; du und der Rehber drehen mit
   const semah = (st && st.semah) || 0;
   setSemah(semah);
   ambience.music(state.scene === 'cemevi' ? (semah || (st && st.id === 'zakir' ? 1 : 0)) : 0);
-  if (moving) for (const fig of [guide, ghost]) {
+  if (moving) for (const fig of [guide]) {
     const swing = Math.sin(clock.elapsedTime * (semah ? (semah === 2 ? 6 : 3.5) : 7)) * (semah ? 0.25 : 0.35);
     fig.legs[0].hip.rotation.x = swing;
     fig.legs[1].hip.rotation.x = -swing;
@@ -446,7 +435,7 @@ function updatePilgrim(dt) {
 }
 
 // --- Waschraum: Füße werden auf den Hockern rechts gewaschen ---
-// Ab dem ersten Fuß-Schritt (und danach beim Bittgebet) sitzen Vorbeter und Ghost dort; vorher stehen sie an den Becken.
+// Ab dem ersten Fuß-Schritt (und danach beim Bittgebet) sitzt der Vorbeter dort; vorher stehen sie an den Becken.
 const atStools = () => state.wuduRoom && (state.view === 'done' || (state.view === 'step' && state.i >= state.steps.findIndex((x) => x.wudu === 'footR')));
 
 // Figuren gehen zu ihrem Platz: über einen Punkt hinter den Becken, damit niemand durch dich hindurchläuft
@@ -463,7 +452,6 @@ function sendTo(fig, pos, rot, snap) {
 function placeWuduFigures(snap = false) {
   const st = wuduStools(), feet = atStools() && st.length > 1;
   sendTo(guide, feet ? new THREE.Vector3(st[0][0], 0, st[0][1]) : new THREE.Vector3(1.1, 0, 0), feet ? Math.PI / 2 : Math.PI, snap);
-  sendTo(ghost, feet ? new THREE.Vector3(st[1][0], 0, st[1][1]) : new THREE.Vector3(WUDU_BASINS[2], 0, 0), feet ? Math.PI / 2 : Math.PI, snap);
 }
 // Haltung setzen; wer gerade geht, nimmt sie erst am Ziel ein
 function posePerson(fig, pose) {
@@ -495,18 +483,6 @@ function updateMovers(dt) {
     fig.arms[0].sh.rotation.x = -swing * 0.6;
     fig.arms[1].sh.rotation.x = swing * 0.6;
   }
-}
-
-// Ghost vor dir (Blick zur Qibla wie du) oder neben dir; im Waschraum am Becken links neben dir
-function placeGhost() {
-  const g = ghost.group;
-  g.visible = state.ghost !== 'off' && !storyActive() && (state.view === 'step' || (state.wuduRoom && state.view === 'done'));
-  if (state.wuduRoom) return;
-  movers.delete(ghost);
-  g.rotation.y = Math.PI;
-  if (state.ghost === 'side' && !(state.cemaat && cong.group.visible)) g.position.set(0.85, 0, 0);
-  // Mit Cemaat steht neben dir schon jemand: dann vor dir; auf der Empore dicht vor der Brüstung
-  else g.position.set(0, 0, onGallery() ? -0.6 : pilgrimActive() && state.scene !== 'miqat' ? -2.2 : -1.3);
 }
 
 function rebuildCong() {
@@ -547,11 +523,11 @@ function view() {
         type: 'step', prayer: state.prayer, step: state.steps[state.i], index: state.i, total: state.steps.length, auto: state.auto,
         prevPose: state.steps[state.i - 1]?.pose ?? null,
         inner: state.kids ? kidLine(state.steps[state.i]) : state.spiritual ? innerMeaning(state.steps[state.i]) : '',
+        kids: state.kids,
         posture: state.steps[state.i].wudu ? 'wudu' : state.steps[state.i].hajj ? 'hajj' : !renderer.xr.isPresenting ? 'off' : state.posture.ok ? 'ok' : 'wait',
         handHint: renderer.xr.isPresenting ? state.posture.handHint : null,
         finger: renderer.xr.isPresenting && state.posture.finger,
         voice: state.voice,
-        ghost: state.ghost,
         noVoice: state.voice && voiceMissing(),
         canDownload: voices.supported && !!PIPER[langInfo().speech],
       };
@@ -697,26 +673,22 @@ function refresh() {
   }
   if (wantsWuduRoom() !== state.wuduRoom || wantsScene() !== state.scene) rebuildEnv();
   // Im Iḥrām: Männer in Weiß ohne Kappe
-  // Im Cemevi ohne Kopftuch (Rehber und Ghost, wenn man als Frau unterwegs ist)
+  // Im Cemevi ohne Kopftuch (Rehber, wenn man als Frau unterwegs ist)
   const scarf = state.scene !== 'cemevi';
-  if (!!guide.noScarf !== !scarf) { guide.setGender(state.gender, { scarf }); ghost.setGender(state.gender, { scarf }); }
+  if (!!guide.noScarf !== !scarf) guide.setGender(state.gender, { scarf });
   const ihram = pilgrimActive() && isHajj(state.prayer);
-  if (!!guide.ihram !== ihram) { guide.setIhram(ihram); ghost.setIhram(ihram); }
+  if (!!guide.ihram !== ihram) guide.setIhram(ihram);
   if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
   const cur = state.view === 'step' && state.steps[state.i];
   ambience.set({ scene: state.wuduRoom ? 'wudu' : state.scene, enabled: state.sounds, chorus: pilgrimActive() && !!cur && CHORUS.has(cur.id), chorusText: TALBIYA_AR, voices });
   const pose = v.type === 'step' ? v.step.pose : 'stand';
   posePerson(guide, pose);
-  posePerson(ghost, pose);
-  placeGhost();
   if (state.wuduRoom) {
     const feet = atStools();
     placeWuduFigures();
     if (feet !== state.atStools && mobileUI) { state.atStools = feet; aimAtGuide(); }
     state.atStools = feet;
   }
-  // Grün, wenn deine Haltung in VR erkannt ist
-  ghost.setGhostColor(v.type === 'step' && v.posture === 'ok' ? GHOST_OK : GHOST_WAIT);
   updateCast();
   if (cong.group.visible && v.type === 'step') cong.lead(v.step.pose, v.step.rakah);
   syncRemote();
@@ -799,8 +771,18 @@ function speak() {
     voices.say(parts);
     return;
   }
-  if (lang === 'ar') { voices.say([{ text: [`${m.cue}.`, step.instr, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
-  const parts = [{ text: [`${m.cue}.`, step.instr, ...step.de].join(' '), lang }];
+  // Ausführlich vorlesen: was du tust, wie du dich bewegst, wie oft – und für Kinder die einfache Erklärung
+  const kid = state.kids ? kidLine(step) : '';
+  const how = step.wudu
+    ? `${t('ui.timesSpoken', step.count)} ${step.fard ? t('wudu.fard') : t('wudu.sunnah')}.`
+    : step.hajj ? '' : (step.how || (state.steps[state.i - 1]?.pose === step.pose ? '' : m.how) || '');
+  // Bewegung nur sagen, wenn sie nicht schon in der Anleitung steht
+  const body = kid ? [kid] : [how && !step.instr.includes(how.replace(/\.$/, '')) ? how : '', step.instr];
+  // Im Kinder-Text steht schon, wie oft – dann nur noch, ob es Pflicht ist
+  const said = [`${m.cue}.`, ...body, ...(kid && step.wudu ? [`${step.fard ? t('wudu.fard') : t('wudu.sunnah')}.`] : [])].filter(Boolean);
+  const rate = state.kids ? 0.92 : 1;
+  if (lang === 'ar') { voices.say([{ text: [...said, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
+  const parts = [{ text: [...said, ...step.de].join(' '), lang, rate }];
   if (step.ar.length && voices.has('ar')) parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
   voices.say(parts);
 }
@@ -842,13 +824,7 @@ function act(action) {
       store.set('madhab', arg);
       store.set('asr', state.asr);
       break;
-    case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); ghost.setGender(arg); rebuildCong(); break;
-    case 'ghost': {
-      const order = ['front', 'side', 'off'];
-      state.ghost = order[(order.indexOf(state.ghost) + 1) % order.length];
-      store.set('ghost', state.ghost);
-      break;
-    }
+    case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); rebuildCong(); break;
     case 'lang':
       setLang(arg);
       store.set('lang', arg);
@@ -1192,35 +1168,21 @@ function setNdc(e) {
   ndc.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
   raycaster.setFromCamera(ndc, camera);
 }
-const touches = new Map();
-let pinch = null, lastTap = 0;
 el.addEventListener('pointerdown', (e) => {
   drag = { x: e.clientX, y: e.clientY, moved: 0 };
   el.setPointerCapture(e.pointerId);
-  if (!mobileUI) return;
-  touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (touches.size === 2) { const [a, b] = [...touches.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), zoom: mobileCam.zoom }; }
-  // Doppelt tippen: Grundansicht
-  const now = performance.now();
-  if (touches.size === 1 && now - lastTap < 320) resetOrbit();
-  lastTap = now;
 });
 el.addEventListener('pointermove', (e) => {
   if (mobileUI) {
-    if (!touches.has(e.pointerId) || !drag) return;
-    touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (touches.size >= 2 && pinch) {
-      const [a, b] = [...touches.values()];
-      mobileCam.zoom = THREE.MathUtils.clamp(pinch.zoom * pinch.d / Math.max(20, Math.hypot(a.x - b.x, a.y - b.y)), 0.35, 2.6);
-    } else {
-      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-      drag.moved += Math.abs(dx) + Math.abs(dy);
-      mobileCam.yaw -= dx * 0.008;
-      mobileCam.pitch = THREE.MathUtils.clamp(mobileCam.pitch + dy * 0.006, -1.2, 0.9);
-    }
+    // Handy: mit einem Finger langsam um die Figur drehen; erst ab einer deutlichen Bewegung (Tippen bewegt nichts)
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    drag.moved += Math.abs(dx) + Math.abs(dy);
     drag.x = e.clientX; drag.y = e.clientY;
+    if (drag.moved < 12) return;
+    mobileCam.goal.yaw = mobileCam.yaw -= dx * 0.005;
+    mobileCam.goal.pitch = mobileCam.pitch = THREE.MathUtils.clamp(mobileCam.pitch + dy * 0.004, -0.9, 0.7);
     applyOrbit();
-    if (drag.moved > 10) orbitUI?.hint.classList.add('gone');
     return;
   }
   if (drag) {
@@ -1236,10 +1198,9 @@ el.addEventListener('pointermove', (e) => {
   updateHover(h?.button?.action ?? null);
   el.style.cursor = h?.button ? 'pointer' : 'grab';
 });
-const endTouch = (e) => { touches.delete(e.pointerId); if (touches.size < 2) pinch = null; if (!touches.size) drag = null; };
-el.addEventListener('pointercancel', endTouch);
+el.addEventListener('pointercancel', () => { drag = null; });
 el.addEventListener('pointerup', (e) => {
-  if (mobileUI) { endTouch(e); return; }
+  if (mobileUI) { drag = null; return; }
   if (drag && drag.moved < 6 && !mobileUI) {
     setNdc(e);
     const b = panelHit()?.button;
@@ -1341,27 +1302,40 @@ renderer.xr.addEventListener('sessionend', () => {
 const params = new URLSearchParams(location.search);
 const isMobile = params.has('mobile') || (!params.has('desktop') && window.innerWidth <= 820 && !/OculusBrowser|Quest/i.test(navigator.userAgent));
 const mobileUI = isMobile ? new MobileUI(document.getElementById('ui'), act) : null;
-// Bedienhilfe über der 3D-Ansicht am Handy: Hinweis (verschwindet nach dem ersten Drehen) und Knopf zurück zur Grundansicht
+// Am Handy: drei Knöpfe über der 3D-Ansicht – hinter dir, von vorn, von der Seite
+const VIEWS = { back: { yaw: 0, pitch: 0, zoom: 1 }, front: { yaw: Math.PI, pitch: 0.12, zoom: 0.6 }, side: { yaw: Math.PI / 2, pitch: 0.08, zoom: 0.7 } };
 const orbitUI = mobileUI ? (() => {
   const box = document.createElement('div');
   box.id = 'orbit';
-  box.innerHTML = `<p class="hint"></p><button type="button" class="reset"></button>`;
+  box.innerHTML = Object.keys(VIEWS).map((k) => `<button type="button" data-view="${k}"></button>`).join('');
   document.body.appendChild(box);
-  const hint = box.querySelector('.hint'), reset = box.querySelector('.reset');
-  reset.addEventListener('click', () => resetOrbit());
-  if (store.get('orbitHintSeen', false)) hint.classList.add('gone');
-  hint.addEventListener('transitionend', () => store.set('orbitHintSeen', true));
-  return { box, hint, reset };
+  box.addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
+  return { box };
 })() : null;
+function setView(name) {
+  Object.assign(mobileCam.goal, VIEWS[name] || VIEWS.back);
+  mobileCam.view = name;
+  markView();
+}
+function markView() {
+  if (!orbitUI) return;
+  // Von vorn geht im Waschraum nicht (dort ist die Wand)
+  const noFront = state.wuduRoom;
+  if (noFront && mobileCam.view === 'front') setView('back');
+  for (const b of orbitUI.box.children) {
+    b.classList.toggle('on', b.dataset.view === mobileCam.view);
+    b.hidden = noFront && b.dataset.view === 'front';
+  }
+}
 
 // Auf dem Handy blickt die Kamera auf die Vorbeter-Figur; mit Cemaat von schräg hinten über die Reihen.
 function aimAtGuide() {
-  // Waschraum: von hinten auf die Becken, Vorbeter und Ghost
-  // Im Gebetsraum: hinter dir, Blick zur Qibla (Mihrab) – Vorbeter und Ghost stehen vor dir
+  // Waschraum: von hinten auf die Becken und den Vorbeter
+  // Im Gebetsraum: hinter dir, Blick zur Qibla (Mihrab) – der Vorbeter steht vor dir
   const eye = state.wuduRoom ? new THREE.Vector3(0.2, 1.75, 2.2) : cong.group.visible ? new THREE.Vector3(0, 2.3, 3.2) : new THREE.Vector3(0.5, 1.9, 2.4);
   camera.position.copy(world.localToWorld(eye));
   const target = new THREE.Vector3(0, 0.85, 0);
-  // Im Waschraum auf dein Becken: links der Ghost, rechts der Vorbeter
+  // Im Waschraum auf dein Becken: rechts der Vorbeter
   const sst = state.view === 'step' || state.view === 'done' ? pilgrimStep() : null;
   if (state.scene === 'starsky') {
     // Sternenhimmel: nach oben zu den Sternbildern schauen
@@ -1387,11 +1361,19 @@ function aimAtGuide() {
   // Grundansicht merken; die eigene Drehung und der Zoom kommen darüber (bleiben beim nächsten Schritt erhalten)
   mobileCam.eye.copy(camera.position);
   mobileCam.target.copy(target);
+  markView();
   applyOrbit();
 }
 
 // Handy: mit einem Finger um die Figur herumgehen, mit zwei Fingern zoomen, doppelt tippen = zurück zur Grundansicht
-const mobileCam = { eye: new THREE.Vector3(), target: new THREE.Vector3(), yaw: 0, pitch: 0, zoom: 1 };
+const mobileCam = { eye: new THREE.Vector3(), target: new THREE.Vector3(), yaw: 0, pitch: 0, zoom: 1, goal: { yaw: 0, pitch: 0, zoom: 1 }, view: 'back' };
+// Weicher Kameraflug zur gewählten Ansicht
+function stepOrbit(dt) {
+  const o = mobileCam, g = o.goal, k = 1 - Math.exp(-dt * 5);
+  if (Math.abs(g.yaw - o.yaw) + Math.abs(g.pitch - o.pitch) + Math.abs(g.zoom - o.zoom) < 1e-3) return;
+  o.yaw += (g.yaw - o.yaw) * k; o.pitch += (g.pitch - o.pitch) * k; o.zoom += (g.zoom - o.zoom) * k;
+  applyOrbit();
+}
 const orbitSph = new THREE.Spherical();
 function applyOrbit() {
   const o = mobileCam, v = o.eye.clone().sub(o.target);
@@ -1403,12 +1385,6 @@ function applyOrbit() {
   camera.position.copy(o.target).add(v.setFromSpherical(orbitSph));
   if (camera.position.y < 0.25) camera.position.y = 0.25;
   camera.lookAt(o.target);
-  const turned = Math.abs(o.yaw) > 0.02 || Math.abs(o.pitch) > 0.02 || Math.abs(o.zoom - 1) > 0.02;
-  orbitUI?.reset.classList.toggle('show', turned);
-}
-function resetOrbit() {
-  Object.assign(mobileCam, { yaw: 0, pitch: 0, zoom: 1 });
-  applyOrbit();
 }
 
 function layout() {
@@ -1424,9 +1400,8 @@ function applyLang() {
   document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
   const hint = document.getElementById('hint');
   if (orbitUI) {
-    orbitUI.hint.textContent = t('ui.orbitHint');
-    orbitUI.reset.textContent = t('ui.orbitReset');
-    orbitUI.reset.setAttribute('aria-label', t('ui.orbitReset'));
+    for (const b of orbitUI.box.children) b.textContent = t(`ui.view.${b.dataset.view}`);
+    markView();
   }
   if (hint) {
     // Hinweis lässt sich einklappen (bleibt gemerkt) und wieder öffnen
@@ -1618,6 +1593,7 @@ renderer.setAnimationLoop(() => {
     orb.scale.setScalar(0.7 + 1.3 * (0.5 - 0.5 * Math.cos(Math.PI * k)));
   }
   walk(dt);
+  if (mobileUI) stepOrbit(dt);
   const cue = state.posture;
   if (cue.cueT > 0 && state.view === 'step' && !mobileUI) {
     cue.cueT -= dt;
@@ -1632,7 +1608,6 @@ renderer.setAnimationLoop(() => {
   if (minute !== lastMinute && isNight() !== state.night) rebuildEnv();
   lastMinute = minute;
   guide.update(dt);
-  ghost.update(dt);
   updateMovers(dt);
   if (state.scene) { updatePilgrim(dt); updateCrowd(dt); updateStory(dt); if (storyActive()) placePilgrim(true); }
   {
@@ -1646,9 +1621,9 @@ renderer.setAnimationLoop(() => {
   // Im Waschraum läuft das Wasser bei den Waschschritten (nicht bei Absicht und Bittgebet), bei den Füßen an den Hockern
   if (state.wuduRoom) {
     const st = state.view === 'step' && state.steps[state.i];
-    const g = ghost.group.visible, arrived = (f) => !movers.has(f);
-    if (state.atStools) setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [], [...(arrived(guide) ? [0] : []), ...(g && arrived(ghost) ? [1] : [])]);
-    else setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : []), ...(g && arrived(ghost) ? [WUDU_BASINS[2]] : [])]);
+    const arrived = (f) => !movers.has(f);
+    if (state.atStools) setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [], arrived(guide) ? [0] : []);
+    else setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : [])]);
   }
   renderer.render(scene, camera);
 });
@@ -1658,7 +1633,6 @@ if (new URLSearchParams(location.search).has('debug')) window.salah = { act, gui
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);
-ghost.setGender(state.gender);
 graphics.casters(guide.group);
 rebuildEnv();
 rebuildCong();

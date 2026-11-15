@@ -72,7 +72,7 @@ export class Graphics {
     });
   }
 
-  // Figuren werfen Schatten (außer dem durchscheinenden Ghost)
+  // Figuren werfen Schatten 
   casters(root) {
     root.traverse((o) => {
       if (o.isMesh && o.userData.figure && !o.material.transparent) o.castShadow = true;

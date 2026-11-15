@@ -25,6 +25,18 @@ export class MobileUI {
     this.root = root;
     this.act = act;
     this.compass = null;
+    let sw = null;
+    root.addEventListener('touchstart', (e) => {
+      sw = this.last?.type === 'step' && e.touches.length === 1 ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+    }, { passive: true });
+    root.addEventListener('touchend', (e) => {
+      if (!sw) return;
+      const t0 = e.changedTouches[0], dx = t0.clientX - sw.x, dy = t0.clientY - sw.y;
+      sw = null;
+      if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
+      const forward = isRTL() ? dx > 0 : dx < 0;
+      act(forward ? 'next' : 'prev');
+    }, { passive: true });
     root.addEventListener('click', (e) => {
       const b = e.target.closest('[data-a]');
       if (!b) return;
@@ -153,12 +165,12 @@ export class MobileUI {
       ${head(s.title, status)}
       ${progressBar((v.index + 1) / v.total)}
       <div class="move"><canvas id="pict" width="240" height="240"></canvas><div><b>${esc(m.cue)}</b><p>${esc(m.how)}</p></div></div>
-      ${v.inner ? `<p class="inner">✦ ${esc(v.inner)}</p>` : ''}
+      ${v.inner ? (v.kids ? `<div class="kid"><span aria-hidden="true">🧒</span><p>${esc(v.inner)}</p></div>` : `<p class="inner">✦ ${esc(v.inner)}</p>`) : ''}
       <p class="muted">${esc(s.instr)}</p>
       ${recitation(s)}
       <div class="dock">
         ${v.noVoice ? `<p class="gold small center">${esc(v.canDownload ? t('voice.hintStep') : t('ui.noVoiceLang'))}</p>` : ''}
-        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn('☰', 'menu', { sub: t('ui.menu') })}${btn(t('ui.autoShort'), 'auto', { cls: `txt${v.auto ? ' active' : ''}`, sub: v.auto ? t('ui.on') : t('ui.off') })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '', sub: t('ui.speak') })}${btn('👤', 'ghost', { cls: v.ghost !== 'off' ? 'active' : '', sub: t(`ghost.${v.ghost}`) })}
+        ${btn(isRTL() ? '▶' : '◀', 'prev')}${btn('☰', 'menu', { sub: t('ui.menu') })}${btn(t('ui.autoShort'), 'auto', { cls: `txt${v.auto ? ' active' : ''}`, sub: v.auto ? t('ui.on') : t('ui.off') })}${btn(v.voice ? '🔊' : '🔇', 'speak', { cls: v.voice ? 'active' : '', sub: t('ui.speak') })}
         ${btn(v.index === v.total - 1 ? t('ui.done') : t('ui.nextStep'), 'next', { cls: 'primary' })}
       </div>`;
   }

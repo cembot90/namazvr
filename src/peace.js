@@ -39,6 +39,6 @@ export const CALM_BREATHS = 5;
 export function kidLine(step) {
   if (step.hajj) return step.kid || '';
   if (step.key === 'shahada') return t('kids.shahada');
-  if (step.wudu) return t('kids.wudu');
+  if (step.wudu) { const k = t(`kids.wuduParts.${step.wudu}`); return k && !k.startsWith('kids.') ? k : t('kids.wudu'); }
   return step.key ? t(`kids.${step.key}`) : '';
 }
