@@ -77,7 +77,7 @@ test('inhalte: alle Sprachen haben dieselben Texte wie Deutsch', async () => {
   }, LANGS);
   await ctx.close();
   // Arabisch: Umschrift und Bedeutung sind absichtlich leer (der Text steht schon auf Arabisch da)
-  const real = problems.filter((p) => !/^ar: (story\.list\..*\.s\.|mean\.|duas\.mean\.|ram\.duas\..*\.tr )/.test(p));
+  const real = problems.filter((p) => !/^ar: (story\.list\..*\.s\.|mean\.|duas\.mean\.|ram\.duas\..*\.tr )/.test(p) && !/^(fa|ur): (story\.list\..*\.s\..*\[2\]|ram\.duas\..*\.tr )/.test(p));
   if (real.length) throw new Error(`${real.length} Abweichungen:\n  ${real.slice(0, 200).join('\n  ')}`);
 });
 
@@ -94,6 +94,8 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
     const { DUA_CATS, duasOf } = await import('/src/duas.js');
     // Ein Text, der wie ein Schlüssel aussieht („hajj.s.tawaf“), wurde nicht übersetzt
     const raw = (s) => typeof s === 'string' && /^[a-z]+(\.[A-Za-z0-9_]+)+$/.test(s);
+    // Sprachen in arabischer Schrift zeigen keine lateinische Umschrift
+    const NO_TR = ['ar', 'fa', 'ur'];
     const check = (where, steps) => {
       if (!steps.length) out.push(`${where}: keine Schritte`);
       steps.forEach((s, i) => {
@@ -124,7 +126,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
       for (const s of STORY_LIST) {
         const steps = buildStory(s.id);
         check(`${lang}/story/${s.id}`, steps);
-        steps.forEach((st, i) => { if (st.instr.length < 60) out.push(`${lang}/story/${s.id} Schritt ${i}: Text zu kurz`); if (st.ar.length && lang !== 'ar' && (!st.tr[0] || !st.de[0])) out.push(`${lang}/story/${s.id} Schritt ${i}: Vers ohne Umschrift/Bedeutung`); });
+        steps.forEach((st, i) => { if (st.instr.length < 60) out.push(`${lang}/story/${s.id} Schritt ${i}: Text zu kurz`); if (st.ar.length && lang !== 'ar' && (!st.de[0] || (!NO_TR.includes(lang) && !st.tr[0]))) out.push(`${lang}/story/${s.id} Schritt ${i}: Vers ohne Umschrift/Bedeutung`); });
         const q = storyQuestion(s.id);
         if (q.options.length !== 3 || new Set(q.options).size !== 3 || !(q.correct >= 0) || !q.q) out.push(`${lang}/story/${s.id}: Frage unvollständig`);
         if (raw(s.name) || raw(s.de)) out.push(`${lang}/story/${s.id}: Name fehlt`);
@@ -132,7 +134,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
       for (const s of SURAS) {
         const v = verses(s.id);
         if (!v.length) out.push(`${lang}/sura/${s.id}: keine Verse`);
-        v.forEach((x, i) => { if (!x.ar || (lang !== 'ar' && (!x.tr || !x.de))) out.push(`${lang}/sura/${s.id} Vers ${i + 1}: unvollständig`); });
+        v.forEach((x, i) => { if (!x.ar || (lang !== 'ar' && (!x.de || (!NO_TR.includes(lang) && !x.tr)))) out.push(`${lang}/sura/${s.id} Vers ${i + 1}: unvollständig`); });
         if (raw(s.name)) out.push(`${lang}/sura/${s.id}: Name fehlt`);
       }
       for (const c of DUA_CATS) {
@@ -167,7 +169,7 @@ test('inhalte: Rakʿāt der Pflichtgebete und feste Zahlen', async () => {
   });
   await ctx.close();
   const eq = (a, b, what) => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error(`${what}: ${JSON.stringify(a)} statt ${JSON.stringify(b)}`); };
-  const want = { fajr: 2, dhuhr: 4, asr: 4, maghrib: 3, isha: 4, sfajr: 2, sdhuhr1: 4, sdhuhr2: 2, smaghrib: 2, sisha: 2, witr: 3, jumua: 2, tahiyya: 2, eid: 2, janaza: 0 };
+  const want = { fajr: 2, dhuhr: 4, asr: 4, maghrib: 3, isha: 4, sfajr: 2, sdhuhr1: 4, sdhuhr2: 2, smaghrib: 2, sisha: 2, witr: 3, jumua: 2, tahiyya: 2, eid: 2, janaza: 0, tarawih: 2, sahw: 0 };
   eq(r.rakat, want, 'Rakʿāt');
   eq(r.umreTawaf, 7, 'Tavaf-Runden der Umre');
   eq(r.umreSay, 7, 'Saʿy-Strecken der Umre');
