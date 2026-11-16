@@ -587,7 +587,7 @@ export default {
   track: {
     menu: (n) => `Ndjekësi i namazeve ${n}/5`, title: 'Ndjekësi i namazeve', today: 'Sot', yesterday: 'Dje',
     allDone: '✓ Të 5 namazet – Mashallah!', count: (n) => `${n} nga 5 namaze të falura – prek atë që e ke falur`,
-    streak: (n) => (n ? `🔥 ${n} ${n === 1 ? 'ditë' : 'ditë'} radhazi me të 5 namazet` : 'Ende asnjë ditë radhazi me të 5 namazet'),
+    streak: (n) => (n ? `🔥 ${n} ditë radhazi me të 5 namazet` : 'Ende asnjë ditë radhazi me të 5 namazet'),
     auto: 'Namazet farz të udhëhequra shënohen automatikisht. Ruhet vetëm në këtë pajisje.',
     kids: 'Për çdo ditë me të 5 namazet merr një yll shtesë ⭐',
     older: '◀ Dita më parë', newer: 'Dita pas ▶',
@@ -598,7 +598,7 @@ export default {
     lastTen: 'Dhjetë netët e fundit: në njërën prej tyre është Nata e Kadrit, më e mirë se një mijë muaj (Kur’ani 97:3).',
     fastNote: 'Agjërohet nga agimi (sabahu) deri në perëndimin e diellit (akshami).',
     eidIn: (n, date) => `Bajrami i Ramazanit pas ${n} ${n === 1 ? 'dite' : 'ditësh'}: ${date}`,
-    eid: 'Bajrami mubarek! 🌙', days: (n) => `${n} ${n === 1 ? 'ditë' : 'ditë'}`, until: (y) => `deri në Ramazanin e vitit ${y}`,
+    eid: 'Bajrami mubarek! 🌙', days: (n) => `${n} ditë`, until: (y) => `deri në Ramazanin e vitit ${y}`,
     tarawih: 'Teravia e parë falet në mbrëmjen e mëparshme.',
     sighting: 'Llogaritur sipas kalendarit Umm al-Qura; sipas vendit dhe shikimit të hënës, fillimi mund të ndryshojë për një ditë.',
     kids: 'Në Ramazan të rriturit agjërojnë nga agimi deri në perëndimin e diellit. Fëmijët ende nuk janë të detyruar të agjërojnë – ata mund të ushtrojnë, për shembull deri në drekë. Gjëja më e bukur në Ramazan: të ndash me të tjerët, të ndihmosh dhe të jesh i sjellshëm.',
