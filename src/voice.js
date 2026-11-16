@@ -1,5 +1,6 @@
 // Sprachausgabe: freie Piper-Stimmen (einmal herunterladen, dann offline) oder die Stimme des Geräts.
 // say([{ text, lang, rate, pitch }]) liest Abschnitte nacheinander vor; ein neuer Aufruf bricht den alten ab.
+import { LANGS } from './i18n.js';
 
 // Kostenlose, offene Stimmen aus dem Piper-Projekt (rhasspy/piper-voices). Die Dateien kommen direkt von
 // Hugging Face auf das Gerät und bleiben dort gespeichert; die App selbst verteilt sie nicht.
@@ -191,8 +192,13 @@ export class Voices {
   saySystem({ text, lang, rate = 1, pitch = 1 }) {
     if (!hasSystem()) return Promise.resolve(false);
     const synth = window.speechSynthesis;
-    const voice = synth.getVoices().find((v) => v.lang?.toLowerCase().startsWith(lang));
-    if (!voice && lang === 'ar') return Promise.resolve(false); // ohne arabische Stimme lieber still
+    // Eigene Stimme der Sprache, sonst eine ähnliche (z. B. Kroatisch für Bosnisch)
+    const all = synth.getVoices();
+    const alt = LANGS.find((l) => l.speech === lang)?.voiceAlt || [];
+    let voice = null;
+    for (const code of [lang, ...alt]) { voice = all.find((v) => v.lang?.toLowerCase().startsWith(code)); if (voice) break; }
+    // Ohne passende Stimme lieber still, als arabische Schrift mit einer fremden Stimme falsch vorzulesen
+    if (!voice && ['ar', 'fa', 'ur'].includes(lang)) return Promise.resolve(false);
     return new Promise((resolve) => {
       const u = new SpeechSynthesisUtterance(text);
       if (voice) u.voice = voice;

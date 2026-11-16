@@ -402,8 +402,9 @@ export class Panel extends CanvasPlane {
       return;
     }
     if (v.prayer.kind === 'wudu') {
-      this.heading(t('ui.wuduDone'), t('ui.wuduSub'));
-      this.paragraphs([t('ui.wuduWell'), t('ui.wuduBreak')], 200, { size: 32, gap: 26 });
+      const vr = v.prayer.variant;
+      this.heading(vr ? t(`pure.${vr}.done`) : t('ui.wuduDone'), t('ui.wuduSub'));
+      this.paragraphs([vr ? t(`pure.${vr}.well`) : t('ui.wuduWell'), t('ui.wuduBreak')], 200, { size: 32, gap: 26 });
       const by = H - 140, gap = 20, w = (W - 120 - gap) / 2;
       this.btn(t('ui.prayNow'), 60, by, w, 96, 'menu', { primary: true });
       this.btn(t('ui.practiceAgain'), 60 + w + gap, by, w, 96, 'again');
@@ -582,24 +583,24 @@ export class Panel extends CanvasPlane {
 
   v_more(v) {
     const { W, H } = this;
-    this.heading(t('ui.menuMore'), v.madhab);
+    this.heading(v.title || t('ui.menuMore'), v.madhab);
     const gap = 20, w = (W - 120 - gap) / 2, h = 112;
     v.prayers.forEach((p, i) => {
       const x = 60 + (i % 2) * (w + gap), y = 130 + Math.floor(i / 2) * (h + 12);
       this.btn(p.name, x, y, w, h, `prayer:${p.id}`, { size: 34, sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de, subSize: 24 });
     });
-    this.text(t('ui.moreNote'), 60, H - 170, { size: 24, color: C.muted });
+    this.paragraphs([v.note || t('ui.moreNote')], H - 200, { size: 24, color: C.muted, gap: 0 });
     this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
   }
 
   // Beschriftung auf der einen, Schalter auf der anderen Seite (in Arabisch gespiegelt)
-  switchRow(y, label, sub, buttons) {
+  switchRow(y, label, sub, buttons, h = 70) {
     const { W } = this;
     this.text(label, 60, y + 30, { size: 28, weight: 600 });
     if (sub) this.text(sub, 60, y + 60, { size: 22, color: C.muted });
     buttons.forEach(([text, action, active], i) => {
       const x = isRTL() ? 60 + i * 250 : W - 60 - (buttons.length - i) * 250 + 10;
-      this.btn(text, x, y, 240, 70, action, { active });
+      this.btn(text, x, y + (70 - h) / 2, 240, h, action, { active, ...(h < 70 ? { size: 26 } : {}) });
     });
   }
 
@@ -608,15 +609,18 @@ export class Panel extends CanvasPlane {
     this.heading(t('ui.settings'));
     const gap = 20, w = (W - 120 - gap * 3) / 4;
     this.text(t('ui.language'), 60, 150, { size: 28, weight: 600 });
-    v.langs.forEach((l, i) => this.btn(l.name, 60 + i * (w + gap), 165, w, 68, `lang:${l.id}`, { active: l.id === v.lang }));
-    this.text(t('ui.madhab'), 60, 280, { size: 28, weight: 600 });
-    v.madhabs.forEach((m, i) => this.btn(m.name, 60 + i * (w + gap), 295, w, 68, `madhab:${m.id}`, { active: m.id === v.madhab.id }));
-    this.text(t('ui.changes', v.madhab.name), 60, 405, { size: 26, color: C.gold, weight: 600 });
-    this.paragraphs(v.madhab.notes.map((n) => `•  ${n}`), 440, { size: 23, gap: 0 });
-    const row = (...a) => this.switchRow(...a);
-    row(645, t('ui.guideFor'), '', [[t('ui.men'), 'gender:m', v.gender !== 'f'], [t('ui.women'), 'gender:f', v.gender === 'f']]);
-    row(728, t('ui.beginner'), t('ui.beginnerSub'), [[v.beginner ? t('ui.on') : t('ui.off'), 'beginner', v.beginner]]);
-    row(811, t('ui.spiritual'), t('ui.spiritualSub'), [[v.spiritual ? t('ui.on') : t('ui.off'), 'spiritual', v.spiritual]]);
+    // Sprachen in zwei Reihen (es sind viele)
+    const per = Math.ceil(v.langs.length / 2), lw = (W - 120 - 10 * (per - 1)) / per;
+    v.langs.forEach((l, i) => this.btn(l.name, 60 + (i % per) * (lw + 10), 160 + Math.floor(i / per) * 58, lw, 50, `lang:${l.id}`, { active: l.id === v.lang, size: 22 }));
+    this.text(t('ui.madhab'), 60, 305, { size: 28, weight: 600 });
+    v.madhabs.forEach((m, i) => this.btn(m.name, 60 + i * (w + gap), 318, w, 60, `madhab:${m.id}`, { active: m.id === v.madhab.id }));
+    this.text(t('ui.changes', v.madhab.name), 60, 412, { size: 26, color: C.gold, weight: 600 });
+    this.paragraphs(v.madhab.notes.map((n) => `•  ${n}`), 444, { size: 22, gap: 0 });
+    const row = (y, l, sub, b) => this.switchRow(y, l, sub, b, 56);
+    row(632, t('ui.guideFor'), '', [[t('ui.men'), 'gender:m', v.gender !== 'f'], [t('ui.women'), 'gender:f', v.gender === 'f']]);
+    row(696, t('ui.beginner'), t('ui.beginnerSub'), [[v.beginner ? t('ui.on') : t('ui.off'), 'beginner', v.beginner]]);
+    row(760, t('ui.spiritual'), t('ui.spiritualSub'), [[v.spiritual ? t('ui.on') : t('ui.off'), 'spiritual', v.spiritual]]);
+    row(824, t('comfort.calm'), t('comfort.calmSub'), [[v.calm ? t('ui.on') : t('ui.off'), 'calmmode', v.calm]]);
     const q = (W - 120 - 70) / 6, x = (i) => 60 + i * (q + 14);
     this.btn(t('voice.btn'), x(0), H - 98, q, 80, 'voice', { primary: true, size: 26 });
     this.btn(t('rem.btn'), x(1), H - 98, q, 80, 'remind', { primary: true, size: 26 });
@@ -640,6 +644,38 @@ export class Panel extends CanvasPlane {
     row(739, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
     row(816, t('gal.title'), t('gal.sub'), [[t('gal.screen'), 'women:screen', v.womenPlace !== 'gallery'], [t('gal.gallery'), 'women:gallery', v.womenPlace === 'gallery']]);
     this.btn(t('ui.back'), 60, H - 98, W - 120, 80, 'menu');
+  }
+
+  // Eltern-Übersicht: je Familienmitglied eine Spalte mit Zahlen und den nächsten Schritten
+  v_parents(v) {
+    const { W, H, ctx } = this;
+    this.heading(t('par.title'), t('par.sub'));
+    const n = Math.max(1, v.list.length), gap = 20, w = (W - 120 - gap * (n - 1)) / n;
+    v.list.forEach((r, i) => {
+      const x = 60 + i * (w + gap), y = 130;
+      ctx.beginPath(); ctx.roundRect(x, y, w, H - 270, 20); ctx.fillStyle = C.btn; ctx.fill();
+      const tx = isRTL() ? x + w - 24 : x + 24, al = isRTL() ? 'right' : 'left';
+      this.text(`${r.icon} ${r.name}${r.kids ? ' 🧒' : ''}`, tx, y + 48, { size: 32, weight: 700, color: C.gold, align: al });
+      const lines = [
+        `${t('par.days')}: ${r.days7}/7`,
+        `${t('par.prayers')}: ${r.prayersN}/${r.prayersOf}`,
+        `${t('par.suras')}: ${r.suras.length}/${r.surasOf}`,
+        `${t('par.quiz')}: ${r.quizRuns ? `${r.quizBest}/10` : '–'}`,
+        `💧 ${t('par.wash', r.wudu, r.ghusl, r.tayammum)}`,
+        `⭐ ${r.stars}  ·  ✅ ${t('par.tracked', r.tracked)}`,
+      ];
+      lines.forEach((l, k) => this.text(l, tx, y + 100 + k * 38, { size: 24, align: al }));
+      this.text(t('par.next'), tx, y + 345, { size: 24, weight: 600, color: C.gold, align: al });
+      let yy = y + 380;
+      ctx.font = `21px ${UI}`;
+      for (const tip of r.tips.length ? r.tips : [t('par.allGood')]) {
+        for (const line of wrap(ctx, `• ${tip}`, w - 48).slice(0, 3)) { if (yy > H - 160) break; this.text(line, tx, yy, { size: 21, color: C.muted, align: al }); yy += 28; }
+        yy += 8;
+      }
+    });
+    const by = H - 120, bw = (W - 120 - gap) / 2;
+    this.btn(t('par.profiles'), 60, by, bw, 90, 'profiles');
+    this.btn(t('ui.back'), 60 + bw + gap, by, bw, 90, 'menu');
   }
 
   v_learn(v) {

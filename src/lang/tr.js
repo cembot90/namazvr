@@ -5,6 +5,7 @@ export default {
   showTranslit: true,
 
   pn: {
+    tarawih: 'Teravih', sahw: 'Sehiv secdesi', ghusl: 'Gusül abdesti', tayammum: 'Teyemmüm',
     cem: 'Cemevi ve Cem', semah: 'Semah',
     umre: 'Umre', hajj: 'Hac', ihramp: 'İhram namazı', tawafp: 'Tavaf namazı',
     eid: 'Bayram namazı', janaza: 'Cenaze namazı',
@@ -13,6 +14,8 @@ export default {
     sisha: 'Yatsının son sünneti', witr: 'Vitir', jumua: 'Cuma', tahiyya: 'Tahiyyetü\'l-mescid', wudu: 'Abdest',
   },
   pd: {
+    tarawih: 'Ramazan geceleri yatsıdan sonra · 20 veya 8 rekât, ikişer ikişer', sahw: 'namazda bir hata olunca yapılan secde',
+    wudu: 'abdest – her namazdan önce', ghusl: 'boy abdesti, bütün vücudu yıkamak', tayammum: 'su olmadan, toprakla temizlenmek',
     cem: 'Cemevinde gezinti (VR)', semah: 'meydanda birlikte (VR)',
     umre: 'küçük hac – yılın her zamanı', hajj: 'hac – 8–13 Zilhicce', ihramp: 'ihramdan önce 2 rekât', tawafp: 'Makâm-ı İbrâhîm’in arkasında',
     eid: 'Ramazan ve Kurban Bayramı, sabah', janaza: 'vefat edenler için, ayakta',
@@ -21,6 +24,7 @@ export default {
     sisha: 'farzdan sonra', witr: 'yatsıdan sonra, sabaha kadar', jumua: 'cuma günü, öğle yerine', tahiyya: 'camiye girince',
   },
   niyya: {
+    tarawih: 'teravih namazının 2 rekâtı',
     ihramp: 'Allah rızası için ihram namazını kılmaya', tawafp: 'Allah rızası için tavaf namazını kılmaya',
     eid: 'Allah rızası için bayram namazını kılmaya, uydum imama', janaza: 'Allah rızası için cenaze namazını kılmaya ve şu ölüye dua etmeye, uydum imama',
     fard: (n, name) => `${name.toLocaleLowerCase('tr')} namazının ${n} rekât farzını`,
@@ -368,7 +372,116 @@ export default {
     ],
     calmDone: 'Aferin! Güçlü olan, öfkelendiğinde kendine hâkim olandır. Artık sakin ve güzel konuşabilirsin.',
   },
+
+  // Temizlik: gusül ve teyemmüm (her adım için başlık, kısa söz, açıklama), ayrıca „ne zaman?“
+  pure: {
+    menu: 'Temizlik', title: 'Abdest, gusül, teyemmüm', ezanMenu: 'Ezan ve kamet',
+    note: 'Namazdan önce abdest, bütün vücut için gusül, su yoksa teyemmüm. Her şey sadece ima edilir ve giyinik gösterilir.',
+    ghusl: {
+      done: 'Gusül tamam', well: 'Boy abdestini adım adım çalıştın. Artık namaza hazırsın.',
+      when: 'Ergenlikten sonra gusül belli durumlarda farzdır: eşler arası birleşmeden sonra, meni gelmesinden sonra, adet ve lohusalık bitince. Cuma, bayram günleri ve ihramdan önce sünnettir. Sorun olursa annene, babana ya da bir imama sor.',
+      steps: [
+        ['Niyet ve besmele', 'Niyet et', 'Kalbinden gusül abdesti almaya niyet et ve „Bismillâh“ de.'],
+        ['Elleri yıkamak', 'Ellerini yıka', 'İki elini bileklere kadar üç kere yıka.'],
+        ['Avret yerini yıkamak', 'Avret yerini temizle', 'Sol elinle avret yerini yıka ve necaseti gider. Sonra ellerini tekrar yıka.'],
+        ['Abdest almak', 'Abdest al', 'Normal abdestini al. Ayakları en sona da bırakabilirsin.'],
+        ['Ağzı iyice çalkalamak', 'Ağzını çalkala', 'Ağzını su her yere ulaşacak şekilde iyice çalkala – üç kere. Hanefî ve Hanbelî mezhebinde gusülde farzdır.'],
+        ['Burnu iyice temizlemek', 'Burnuna su ver', 'Burnuna su çek ve sümkür – üç kere. Hanefî ve Hanbelî mezhebinde bu da farzdır.'],
+        ['Başa su dökmek', 'Başından dök', 'Başından üç kere su dök; su saç diplerine ve bütün saçlara ulaşsın.'],
+        ['Sağ taraf', 'Sağ taraf', 'Vücudun sağ tarafına omuzdan ayağa kadar üç kere su dök.'],
+        ['Sol taraf', 'Sol taraf', 'Sonra aynı şekilde sol tarafa üç kere.'],
+        ['Bütün vücut', 'Kuru yer kalmasın', 'Suyun bütün vücuda ulaştığından emin ol: göbek deliği, kulak arkası, koltuk altları, parmak araları; yüzükleri oynat. Gusülün asıl farzı budur.'],
+        ['Kelime-i şehadet', 'Şehadet getir', 'Son olarak kelime-i şehadet getir. Gusülden sonra abdest bozulmadıkça namaz için yeni abdest gerekmez.'],
+      ],
+    },
+    tayammum: {
+      done: 'Teyemmüm tamam', well: 'Artık su olmadan da namaza nasıl hazırlanacağını biliyorsun.',
+      when: 'Teyemmüm (Kur’an 5:6), su bulunmadığında ya da su zarar vereceğinde (hastalık, yara gibi) abdestin ve guslün yerine geçer. Su bulununca normal yıkanırsın.',
+      second: {
+        hanafi: 'Hanefî: ellerini iki kere toprağa vurursun – bir kere yüz için, bir kere dirseklere kadar kollar için.',
+        shafii: 'Şâfiî: ellerini iki kere toprağa vurursun – bir kere yüz için, bir kere dirseklere kadar kollar için.',
+        maliki: 'Mâlikî: bir kere farzdır; ikincisi (dirseklere kadar kollar için) müstehaptır.',
+        hanbali: 'Hanbelî: bir kere vurmak yeter; onunla yüz ve bileklere kadar eller mesh edilir.',
+      },
+      steps: [
+        ['Niyet ve besmele', 'Niyet et', 'Abdest yerine teyemmüm etmeye niyet et ve „Bismillâh“ de. Teyemmümde niyet bütün mezheplerde farzdır.'],
+        ['Elleri temiz toprağa', 'Ellerini toprağa koy', 'İki avucunu parmakların açık olarak temiz toprağa, kuma ya da taşa koy.'],
+        ['Tozu silkelemek', 'Silkele', 'Ellerini kaldır, fazla tozu hafifçe silkele ya da üfle.'],
+        ['Yüzü mesh etmek', 'Yüzünü mesh et', 'İki elinle bütün yüzünü bir kere mesh et – alından çeneye, kulaktan kulağa.'],
+        ['İkinci kez toprağa', 'Bir kez daha', 'Ellerini ikinci kez toprağa koy ve silkele.'],
+        ['Sağ kolu mesh etmek', 'Sağ kol', 'Sol elinle sağ kolunu parmaklardan dirseğe kadar mesh et.'],
+        ['Sol kolu mesh etmek', 'Sol kol', 'Sonra sağ elinle sol kolunu dirseğe kadar mesh et.'],
+        ['Kelime-i şehadet', 'Şehadet getir', 'Kelime-i şehadet getir. Teyemmüm, suyu kullanabilene kadar ya da abdest gibi bozulana kadar geçerlidir.'],
+      ],
+    },
+  },
+
+  // Sehiv secdesi
+  sahw: {
+    tIntro: 'Sehiv secdesi nedir?',
+    intro: 'Namazda yanlışlıkla önemli bir şeyi unuttuysan (mesela ilk oturuşu) ya da fazladan bir şey yaptıysan (mesela bir secde daha), sonunda iki secde daha yaparsın. Böylece hata telafi edilir – Allah her insanın bazen unuttuğunu bilir.',
+    when: 'Ne zaman? Unutulan bir vâcipte (ilk oturuş, teşehhüd, vitirde kunut gibi) ve yanlışlıkla yapılan fazlalıkta. Rükû ya da secde gibi bir farzı (rükün) unutan onu yerine getirir – namazdan sonra fark edilirse namaz yeniden kılınır. Kaç rekât kıldığından emin değilsen, az olan sayıyı esas alırsın.',
+    school: {
+      hanafi: 'Hanefî: teşehhüdden sonra sağa bir selam, sonra iki secde, sonra teşehhüd, salavat, dua ve selam.',
+      shafii: 'Şâfiî: iki secde her zaman selamdan önce, teşehhüd ve salavattan sonra.',
+      maliki: 'Mâlikî: unutulan bir şey için selamdan önce (burada gösterildiği gibi); fazlalık için selamdan sonra – ardından tekrar teşehhüd ve selam.',
+      hanbali: 'Hanbelî: çoğunlukla selamdan önce (burada gösterildiği gibi); bazı durumlarda, mesela erken selam verildiyse, sonra.',
+    },
+    tash: (hanafi) => (hanafi ? 'Son oturuştasın ve Ettehiyyâtü’yü „abduhû ve rasûlüh“ kısmına kadar okursun.' : 'Son oturuştasın ve Ettehiyyâtü’yü her zamanki gibi okursun.'),
+    tSalamOne: 'Sağa bir selam', salamOne: 'Sadece sağa bir selam ver – henüz sola değil. Namaz daha bitmedi.',
+    tSujud1: 'Birinci sehiv secdesi', sujud1: '„Allâhü ekber“ de ve namazdaki gibi secdeye var. Üç kere „Sübhâne rabbiye’l-a’lâ“ de.',
+    tSujud2: 'İkinci sehiv secdesi', sujud2: 'Kısa bir oturuştan sonra ikinci secde, aynı şekilde.',
+    tTashAgain: 'Tekrar teşehhüd', tashAgain: 'Doğrul, Ettehiyyâtü’yü tekrar oku, sonra salavat ve dua.',
+  },
+
+  // Anne-baba sayfası
+  par: {
+    menu: 'Anne-baba', title: 'Anne-baba sayfası', sub: 'Ailenizde neler çalışıldı', profiles: 'Aileyi düzenle',
+    intro: 'Her şey bu cihazda kalır. Her aile üyesi için: neyin iyi gittiği ve birlikte sırada neyi çalışabileceğiniz. Övgü baskıdan daha çok işe yarar.',
+    days: 'Çalışılan gün (7)', prayers: 'Çalışılan namaz', suras: 'Öğrenilen sure', quiz: 'En iyi test',
+    wash: (w, g, ty) => `Abdest ${w}× · Gusül ${g}× · Teyemmüm ${ty}×`, tracked: (n) => `Bu hafta ${n} namaz`,
+    learned: 'Çalışıldı', surasKnown: 'Biliyor', next: 'Sırada',
+    allGood: 'Önemli olan her şey çalışıldı – böyle devam, birlikte namaz kılın!',
+    tipWudu: 'Abdesti birlikte çalışın (Temizlik → Abdest) – sonra en iyisi gerçek lavaboda.',
+    tipMissing: (list) => `Bu namazları bir kez daha gözden geçirin: ${list}.`,
+    tipFirst: 'Sabah namazıyla başlayın: sadece 2 rekât, başlangıç için ideal. Çocuk modunu da açın.',
+    tipSura: 'Fâtiha’yı öğrenin – her namazda okunur (Sure öğren → Fâtiha).',
+    tipNextSura: (name) => `Sıradaki sure: ${name} – her gün bir âyet yeter.`,
+    tipQuiz: 'Testi birlikte tekrar yapın ve cevaplar hakkında konuşun.',
+    tipQuizStart: 'Testi bir kez deneyin – neyin oturduğunu gösterir.',
+    tipRoutine: 'Her gün sabit, kısa bir zaman ayırın, mesela akşam yemeğinden sonra 10 dakika.',
+    tipSahw: '„Namazda hata“yı (Diğer namazlar → Sehiv secdesi) gösterin – çocukların yanlış yapma korkusunu giderir.',
+  },
+
+  // Büyük yazı ve sakin mod
+  comfort: {
+    big: 'Büyük yazı', bigSub: 'Bütün yazılar ve düğmeler daha büyük',
+    calm: 'Sakin mod', calmSub: 'Müzik ve ses yok, daha yavaş okuma, arayüzde animasyon yok',
+  },
+
   kids: {
+    sahw: 'Herkes bazen bir şeyi unutur – namazda da. Bu hiç dert değil! Mesela ikinci rekâttan sonra oturmayı unuttuysan, sonunda iki secde daha yaparsın. Böylece her şey yine yerine gelir.',
+    ghuslParts: {
+      heart: 'Gusül, bütün vücut için büyük bir yıkanmadır. Büyükler bunu belli durumlarda yapar, birçoğu cuma günü veya bayramdan önce de yapar. Kalbinden şöyle de: „Şimdi Allah için bütün vücudumu yıkıyorum“ – sonra da „Bismillâh“.',
+      hands: 'Önce ellerini yıkarsın – üç kere, parmak aralarını da.',
+      private: 'Sonra sol elinle iç çamaşırının örttüğü yerleri iyice temizlersin. Ardından ellerini bir kez daha yıkarsın.',
+      wuduAll: 'Şimdi bildiğin normal abdesti alırsın: eller, ağız, burun, yüz, kollar, baş, kulaklar ve ayaklar.',
+      mouth: 'Ağzını çok iyi çalkala, su her yere ulaşsın – üç kere.',
+      nose: 'Burnunu da: dikkatlice su çek ve sümkür, üç kere.',
+      headPour: 'Şimdi başından üç kere su dökersin. Su, saçların altındaki deriye kadar ulaşmalı – uzun saçları iyice ov.',
+      sideR: 'Sonra vücudunun sağ tarafı: omuzdan ayağa kadar, üç kere. Hep önce sağ taraf gelir.',
+      sideL: 'Şimdi sol tarafı da aynı şekilde, üç kere.',
+      body: 'Son olarak hiçbir yerin kuru kalmadığına bak: göbek deliği, kulak arkası, koltuk altları, parmak araları. Duşta gibi – ama çok dikkatli.',
+    },
+    tayammumParts: {
+      heart: 'Bazen su yoktur – mesela bir yürüyüşte – ya da biri hastadır ve ıslanmaması gerekir. O zaman teyemmüm yardım eder: Temiz toprakla namaza hazırlanırsın. Kalbinden şöyle de: „Namaz için teyemmüm ediyorum“ – ve „Bismillâh“.',
+      strike: 'İki elini düz bir şekilde temiz toprağa, kuma ya da bir taşa koy.',
+      dust: 'Ellerini hafifçe silkele ya da üfle – kirlenmemelisin, toprak sadece ellerine değmeli.',
+      tFace: 'İki elinle bütün yüzünü bir kere mesh et, alından çeneye kadar.',
+      strike2: 'Ellerini bir kez daha toprağa koy ve silkele.',
+      tArmR: 'Sol elinle sağ kolunu parmaklardan dirseğe kadar mesh et.',
+      tArmL: 'Sağ elinle de sol kolunu dirseğe kadar. Tamam – artık namaz kılabilirsin!',
+    },
     niyya: 'Sakin bir şekilde ayakta dur ve birazdan alnının yere değeceği yere bak. Kalbinden şöyle de: „Şimdi Allah için namaz kılıyorum.“ Buna niyet denir – yüksek sesle söylemen gerekmez.',
     takbir: 'İki elini, başparmakların neredeyse kulaklarına değecek kadar kaldır ve „Allâhü ekber“ de – Allah her şeyden büyüktür. Artık namazdasın: Başkalarıyla konuşmaz, etrafına bakmazsın.',
     opening: 'Sağ elini sol elinin üzerine koy ve bir ağaç gibi sakin dur. Şimdi Allah’ı çok sessizce övüyorsun – tıpkı birinden bir şey istemeden önce onu güzelce selamlamak gibi.',

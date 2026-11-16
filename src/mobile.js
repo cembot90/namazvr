@@ -210,8 +210,8 @@ export class MobileUI {
         <div class="grid2">${btn(t('ui.again'), 'again')}${btn(t('ui.menu'), 'menu', { cls: 'primary' })}</div>`;
     }
     if (v.prayer.kind === 'wudu') {
-      return `${head(t('ui.wuduDone'))}
-        <p>${esc(t('ui.wuduWell'))}</p>
+      return `${head(v.prayer.variant ? t(`pure.${v.prayer.variant}.done`) : t('ui.wuduDone'))}
+        <p>${esc(v.prayer.variant ? t(`pure.${v.prayer.variant}.well`) : t('ui.wuduWell'))}</p>
         <p class="muted">${esc(t('ui.wuduBreak'))}</p>
         <div class="grid2">${btn(t('ui.prayNow'), 'menu', { cls: 'primary' })}${btn(t('ui.practiceAgain'), 'again')}</div>`;
     }
@@ -295,16 +295,36 @@ export class MobileUI {
   }
 
   v_more(v) {
-    return `${head(t('ui.menuMore'), v.madhab)}
+    return `${head(v.title || t('ui.menuMore'), v.madhab)}
       <div class="list">${v.prayers.map((p) => btn(p.name, `prayer:${p.id}`, { sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de })).join('')}</div>
+      ${v.note ? `<p class="muted small">${esc(v.note)}</p>` : ''}
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Eltern-Übersicht: je Familienmitglied eine Karte mit Zahlen und Tipps
+  v_parents(v) {
+    const card = (r) => `<div class="pcard">
+        <h3>${esc(r.icon)} ${esc(r.name)}${r.kids ? ' · 🧒' : ''}</h3>
+        <div class="stats">
+          <div><b>${r.days7}/7</b><small>${esc(t('par.days'))}</small></div><div><b>${r.prayersN}/${r.prayersOf}</b><small>${esc(t('par.prayers'))}</small></div>
+          <div><b>${r.suras.length}/${r.surasOf}</b><small>${esc(t('par.suras'))}</small></div><div><b>${r.quizRuns ? `${r.quizBest}/10` : '–'}</b><small>${esc(t('par.quiz'))}</small></div>
+        </div>
+        <p class="small">💧 ${esc(t('par.wash', r.wudu, r.ghusl, r.tayammum))} · ⭐ ${r.stars} · 📚 ${r.stories} · ✅ ${esc(t('par.tracked', r.tracked))}</p>
+        ${r.prayers.length ? `<p class="small muted">${esc(t('par.learned'))}: ${esc(r.prayers.join(', '))}</p>` : ''}
+        ${r.suras.length ? `<p class="small muted">${esc(t('par.surasKnown'))}: ${esc(r.suras.join(', '))}</p>` : ''}
+        ${r.tips.length ? `<h4>${esc(t('par.next'))}</h4><ul class="notes">${r.tips.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : `<p class="ok">${esc(t('par.allGood'))}</p>`}
+      </div>`;
+    return `${head(t('par.title'), t('par.sub'))}
+      <p class="muted small">${esc(t('par.intro'))}</p>
+      ${v.list.map(card).join('')}
+      <div class="grid2">${btn(t('par.profiles'), 'profiles')}${btn(t('ui.back'), 'menu')}</div>`;
   }
 
   v_settings(v) {
     const toggle = (label, sub, action, on) => `<div class="setting"><div><b>${esc(label)}</b><small>${esc(sub)}</small></div>${btn(on ? t('ui.on') : t('ui.off'), action, { cls: on ? 'active' : '' })}</div>`;
     return `${head(t('ui.settings'))}
       <h3>${esc(t('ui.language'))}</h3>
-      <div class="grid2">${v.langs.map((l) => btn(l.name, `lang:${l.id}`, { cls: l.id === v.lang ? 'active' : '' })).join('')}</div>
+      <div class="grid3">${v.langs.map((l) => btn(l.name, `lang:${l.id}`, { cls: l.id === v.lang ? 'active' : '' })).join('')}</div>
       <h3>${esc(t('ui.madhabShort'))}</h3>
       <div class="grid2">${v.madhabs.map((m) => btn(m.name, `madhab:${m.id}`, { cls: m.id === v.madhab.id ? 'active' : '' })).join('')}</div>
       <ul class="notes">${v.madhab.notes.map((n) => `<li>${esc(n)}</li>`).join('')}</ul>
@@ -315,6 +335,8 @@ export class MobileUI {
       <div class="grid2">${btn(t('voice.btn'), 'voice', { cls: 'primary' })}${btn(t('rem.btn'), 'remind', { cls: 'primary' })}</div>
       ${btn(`${t('gfx.btn')}: ${v.gfxHigh ? t('gfx.high') : t('gfx.normal')}`, 'gfx', { cls: `wide ${v.gfxHigh ? 'active' : ''}` })}
       ${toggle(t('gfx.faces'), t('gfx.facesSub'), 'faces', v.faces)}
+      ${toggle(t('comfort.big'), t('comfort.bigSub'), 'big', v.big)}
+      ${toggle(t('comfort.calm'), t('comfort.calmSub'), 'calmmode', v.calm)}
       <h3>${esc(t('remote.title'))}</h3>
       ${v.mediaOk ? toggle(t('remote.media'), t('remote.mediaSub'), 'rmedia', v.remoteMedia) : ''}
       ${v.camOk ? toggle(t('remote.cam'), t('remote.camSub'), 'rcam', v.remoteCam) : ''}

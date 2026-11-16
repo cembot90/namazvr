@@ -6,6 +6,7 @@ export default {
 
   // Gebetsnamen und Untertitel
   pn: {
+    tarawih: 'Tarāwīḥ', sahw: 'Sajdat as-Sahw', ghusl: 'Ghusl', tayammum: 'Tayammum',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'Umre', hajj: 'Hac', ihramp: 'Iḥrām-Gebet', tawafp: 'Tavaf-Gebet',
     eid: 'Festgebet (ʿĪd)', janaza: 'Totengebet (Janāza)',
@@ -14,6 +15,8 @@ export default {
     sisha: 'Sunnah nach Isha', witr: 'Witr', jumua: 'Jumuʿa', tahiyya: 'Taḥiyyat al-Masjid', wudu: 'Wuḍūʾ',
   },
   pd: {
+    tarawih: 'Ramadan-Nächte nach Isha · 20 oder 8 Rakʿāt in Zweierschritten', sahw: 'Niederwerfung bei einem Fehler im Gebet',
+    wudu: 'Gebetswaschung – vor jedem Gebet', ghusl: 'Ganzkörperwaschung', tayammum: 'Reinigung ohne Wasser, mit Erde',
     cem: 'Rundgang durch ein Cemevi (VR)', semah: 'zum Mitmachen im Meydan (VR)',
     umre: 'kleine Pilgerfahrt – jederzeit im Jahr', hajj: 'Pilgerfahrt – 8. bis 13. Dhu l-Ḥijja', ihramp: '2 Rakʿāt vor dem Iḥrām', tawafp: 'hinter dem Maqām Ibrāhīm',
     eid: 'Ramadan- und Opferfest, morgens', janaza: 'für Verstorbene, im Stehen',
@@ -22,6 +25,7 @@ export default {
     sisha: 'nach dem Pflichtgebet', witr: 'nach Isha bis vor Fajr', jumua: 'Freitag, statt Dhuhr', tahiyya: 'beim Betreten der Moschee',
   },
   niyya: {
+    tarawih: 'die 2 Rakʿāt Tarāwīḥ',
     ihramp: 'die 2 Rakʿāt Sunnah des Iḥrām', tawafp: 'die 2 Rakʿāt des Tavaf hinter dem Maqām Ibrāhīm',
     eid: 'die 2 Rakʿāt des Festgebets hinter dem Imam', janaza: 'das Totengebet für Allah und das Bittgebet für den Verstorbenen, hinter dem Imam',
     fard: (n, name) => `die ${n} Rakʿāt des ${name}-Gebets`,
@@ -326,7 +330,116 @@ export default {
     ],
     calmDone: 'Gut gemacht! Der Starke ist, wer sich im Zorn beherrscht. Jetzt kannst du ruhig und freundlich sprechen.',
   },
+
+  // Waschungen: Ghusl und Tayammum (Titel, Ansage, Anleitung je Schritt), dazu „Wann?“
+  pure: {
+    menu: 'Waschungen', title: 'Waschungen', ezanMenu: 'Ezan & Ikamet',
+    note: 'Wuḍūʾ vor dem Gebet, Ghusl als Ganzkörperwaschung, Tayammum, wenn kein Wasser da ist. Alles wird nur angedeutet und mit Kleidung gezeigt.',
+    ghusl: {
+      done: 'Ghusl geschafft', well: 'Du hast die Ganzkörperwaschung Schritt für Schritt geübt. Danach bist du bereit für das Gebet.',
+      when: 'Der Ghusl ist nach der Pubertät in bestimmten Fällen Pflicht: nach ehelichem Verkehr, nach einem Samenerguss und nach dem Ende der Periode oder des Wochenbetts. Empfohlen ist er am Freitag, an den Festtagen und vor dem Iḥrām. Bei Fragen: Eltern oder Imam fragen.',
+      steps: [
+        ['Absicht und Basmala', 'Absicht fassen', 'Fasse im Herzen die Absicht, die Ganzkörperwaschung (Ghusl) zu machen, und sprich „Bismillāh“.'],
+        ['Hände waschen', 'Hände waschen', 'Wasche beide Hände bis zu den Handgelenken, dreimal.'],
+        ['Intimbereich waschen', 'Intimbereich reinigen', 'Wasche mit der linken Hand den Intimbereich und entferne alle Unreinheiten. Danach die Hände noch einmal waschen.'],
+        ['Wuḍūʾ machen', 'Wuḍūʾ wie gelernt', 'Mache die Gebetswaschung wie gewohnt. Die Füße kannst du auch erst ganz am Ende waschen.'],
+        ['Mund gründlich ausspülen', 'Mund ausspülen', 'Spüle den Mund gründlich aus, sodass das Wasser überall hinkommt – dreimal. Nach Ḥanafī- und Ḥanbalī-Lehre ist das beim Ghusl Pflicht.'],
+        ['Nase gründlich reinigen', 'Nase reinigen', 'Ziehe Wasser in die Nase und putze sie aus – dreimal. Nach Ḥanafī- und Ḥanbalī-Lehre ebenfalls Pflicht.'],
+        ['Wasser über den Kopf', 'Über den Kopf gießen', 'Gieße dreimal Wasser über den Kopf, sodass es bis zur Kopfhaut und an alle Haare kommt.'],
+        ['Rechte Körperseite', 'Rechte Seite', 'Gieße Wasser über die rechte Körperseite, von der Schulter bis zum Fuß – dreimal.'],
+        ['Linke Körperseite', 'Linke Seite', 'Dann genauso über die linke Seite – dreimal.'],
+        ['Ganzer Körper', 'Nichts trocken lassen', 'Achte darauf, dass das Wasser den ganzen Körper erreicht: Bauchnabel, hinter den Ohren, unter den Achseln, zwischen Fingern und Zehen; Ringe bewegen. Das ist die eigentliche Pflicht des Ghusl.'],
+        ['Glaubensbekenntnis', 'Bekenntnis sprechen', 'Sprich zum Schluss das Glaubensbekenntnis. Nach dem Ghusl brauchst du für das Gebet keine neue Wuḍūʾ, solange sie nicht gebrochen wird.'],
+      ],
+    },
+    tayammum: {
+      done: 'Tayammum geschafft', well: 'Du weißt jetzt, wie du dich auch ohne Wasser für das Gebet bereit machst.',
+      when: 'Tayammum (Koran 5:6) ersetzt Wuḍūʾ und Ghusl, wenn kein Wasser da ist oder Wasser schaden würde, z. B. bei Krankheit oder einer Verletzung. Sobald wieder Wasser da ist, wäschst du dich normal.',
+      second: {
+        hanafi: 'Ḥanafī: zweimal auf die Erde – einmal für das Gesicht, einmal für die Arme bis zum Ellbogen.',
+        shafii: 'Shāfiʿī: zweimal auf die Erde – einmal für das Gesicht, einmal für die Arme bis zum Ellbogen.',
+        maliki: 'Mālikī: einmal ist Pflicht; das zweite Mal (für die Arme bis zum Ellbogen) ist empfohlen.',
+        hanbali: 'Ḥanbalī: einmal auf die Erde genügt; damit werden Gesicht und Hände bis zu den Handgelenken bestrichen.',
+      },
+      steps: [
+        ['Absicht und Basmala', 'Absicht fassen', 'Fasse die Absicht, Tayammum statt der Waschung zu machen, und sprich „Bismillāh“. Beim Tayammum ist die Absicht in allen Rechtsschulen Pflicht.'],
+        ['Hände auf reine Erde', 'Hände auf die Erde', 'Lege beide Handflächen mit gespreizten Fingern auf reine Erde, Sand oder Stein.'],
+        ['Staub abklopfen', 'Abklopfen', 'Hebe die Hände und klopfe oder puste den groben Staub leicht ab.'],
+        ['Gesicht bestreichen', 'Gesicht bestreichen', 'Streiche mit beiden Händen einmal über das ganze Gesicht – von der Stirn bis zum Kinn, von Ohr zu Ohr.'],
+        ['Zweites Mal auf die Erde', 'Noch einmal', 'Lege die Hände ein zweites Mal auf die Erde und klopfe sie ab.'],
+        ['Rechten Arm bestreichen', 'Rechter Arm', 'Streiche mit der linken Hand über den rechten Arm, von den Fingern bis zum Ellbogen.'],
+        ['Linken Arm bestreichen', 'Linker Arm', 'Dann mit der rechten Hand über den linken Arm, bis zum Ellbogen.'],
+        ['Glaubensbekenntnis', 'Bekenntnis sprechen', 'Sprich das Glaubensbekenntnis. Der Tayammum gilt, bis du wieder Wasser benutzen kannst oder er wie die Wuḍūʾ gebrochen wird.'],
+      ],
+    },
+  },
+
+  // Niederwerfung bei einem Fehler (Sajdat as-Sahw)
+  sahw: {
+    tIntro: 'Was ist Sajdat as-Sahw?',
+    intro: 'Hast du im Gebet aus Versehen etwas Wichtiges ausgelassen (z. B. das erste Sitzen) oder etwas zu viel gemacht (z. B. eine zusätzliche Niederwerfung), machst du am Ende zwei extra Niederwerfungen. So wird der Fehler ausgeglichen – Allah weiß, dass jeder Mensch einmal etwas vergisst.',
+    when: 'Wann? Bei vergessenen Wājib-Teilen (z. B. erstes Sitzen, Tashahhud, Qunūt im Witr) und bei versehentlichen Zusätzen. Wer einen Grundpfeiler (Rukn) wie den Rukūʿ oder eine Niederwerfung vergisst, holt ihn nach – fällt es erst nach dem Gebet auf, wird das Gebet wiederholt. Bist du unsicher, wie viele Rakʿāt du gebetet hast, gehst du von der kleineren Zahl aus.',
+    school: {
+      hanafi: 'Ḥanafī: nach dem Tashahhud ein Salām nach rechts, dann zwei Niederwerfungen, dann Tashahhud, Ṣalawāt, Bittgebet und Salām.',
+      shafii: 'Shāfiʿī: die zwei Niederwerfungen immer vor dem Salām, nach Tashahhud und Ṣalawāt.',
+      maliki: 'Mālikī: bei Vergessenem vor dem Salām (so wie hier gezeigt); bei etwas zu viel nach dem Salām – dann folgen noch einmal Tashahhud und Salām.',
+      hanbali: 'Ḥanbalī: meist vor dem Salām (so wie hier gezeigt); in einigen Fällen, z. B. wenn der Salām zu früh gegeben wurde, danach.',
+    },
+    tash: (hanafi) => (hanafi ? 'Du sitzt im letzten Sitzen und sprichst den Tashahhud bis „ʿabduhū wa rasūluh“.' : 'Du sitzt im letzten Sitzen und sprichst den Tashahhud wie gewohnt.'),
+    tSalamOne: 'Ein Salām nach rechts', salamOne: 'Gib nur einen Salām nach rechts – noch nicht nach links. Das Gebet ist damit noch nicht zu Ende.',
+    tSujud1: 'Erste Sahw-Niederwerfung', sujud1: 'Sprich „Allāhu akbar“ und wirf dich nieder wie im Gebet. Sprich dreimal „Subḥāna rabbiya l-aʿlā“.',
+    tSujud2: 'Zweite Sahw-Niederwerfung', sujud2: 'Nach kurzem Sitzen die zweite Niederwerfung, genauso.',
+    tTashAgain: 'Noch einmal Tashahhud', tashAgain: 'Setz dich auf und sprich den Tashahhud noch einmal, danach Ṣalawāt und Bittgebet.',
+  },
+
+  // Eltern-Übersicht
+  par: {
+    menu: 'Eltern', title: 'Eltern-Übersicht', sub: 'Was in eurer Familie geübt wurde', profiles: 'Familie verwalten',
+    intro: 'Alles bleibt auf diesem Gerät. Für jedes Familienmitglied: was schon gut klappt und was ihr als Nächstes gemeinsam üben könnt. Lob hilft mehr als Druck.',
+    days: 'Tage geübt (7)', prayers: 'Gebete geübt', suras: 'Suren gelernt', quiz: 'Bestes Quiz',
+    wash: (w, g, ty) => `Wuḍūʾ ${w}× · Ghusl ${g}× · Tayammum ${ty}×`, tracked: (n) => `${n} Gebete diese Woche`,
+    learned: 'Schon geübt', surasKnown: 'Kann schon', next: 'Als Nächstes',
+    allGood: 'Alles Wichtige ist geübt – weiter so, und gern gemeinsam beten!',
+    tipWudu: 'Die Gebetswaschung zusammen üben (Waschungen → Wuḍūʾ) – am besten danach am echten Waschbecken.',
+    tipMissing: (list) => `Diese Gebete noch einmal durchgehen: ${list}.`,
+    tipFirst: 'Mit Fajr anfangen: nur 2 Rakʿāt, gut für den Einstieg. Dazu den Kinder-Modus einschalten.',
+    tipSura: 'Die Fātiḥa lernen – sie gehört zu jedem Gebet (Suren lernen → Al-Fātiḥa).',
+    tipNextSura: (name) => `Nächste Sure: ${name} – jeden Tag ein Vers reicht.`,
+    tipQuiz: 'Das Quiz noch einmal zusammen machen und die Antworten besprechen.',
+    tipQuizStart: 'Das Quiz einmal ausprobieren – es zeigt, was schon sitzt.',
+    tipRoutine: 'Eine feste, kurze Zeit am Tag einplanen, z. B. 10 Minuten nach dem Abendessen.',
+    tipSahw: '„Fehler im Gebet“ (Weitere Gebete → Sajdat as-Sahw) zeigen – das nimmt Kindern die Angst, etwas falsch zu machen.',
+  },
+
+  // Große Schrift und ruhiger Modus
+  comfort: {
+    big: 'Große Schrift', bigSub: 'Alle Texte und Knöpfe größer',
+    calm: 'Ruhiger Modus', calmSub: 'Keine Musik und Geräusche, langsamer vorlesen, keine Animationen in der Oberfläche',
+  },
+
   kids: {
+    sahw: 'Jeder vergisst mal etwas – auch im Gebet. Das ist nicht schlimm! Wenn du zum Beispiel vergessen hast, nach der zweiten Rakʿa zu sitzen, machst du am Ende einfach zwei extra Niederwerfungen. Damit ist alles wieder gut.',
+    ghuslParts: {
+      heart: 'Der Ghusl ist eine große Waschung für den ganzen Körper. Erwachsene machen ihn in bestimmten Fällen, viele auch am Freitag oder vor dem Fest. Sag in deinem Herzen: „Ich wasche mich jetzt ganz für Allah“ – und dann „Bismillāh“.',
+      hands: 'Zuerst wäschst du die Hände – dreimal, auch zwischen den Fingern.',
+      private: 'Dann wäschst du die Stellen, die die Unterhose bedeckt, mit der linken Hand gut sauber. Danach wäschst du die Hände noch einmal.',
+      wuduAll: 'Jetzt machst du die ganz normale Gebetswaschung, die du schon kennst: Hände, Mund, Nase, Gesicht, Arme, Kopf, Ohren und Füße.',
+      mouth: 'Spül den Mund richtig gut aus, damit das Wasser überall hinkommt – dreimal.',
+      nose: 'Und auch die Nase: vorsichtig Wasser hineinziehen und wieder ausputzen, dreimal.',
+      headPour: 'Jetzt gießt du Wasser über den Kopf, dreimal. Das Wasser soll bis auf die Haut unter den Haaren kommen – lange Haare gut durchkneten.',
+      sideR: 'Dann die rechte Seite des Körpers: von der Schulter bis hinunter zum Fuß, dreimal. Rechts kommt immer zuerst.',
+      sideL: 'Jetzt die linke Seite genauso, dreimal.',
+      body: 'Zum Schluss schaust du, dass wirklich kein Fleckchen trocken bleibt: Bauchnabel, hinter den Ohren, unter den Armen, zwischen Fingern und Zehen. Wie unter der Dusche – nur ganz bewusst.',
+    },
+    tayammumParts: {
+      heart: 'Manchmal gibt es kein Wasser – zum Beispiel auf einer Wanderung – oder jemand ist krank und darf nicht nass werden. Dann hilft Tayammum: Du machst dich mit reiner Erde bereit. Sag in deinem Herzen: „Ich mache Tayammum für das Gebet“ – und „Bismillāh“.',
+      strike: 'Leg beide Hände flach auf saubere Erde, Sand oder einen Stein.',
+      dust: 'Klopf die Hände leicht ab oder puste – du sollst nicht dreckig werden, die Erde soll deine Hände nur berühren.',
+      tFace: 'Streich mit beiden Händen einmal über dein ganzes Gesicht, von der Stirn bis zum Kinn.',
+      strike2: 'Leg die Hände noch einmal auf die Erde und klopf sie ab.',
+      tArmR: 'Streich mit der linken Hand über deinen rechten Arm, von den Fingern bis zum Ellbogen.',
+      tArmL: 'Und mit der rechten Hand über den linken Arm, bis zum Ellbogen. Fertig – jetzt darfst du beten!',
+    },
     niyya: 'Stell dich ruhig hin und schau auf den Platz, wo gleich deine Stirn den Boden berührt. Sag in deinem Herzen: „Ich bete jetzt für Allah.“ Das ist die Niyya, die Absicht – du musst sie nicht laut sagen.',
     takbir: 'Heb beide Hände hoch, bis die Daumen fast die Ohren berühren, und sag: „Allāhu akbar“ – Allah ist größer als alles. Ab jetzt bist du im Gebet: Du redest nicht mehr mit anderen und schaust nicht herum.',
     opening: 'Leg die rechte Hand über die linke und steh ruhig wie ein Baum. Jetzt lobst du Allah ganz leise – so, wie man jemanden freundlich begrüßt, bevor man ihn um etwas bittet.',

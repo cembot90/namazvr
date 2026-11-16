@@ -8,8 +8,8 @@ import { Guide, setFaces } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
-import { ALEVI, EXTRA_PRAYERS, MADHABS, PILGRIMAGES, PRAYERS, TASBIH, buildSteps, findPrayer } from './prayer.js';
-import { LANGS, deviceLang, getLang, isRTL, langInfo, setLang, t } from './i18n.js';
+import { ALEVI, EXTRA_PRAYERS, MADHABS, PILGRIMAGES, PRAYERS, PURIFY, TASBIH, buildSteps, findPrayer } from './prayer.js';
+import { LANGS, deviceLang, getLang, isLoaded, isRTL, langInfo, loadLang, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
 import { BREATH, innerMeaning } from './spirit.js';
@@ -129,7 +129,9 @@ const profile = () => profiles.find((p) => p.id === profileId) || profiles[0];
 const saveProfiles = () => { store.set('profiles', profiles); store.set('profileId', profileId); };
 
 // Sprache vor allem anderen setzen, damit alle Texte schon passen.
-setLang(store.get('lang', deviceLang()));
+const startLang = store.get('lang', deviceLang());
+await loadLang(startLang);
+setLang(startLang);
 
 const state = {
   view: 'menu',
@@ -138,6 +140,8 @@ const state = {
   i: 0,
   auto: false,
   autoT: 0,
+  big: store.get('big', false), // große Schrift
+  quiet: store.get('calm', false), // ruhiger Modus: keine Musik und Geräusche, langsamer vorlesen
   location: store.get('location', CITIES[0]),
   northYaw: store.get('northYaw', null),
   // Alternative zur Nord-Kalibrierung: Blickrichtung zur Qibla direkt festgelegt
@@ -213,6 +217,42 @@ function remoteFlash() {
 }
 function remoteNext() { if (state.view === 'step') { act('next'); remoteFlash(); } }
 function remotePrev() { if (state.view === 'step') { act('prev'); remoteFlash(); } }
+// Große Schrift und ruhiger Modus (für jüngere Kinder und ältere Menschen)
+function applyComfort() {
+  document.documentElement.classList.toggle('big', !!state.big);
+  document.documentElement.classList.toggle('calm', !!state.quiet);
+}
+
+// Eltern-Übersicht: was jedes Familienmitglied geübt hat und wo es noch hakt
+function parentReport(p, prog) {
+  const last7 = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return dayKey(d); });
+  const learnedPrayers = PRAYERS.filter((x) => prog.done[x.id]);
+  const missing = PRAYERS.filter((x) => !prog.done[x.id]);
+  const suraList = SURAS.filter((x) => !x.call);
+  const suras = suraList.filter((x) => prog.suras?.[x.id]);
+  const tracked = last7.reduce((a, k) => a + (prog.log?.[k]?.length || 0), 0);
+  const tips = [];
+  if (!prog.wudu) tips.push(t('par.tipWudu'));
+  if (missing.length && missing.length < PRAYERS.length) tips.push(t('par.tipMissing', missing.map((x) => x.name).join(', ')));
+  if (!learnedPrayers.length) tips.push(t('par.tipFirst'));
+  if (!suras.length) tips.push(t('par.tipSura'));
+  else if (suras.length < suraList.length) tips.push(t('par.tipNextSura', suraList.find((x) => !prog.suras?.[x.id]).name));
+  if (prog.quizRuns && prog.quizBest < 7) tips.push(t('par.tipQuiz'));
+  if (!prog.quizRuns) tips.push(t('par.tipQuizStart'));
+  if (!last7.some((k) => prog.days.includes(k))) tips.push(t('par.tipRoutine'));
+  if (!prog.done.sahw) tips.push(t('par.tipSahw'));
+  return {
+    id: p.id, name: profName(p), icon: p.icon, kids: !!p.kids,
+    days7: last7.filter((k) => prog.days.includes(k)).length, streak: streak(prog),
+    prayers: learnedPrayers.map((x) => x.name), prayersN: learnedPrayers.length, prayersOf: PRAYERS.length,
+    wudu: prog.wudu, ghusl: prog.done.ghusl || 0, tayammum: prog.done.tayammum || 0,
+    suras: suras.map((x) => x.name), surasOf: suraList.length,
+    quizBest: prog.quizBest, quizRuns: prog.quizRuns, stars: prog.stars || 0, tracked,
+    stories: Object.keys(prog.stories || {}).length,
+    tips: tips.slice(0, 4),
+  };
+}
+
 const mediaRemote = new MediaRemote({ next: remoteNext, prev: remotePrev, busy: () => voices.busy, edge: () => voices.edgeAt ?? -1e9 });
 let camState = 'off';
 const handWave = new HandWave({ onTrigger: remoteNext, onState: (st) => { camState = st; showRemoteInd(); if (st === 'denied') { state.remoteCam = false; store.set('remoteCam', false); refresh(); } } });
@@ -423,7 +463,7 @@ function updatePilgrim(dt) {
     const ci = state.steps.findIndex((x) => x.id === 'cerag');
     setCemStep(state.view === 'step' ? st?.id || '' : '', ci < 0 || state.view !== 'step' || state.i >= ci);
   }
-  ambience.music(state.scene === 'cemevi' ? (semah || (st && st.id === 'zakir' ? 1 : 0)) : 0);
+  ambience.music(state.scene === 'cemevi' && !state.quiet ? (semah || (st && st.id === 'zakir' ? 1 : 0)) : 0);
   if (moving) for (const fig of [guide]) {
     const swing = Math.sin(clock.elapsedTime * (semah ? (semah === 2 ? 6 : 3.5) : 7)) * (semah ? 0.25 : 0.35);
     fig.legs[0].hip.rotation.x = swing;
@@ -440,7 +480,11 @@ function updatePilgrim(dt) {
 
 // --- Waschraum: Füße werden auf den Hockern rechts gewaschen ---
 // Ab dem ersten Fuß-Schritt (und danach beim Bittgebet) sitzt der Vorbeter dort; vorher stehen sie an den Becken.
-const atStools = () => state.wuduRoom && (state.view === 'done' || (state.view === 'step' && state.i >= state.steps.findIndex((x) => x.wudu === 'footR')));
+const atStools = () => {
+  if (!state.wuduRoom) return false;
+  const k = state.steps.findIndex((x) => x.wudu === 'footR');
+  return k >= 0 && (state.view === 'done' || (state.view === 'step' && state.i >= k));
+};
 
 // Figuren gehen zu ihrem Platz: über einen Punkt hinter den Becken, damit niemand durch dich hindurchläuft
 const movers = new Map();
@@ -586,8 +630,13 @@ function view() {
     }
     case 'more':
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
+    case 'purify':
+      return { type: 'more', title: t('pure.title'), note: t('pure.note'), prayers: PURIFY, madhab: madhab().name };
+    case 'parents':
+      return { type: 'parents', list: profiles.map((p) => parentReport(p, p.id === profileId ? state.progress : loadProgress(p.id))) };
     case 'settings':
       return { type: 'settings', gfxHigh: graphics.high, faces: store.get('faces', true),
+        big: state.big, calm: state.quiet,
         remoteMedia: state.remoteMedia, remoteCam: state.remoteCam, mediaOk: mediaRemote.supported, camOk: handWave.supported, langs: LANGS, lang: getLang(), madhabs: MADHABS, madhab: madhab(), beginner: state.beginner, gender: state.gender, spiritual: state.spiritual };
     case 'learn': {
       const p = state.progress;
@@ -684,7 +733,7 @@ function refresh() {
   if (!!guide.ihram !== ihram) guide.setIhram(ihram);
   if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
   const cur = state.view === 'step' && state.steps[state.i];
-  ambience.set({ scene: state.wuduRoom ? 'wudu' : state.scene, enabled: state.sounds, chorus: pilgrimActive() && !!cur && CHORUS.has(cur.id), chorusText: TALBIYA_AR, voices });
+  ambience.set({ scene: state.wuduRoom ? 'wudu' : state.scene, enabled: state.sounds && !state.quiet, chorus: pilgrimActive() && !!cur && CHORUS.has(cur.id), chorusText: TALBIYA_AR, voices });
   const pose = v.type === 'step' ? v.step.pose : 'stand';
   posePerson(guide, pose);
   if (state.wuduRoom) {
@@ -721,7 +770,7 @@ function onStep() {
   }
 }
 
-const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab)
+const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab, prayer.variant)
   : prayer.kind === 'story' ? buildStory(prayer.id)
   : isPilgrimage(prayer) ? buildPilgrimage(prayer.kind, state.madhab, state.gender, state.prayerSura)
     : buildSteps(prayer, state.madhab, state.gender, state.prayerSura));
@@ -784,7 +833,7 @@ function speak() {
   const body = kid ? [kid] : [how && !step.instr.includes(how.replace(/\.$/, '')) ? how : '', step.instr];
   // Im Kinder-Text steht schon, wie oft – dann nur noch, ob es Pflicht ist
   const said = [`${m.cue}.`, ...body, ...(kid && step.wudu ? [`${step.fard ? t('wudu.fard') : t('wudu.sunnah')}.`] : [])].filter(Boolean);
-  const rate = state.kids ? 0.92 : 1;
+  const rate = (state.kids ? 0.92 : 1) * (state.quiet ? 0.88 : 1);
   if (lang === 'ar') { voices.say([{ text: [...said, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
   const parts = [{ text: [...said, ...step.de].join(' '), lang, rate }];
   if (step.ar.length && voices.has('ar')) parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
@@ -821,6 +870,10 @@ function act(action) {
     case 'prayer': start(findPrayer(arg)); break;
     case 'wudu': start(WUDU); break;
     case 'more': state.view = 'more'; break;
+    case 'purify': state.view = 'purify'; break;
+    case 'parents': state.view = 'parents'; break;
+    case 'big': state.big = !state.big; store.set('big', state.big); applyComfort(); break;
+    case 'calmmode': state.quiet = !state.quiet; store.set('calm', state.quiet); applyComfort(); break;
     case 'settings': state.view = 'settings'; break;
     case 'madhab':
       state.madhab = arg;
@@ -830,6 +883,8 @@ function act(action) {
       break;
     case 'gender': state.gender = arg; store.set('gender', arg); guide.setGender(arg); rebuildCong(); break;
     case 'lang':
+      // Sprache erst laden, dann umschalten (die erste Wahl einer Sprache dauert einen Moment)
+      if (!isLoaded(arg)) { loadLang(arg).then((ok) => { if (ok) act(`lang:${arg}`); }); break; }
       setLang(arg);
       store.set('lang', arg);
       applyLang();
@@ -1639,6 +1694,7 @@ if (new URLSearchParams(location.search).has('debug')) window.salah = { act, gui
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);
+applyComfort();
 graphics.casters(guide.group);
 rebuildEnv();
 rebuildCong();

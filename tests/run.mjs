@@ -48,16 +48,16 @@ async function open(mode, query = '', init = null) {
 
 const tests = [];
 const test = (name, fn) => tests.push({ name, fn });
-const LANGS = ['de', 'tr', 'en', 'ar'];
+const LANGS = ['de', 'tr', 'en', 'ar', 'bs', 'sq', 'ku', 'fa', 'fr', 'ur', 'id'];
 
 // ---------- Inhalte ----------
 test('inhalte: alle Sprachen haben dieselben Texte wie Deutsch', async () => {
   const { ctx, page } = await open('mobile');
-  const problems = await page.evaluate(async () => {
+  const problems = await page.evaluate(async (LANGS) => {
     const out = [];
     const de = (await import('/src/lang/de.js')).default;
     const kind = (v) => (Array.isArray(v) ? 'array' : v === null ? 'null' : typeof v);
-    for (const l of ['tr', 'en', 'ar']) {
+    for (const l of LANGS.filter((x) => x !== 'de')) {
       const d = (await import(`/src/lang/${l}.js`)).default;
       const walk = (a, b, p) => {
         for (const k of Object.keys(a)) {
@@ -74,7 +74,7 @@ test('inhalte: alle Sprachen haben dieselben Texte wie Deutsch', async () => {
       walk(de, d, '');
     }
     return out;
-  });
+  }, LANGS);
   await ctx.close();
   // Arabisch: Umschrift und Bedeutung sind absichtlich leer (der Text steht schon auf Arabisch da)
   const real = problems.filter((p) => !/^ar: (story\.list\..*\.s\.|mean\.|duas\.mean\.|ram\.duas\..*\.tr )/.test(p));
@@ -89,7 +89,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
     const { buildWuduSteps } = await import('/src/wudu.js');
     const { buildPilgrimage } = await import('/src/hajj.js');
     const { STORY_LIST, buildStory, storyQuestion } = await import('/src/stories.js');
-    const { setLang } = await import('/src/i18n.js');
+    const { setLang, loadLang } = await import('/src/i18n.js');
     const { SURAS, verses } = await import('/src/suras.js');
     const { DUA_CATS, duasOf } = await import('/src/duas.js');
     // Ein Text, der wie ein Schlüssel aussieht („hajj.s.tawaf“), wurde nicht übersetzt
@@ -106,6 +106,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
       });
     };
     for (const lang of LANGS) {
+      await loadLang(lang);
       setLang(lang);
       for (const m of MADHABS) for (const g of ['m', 'f']) {
         for (const p of [...PRAYERS, ...EXTRA_PRAYERS]) {
@@ -117,7 +118,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
           if (p.rakat && Math.max(...rak) !== (steps.find((s) => s.of)?.of || p.rakat) && p.kind !== 'witr') out.push(`${lang}/${m.id}/${g}/${p.id}: höchste Rakʿa ${Math.max(...rak)} statt ${p.rakat}`);
           if (rak.some((r, i) => i && r < rak[i - 1] && !steps.some((s) => s.unit))) out.push(`${lang}/${m.id}/${g}/${p.id}: Rakʿāt nicht aufsteigend`);
         }
-        check(`${lang}/${m.id}/wudu`, buildWuduSteps(m.id));
+        for (const variant of ['wudu', 'ghusl', 'tayammum']) check(`${lang}/${m.id}/${variant}`, buildWuduSteps(m.id, variant));
         for (const p of [...PILGRIMAGES, ...ALEVI]) check(`${lang}/${m.id}/${g}/${p.id}`, buildPilgrimage(p.kind, m.id, g, 'ikhlas'));
       }
       for (const s of STORY_LIST) {
@@ -252,9 +253,9 @@ test('inhalte: Gebetszeiten, Qibla und islamischer Kalender', async () => {
 });
 
 // ---------- Oberfläche ----------
-const VIEWS = ['menu', 'times', 'qibla', 'more', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
+const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
 // Auf dem Bildschirm darf kein unübersetzter Schlüssel und kein „undefined“ stehen
-const BAD = /\b(?:ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
+const BAD = /\b(?:pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
 
 for (const mode of ['mobile', 'desktop']) {
   test(`oberfläche (${mode}): jede Ansicht in jeder Sprache ohne Fehler`, async () => {
@@ -265,7 +266,8 @@ for (const mode of ['mobile', 'desktop']) {
       await page.evaluate(() => { window.__texts = []; const c = salah.panel.ctx, f = c.fillText.bind(c); c.fillText = (s, ...a) => { window.__texts.push(String(s)); return f(s, ...a); }; });
     }
     for (const lang of LANGS) {
-      await page.evaluate((l) => salah.act(`lang:${l}`), lang);
+      // Eine Sprache wird beim ersten Wählen erst geladen
+      await page.evaluate(async (l) => { salah.act(`lang:${l}`); for (let i = 0; i < 100 && document.documentElement.lang !== l; i++) await new Promise((r) => setTimeout(r, 50)); }, lang);
       for (const v of VIEWS) {
         const text = await page.evaluate(({ v, mode }) => {
           if (mode === 'desktop') window.__texts.length = 0;
@@ -311,10 +313,10 @@ const run = (page, id) => page.evaluate(async (id) => {
 
 test('abläufe (Handy): jedes Gebet und die Waschung bis zum Ende', async () => {
   const { ctx, page, errors } = await open('mobile');
-  const ids = ['wudu', 'fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'sfajr', 'witr', 'jumua', 'eid', 'janaza', 'tahiyya'];
+  const ids = ['wudu', 'ghusl', 'tayammum', 'fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'sfajr', 'witr', 'jumua', 'eid', 'janaza', 'tahiyya', 'tarawih', 'sahw'];
   for (const madhab of ['hanafi', 'shafii', 'maliki', 'hanbali']) {
     await page.evaluate((m) => { salah.act('menu'); salah.act(`madhab:${m}`); }, madhab);
-    for (const id of madhab === 'hanafi' ? ids : ['fajr', 'maghrib', 'witr']) {
+    for (const id of madhab === 'hanafi' ? ids : ['fajr', 'maghrib', 'witr', 'sahw', 'tayammum']) {
       const r = await run(page, id);
       if (r.view !== 'done') throw new Error(`${madhab}/${id}: endet in „${r.view}“ nach ${r.n} Schritten`);
     }
@@ -441,12 +443,16 @@ test('funktionen: Familie & Profile – jedes Kind hat eigenen Fortschritt', asy
 
 test('funktionen: Einstellungen bleiben nach dem Neuladen erhalten', async () => {
   const { ctx, page, errors } = await open('mobile');
-  await page.evaluate(() => { salah.act('lang:tr'); salah.act('madhab:shafii'); salah.act('gender:f'); salah.act('track:asr'); });
+  await page.evaluate(async () => {
+    salah.act('lang:tr'); salah.act('madhab:shafii'); salah.act('gender:f'); salah.act('track:asr'); salah.act('big'); salah.act('calmmode');
+    for (let i = 0; i < 100 && document.documentElement.lang !== 'tr'; i++) await new Promise((r) => setTimeout(r, 50));
+  });
   await page.reload();
   await page.waitForFunction(() => window.salah);
-  const r = await page.evaluate(() => ({ lang: document.documentElement.lang, madhab: salah.state.madhab, gender: salah.state.gender, tracked: salah.view().tracked }));
+  const r = await page.evaluate(() => ({ lang: document.documentElement.lang, madhab: salah.state.madhab, gender: salah.state.gender, tracked: salah.view().tracked,
+    big: document.documentElement.classList.contains('big'), quiet: document.documentElement.classList.contains('calm') }));
   await ctx.close();
-  if (r.lang !== 'tr' || r.madhab !== 'shafii' || r.gender !== 'f' || r.tracked !== 1) throw new Error(JSON.stringify(r));
+  if (r.lang !== 'tr' || r.madhab !== 'shafii' || r.gender !== 'f' || r.tracked !== 1 || !r.big || !r.quiet) throw new Error(JSON.stringify(r));
   if (errors.length) throw new Error(errors.join('\n'));
 });
 

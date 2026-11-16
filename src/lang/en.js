@@ -5,6 +5,7 @@ export default {
   showTranslit: true,
 
   pn: {
+    tarawih: 'Tarāwīḥ', sahw: 'Sajdat as-Sahw', ghusl: 'Ghusl', tayammum: 'Tayammum',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'Umrah', hajj: 'Hajj', ihramp: 'Iḥrām prayer', tawafp: 'Ṭawāf prayer',
     eid: 'Eid prayer', janaza: 'Funeral prayer (Janāza)',
@@ -13,6 +14,8 @@ export default {
     sisha: 'Sunnah after Isha', witr: 'Witr', jumua: 'Jumuʿa', tahiyya: 'Taḥiyyat al-Masjid', wudu: 'Wuḍūʾ',
   },
   pd: {
+    tarawih: 'Ramadan nights after Isha · 20 or 8 rakʿahs in pairs', sahw: 'prostration for a mistake in prayer',
+    wudu: 'ablution – before every prayer', ghusl: 'full-body washing', tayammum: 'purification without water, with earth',
     cem: 'a tour of a cemevi (VR)', semah: 'join in on the meydan (VR)',
     umre: 'the lesser pilgrimage – any time of year', hajj: 'the pilgrimage – 8th to 13th Dhu l-Ḥijja', ihramp: '2 rakʿahs before iḥrām', tawafp: 'behind the Maqām Ibrāhīm',
     eid: 'Eid al-Fitr and Eid al-Adha, morning', janaza: 'for the deceased, standing',
@@ -21,6 +24,7 @@ export default {
     sisha: 'after the obligatory prayer', witr: 'after Isha until before Fajr', jumua: 'Friday, instead of Dhuhr', tahiyya: 'on entering the mosque',
   },
   niyya: {
+    tarawih: 'the 2 rakʿahs of Tarāwīḥ',
     ihramp: 'the 2 sunnah rakʿahs of iḥrām', tawafp: 'the 2 rakʿahs of ṭawāf behind the Maqām Ibrāhīm',
     eid: 'the 2 rakʿahs of the Eid prayer behind the imam', janaza: 'the funeral prayer for Allah and the supplication for the deceased, behind the imam',
     fard: (n, name) => `the ${n} rakʿahs of the ${name} prayer`,
@@ -317,7 +321,116 @@ export default {
     ],
     calmDone: 'Well done! The strong one is the one who controls himself when angry. Now you can speak calmly and kindly.',
   },
+
+  // Purification: ghusl and tayammum (title, cue, instruction per step), plus “when?”
+  pure: {
+    menu: 'Purification', title: 'Purification', ezanMenu: 'Adhan & Iqama',
+    note: 'Wuḍūʾ before prayer, ghusl as full-body washing, tayammum when there is no water. Everything is only hinted at and shown with clothes on.',
+    ghusl: {
+      done: 'Ghusl done', well: 'You have practised the full-body washing step by step. After it you are ready for prayer.',
+      when: 'After puberty, ghusl is required in certain cases: after marital intercourse, after a seminal discharge, and after the end of the period or of post-natal bleeding. It is recommended on Fridays, on the Eid days and before iḥrām. If you have questions, ask your parents or an imam.',
+      steps: [
+        ['Intention and Basmala', 'Make the intention', 'Make the intention in your heart to perform the full-body washing (ghusl) and say “Bismillāh”.'],
+        ['Wash hands', 'Wash hands', 'Wash both hands up to the wrists, three times.'],
+        ['Wash private parts', 'Clean private parts', 'With your left hand, wash the private parts and remove any impurity. Then wash your hands again.'],
+        ['Perform wuḍūʾ', 'Wuḍūʾ as learned', 'Perform the ablution as usual. You may also leave washing the feet until the very end.'],
+        ['Rinse mouth thoroughly', 'Rinse mouth', 'Rinse your mouth thoroughly so the water reaches everywhere – three times. In the Ḥanafī and Ḥanbalī schools this is obligatory in ghusl.'],
+        ['Clean nose thoroughly', 'Clean nose', 'Draw water into your nose and blow it out – three times. In the Ḥanafī and Ḥanbalī schools this is obligatory too.'],
+        ['Water over the head', 'Pour over the head', 'Pour water over your head three times so it reaches the scalp and all the hair.'],
+        ['Right side of the body', 'Right side', 'Pour water over the right side of the body, from the shoulder to the foot – three times.'],
+        ['Left side of the body', 'Left side', 'Then the same over the left side – three times.'],
+        ['Whole body', 'Leave nothing dry', 'Make sure the water reaches the whole body: belly button, behind the ears, under the armpits, between fingers and toes; move rings. This is the actual obligation of ghusl.'],
+        ['Declaration of faith', 'Say the shahada', 'Finally say the declaration of faith. After ghusl you need no new wuḍūʾ for prayer, as long as it is not broken.'],
+      ],
+    },
+    tayammum: {
+      done: 'Tayammum done', well: 'Now you know how to get ready for prayer even without water.',
+      when: 'Tayammum (Quran 5:6) replaces wuḍūʾ and ghusl when there is no water or water would cause harm, e.g. in illness or with an injury. As soon as water is available again, you wash normally.',
+      second: {
+        hanafi: 'Ḥanafī: strike the earth twice – once for the face, once for the arms up to the elbows.',
+        shafii: 'Shāfiʿī: strike the earth twice – once for the face, once for the arms up to the elbows.',
+        maliki: 'Mālikī: once is obligatory; the second time (for the arms up to the elbows) is recommended.',
+        hanbali: 'Ḥanbalī: one strike is enough; with it you wipe the face and the hands up to the wrists.',
+      },
+      steps: [
+        ['Intention and Basmala', 'Make the intention', 'Make the intention to perform tayammum instead of washing and say “Bismillāh”. In tayammum the intention is obligatory in all schools.'],
+        ['Hands on clean earth', 'Hands on the earth', 'Place both palms with fingers spread on clean earth, sand or stone.'],
+        ['Tap off the dust', 'Tap off', 'Lift your hands and lightly tap or blow off the coarse dust.'],
+        ['Wipe the face', 'Wipe the face', 'Wipe both hands once over the whole face – from forehead to chin, from ear to ear.'],
+        ['Earth a second time', 'Once more', 'Place your hands on the earth a second time and tap them off.'],
+        ['Wipe the right arm', 'Right arm', 'Wipe your left hand over your right arm, from the fingers to the elbow.'],
+        ['Wipe the left arm', 'Left arm', 'Then your right hand over your left arm, up to the elbow.'],
+        ['Declaration of faith', 'Say the shahada', 'Say the declaration of faith. Tayammum remains valid until you can use water again or it is broken like wuḍūʾ.'],
+      ],
+    },
+  },
+
+  // Prostration for a mistake (Sajdat as-Sahw)
+  sahw: {
+    tIntro: 'What is Sajdat as-Sahw?',
+    intro: 'If during prayer you accidentally left out something important (e.g. the first sitting) or did something extra (e.g. an additional prostration), you make two extra prostrations at the end. This makes up for the mistake – Allah knows that every human forgets sometimes.',
+    when: 'When? For a forgotten wājib part (e.g. the first sitting, tashahhud, qunūt in witr) and for accidental additions. Whoever forgets a pillar (rukn) such as rukūʿ or a prostration makes it up – if it is only noticed after the prayer, the prayer is repeated. If you are unsure how many rakʿahs you prayed, go by the smaller number.',
+    school: {
+      hanafi: 'Ḥanafī: after the tashahhud one salām to the right, then two prostrations, then tashahhud, ṣalawāt, supplication and salām.',
+      shafii: 'Shāfiʿī: the two prostrations always before the salām, after tashahhud and ṣalawāt.',
+      maliki: 'Mālikī: for something forgotten, before the salām (as shown here); for something extra, after the salām – followed again by tashahhud and salām.',
+      hanbali: 'Ḥanbalī: mostly before the salām (as shown here); in some cases, e.g. if the salām was given too early, after it.',
+    },
+    tash: (hanafi) => (hanafi ? 'You are in the final sitting and recite the tashahhud up to “ʿabduhū wa rasūluh”.' : 'You are in the final sitting and recite the tashahhud as usual.'),
+    tSalamOne: 'One salām to the right', salamOne: 'Give only one salām to the right – not yet to the left. The prayer is not over yet.',
+    tSujud1: 'First sahw prostration', sujud1: 'Say “Allāhu akbar” and prostrate as in prayer. Say three times “Subḥāna rabbiya l-aʿlā”.',
+    tSujud2: 'Second sahw prostration', sujud2: 'After sitting briefly, the second prostration, the same way.',
+    tTashAgain: 'Tashahhud once more', tashAgain: 'Sit up and recite the tashahhud once more, then ṣalawāt and supplication.',
+  },
+
+  // Parents’ overview
+  par: {
+    menu: 'Parents', title: 'Parents’ overview', sub: 'What your family has practised', profiles: 'Manage family',
+    intro: 'Everything stays on this device. For each family member: what already works well and what you can practise together next. Praise helps more than pressure.',
+    days: 'Days practised (7)', prayers: 'Prayers practised', suras: 'Surahs learned', quiz: 'Best quiz',
+    wash: (w, g, ty) => `Wuḍūʾ ${w}× · Ghusl ${g}× · Tayammum ${ty}×`, tracked: (n) => `${n} prayers this week`,
+    learned: 'Already practised', surasKnown: 'Knows', next: 'Next steps',
+    allGood: 'Everything important has been practised – keep it up, and pray together!',
+    tipWudu: 'Practise the ablution together (Purification → Wuḍūʾ) – ideally afterwards at a real sink.',
+    tipMissing: (list) => `Go through these prayers once more: ${list}.`,
+    tipFirst: 'Start with Fajr: only 2 rakʿahs, a good beginning. Switch on kids mode as well.',
+    tipSura: 'Learn the Fātiḥa – it belongs to every prayer (Learn surahs → Al-Fātiḥa).',
+    tipNextSura: (name) => `Next surah: ${name} – one verse a day is enough.`,
+    tipQuiz: 'Do the quiz again together and talk about the answers.',
+    tipQuizStart: 'Try the quiz once – it shows what has already sunk in.',
+    tipRoutine: 'Plan a fixed, short time each day, e.g. 10 minutes after dinner.',
+    tipSahw: 'Show “mistakes in prayer” (More prayers → Sajdat as-Sahw) – it takes away children’s fear of doing something wrong.',
+  },
+
+  // Large text and calm mode
+  comfort: {
+    big: 'Large text', bigSub: 'All texts and buttons bigger',
+    calm: 'Calm mode', calmSub: 'No music or sounds, slower reading aloud, no animations in the interface',
+  },
+
   kids: {
+    sahw: 'Everyone forgets something sometimes – even in prayer. That’s okay! If, for example, you forgot to sit after the second rakʿah, you simply do two extra prostrations at the end. Then everything is fine again.',
+    ghuslParts: {
+      heart: 'Ghusl is a big washing for the whole body. Grown-ups do it in certain situations, and many also on Friday or before Eid. Say in your heart: “I am now washing my whole body for Allah” – and then “Bismillāh”.',
+      hands: 'First you wash your hands – three times, between the fingers too.',
+      private: 'Then, with your left hand, you wash the parts your underwear covers until they are clean. After that you wash your hands again.',
+      wuduAll: 'Now you do the normal ablution you already know: hands, mouth, nose, face, arms, head, ears and feet.',
+      mouth: 'Rinse your mouth really well so the water reaches everywhere – three times.',
+      nose: 'And your nose too: gently draw in water and blow it out, three times.',
+      headPour: 'Now pour water over your head, three times. The water should reach the skin under your hair – rub long hair well.',
+      sideR: 'Then the right side of your body: from the shoulder all the way down to the foot, three times. Right always comes first.',
+      sideL: 'Now the left side the same way, three times.',
+      body: 'Finally, check that really no spot stays dry: belly button, behind the ears, under the arms, between fingers and toes. Like in the shower – only very mindfully.',
+    },
+    tayammumParts: {
+      heart: 'Sometimes there is no water – for example on a hike – or someone is ill and must not get wet. Then tayammum helps: you get ready with clean earth. Say in your heart: “I am doing tayammum for the prayer” – and “Bismillāh”.',
+      strike: 'Place both hands flat on clean earth, sand or a stone.',
+      dust: 'Tap your hands lightly or blow – you shouldn’t get dirty, the earth should only touch your hands.',
+      tFace: 'Wipe both hands once over your whole face, from the forehead to the chin.',
+      strike2: 'Place your hands on the earth once more and tap them off.',
+      tArmR: 'Wipe your left hand over your right arm, from the fingers to the elbow.',
+      tArmL: 'And your right hand over your left arm, up to the elbow. Done – now you may pray!',
+    },
     niyya: 'Stand calmly and look at the spot where your forehead will soon touch the floor. Say in your heart: “I am now praying for Allah.” This is the niyya, the intention – you don’t have to say it out loud.',
     takbir: 'Raise both hands until your thumbs almost touch your ears and say: “Allāhu akbar” – Allah is greater than everything. Now you are in the prayer: you don’t talk to others and you don’t look around.',
     opening: 'Place your right hand over your left and stand still like a tree. Now you praise Allah very quietly – just like greeting someone kindly before you ask them for something.',

@@ -26,7 +26,12 @@ export const EXTRA_PRAYERS = [
   { id: 'tahiyya', rakat: 2, kind: 'sunnah' },
   { id: 'eid', rakat: 2, kind: 'eid' },
   { id: 'janaza', rakat: 0, kind: 'janaza' },
+  { id: 'tarawih', rakat: 2, kind: 'sunnah' },
+  { id: 'sahw', rakat: 0, kind: 'sahw' },
 ].map(named);
+
+// Waschungen: kleine Waschung (Wuḍūʾ), Ganzkörperwaschung (Ghusl), Reinigung ohne Wasser (Tayammum)
+export const PURIFY = [{ id: 'wudu', kind: 'wudu' }, { id: 'ghusl', kind: 'wudu', variant: 'ghusl' }, { id: 'tayammum', kind: 'wudu', variant: 'tayammum' }].map(named);
 
 // Umre und Hac (Simulator); die 2 Rakʿāt im Iḥrām und nach dem Tavaf werden wie Sunnah-Gebete geführt
 export const PILGRIMAGES = [{ id: 'umre', kind: 'umre' }, { id: 'hajj', kind: 'hajj' }].map(named);
@@ -35,7 +40,7 @@ export const ALEVI = [{ id: 'cem', kind: 'cem' }, { id: 'semah', kind: 'semah' }
 export const IHRAM_PRAYER = named({ id: 'ihramp', rakat: 2, kind: 'sunnah' });
 export const TAWAF_PRAYER = named({ id: 'tawafp', rakat: 2, kind: 'sunnah' });
 
-export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PILGRIMAGES, ...ALEVI, ...STORY_LIST].find((p) => p.id === id);
+export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PURIFY, ...PILGRIMAGES, ...ALEVI, ...STORY_LIST].find((p) => p.id === id);
 
 // Vereinfachte Unterschiede der vier sunnitischen Rechtsschulen (für Männer; Details bei Gelehrten erfragen).
 // Texte (hands, takbir, notes) stehen in der Sprachdatei unter madhab.<id>.
@@ -443,6 +448,36 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
 
   const raiseNote = t('instr.raise');
   const sitText = (final, n) => (womenSit ? t('women.sit') : m.tawarruk(final, n) ? t('tawarruk') : t('iftirash'));
+  // Niederwerfung bei einem Fehler (Sajdat as-Sahw): gezeigt am Ende eines Gebets mit 2 Rakʿāt
+  if (kind === 'sahw') {
+    const how = sitText(true, 2), base = { unit: '', of: 2, rakah: 2 };
+    const hanafi = m.id === 'hanafi';
+    add({ ...base, key: 'sahw', title: t('sahw.tIntro'), pose: 'sit', how, dur: 20, instr: t('sahw.intro'), de: [t('sahw.when'), t(`sahw.school.${m.id}`)] });
+    add({ ...base, key: 'tashahhud', title: t('title.tashLast'), pose: 'sit', how, dur: 20, instr: t('sahw.tash', hanafi), ...text('tashahhud') });
+    const sujud = () => {
+      add({ ...base, key: 'sujud', title: t('sahw.tSujud1'), pose: 'sujud', dur: 9, instr: t('sahw.sujud1'), ...text('sujud') });
+      add({ ...base, key: 'jalsa', title: t('title.jalsa'), pose: 'sit', how, dur: 6, instr: t('instr.jalsa'), ...text('jalsa') });
+      add({ ...base, key: 'sujud', title: t('sahw.tSujud2'), pose: 'sujud', dur: 9, instr: t('sahw.sujud2'), ...text('sujud') });
+    };
+    const ending = () => {
+      add({ ...base, key: 'salawat', title: t('title.salawat'), pose: 'sit', how, dur: 24, instr: t('instr.salawat'), ...text('salawat') });
+      add({ ...base, key: 'dua', title: t('title.dua'), pose: 'sit', how, dur: 10, instr: t('instr.dua'), ...text('dua') });
+    };
+    if (hanafi) {
+      // Ḥanafī: nach dem Tashahhud ein Salām nach rechts, dann zwei Niederwerfungen, dann alles noch einmal bis zum Ende
+      add({ ...base, key: 'salam', title: t('sahw.tSalamOne'), pose: 'taslimR', dur: 6, instr: t('sahw.salamOne'), ...text('salam') });
+      sujud();
+      add({ ...base, key: 'tashahhud', title: t('sahw.tTashAgain'), pose: 'sit', how, dur: 20, instr: t('sahw.tashAgain'), ...text('tashahhud') });
+      ending();
+    } else {
+      // Shāfiʿī, Ḥanbalī (und Mālikī bei Vergessenem): die zwei Niederwerfungen kurz vor dem Salām
+      ending();
+      sujud();
+    }
+    add({ ...base, key: 'salam', title: t('title.salamR'), pose: 'taslimR', dur: 5, instr: t('instr.salamR'), ...text('salam') });
+    add({ ...base, key: 'salam', title: t('title.salamL'), pose: 'taslimL', dur: 5, instr: t('instr.salamL'), ...text('salam') });
+    return steps;
+  }
   for (const [ui, unit] of units.entries()) {
     const { n, label } = unit;
     const witrUnit = kind === 'witr' && (units.length === 1 || ui === 1);

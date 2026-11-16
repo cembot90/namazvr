@@ -9,13 +9,14 @@ export function menuGroups(v, { mobile = false } = {}) {
   return [
     { label: t('ui.grp.pray'), items: [
       item('🕐', t('ui.menuTimes'), 'times'),
-      item('💧', t('ui.menuWudu'), 'wudu', { primary: !v.wuduDone }),
+      item('💧', t('pure.menu'), 'purify', { primary: !v.wuduDone }),
       item('🧭', mobile ? t('ui.menuQiblaMobile') : t('ui.menuQibla'), 'qibla'),
       item('🤲', t('ui.menuMore'), 'more'),
       item('🕌', t('ui.menuMosque'), 'mosque'),
     ] },
     { label: t('ui.grp.learn'), items: [
       item('📖', t('ui.menuSuras'), 'suras'),
+      item('📣', t('pure.ezanMenu'), 'sura:ezan'),
       item('📚', t('story.menu'), 'stories'),
       item('🎓', t('ui.menuLearn'), 'learn'),
       item('📿', t('ui.menuTasbih'), 'tasbih'),
@@ -31,6 +32,7 @@ export function menuGroups(v, { mobile = false } = {}) {
       item('✅', t('track.menu', v.tracked), 'tracker', { active: v.tracked === 5 }),
       item(v.profile.icon, v.profile.name, 'profiles'),
       item('🧒', t('ui.kidsBtn', v.kids), 'kids', { active: v.kids }),
+      item('👪', t('par.menu'), 'parents'),
       item('⚙️', t('ui.menuSettings'), 'settings'),
     ] },
   ];

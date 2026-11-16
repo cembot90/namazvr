@@ -189,6 +189,15 @@
     #ui .stats div { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 4px; text-align: center; }
     #ui .stats b { display: block; font-size: 24px; color: var(--gold); font-variant-numeric: tabular-nums; }
     #ui .stats small { color: var(--muted); font-size: 11px; }
+    #ui .pcard { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 4px 14px 12px; margin: 12px 0; }
+    #ui .pcard h3 { color: var(--gold); font-size: 18px; margin: 12px 0 10px; }
+    #ui .pcard p { margin: 10px 2px 0; }
+    #ui .pcard .ok { color: var(--ok, #7fd49b); }
+    /* Große Schrift: alles im Bedienteil etwas größer (für Kinder und ältere Menschen) */
+    html.big #ui > * { zoom: 1.16; }
+    html.big #ui .dock { zoom: 1.08; }
+    /* Ruhiger Modus: keine Animationen in der Oberfläche */
+    html.calm *, html.calm *::before, html.calm *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     #ui .badges { display: flex; flex-wrap: wrap; gap: 6px; }
     #ui .badges span { background: var(--surface); border: 1px solid var(--line); color: var(--muted); padding: 6px 10px; border-radius: 999px; font-size: 13px; }
     #ui .badges span.ok { background: var(--gold-soft); border-color: var(--gold); color: var(--gold); }
