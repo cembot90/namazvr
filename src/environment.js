@@ -13,6 +13,7 @@ const SIZES = {
   osmanisch: { w: 36, d: 36, h: 13 },
   andalusisch: { w: 44, d: 40, h: 8.5 },
   gross: { w: 60, d: 56, h: 18 },
+  kuppel: { w: 48, d: 62, h: 16 },
   wudu: { w: 9, d: 6, h: 3.4 },
 };
 // Maße des aktuell gebauten Raums; NIGHT: Fenster dunkel, Lampen heller
@@ -27,7 +28,7 @@ let STOOLS = [], FOOT_WATER = [];
 const block = (list, r) => { for (const [x, , z] of list) OBSTACLES.push([x, z + HD - FRONT, r]); };
 
 // Freie Stile, inspiriert von Bautraditionen – keine Nachbauten bestimmter Moscheen.
-export const STYLES = ['klassisch', 'osmanisch', 'andalusisch', 'gross'].map((id) => ({
+export const STYLES = ['klassisch', 'osmanisch', 'andalusisch', 'gross', 'kuppel'].map((id) => ({
   id, get name() { return t(`styles.${id}`)[0]; }, get de() { return t(`styles.${id}`)[1]; },
 }));
 
@@ -35,6 +36,7 @@ const PALETTE = {
   klassisch: { carpet: ['#5e1a24', '#6f2330', '#c9a85c', '#2f6b5a'], wall: ['#efe4cf', '#e2d3b6'], tile: ['#1d5a63', '#e8dcc0', '#2b7c86'], band: 1.3 },
   osmanisch: { carpet: ['#7c1820', '#8e2229', '#d8b46a', '#2c4f8a'], wall: ['#f4f1ea', '#e7e2d6'], tile: ['#f4f6f8', '#1f4fa0', '#2fa3b5'], band: 2.6 },
   andalusisch: { carpet: ['#23443f', '#2c524b', '#c9a85c', '#8c2f24'], wall: ['#ecd7b4', '#ddc39a'], tile: ['#2d5a4f', '#e9d8b0', '#b8442f'], band: 1.4 },
+  kuppel: { carpet: ['#1d5c6e', '#24697c', '#d8c07a', '#7c2a2a'] },
   gross: { carpet: ['#8a1c24', '#9c2630', '#d8b46a', '#1f3f7a'], wall: ['#f6f1e6', '#e9e1cf'], tile: ['#f4f6f8', '#1f4fa0', '#c0392b'], band: 3.2 },
 };
 
@@ -394,7 +396,7 @@ function floorAndWalls(scene, style) {
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
   // Wandtextur je Wandlänge wiederholen, damit das Fliesenband nicht verzerrt
-  const tex = wallTexture(style);
+  const tex = style === 'kuppel' ? revetmentTexture() : wallTexture(style);
   tex.wrapS = THREE.RepeatWrapping;
   const mats = [W, D].map((len) => {
     const map = len === W ? tex : tex.clone();
@@ -551,7 +553,7 @@ function lanterns(scene, spots, color = 0xffd48a) {
 }
 
 // Tief hängender Lichterkranz (osmanische Art) mit Ketten zur Decke
-function lightRing(scene, x, z, r, y, n) {
+function lightRing(scene, x, z, r, y, n, top = H + 1) {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.035 + r * 0.004, 8, 128), gold());
   ring.rotation.x = Math.PI / 2;
   ring.position.set(x, y, z);
@@ -560,7 +562,7 @@ function lightRing(scene, x, z, r, y, n) {
   const lamps = [];
   for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2; lamps.push([x + Math.sin(a) * r, y - 0.08, z + Math.cos(a) * r]); }
   inst(scene, new THREE.SphereGeometry(0.06 + r * 0.004, 10, 8), glow, lamps);
-  const len = H + 1 - y, ropes = [];
+  const len = top - y, ropes = [];
   for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; ropes.push([x + Math.sin(a) * r, y + len / 2, z + Math.cos(a) * r]); }
   inst(scene, new THREE.CylinderGeometry(0.008, 0.008, len, 4), new THREE.MeshBasicMaterial({ color: 0x5a4a2a }), ropes);
 }
@@ -740,6 +742,266 @@ function buildGross(scene) {
   for (const [x, z, r] of [[-23, domeZ, 3], [23, domeZ, 3], [-12, domeZ + 26, 4], [12, domeZ + 26, 4]]) lightRing(scene, x, z, r, 4.4, 28);
 }
 
+// Lichtkuppel: frei inspiriert vom spätantik-osmanischen Kuppelsaal (kein Nachbau).
+// Eine flache Riesenkuppel über Hängezwickeln, davor und dahinter je eine Halbkuppel, zweigeschossige
+// Arkaden mit Emporen an den Seiten, Fensterkranz, Goldmosaik, Marmorverkleidung und große Rundschilde.
+
+// Marmorverkleidung unten (bis zur Empore), darüber warmer Putz mit Goldfries
+function revetmentTexture() {
+  return canvasTexture(1024, 448, (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#efe2c6'); g.addColorStop(1, '#e3d2b0');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    const top = h * (1 - 7 / H), cols = ['#8c8577', '#b7ab93', '#6f7f74', '#a99a80'];
+    const n = 8, pw = w / n;
+    for (let i = 0; i < n; i++) {
+      for (const [y0, y1] of [[top, top + (h - top) * 0.55], [top + (h - top) * 0.55, h]]) {
+        const x = i * pw;
+        ctx.fillStyle = cols[(i + (y0 > top ? 2 : 0)) % cols.length];
+        ctx.fillRect(x + 3, y0 + 3, pw - 6, y1 - y0 - 6);
+        // gespiegelte Maserung („aufgeschlagenes Buch“)
+        ctx.strokeStyle = 'rgba(255,255,255,0.22)'; ctx.lineWidth = 1.4;
+        for (let k = 0; k < 9; k++) {
+          const yy = y0 + ((k + 0.5) / 9) * (y1 - y0);
+          ctx.beginPath();
+          ctx.moveTo(x + pw / 2, yy);
+          ctx.bezierCurveTo(x + pw * 0.35, yy - 14, x + pw * 0.2, yy + 12, x + 4, yy - 6);
+          ctx.moveTo(x + pw / 2, yy);
+          ctx.bezierCurveTo(x + pw * 0.65, yy - 14, x + pw * 0.8, yy + 12, x + pw - 4, yy - 6);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = '#c9a85c'; ctx.lineWidth = 3; ctx.strokeRect(x + 3, y0 + 3, pw - 6, y1 - y0 - 6);
+      }
+    }
+    ctx.fillStyle = '#c9a85c'; ctx.fillRect(0, top - 8, w, 8);
+    ctx.fillStyle = '#7c2a2a'; ctx.fillRect(0, top - 14, w, 6);
+    grain(ctx, w, h, 6, 21);
+  });
+}
+
+// Goldmosaik: warmer Goldgrund mit feinen Steinchen und dunklen Rippen (n Stück)
+function mosaicMaterial(ribs = 0, side = THREE.BackSide) {
+  const map = canvasTexture(1024, 512, (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, '#e8c46a'); g.addColorStop(0.6, '#c99a3e'); g.addColorStop(1, '#a87a2c');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 9000; i++) {
+      ctx.fillStyle = `rgba(${Math.random() < 0.5 ? '255,240,190' : '120,80,20'},${0.08 + Math.random() * 0.12})`;
+      ctx.fillRect(Math.random() * w, Math.random() * h, 3, 3);
+    }
+    if (ribs) {
+      for (let i = 0; i < ribs; i++) {
+        const x = (i / ribs) * w;
+        ctx.fillStyle = 'rgba(90,60,20,0.55)'; ctx.fillRect(x - 3, 0, 6, h);
+        ctx.fillStyle = 'rgba(255,235,170,0.5)'; ctx.fillRect(x + 3, 0, 2, h);
+      }
+    }
+    // Ornamentband am Fuß
+    ctx.fillStyle = '#1d5c6e'; ctx.fillRect(0, h - 40, w, 22);
+    ctx.fillStyle = '#e6c77f';
+    for (let x = 8; x < w; x += 24) { ctx.beginPath(); ctx.arc(x, h - 29, 6, 0, Math.PI * 2); ctx.fill(); }
+  });
+  return new THREE.MeshStandardMaterial({ map, roughness: 0.55, metalness: 0.25, side, emissive: 0x6a4a18, emissiveIntensity: NIGHT ? 0.22 : 0.35 });
+}
+
+// Großes Rundschild: grüner Grund, Goldrand, goldene Schrift
+function medallionTexture(text, size = 190) {
+  return canvasTexture(512, 512, (ctx, w) => {
+    const c = w / 2;
+    ctx.fillStyle = '#c9a85c'; ctx.beginPath(); ctx.arc(c, c, c - 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#123f36'; ctx.beginPath(); ctx.arc(c, c, c - 26, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(230,199,127,0.7)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(c, c, c - 40, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillStyle = '#e6c77f';
+    ctx.font = `${size}px Amiri, "Noto Naskh Arabic", "Geeza Pro", serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = 'rtl';
+    ctx.fillText(text, c, c + 14);
+  });
+}
+
+// Rundbogen-Zwickelwand zwischen zwei Stützen: Spannweite s, Öffnungsradius o, Kämpfer spring, Oberkante top
+function spandrelShape(s, o, spring, top) {
+  const sh = new THREE.Shape();
+  sh.moveTo(-s / 2, top);
+  sh.lineTo(-s / 2, spring);
+  sh.lineTo(-o, spring);
+  sh.absarc(0, spring, o, Math.PI, 0, true);
+  sh.lineTo(s / 2, spring);
+  sh.lineTo(s / 2, top);
+  sh.lineTo(-s / 2, top);
+  return sh;
+}
+
+// Hängezwickel: Kugelfläche (Radius a·√2, Mitte auf Höhe yc) über dem Quadrat ±a, innen bis zum Kuppelkreis a
+function pendentives(scene, cx, cz, a, yc, mat) {
+  const R = a * Math.SQRT2, nA = 160, nT = 14, pos = [], uv = [], idx = [];
+  for (let i = 0; i <= nA; i++) {
+    const th = (i / nA) * Math.PI * 2, c = Math.cos(th), s = Math.sin(th);
+    const edge = a / Math.max(Math.abs(c), Math.abs(s));
+    for (let j = 0; j <= nT; j++) {
+      const r = a + (edge - a) * (j / nT);
+      pos.push(cx + c * r, yc + Math.sqrt(Math.max(0, R * R - r * r)), cz + s * r);
+      uv.push(i / nA * 4, j / nT);
+    }
+  }
+  for (let i = 0; i < nA; i++) for (let j = 0; j < nT; j++) {
+    const p = i * (nT + 1) + j, q = p + nT + 1;
+    idx.push(p, q, p + 1, q, q + 1, p + 1);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  scene.add(new THREE.Mesh(geo, mat));
+}
+
+function buildKuppel(scene) {
+  lights(scene, 1.15);
+  floorAndWalls(scene, 'kuppel');
+  const a = 15, yc = H, zF = -HD + a + 0.5, cz = zF + a, zB = cz + a;
+  const gm = gold();
+  const mosaic = mosaicMaterial(0, THREE.DoubleSide);
+
+  // Flache Decke der Seitenschiffe mit einer Öffnung: vordere Halbkuppel, Mittelquadrat, hintere Halbkuppel
+  const shape = new THREE.Shape();
+  shape.moveTo(-HW, -HD); shape.lineTo(HW, -HD); shape.lineTo(HW, HD); shape.lineTo(-HW, HD); shape.lineTo(-HW, -HD);
+  const hole = new THREE.Path();
+  hole.moveTo(a, zF);
+  hole.absarc(0, zF, a, 0, -Math.PI, true);
+  hole.lineTo(-a, zB);
+  hole.absarc(0, zB, a, Math.PI, 0, true);
+  hole.lineTo(a, zF);
+  shape.holes.push(hole);
+  const ceilColor = 0xe9dcc0;
+  const ceiling = new THREE.Mesh(new THREE.ShapeGeometry(shape, 64), new THREE.MeshStandardMaterial({ color: ceilColor, roughness: 1, side: THREE.DoubleSide, emissive: ceilColor, emissiveIntensity: NIGHT ? 0.12 : 0.25 }));
+  ceiling.rotation.x = Math.PI / 2;
+  ceiling.position.y = H;
+  scene.add(ceiling);
+
+  // Halbkuppeln (Qibla-Seite und hinten), Hängezwickel, flache Hauptkuppel
+  for (const [z, start] of [[zF, Math.PI], [zB, 0]]) {
+    const half = new THREE.Mesh(new THREE.SphereGeometry(a, 64, 20, start, Math.PI, 0, Math.PI / 2), mosaicMaterial(14, THREE.DoubleSide));
+    half.position.set(0, yc, z);
+    scene.add(half);
+  }
+  pendentives(scene, 0, cz, a, yc, mosaic);
+  const top = yc + a, flat = 0.6;
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(a, 96, 28, 0, Math.PI * 2, 0, Math.PI / 2), mosaicMaterial(40));
+  dome.scale.y = flat;
+  dome.position.set(0, top, cz);
+  scene.add(dome);
+  // Goldener Gesimsring am Kuppelfuß und Schild im Scheitel
+  const cornice = new THREE.Mesh(new THREE.TorusGeometry(a - 0.15, 0.22, 8, 160), gm);
+  cornice.rotation.x = Math.PI / 2;
+  cornice.position.set(0, top, cz);
+  scene.add(cornice);
+  const crown = new THREE.Mesh(new THREE.CircleGeometry(3.2, 64), new THREE.MeshBasicMaterial({ map: medallionTexture('ٱلنُّور', 170) }));
+  crown.rotation.x = Math.PI / 2;
+  crown.rotation.z = Math.PI;
+  crown.position.set(0, top + a * flat - 0.12, cz);
+  scene.add(crown);
+
+  // Fensterkranz (40 Fenster) am Kuppelfuß, je fünf am Fuß der Halbkuppeln
+  const glass = new THREE.MeshBasicMaterial({ color: glassColor(0xfff4dc) });
+  const ring = [];
+  for (let i = 0; i < 40; i++) { const t = (i / 40) * Math.PI * 2; ring.push([Math.sin(t) * (a - 0.32), top + 0.25, cz + Math.cos(t) * (a - 0.32), t + Math.PI]); }
+  inst(scene, new THREE.ShapeGeometry(roundArch(0.75, 0.8)), glass, ring);
+  const halfWin = [];
+  for (const [z, dir] of [[zF, -1], [zB, 1]]) for (let i = 0; i < 5; i++) {
+    const t = -Math.PI / 2 + ((i + 0.5) / 5) * Math.PI, x = Math.sin(t) * (a - 0.3), dz = Math.cos(t) * (a - 0.3) * dir;
+    halfWin.push([x, yc + 0.35, z + dz, Math.atan2(-x, -dz)]);
+  }
+  inst(scene, new THREE.ShapeGeometry(roundArch(1.3, 1.4)), glass, halfWin);
+
+  // Schildwände unter den großen Seitenbögen mit zwei Fensterreihen
+  const tymp = new THREE.Shape();
+  tymp.moveTo(-a, yc); tymp.absarc(0, yc, a, Math.PI, 0, true); tymp.lineTo(-a, yc);
+  const tympMat = new THREE.MeshStandardMaterial({ color: 0xeadcbe, roughness: 0.95, side: THREE.DoubleSide, emissive: 0xeadcbe, emissiveIntensity: NIGHT ? 0.08 : 0.18 });
+  const tympWin = [];
+  for (const side of [-1, 1]) {
+    const m = new THREE.Mesh(new THREE.ShapeGeometry(tymp, 48), tympMat);
+    m.rotation.y = side * Math.PI / 2;
+    m.position.set(side * a, 0, cz);
+    scene.add(m);
+    for (const [y, zs] of [[yc + 1.2, range(-9, 9, 3)], [yc + 6.5, range(-6, 6, 3)]]) for (const z of zs) tympWin.push([side * (a - 0.05), y, cz + z, -side * Math.PI / 2]);
+  }
+  inst(scene, new THREE.ShapeGeometry(roundArch(1.4, 2.0)), glass, tympWin);
+  sunShafts(scene, [-6, 0, 6].map((z) => [a - 0.1, yc + 2.6, cz + z]), 1.4, 2.4);
+
+  // Vier mächtige Pfeiler, auf ihnen große Rundschilde zur Mitte hin
+  const marble = stoneMat(0xece3d2, 0.55);
+  const piers = [-a, a].flatMap((x) => [zF, zB].map((z) => [x, yc / 2, z]));
+  inst(scene, new THREE.BoxGeometry(4, yc, 4), marble, piers);
+  inst(scene, new THREE.BoxGeometry(4.3, 0.5, 4.3), gm, piers.map(([x, , z]) => [x, yc - 0.25, z]));
+  // vorn (hinter dem Betenden) as-Salām und ar-Raḥmān, hinten unter der Kuppel Allah und Muhammad
+  const names = ['ٱلسَّلَام', 'مُحَمَّد', 'ٱلرَّحْمَٰن', 'ٱللَّٰه'];
+  piers.forEach(([x, , z], i) => {
+    const dx = -x, dz = cz - z, l = Math.hypot(dx, dz);
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(2.4, 64), new THREE.MeshBasicMaterial({ map: medallionTexture(names[i]) }));
+    disc.position.set(x + (dx / l) * 2.95, 11.2, z + (dz / l) * 2.95);
+    disc.rotation.y = Math.atan2(dx, dz);
+    scene.add(disc);
+  });
+
+  // Zweigeschossige Arkaden an den Seiten, darüber die Emporen
+  const green = stoneMat(0x46644f, 0.35), gy = 7;
+  const ground = range(zF - 6, HD - 2, 6).filter((z) => Math.abs(z - zF) > 1 && Math.abs(z - zB) > 1);
+  const upper = range(zF - 6, HD - 2, 3).filter((z) => Math.abs(z - zF) > 2.5 && Math.abs(z - zB) > 2.5);
+  const gCols = [-a, a].flatMap((x) => ground.map((z) => [x, 1.8, z]));
+  const uCols = [-a, a].flatMap((x) => upper.map((z) => [x, gy + 2.775, z]));
+  inst(scene, new THREE.CylinderGeometry(0.4, 0.45, 3.6, 18), green, gCols);
+  inst(scene, new THREE.CylinderGeometry(0.62, 0.42, 0.5, 18), gm, gCols.map(([x, , z]) => [x, 3.85, z]));
+  inst(scene, new THREE.CylinderGeometry(0.26, 0.3, 5.1, 16), green, uCols);
+  inst(scene, new THREE.CylinderGeometry(0.42, 0.28, 0.5, 16), gm, uCols.map(([x, , z]) => [x, gy + 5.575, z]));
+  const posts = [...ground, zF, zB].sort((p, q) => p - q);
+  const gArch = [], uArch = [];
+  for (const x of [-a, a]) {
+    for (let i = 0; i + 1 < posts.length; i++) gArch.push([x - 0.2, 0, (posts[i] + posts[i + 1]) / 2, Math.PI / 2]);
+    const up = [...upper, zF, zB].sort((p, q) => p - q);
+    for (let i = 0; i + 1 < up.length; i++) if (up[i + 1] - up[i] <= 3.1) uArch.push([x - 0.15, 0, (up[i] + up[i + 1]) / 2, Math.PI / 2]);
+  }
+  inst(scene, new THREE.ExtrudeGeometry(spandrelShape(6, 2.55, 4.1, gy - 0.2), { depth: 0.4, bevelEnabled: false }), marble, gArch);
+  inst(scene, new THREE.ExtrudeGeometry(spandrelShape(3, 1.15, gy + 5.83, H), { depth: 0.3, bevelEnabled: false }), marble, uArch);
+  const z0 = -HD + 8, len = HD - z0, depth = HW - a;
+  inst(scene, new THREE.BoxGeometry(depth, 0.45, len), marble, [-1, 1].map((s) => [s * (a + depth / 2), gy, z0 + len / 2]));
+  inst(scene, new THREE.BoxGeometry(0.12, 0.9, len), gm, [-1, 1].map((s) => [s * (a + 0.35), gy + 0.65, z0 + len / 2]));
+  const back = new THREE.Mesh(new THREE.BoxGeometry(2 * a, 0.45, 5), marble);
+  back.position.set(0, gy, HD - 2.5);
+  const backRail = new THREE.Mesh(new THREE.BoxGeometry(2 * a, 0.9, 0.12), gm);
+  backRail.position.set(0, gy + 0.65, HD - 5);
+  scene.add(back, backRail);
+  const backCols = range(-12, 12, 4).map((x) => [x, gy / 2, HD - 4.6]);
+  inst(scene, new THREE.CylinderGeometry(0.32, 0.36, gy, 16), green, backCols);
+  sideWindows(scene, [3, 10.5], 0xfff0d0, range(-HD + 5, HD - 4, 5), 1.2);
+
+  // Mihrab, Minbar, Lichterkränze an langen Ketten tief über dem Boden
+  mihrab(scene, gm, nicheTexture(), false, 1.7);
+  minbar(scene, 1.6, marble, gm, 7.5);
+  block(piers, 2.7);
+  block(gCols, 0.5);
+  block(backCols, 0.4);
+  baseShade(scene, piers, 2.4, 0.5);
+  baseShade(scene, gCols, 0.45);
+  lightRing(scene, 0, cz, 11, 4.4, 110, top + 6);
+  lightRing(scene, 0, cz, 7, 4.9, 72, top + 7.5);
+  lightRing(scene, 0, zF - 6, 4.5, 4.3, 40, yc + 9);
+  lightRing(scene, 0, zB + 6, 4.5, 4.3, 40, yc + 9);
+  const aisle = [];
+  for (const x of [-19.5, 19.5]) {
+    for (const z of [-HD + 3, -HD + 6.5]) aisle.push([x, z, 4.5]);
+    for (const z of range(z0 + 2, HD - 2, 4)) aisle.push([x, z, gy + 4]);
+  }
+  lanterns(scene, aisle);
+}
+
+// Rundbogen: Breite w, Höhe der Seitenwände h
+function roundArch(w, h) {
+  const sh = new THREE.Shape();
+  sh.moveTo(-w / 2, 0); sh.lineTo(-w / 2, h); sh.absarc(0, h, w / 2, Math.PI, 0, true); sh.lineTo(w / 2, 0); sh.lineTo(-w / 2, 0);
+  return sh;
+}
+
 // Waschraum (Abdesthane) neben dem Gebetssaal: Reihe von Waschbecken mit Hähnen an der Wand vor dir,
 // rechts niedrige Hähne mit Hockern für die Füße, hinten der Durchgang zum Gebetssaal.
 // Gebaut in Weltkoordinaten: Platz am Ursprung, Becken vor dir (−Z).
@@ -870,7 +1132,7 @@ export function setWater(on, t = 0, basins = [0, 1.1], stools = []) {
 // Hocker im Waschraum in Weltkoordinaten
 export const wuduStools = () => STOOLS;
 
-const BUILDERS = { klassisch: buildKlassisch, osmanisch: buildOsmanisch, andalusisch: buildAndalusisch, gross: buildGross };
+const BUILDERS = { klassisch: buildKlassisch, osmanisch: buildOsmanisch, andalusisch: buildAndalusisch, gross: buildGross, kuppel: buildKuppel };
 
 // night: nach Sonnenuntergang bzw. vor Sonnenaufgang
 export function buildEnvironment(group, style = 'klassisch', { night = false } = {}) {

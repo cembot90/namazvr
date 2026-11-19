@@ -336,6 +336,7 @@ export default {
     osmanisch: ['Osmanlı', 'Dört fil ayağı üzerinde dev kubbe, mavi çiniler, iki avize halkası'],
     andalusisch: ['Endülüs', 'Yüzlerce kırmızı-beyaz at nalı kemerli sütun ormanı ve ahşap tavan'],
     gross: ['Büyük Cami', '60 m salon: ana kubbe, yan kubbeler, mahfiller ve vitray'],
+    kuppel: ['Işık Kubbesi', 'İki yarım kubbe üzerinde dev basık kubbe, pencere halkası, altın mozaik, mahfiller'],
   },
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (yaklaşık)', isna: 'ISNA (Kuzey Amerika)', egypt: 'Mısır', makkah: 'Ümmü\'l-Kurâ (Mekke)' },
   asrName: { standard: 'Standart (Şâfiî, Mâlikî, Hanbelî)', hanafi: 'Hanefî' },

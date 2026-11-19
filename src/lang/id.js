@@ -293,6 +293,7 @@ export default {
     osmanisch: ['Utsmani', 'Kubah tengah raksasa di atas empat pilar, ubin biru, dua lingkaran lampu'],
     andalusisch: ['Andalusia', 'Hutan tiang dengan ratusan lengkung tapal kuda merah-putih dan langit-langit kayu'],
     gross: ['Masjid Agung', 'Aula 60 m: kubah utama, kubah samping, balkon, dan kaca patri'],
+    kuppel: ['Kubah Cahaya', 'Kubah raksasa landai di atas dua setengah kubah, lingkaran jendela, mozaik emas, balkon'],
   },
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (perkiraan)', isna: 'ISNA (Amerika Utara)', egypt: 'Mesir', makkah: 'Umm al-Qura (Makkah)' },
   asrName: { standard: 'Standar (Syafi’i, Maliki, Hambali)', hanafi: 'Hanafi' },

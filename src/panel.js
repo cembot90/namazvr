@@ -634,15 +634,15 @@ export class Panel extends CanvasPlane {
     const { W, H } = this;
     this.heading(t('ui.mosqueTitle'), t('ui.mosqueSub'));
     v.styles.forEach((st, i) => {
-      this.btn(st.name, 60, 128 + i * 100, W - 120, 90, `style:${st.id}`, { size: 31, sub: st.de, subSize: 21, active: st.id === v.style });
+      this.btn(st.name, 60, 122 + i * 84, W - 120, 82, `style:${st.id}`, { size: 28, sub: st.de, subSize: 18, active: st.id === v.style });
     });
-    this.paragraphs([t('ui.mosqueNote')], 548, { size: 20, color: C.muted, gap: 0 });
+    this.paragraphs([t('ui.mosqueNote')], 562, { size: 20, color: C.muted, gap: 0 });
     // Cemaat: Gemeinschaftsgebet mit Imam
     const row = (...a) => this.switchRow(...a);
-    row(585, t('ui.cemaat'), t('ui.cemaatTip'), [[v.cemaat ? t('ui.on') : t('ui.off'), 'cemaat', v.cemaat]]);
-    row(662, t('ui.cemaatSize'), '', [[t('ui.small'), 'csize:small', v.size !== 'large'], [t('ui.large'), 'csize:large', v.size === 'large']]);
-    row(739, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
-    row(816, t('gal.title'), t('gal.sub'), [[t('gal.screen'), 'women:screen', v.womenPlace !== 'gallery'], [t('gal.gallery'), 'women:gallery', v.womenPlace === 'gallery']]);
+    row(592, t('ui.cemaat'), t('ui.cemaatTip'), [[v.cemaat ? t('ui.on') : t('ui.off'), 'cemaat', v.cemaat]]);
+    row(667, t('ui.cemaatSize'), '', [[t('ui.small'), 'csize:small', v.size !== 'large'], [t('ui.large'), 'csize:large', v.size === 'large']]);
+    row(742, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
+    row(817, t('gal.title'), t('gal.sub'), [[t('gal.screen'), 'women:screen', v.womenPlace !== 'gallery'], [t('gal.gallery'), 'women:gallery', v.womenPlace === 'gallery']]);
     this.btn(t('ui.back'), 60, H - 98, W - 120, 80, 'menu');
   }
 

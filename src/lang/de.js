@@ -293,6 +293,7 @@ export default {
     osmanisch: ['Osmanisch', 'Riesige Zentralkuppel auf vier Pfeilern, blaue Fliesen, zwei Lichterkränze'],
     andalusisch: ['Andalusisch', 'Säulenwald mit Hunderten rot-weißen Hufeisenbögen und Holzdecke'],
     gross: ['Großmoschee', '60 m Halle: Hauptkuppel, Nebenkuppeln, Emporen und Buntglas'],
+    kuppel: ['Lichtkuppel', 'Flache Riesenkuppel über zwei Halbkuppeln, Fensterkranz, Goldmosaik, Emporen'],
   },
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (Näherung)', isna: 'ISNA (Nordamerika)', egypt: 'Ägypten', makkah: 'Umm al-Qura (Mekka)' },
   asrName: { standard: 'Standard (Shāfiʿī, Mālikī, Ḥanbalī)', hanafi: 'Ḥanafī' },

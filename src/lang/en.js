@@ -285,6 +285,7 @@ export default {
     osmanisch: ['Ottoman', 'Huge central dome on four piers, blue tiles, two chandelier rings'],
     andalusisch: ['Andalusian', 'Forest of columns with hundreds of red-and-white horseshoe arches'],
     gross: ['Grand mosque', '60 m hall: main dome, side domes, galleries and stained glass'],
+    kuppel: ['Dome of Light', 'Vast shallow dome over two half-domes, ring of windows, gold mosaic, galleries'],
   },
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (approximation)', isna: 'ISNA (North America)', egypt: 'Egypt', makkah: 'Umm al-Qura (Mecca)' },
   asrName: { standard: 'Standard (Shāfiʿī, Mālikī, Ḥanbalī)', hanafi: 'Ḥanafī' },

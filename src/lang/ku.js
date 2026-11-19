@@ -293,6 +293,7 @@ export default {
     osmanisch: ['Osmanî', 'Qubeya navendî ya mezin li ser çar stûnan, kaşiyên şîn, du xeleka ronahiyê'],
     andalusisch: ['Endelusî', 'Daristana stûnan bi sedan kevanên nalî yên sor û spî û banê darîn'],
     gross: ['Mizgefta mezin', 'Salona 60 m: qubeya sereke, qubeyên alîkar, galerî û camên rengîn'],
+    kuppel: ['Qubeya ronahiyê', 'Qubeyeke mezin a nizm li ser du nîvqubeyan, xeleka pencereyan, mozaîka zêrîn, galerî'],
   },
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (nêzîkî)', isna: 'ISNA (Amerîkaya Bakur)', egypt: 'Misir', makkah: 'Umm al-Qura (Mekke)' },
   asrName: { standard: 'Standard (Şafiî, Malikî, Henbelî)', hanafi: 'Henefî' },

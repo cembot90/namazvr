@@ -297,6 +297,7 @@ export default {
     osmanisch: ['Ottoman', 'Immense coupole centrale sur quatre piliers, faïences bleues, deux couronnes de lumières'],
     andalusisch: ['Andalou', 'Forêt de colonnes avec des centaines d’arcs outrepassés rouges et blancs et un plafond en bois'],
     gross: ['Grande mosquée', 'Salle de 60 m : coupole principale, coupoles secondaires, galeries et vitraux'],
+    kuppel: ['Coupole de lumière', 'Immense coupole surbaissée sur deux demi-coupoles, couronne de fenêtres, mosaïque d’or, tribunes'],
   },
   methods: { mwl: 'Ligue islamique mondiale', diyanet: 'Diyanet (approximation)', isna: 'ISNA (Amérique du Nord)', egypt: 'Égypte', makkah: 'Umm al-Qura (La Mecque)' },
   asrName: { standard: 'Standard (chaféite, malékite, hanbalite)', hanafi: 'Hanafite' },

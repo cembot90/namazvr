@@ -301,6 +301,7 @@ export default {
     osmanisch: ['Osmanska', 'Ogromna centralna kupola na četiri stuba, plave pločice, dva kruga svjetiljki'],
     andalusisch: ['Andaluzijska', 'Šuma stubova sa stotinama crveno-bijelih potkovičastih lukova i drvenim stropom'],
     gross: ['Velika džamija', 'Dvorana od 60 m: glavna kupola, sporedne kupole, galerije i vitraži'],
+    kuppel: ['Kupola svjetla', 'Ogromna plitka kupola nad dvije polukupole, vijenac prozora, zlatni mozaik, galerije'],
   },
   methods: { mwl: 'Muslim World League', diyanet: 'Diyanet (približno)', isna: 'ISNA (Sjeverna Amerika)', egypt: 'Egipat', makkah: 'Umm al-Qura (Mekka)' },
   asrName: { standard: 'Standardno (šafijski, malikijski, hanbelijski)', hanafi: 'Hanefijski' },

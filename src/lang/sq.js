@@ -293,6 +293,7 @@ export default {
     osmanisch: ['Osmane', 'Kube qendrore e madhe mbi katër shtylla, pllaka blu, dy kurora dritash'],
     andalusisch: ['Andaluziane', 'Pyll shtyllash me qindra harqe patkoi kuq-bardhë dhe tavan druri'],
     gross: ['Xhami e madhe', 'Sallë 60 m: kube kryesore, kube anësore, galeri dhe xhama me ngjyra'],
+    kuppel: ['Kubeja e dritës', 'Kube e madhe e cekët mbi dy gjysmëkube, kurorë dritaresh, mozaik i artë, galeri'],
   },
   methods: { mwl: 'Lidhja Botërore Islame (MWL)', diyanet: 'Diyanet (përafërsisht)', isna: 'ISNA (Amerika e Veriut)', egypt: 'Egjipti', makkah: 'Umm al-Qura (Meka)' },
   asrName: { standard: 'Standard (shafii, maliki, hanbeli)', hanafi: 'Hanefi' },
