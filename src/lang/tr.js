@@ -5,6 +5,8 @@ export default {
   showTranslit: true,
 
   pn: {
+    tahajjud: 'Teheccüd namazı', duha: 'Kuşluk (Duhâ) namazı', ishraq: 'İşrak namazı', awwabin: 'Evvâbîn namazı',
+    wuduprayer: 'Abdest namazı', istikhara: 'İstihare namazı', hajat: 'Hacet namazı', tawba: 'Tövbe namazı', tasbihp: 'Tesbih namazı',
     tarawih: 'Teravih', sahw: 'Sehiv secdesi', ghusl: 'Gusül abdesti', tayammum: 'Teyemmüm',
     cem: 'Cemevi ve Cem', semah: 'Semah',
     umre: 'Umre', hajj: 'Hac', ihramp: 'İhram namazı', tawafp: 'Tavaf namazı',
@@ -14,6 +16,9 @@ export default {
     sisha: 'Yatsının son sünneti', witr: 'Vitir', jumua: 'Cuma', tahiyya: 'Tahiyyetü\'l-mescid', wudu: 'Abdest',
   },
   pd: {
+    tahajjud: 'uyuduktan sonra gece namazı · 2–12 rekât', duha: 'kuşluk vakti · 2–8 rekât', ishraq: 'güneş doğduktan biraz sonra',
+    awwabin: 'akşam ile yatsı arası · 6 rekâta kadar', wuduprayer: 'abdestten hemen sonra', istikhara: 'doğru kararı Allah’tan istemek',
+    hajat: 'bir dert ya da dilek için', tawba: 'pişmanlık ve tövbe namazı', tasbihp: 'Salâtü’t-tesbîh · 300 tesbih',
     tarawih: 'Ramazan geceleri yatsıdan sonra · 20 veya 8 rekât, ikişer ikişer', sahw: 'namazda bir hata olunca yapılan secde',
     wudu: 'abdest – her namazdan önce', ghusl: 'boy abdesti, bütün vücudu yıkamak', tayammum: 'su olmadan, toprakla temizlenmek',
     cem: 'Cemevinde gezinti (VR)', semah: 'meydanda birlikte (VR)',
@@ -24,6 +29,9 @@ export default {
     sisha: 'farzdan sonra', witr: 'yatsıdan sonra, sabaha kadar', jumua: 'cuma günü, öğle yerine', tahiyya: 'camiye girince',
   },
   niyya: {
+    tahajjud: 'teheccüd namazının 2 rekâtını', duha: 'kuşluk (duhâ) namazının 2 rekâtını', ishraq: 'işrak namazının 2 rekâtını',
+    awwabin: 'evvâbîn namazının 2 rekâtını', wuduprayer: 'abdest namazının 2 rekâtını', istikhara: 'istihare namazının 2 rekâtını',
+    hajat: 'hacet namazının 2 rekâtını', tawba: 'tövbe namazının 2 rekâtını', tasbihp: 'tesbih namazının 4 rekâtını',
     tarawih: 'teravih namazının 2 rekâtı',
     ihramp: 'Allah rızası için ihram namazını kılmaya', tawafp: 'Allah rızası için tavaf namazını kılmaya',
     eid: 'Allah rızası için bayram namazını kılmaya, uydum imama', janaza: 'Allah rızası için cenaze namazını kılmaya ve şu ölüye dua etmeye, uydum imama',
@@ -82,6 +90,20 @@ export default {
 
   // Türkçe okunuşlar
   translit: {
+    tsp: ['Sübhânallâhi vel-hamdü lillâhi ve lâ ilâhe illallâhü vallâhü ekber'],
+    istikhara: [
+      'Allâhümme innî estehîrüke bi-ilmike ve estakdirüke bi-kudretike ve es\'elüke min fadlikel-azîm. Fe-inneke takdiru ve lâ akdiru, ve ta\'lemü ve lâ a\'lemü, ve ente allâmül-ğuyûb.',
+      'Allâhümme in künte ta\'lemü enne hâzel-emra hayrun lî fî dînî ve meâşî ve âkıbeti emrî, fakdirhü lî ve yessirhü lî, sümme bârik lî fîh.',
+      'Ve in künte ta\'lemü enne hâzel-emra şerrun lî fî dînî ve meâşî ve âkıbeti emrî, fasrifhü annî vasrifnî anh, vakdir liyel-hayra haysü kâne, sümme ardınî bih.',
+    ],
+    istighfar: [
+      'Allâhümme ente rabbî, lâ ilâhe illâ ente, halaktenî ve ene abdük, ve ene alâ ahdike ve va\'dike mesteta\'tü.',
+      'Eûzü bike min şerri mâ sana\'tü, ebûü leke bi-ni\'metike aleyye, ve ebûü bi-zenbî, fağfirlî, fe-innehû lâ yağfiruz-zünûbe illâ ente.',
+    ],
+    yunus: ['Lâ ilâhe illâ ente sübhâneke innî küntü minez-zâlimîn.'],
+    qadrDua: ['Allâhümme inneke afüvvün tühibbül-afve fa\'fü annî.'],
+    salawatShort: ['Allâhümme salli alâ seyyidinâ Muhammedin ve alâ âli seyyidinâ Muhammed.'],
+    astaghfir: ['Estağfirullâhel-azîm ellezî lâ ilâhe illâ hüvel-hayyel-kayyûme ve etûbü ileyh.'],
     talbiya: ['Lebbeyk Allâhümme lebbeyk, lebbeyke lâ şerîke leke lebbeyk', 'İnnel-hamde ven-ni\'mete leke vel-mülk, lâ şerîke lek'],
     niyyaUmre: ['Allâhümme innî ürîdül-umrate fe-yessirhâ lî ve tekabbelhâ minnî'],
     niyyaHajj: ['Allâhümme innî ürîdül-hacce fe-yessirhü lî ve tekabbelhü minnî'],
@@ -132,6 +154,20 @@ export default {
     tasbih: ['Sübhânallâh', 'Elhamdülillâh', 'Allâhü ekber'],
   },
   mean: {
+    tsp: ['Allah’ı tesbih ederim, hamd Allah’a mahsustur, Allah’tan başka ilah yoktur ve Allah en büyüktür.'],
+    istikhara: [
+      'Allah’ım! İlminle Senden hayır istiyor, kudretinle Senden güç diliyor ve büyük lütfundan istiyorum. Çünkü Sen güç yetirirsin, ben yetiremem; Sen bilirsin, ben bilemem; gizlileri bilen Sensin.',
+      'Allah’ım! Bu işin dinim, hayatım ve işimin sonu bakımından benim için hayırlı olduğunu biliyorsan, onu bana takdir et, kolaylaştır ve bana mübarek kıl.',
+      'Eğer bu işin dinim, hayatım ve işimin sonu bakımından benim için kötü olduğunu biliyorsan, onu benden, beni de ondan uzaklaştır; hayır nerede ise onu bana takdir et ve beni ona razı kıl. (Buhârî)',
+    ],
+    istighfar: [
+      'Allah’ım! Sen benim Rabbimsin, Senden başka ilah yoktur. Beni Sen yarattın, ben Senin kulunum. Gücüm yettiğince Sana verdiğim söz ve ahit üzereyim.',
+      'Yaptıklarımın kötülüğünden Sana sığınırım. Bana verdiğin nimeti kabul eder, günahımı itiraf ederim. Beni bağışla; çünkü günahları Senden başka bağışlayan yoktur. (Buhârî)',
+    ],
+    yunus: ['Senden başka ilah yoktur. Sen her türlü eksiklikten uzaksın! Ben gerçekten zalimlerden oldum. (Enbiyâ 21:87 – Yûnus peygamberin duası)'],
+    qadrDua: ['Allah’ım! Sen çok affedicisin, affetmeyi seversin; beni de affet. (Tirmizî, Hz. Âişe’den)'],
+    salawatShort: ['Allah’ım! Efendimiz Muhammed’e ve Efendimiz Muhammed’in ailesine rahmet eyle.'],
+    astaghfir: ['Kendisinden başka ilah olmayan, diri ve her şeyi ayakta tutan yüce Allah’tan bağışlanma diler ve O’na tövbe ederim.'],
     talbiya: ['Buyur Allah’ım, buyur! Buyur, Senin hiçbir ortağın yoktur, buyur!', 'Hamd Sana, nimet Senin, mülk de Senindir. Senin hiçbir ortağın yoktur.'],
     niyyaUmre: ['Allah’ım, umre yapmak istiyorum; onu bana kolaylaştır ve benden kabul et.'],
     niyyaHajj: ['Allah’ım, hac yapmak istiyorum; onu bana kolaylaştır ve benden kabul et.'],
@@ -274,6 +310,7 @@ export default {
   },
 
   inner: {
+    tasbihp: 'Her „Sübhânallâh“ bir şükür nefesi gibidir. Parmaklarınla sakince say – kalbin de seninle birlikte sayar.',
     niyya: 'Dünyayı bir anlığına bırak. Şimdi Rabbinin huzurundasın – sadece bedeninle değil, kalbinle de burada ol.',
     takbir: 'Ellerini kaldırınca her şeyi arkana atıyorsun: dertleri, planları, dağınıklığı. Allah bunların hepsinden büyüktür.',
     opening: 'Önce övgüyle başla – istemeden önce selam veren bir misafir gibi.',
@@ -461,6 +498,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Şimdi Allah’ı art arda çok kez övüyorsun: „Sübhânallâh, elhamdülillâh, lâ ilâhe illallâh, Allâhü ekber.“ Parmaklarınla sessizce say – teşekkür ettiğin küçük bir şarkı gibi.',
     sahw: 'Herkes bazen bir şeyi unutur – namazda da. Bu hiç dert değil! Mesela ikinci rekâttan sonra oturmayı unuttuysan, sonunda iki secde daha yaparsın. Böylece her şey yine yerine gelir.',
     ghuslParts: {
       heart: 'Gusül, bütün vücut için büyük bir yıkanmadır. Büyükler bunu belli durumlarda yapar, birçoğu cuma günü veya bayramdan önce de yapar. Kalbinden şöyle de: „Şimdi Allah için bütün vücudumu yıkıyorum“ – sonra da „Bismillâh“.',
@@ -634,6 +672,133 @@ export default {
     auto: 'Rehberli kılınan farz namazlar otomatik işaretlenir. Sadece bu cihazda kaydedilir.',
     kids: '5 vaktin hepsini kıldığın her gün için ekstra bir yıldız ⭐',
     older: '◀ Önceki gün', newer: 'Sonraki gün ▶',
+  },
+  nfl: {
+    menu: 'Nafile', title: 'Nafile namazlar',
+    note: 'Nafile namazlar gönüllüdür – bir borç değil, kendine verdiğin bir hediyedir. Kerahat vakitlerinde kılınmaz: güneş doğarken, öğle vakti güneş tam tepedeyken ve güneş batarken (Hanefîlere göre sabah ve ikindi namazından sonra da). Teravih ve vitri „Diğer namazlar“ bölümünde bulabilirsin.',
+    when: {
+      tarawih: 'Teravih yalnızca Ramazan’da kılınır: her gece yatsı namazından sonra, vitirden önce. İkişer rekât hâlinde, her iki rekâtta selam verilerek kılınır – burada böyle bir bölümü öğreniyorsun. Cemaatlerin çoğu (Hanefî, Şâfiî, Hanbelî, Diyanet de) 20 rekât kılar, yani bu bölümü on kez; bazıları ise Hz. Âişe’den gelen bir rivayete dayanarak 8 rekât kılar. Her 4 rekâttan sonra biraz oturup dinlenilir – „teravih“ (dinlenmeler) adı buradan gelir. Bu arada Allah anılır; Türkiye’de mesela „Sübhâne zil-mülki vel-melekût …“ ya da salavat okunur. Ramazan’da vitir de sonunda genellikle cemaatle kılınır. Camide kılmak çok güzeldir; ama evde tek başına kılmak da aynı şekilde geçerlidir.',
+      tahajjud: 'Teheccüd, uyuduktan sonra kılınan gece namazıdır: yatsıdan sonra biraz uyursun, sonra sabah namazından önce kalkarsın. En güzel vakit gecenin son üçte biridir – Buhârî’nin rivayetine göre Allah o vakit şöyle buyurur: „Kim Bana dua eder ki ona vereyim?“ 2’den 12 rekâta kadar, hep ikişer ikişer kılınır; kıraat ve secdeler uzun tutulur. Uyanacağından emin olan, vitri gecenin son namazı olarak teheccüdden sonra kılar. (İsrâ 17:79)',
+      duha: 'Kuşluk (Duhâ) namazı öğleden önce kılınır: güneş doğduktan yaklaşık 45 dakika sonra, güneş „bir mızrak boyu“ yükselince başlar ve öğleye kadar (öğle ezanından yaklaşık 15 dakika öncesine kadar) sürer. 2, 4 veya 8 rekât, ikişer ikişer. Müslim’deki bir hadise göre bu namaz, vücudundaki her eklem için verilmiş bir sadaka gibidir – yeni bir gün için bir teşekkür.',
+      ishraq: 'İşrak, kuşluğun erken vaktinde kılınan namazdır: Sabah namazını cemaatle kılıp güneş doğana kadar oturarak Allah’ı anan, sonra 2 rekât namaz kılan kimseye hac ve umre gibi sevap vardır (Tirmizî). Güneş tamamen doğana kadar bekle (güneş doğduktan yaklaşık 15–20 dakika sonra; Türkiye’de çoğunlukla 45 dakika denir) – güneş doğarken namaz kılınmaz.',
+      awwabin: 'Evvâbîn („Allah’a çokça yönelenler“) birçok Hanefî âlime göre akşam ile yatsı arasında kılınan nafile namazdır: akşamın sünnetinden sonra, ikişer rekâtlık üç bölüm hâlinde 6 rekâta kadar. Bazı âlimler ise kuşluk namazına „evvâbîn namazı“ der. İkisi de güzeldir – akşamın sakin bir anı.',
+      wuduprayer: 'Abdestten hemen sonra – azalar daha kurumadan – 2 rekât namaz kılınır. Peygamberimiz cennette Hz. Bilâl’in ayak seslerini duydu, çünkü Bilâl her abdestten sonra namaz kılardı (Buhârî). Hanefîlere göre kerahat vakitlerinde kılınmaz, mesela ikindi namazından sonra.',
+      istikhara: 'İstihare namazını, helal olan şeyler arasında bir karar vermen gerektiğinde kılarsın – okul, iş, taşınma, evlilik. 2 rekât; mesela birincide Kâfirûn, ikincide İhlâs sûresi okunur. Sonra istihare duası yapılır: „bu iş“ denilen yerde sorunu düşünürsün. Rüya beklemek zorunda değilsin: kalbinin nereye meylettiğine sakince bak ve güvendiğin insanlara danış. İstihare birkaç kez tekrarlanabilir.',
+      hajat: 'Hacet namazını, seni bir şey sıktığında ya da bir şeyi çok istediğinde kılarsın – sağlık, bir sınav, ailede bir dert. 2 rekât (bazıları 4 kılar), sonra Allah’a hamd edilir, salavat getirilir ve kendi sözlerinle dua edilir. Belirli bir şekil hakkındaki rivayetler zayıftır; ama dua ile birlikte kılınan bir nafile namaz her zaman güzeldir.',
+      tawba: 'Tövbe namazını, bir hatana pişman olduğunda kılarsın. Hz. Ebû Bekir şöyle rivayet eder: Bir günah işleyip sonra abdest alan, 2 rekât namaz kılan ve Allah’tan bağışlanma dileyen kimseyi Allah bağışlar (Ebû Dâvûd, Tirmizî; Âl-i İmrân 3:135). Gerçek tövbe şudur: pişman olmak, o işi bırakmak, bir daha yapmamaya karar vermek – ve birine haksızlık ettiysen onunla helalleşmek.',
+      tasbihp: 'Tesbih namazı 4 rekâttır ve toplam 300 tesbih içerir – her rekâtta 75. Peygamberimiz bu namazı amcası Hz. Abbas’a öğretti: mümkünse her gün, olmazsa her cuma, her ay, her yıl – ya da hiç olmazsa ömründe bir kez (Ebû Dâvûd, İbn Mâce). Birçok kişi onu kandil gecelerinde ve Kadir Gecesi’nde kılar. Tesbihleri yüksek sesle değil, parmaklarınla say. Bir sayıyı unutursan bir sonraki yerde tamamlarsın – ama rükûdan sonraki kısa kıyamda ve iki secde arasındaki oturuşta değil. Kerahat vakitlerinde kılınmaz.',
+    },
+    duaTitle: { istikhara: 'İstihare duası', hajat: 'Hacet duası', tawba: 'Seyyidü’l-istiğfar' },
+    duaInstr: {
+      istikhara: 'Selamdan sonra: Ellerini kaldır, Allah’a hamd et ve salavat getir. Sonra bu duayı oku. „Bu iş“ (hâze’l-emr) denilen yerde sorunu düşün – ya da onu söyle. Ardından sakince karar ver ve güvendiğin insanlara da danış.',
+      hajat: 'Selamdan sonra: Ellerini kaldır, Allah’a hamd et, salavat getir ve ihtiyacın olan şeyi kendi sözlerinle iste. Kur’an’daki Yûnus peygamberin duası her derde uygundur.',
+      tawba: 'Selamdan sonra: Ellerini kaldır ve Allah’tan içtenlikle bağışlanma dile – „istiğfarların efendisi“ olan Seyyidü’l-istiğfar ile. Pişman ol, o işi bırak ve bir daha yapmamaya niyet et.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tesbih ${n}×`,
+    at: {
+      before: (n) => `Sübhâneke’den sonra, Fâtiha’dan önce: içinden ${n}× „Sübhânallâhi vel-hamdü lillâhi ve lâ ilâhe illallâhü vallâhü ekber“ de. Parmaklarınla say.`,
+      sura: (n) => `Zamm-ı sûreden sonra, hâlâ ayaktayken ve rükûdan önce: içinden ${n}× tesbih et.`,
+      ruku: (n) => `Rükûda kal: „Sübhâne rabbiyel-azîm“den (3×) sonra ${n}× tesbih et.`,
+      itidal: (n) => `Doğrulup ayakta dururken, „Rabbenâ lekel-hamd“den sonra: ${n}× tesbih.`,
+      sujud: (n) => `Secdede kal: „Sübhâne rabbiyel-a’lâ“dan (3×) sonra ${n}× tesbih et.`,
+      jalsa: (n) => `İki secde arasında otururken: ${n}× tesbih.`,
+      after: (n) => `İkinci secdeden sonra kısa bir süre otur (kalkmadan ya da tahiyyattan önce) ve ${n}× tesbih et.`,
+    },
+    school: {
+      hanafi: 'Hanefî (Abdullah b. Mübârek’e göre): 4 rekât, tek selamla. Her rekâtta Fâtiha’dan önce 15, zamm-ı sûreden sonra 10; rükûda, rükûdan sonra ayakta, iki secdede ve aradaki oturuşta 10’ar – rekât başına 75, toplam 300.',
+      shafii: 'Şâfiî (İbn Abbas hadisine göre): zamm-ı sûreden sonra 15; rükûda, rükûdan sonra ayakta, iki secdede, aradaki oturuşta 10’ar ve ikinci secdeden sonraki kısa oturuşta yine 10 – rekât başına 75. Gündüz dört rekât bir arada ya da 2 + 2, gece 2 + 2 kılınır.',
+      maliki: 'Mâlikî mezhebinde tesbih namazı pek yaygın değildir; kılanlar çoğunlukla İbn Abbas hadisine uyar – burada gösterildiği gibi 2 + 2 rekât.',
+      hanbali: 'İmam Ahmed bu rivayeti zayıf saymıştır; ama birçok âlim (Hanefî ve Şâfiîler de) bu namazı tavsiye eder. Burada İbn Abbas’a göre olan şekil gösterilir.',
+    },
+  },
+  holy: {
+    menu: 'Mübarek günler', title: 'Mübarek gün ve geceler', sub: 'Kandiller, bayramlar ve özel günler',
+    today: 'bugün', tomorrowShort: 'yarın', inDays: (n) => `${n} gün sonra`, nightOf: (d) => `${d} akşamı başlayan gece`, nightShort: 'gece',
+    sighting: 'Ümmü’l-Kurâ takvimine göre hesaplanmıştır. Türkiye’de (Diyanet) ve diğer ülkelerde tarih bir gün farklı olabilir. Bir gece, önceki akşam, akşam namazı vaktiyle başlar.',
+    remind: 'Mübarek günleri hatırlat', remindSub: 'Kandiller aynı gün saat 10.00’da, bayramlar arife akşamı saat 18.00’de',
+    cal: '📅 Tüm tarihleri takvime ekle', calName: 'NamazVR · Mübarek günler',
+    tonight: 'Bu akşam gece başlıyor.', tomorrow: 'Yarın o gün.',
+    doTitle: 'Neler yapabilirsin', duaTitle: 'Dualar',
+    duaName: { astaghfir: 'İstiğfar', istighfar: 'Seyyidü’l-istiğfar', salawatShort: 'Salavat (kısa)', salawat: 'Salli-Bârik duaları', qadrDua: 'Kadir Gecesi duası', tashriq: 'Teşrik tekbiri', tahlil: 'Arefe tehlili' },
+    hijri: {
+      name: 'Hicrî yılbaşı', short: '1 Muharrem: Hicrete göre yeni bir yıl başlıyor.',
+      about: ['1 Muharrem ile hicrî yıl başlar. Yıllar hicretten itibaren sayılır: 622’de Peygamberimiz ﷺ ashabıyla birlikte Mekke’den, Müslümanların huzur içinde yaşayabileceği Medine’ye göç etti. Bu takvimi Halife Hz. Ömer başlattı.', 'Muharrem dört haram aydan biridir (Tevbe 9:36). Bir hicrî yıl sadece 354 veya 355 gündür – bu yüzden Ramazan ve bayramlar her yıl yaklaşık 11 gün öne kayar.'],
+      do: ['Geçen yıla dönüp bakmak ve Allah’a şükretmek', 'Güzel niyetler edinmek – yeni bir iyiliğe başlamak', 'Muharrem’de oruç tutmak: Ramazan’dan sonra en faziletli oruç ayı (Müslim)', 'Hicretin hikâyesini okumak ya da uygulamada dinlemek'],
+      kids: 'Bugün hicrî yeni yıl başlıyor! Bu yıl, Peygamberimizin ﷺ Mekke’den Medine’ye göç ettiği günden itibaren sayılır. Bir düşün: Bu yıl hangi güzel şeyleri yapmak istiyorum?',
+      note: 'Yılbaşı için özel bir namaz yoktur – durup düşünme günüdür.',
+    },
+    ashura: {
+      name: 'Aşure Günü (Âşûrâ)', short: '10 Muharrem: oruç, paylaşmak ve anmak.',
+      about: ['10 Muharrem’de Allah, Hz. Mûsâ’yı ve kavmini Firavun’dan kurtardı. Peygamberimiz ﷺ bu gün oruç tuttu ve tavsiye etti; bu oruç geçen yılın küçük günahlarına kefarettir (Müslim). Yanına bir gün daha eklemek tavsiye edilir: 9’unu ya da 11’ini.', '10 Muharrem 680’de Kerbela’da Peygamberimizin torunu Hz. Hüseyin ailesiyle birlikte şehit edildi. Şiiler ve Aleviler onu yas içinde anar; birçok Alevi Muharrem’de 12 gün oruç tutar. Türkiye’de birçok malzemeden yapılan bir tatlı olan aşure pişirilir ve komşularla paylaşılır – tufandan sonra Hz. Nûh’un hatırasına da.'],
+      do: ['9 ve 10 (ya da 10 ve 11) Muharrem’de oruç tutmak', 'Aşure pişirip komşularla paylaşmak – dini ne olursa olsun herkesle', 'İhtiyacı olanlara yardım etmek, aileye iyilik yapmak', 'Hz. Hüseyin’i ve Kerbela’yı anmak: adalet için, zulme karşı'],
+      kids: 'Bugün Aşure Günü! Bu gün Allah, Hz. Mûsâ’yı kurtardı. Birçok aile bugün rengârenk bir tatlı olan aşureyi pişirir ve komşulara bir kâse götürür – paylaşmak insanı mutlu eder.',
+      note: 'Aleviler Muharrem orucuna cemaatlerinin takvimine göre başlar; ayrıntılar „Alevilik → Muharrem ve Aşure“ bölümünde.',
+    },
+    mevlid: {
+      name: 'Mevlid Kandili', short: 'Peygamberimizin ﷺ doğduğu gece.',
+      about: ['Rebîülevvel’in 12. gecesinde birçok Müslüman Peygamberimiz Hz. Muhammed’in ﷺ doğumunu anar – 571’de, „Fil Yılı“nda Mekke’de. Allah onu „âlemlere rahmet“ olarak tanıtır (Enbiyâ 21:107).', 'Türkiye’de Süleyman Çelebi’nin Mevlid’i (1409) okunur, birçok ülkede onun hayatı anlatılır. Kandil geceleri bu adı, eskiden minarelerin kandillerle (yağ lambalarıyla) aydınlatılmasından alır.'],
+      do: ['Peygamberimize ﷺ bolca salavat getirmek', 'Onun hayatını okumak ya da anlatmak – çocuklara, hayvanlara ve komşulara gösterdiği şefkat', 'Nafile namaz kılmak, mesela tesbih namazı, ya da kaza namazı kılmak', 'Aileyi ve dostları kutlamak: „Kandiliniz mübarek olsun“'],
+      kids: 'Bu gece Peygamberimiz Hz. Muhammed’in ﷺ doğumunu anıyoruz. O herkese karşı çok nazikti – çocuklara, hayvanlara ve yoksul insanlara. Bugün sık sık „Allâhümme salli alâ Muhammed“ de – ve onun gibi nazik ol.',
+      note: 'Doğumun özel olarak kutlanmasına âlimler farklı bakar: birçoğu (mesela Diyanet ve el-Ezher) bunu güzel bir gelenek olarak görür, bazıları ise özel kutlamaları kabul etmez. Herkesin birleştiği nokta: Peygamberi sevmek ve ona uymak güzeldir.',
+    },
+    regaib: {
+      name: 'Regaib Kandili', short: 'İlk kandil gecesi – üç aylar başlıyor.',
+      about: ['Regaib Gecesi, Recep ayının ilk cumasına bağlayan gecedir. Recep ile birlikte Recep, Şaban ve Ramazan’dan oluşan „üç aylar“ başlar – Ramazan’a hazırlanma zamanı. Recep dört haram aydan biridir (Tevbe 9:36).', '„Regaib“ „büyük ihsanlar, bağışlar“ demektir: Bu gece Müslümanlar Allah’ın rahmetini ve bağışlamasını özellikle dilerler.'],
+      do: ['Dua ve istiğfar (bağışlanma dilemek)', 'Nafile namaz kılmak ya da kaza namazı kılmak', 'Kur’an okumak', 'Anne babayı ve akrabaları ziyaret etmek ya da aramak, küslükleri bitirmek'],
+      kids: 'Bugün Regaib Kandili – beş özel kandil gecesinin ilki. Şimdi Ramazan’dan önceki üç aylar başlıyor. Bugün Allah’tan güzel bir şey isteyebilir ve anne babanı sevindirebilirsin.',
+      note: '12 rekâtlık özel bir „Regaib namazı“, birçok âlime göre (mesela İmam Nevevî) uydurma bir rivayete dayanır. Normal nafile namazlar, dualar ve iyilikler ise her zaman doğrudur.',
+    },
+    mirac: {
+      name: 'Miraç Kandili', short: 'Göklere yolculuk gecesi – beş vakit namaz hediyesi.',
+      about: ['Bir gecede Peygamberimiz ﷺ Mekke’den Kudüs’teki Mescid-i Aksâ’ya gitti (İsrâ, İsrâ 17:1), oradan da göklere yükseldi (Miraç, Necm 53:13–18). Orada ona beş vakit namaz hediye edildi – bir de Bakara sûresinin son âyetleri (Müslim).', 'Bu yüzden namaza „müminin miracı“ denir: her namazda Allah’a çok yakınsın.'],
+      do: ['Beş vakit namazı bugün özellikle bilinçli kılmak – onlar bu gecenin hediyesidir', 'İsrâ sûresini ya da Bakara’nın son âyetlerini okumak', 'Nafile namaz kılmak, mesela teheccüd ya da tesbih namazı', 'Salavat getirmek ve Allah’a şükretmek'],
+      kids: 'Bu gece Peygamberimizin ﷺ göklere yaptığı harika yolculuğu anıyoruz. Oradan bize bir hediye getirdi: beş vakit namaz! Her namaz kıldığında doğrudan Allah ile konuşuyorsun.',
+      note: '27 Recep yaygın kabul edilen tarihtir; gecenin tam olarak hangisi olduğu kesin olarak rivayet edilmemiştir.',
+    },
+    berat: {
+      name: 'Berat Kandili', short: 'Şaban ayının ortasında bağışlanma gecesi.',
+      about: ['Şaban’ın 15. gecesi (Leyletü’l-berâe) bağışlanma ve yeni bir başlangıç gecesi kabul edilir. Bir hadise göre (İbn Mâce; farklı değerlendirilir) Allah bu gece herkesi bağışlar – O’na ortak koşan ve kalbinde başkalarına kin taşıyan hariç.', 'Şaban, Ramazan’dan önceki aydır; Peygamberimiz ﷺ bu ayda çok oruç tutardı (Buhârî).'],
+      do: ['Biriyle barışmak – kini bırakmak', 'Bağışlanma dilemek (tövbe, istiğfar)', 'Nafile namaz kılmak, kaza namazı kılmak, Kur’an okumak', 'Ertesi gün oruç tutmak (birçok kişi tutar) ve Ramazan’a hazırlanmak'],
+      kids: 'Bugün Berat Kandili, bağışlanma gecesi. Küs olduğun biri var mı? Bugün „özür dilerim“ demek ve yeniden arkadaş olmak için güzel bir gün.',
+      note: 'Bu geceyle ilgili rivayetler farklı değerlendirilir; belirli namaz şekilleri (mesela „100 rekât“) sabit değildir. Barışmak, dua ve nafile namaz her zaman güzeldir.',
+    },
+    ramadan: {
+      name: 'Ramazan’ın başlangıcı', short: 'Oruç ayı başlıyor – arife akşamı ilk teravih.',
+      about: ['Kur’an Ramazan ayında indirildi (Bakara 2:185). Ergenlik çağına girmiş, sağlıklı Müslümanlar imsaktan güneş batana kadar oruç tutar. İlk oruç gününden önceki akşam ilk teravih kılınır, gece de sahura kalkılır.'],
+      do: ['Niyet etmek ve sahur yapmak', 'Teravih ve vitir kılmak', 'Her gün biraz Kur’an okumak', 'Sadaka vermek, paylaşmak, iftara davet etmek'],
+      kids: 'Yakında Ramazan! Büyükler bütün gün oruç tutar. Sen de deneyebilirsin – belki öğlene kadar. Akşam iftarda da herkes birlikte yemek yer.',
+      note: 'Sahur, iftar ve bayrama geri sayımı Ramazan sayfasında bulabilirsin.',
+    },
+    qadr: {
+      name: 'Kadir Gecesi (Leyletü’l-Kadr)', short: 'Kader gecesi – bin aydan daha hayırlı.',
+      about: ['Bu gece Kur’an’ın indirilmesi başladı. „Kadir Gecesi bin aydan daha hayırlıdır. Melekler ve Ruh o gece iner … O gece, tan yeri ağarıncaya kadar bir esenliktir.“ (Kadir 97)', 'Peygamberimiz ﷺ şöyle buyurdu: „Onu son on gecenin tek olanlarında arayın“ (Buhârî). Türkiye’de ve birçok ülkede Ramazan’ın 27. gecesinde ihya edilir.'],
+      do: ['Namaz kılmak: teravih, teheccüd, tesbih namazı', 'Kur’an okumak ve dinlemek', 'Hz. Âişe’nin duası: „Allâhümme inneke afüvvün …“', 'Sadaka vermek, affetmek ve bütün insanlar için dua etmek'],
+      kids: 'Bu gece belki de yılın en güzel gecesi: Kadir Gecesi! Melekler yeryüzüne iner ve her yer huzur dolar. Biraz daha geç yat, ailenle namaz kıl ve Allah’tan bütün güzellikleri iste.',
+      note: 'Gecenin tam olarak hangisi olduğu gizlidir – son on gecenin hepsi değerlendirilsin diye. 27. gece yaygın bir kabuldür.',
+    },
+    fitr: {
+      name: 'Ramazan Bayramı (Îdü’l-Fıtr)', short: 'Ramazan’dan sonraki bayram – üç gün sevinç.',
+      about: ['1 Şevval’de Müslümanlar oruç ayının sonunu kutlar. Bayram namazından önce fitre (sadaka-i fıtır) verilir ki yoksullar da bayram edebilsin. Bayram günü oruç tutulmaz.'],
+      do: ['Fitreyi en geç bayram namazından önce vermek', 'Gusül, güzel elbiseler, namazdan önce tatlı bir şey ya da hurma yemek', 'Sabah bayram namazı, yolda tekbir getirmek', 'Anne babayı ve akrabaları ziyaret etmek, çocuklara hediye vermek, barışmak', 'Sonra Şevval’de 6 gün oruç tutmak (Müslim)'],
+      kids: 'Bayram! Bugün güzel elbiselerini giyer, büyüklerin elini öper ve belki şeker ya da küçük bir hediye alırsın. Unutma: Az şeyi olan çocuklarla da paylaş.',
+      note: 'Bayram namazını „Diğer namazlar → Bayram namazı“ bölümünde öğrenebilirsin.',
+    },
+    arafa: {
+      name: 'Arefe Günü', short: '9 Zilhicce: dua için en güzel gün.',
+      about: ['Bu gün hacılar Arafat’ta vakfeye durur – haccın en önemli rüknü. Peygamberimiz ﷺ şöyle buyurdu: „Duaların en hayırlısı Arefe günü yapılan duadır.“ (Tirmizî)', 'Hacca gitmeyen bu gün oruç tutar: geçen ve gelecek yılın günahlarına kefarettir (Müslim). Sabah namazından itibaren her farz namazdan sonra teşrik tekbirleri başlar.'],
+      do: ['Oruç tutmak (hacda olmayanlar)', 'Çokça dua etmek – kendin, ailen ve bütün dünya için', 'Tehlil getirmek: „Lâ ilâhe illallâhü vahdehû …“', 'Sabah namazından itibaren her farzdan sonra teşrik tekbiri'],
+      kids: 'Bugün beyaz ihramlar içindeki çok sayıda hacı Arafat’ta durup dua ediyor. Sen de evden onlarla birlikte dua edebilirsin! Bugün Allah’tan dilediğin her şeyi iste.',
+      note: 'Arafat’ıyla birlikte haccı uygulamadaki Hac simülatöründe yaşayabilirsin.',
+    },
+    adha: {
+      name: 'Kurban Bayramı (Îdü’l-Adhâ)', short: 'Kurban Bayramı – dört gün paylaşmak ve şükretmek.',
+      about: ['Kurban Bayramı, Allah’a her şeyini vermeye hazır olan Hz. İbrâhîm’i – ve oğlunu kurtaran Allah’ın rahmetini – hatırlatır (Sâffât 37:102–107). Gücü yeten bir hayvan kurban eder ve etini paylaşır: ailesiyle, akrabaları ve komşularıyla, ihtiyacı olanlarla.', '9 Zilhicce sabah namazından 13 Zilhicce ikindi namazına kadar her farz namazdan sonra teşrik tekbiri getirilir.'],
+      do: ['Sabah bayram namazı – öncesinde bir şey yememek (sünnet)', 'Her farz namazdan sonra teşrik tekbiri', 'Bayram namazından sonra kurban kesmek, eti üçe bölmek', 'Aileyi ve komşuları ziyaret etmek, ihtiyacı olanlara hediye vermek'],
+      kids: 'Bugün Kurban Bayramı! Allah’a çok güvenen Hz. İbrâhîm’i anıyoruz. Birçok aile bugün az şeyi olan insanlarla yemeğini paylaşır – böylece bayram herkes için güzel olur.',
+      note: 'Kurban kesecek olanın, birçok âlime göre 1 Zilhicce’den kurban kesilene kadar saçını ve tırnaklarını kesmemesi tavsiye edilir (müstehap).',
+    },
   },
   ram: {
     menu: '🌙 Ramazan', title: 'Ramazan', day: (d, n) => `${n} günün ${d}. günü`,
