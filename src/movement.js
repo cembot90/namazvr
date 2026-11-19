@@ -3,7 +3,7 @@
 import { t } from './i18n.js';
 
 // Haltung → Körperlage, die in VR erkannt werden kann.
-const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit', salamStandR: 'stand', salamStandL: 'stand', istilam: 'stand', throw: 'stand', drink: 'stand', pick: 'ruku', niyaz: 'stand', semah: 'stand', semahFast: 'stand' };
+const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', sitDua: 'sit', ruku: 'ruku', sujud: 'sujud', sit: 'sit', taslimR: 'sit', taslimL: 'sit', salamStandR: 'stand', salamStandL: 'stand', istilam: 'stand', throw: 'stand', drink: 'stand', pick: 'ruku', niyaz: 'stand', semah: 'stand', semahFast: 'stand' };
 
 /**
  * Bewegung von der vorherigen zur aktuellen Haltung.
@@ -12,12 +12,12 @@ const BODY = { stand: 'stand', takbir: 'stand', qiyam: 'stand', dua: 'stand', ru
 export function moveFor(prev, pose) {
   const body = BODY[pose];
   const from = prev ? BODY[prev] : null;
-  const how = t(`how.${pose.replace('salamStand', 'taslim')}`);
+  const how = t(`how.${pose === 'sitDua' ? 'dua' : pose.replace('salamStand', 'taslim')}`);
   const r = (arrow, cue) => ({ arrow, cue: t(`cue.${cue}`), how, body });
   if (pose === 'taslimR' || pose === 'salamStandR') return r('right', 'taslimR');
   if (pose === 'taslimL' || pose === 'salamStandL') return r('left', 'taslimL');
   if (!prev) return r(null, 'start');
-  if (pose === 'dua') return r('up', 'dua');
+  if (pose === 'dua' || pose === 'sitDua') return r('up', 'dua');
   if (pose === 'takbir') return r('up', 'takbir');
   if (from === body) {
     if (pose === 'qiyam' && prev === 'takbir') return r(null, 'fold');
@@ -66,6 +66,7 @@ const FIG = {
   sit: { head: [0.42, 0.4], neck: [0.41, 0.51], hip: [0.38, 0.83], knee: [0.7, 0.93], foot: [0.36, 0.95], toe: [0.28, 0.95], elbow: [0.46, 0.68], hand: [0.62, 0.84] },
 };
 FIG.dua = { ...FIG.stand, elbow: [0.56, 0.42], hand: [0.68, 0.34] };
+FIG.sitDua = { ...FIG.sit, elbow: [0.5, 0.66], hand: [0.62, 0.56] };
 FIG.taslimR = FIG.sit;
 FIG.taslimL = FIG.sit;
 FIG.salamStandR = FIG.stand;
