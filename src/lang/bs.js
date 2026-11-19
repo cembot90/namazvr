@@ -14,6 +14,8 @@ export default {
 
   // Nazivi namaza i podnaslovi
   pn: {
+    tahajjud: 'Teheddžud (noćni namaz)', duha: 'Duha-namaz (Ḍuḥā)', ishraq: 'Išrak-namaz (Ishrāq)', awwabin: 'Evvabin-namaz (Awwābīn)',
+    wuduprayer: 'Namaz poslije abdesta', istikhara: 'Istihara (Istikhāra)', hajat: 'Hadžet-namaz (Ḥājat)', tawba: 'Tevba-namaz (Tawba)', tasbihp: 'Tesbih-namaz',
     tarawih: 'Teravija', sahw: 'Sehvi-sedžda', ghusl: 'Gusul', tayammum: 'Tejemmum',
     cem: 'Cemevi i Cem', semah: 'Semah',
     umre: 'Umra', hajj: 'Hadž', ihramp: 'Namaz za ihram', tawafp: 'Namaz nakon tavafa',
@@ -23,6 +25,9 @@ export default {
     sisha: 'Sunnet jacije', witr: 'Vitr', jumua: 'Džuma', tahiyya: 'Tehijjetul-mesdžid', wudu: 'Abdest',
   },
   pd: {
+    tahajjud: 'noćni namaz nakon spavanja · 2–12 rekata', duha: 'prijepodne · 2–8 rekata', ishraq: 'ubrzo nakon izlaska sunca',
+    awwabin: 'između akšama i jacije · do 6 rekata', wuduprayer: 'odmah nakon abdesta', istikhara: 'moliti za pravu odluku',
+    hajat: 'kad imaš brigu ili neku potrebu', tawba: 'namaz pokajanja', tasbihp: 'Salatu-t-tesbih · 300 puta tesbih',
     tarawih: 'noći ramazana nakon jacije · 20 ili 8 rekata, po dva', sahw: 'sedžda zbog greške u namazu',
     wudu: 'pranje pred namaz – prije svakog namaza', ghusl: 'kupanje cijelog tijela', tayammum: 'čišćenje bez vode, zemljom',
     cem: 'obilazak cemevija (VR)', semah: 'za učestvovanje na meydanu (VR)',
@@ -33,6 +38,9 @@ export default {
     sisha: 'poslije farza', witr: 'nakon jacije do sabaha', jumua: 'petkom, umjesto podne', tahiyya: 'pri ulasku u džamiju',
   },
   niyya: {
+    tahajjud: '2 rekata teheddžud-namaza (noćnog namaza)', duha: '2 rekata duha-namaza', ishraq: '2 rekata išrak-namaza',
+    awwabin: '2 rekata evvabin-namaza', wuduprayer: '2 rekata namaza poslije abdesta', istikhara: '2 rekata istihara-namaza',
+    hajat: '2 rekata hadžet-namaza', tawba: '2 rekata tevba-namaza', tasbihp: '4 rekata tesbih-namaza',
     tarawih: '2 rekata teravije',
     ihramp: '2 rekata sunneta ihrama', tawafp: '2 rekata tavafa iza Mekami-Ibrahima',
     eid: '2 rekata bajram-namaza za imamom', janaza: 'dženaza-namaz radi Allaha i dovu za umrlog, za imamom',
@@ -92,6 +100,20 @@ export default {
 
   // Značenje arapskih tekstova, red po red
   mean: {
+    tsp: ['Slavljen neka je Allah, hvala pripada Allahu, nema boga osim Allaha, i Allah je najveći.'],
+    istikhara: [
+      'Allahu moj, tražim od Tebe dobro Tvojim znanjem i snagu Tvojom moći, i molim Te za Tvoju veliku dobrotu. Jer Ti možeš, a ja ne mogu; Ti znaš, a ja ne znam; Ti poznaješ i ono što je skriveno.',
+      'Allahu moj, ako znaš da je ova stvar dobra za mene – u mojoj vjeri, mom životu i ishodu moga posla –, onda mi je odredi, olakšaj mi je i blagoslovi mi je.',
+      'A ako znaš da je ova stvar loša za mene – u mojoj vjeri, mom životu i ishodu moga posla –, onda je okreni od mene i mene od nje, odredi mi dobro gdje god da je, i učini me zadovoljnim njime. (Buhari)',
+    ],
+    istighfar: [
+      'Allahu moj, Ti si moj Gospodar, nema boga osim Tebe. Ti si me stvorio, i ja sam Tvoj rob. Držim se zavjeta i obećanja Tebi koliko god mogu.',
+      'Utječem Ti se od zla onoga što sam učinio. Priznajem Tvoju blagodat prema meni i priznajem svoj grijeh – pa mi oprosti, jer grijehe ne oprašta niko osim Tebe. (Buhari)',
+    ],
+    yunus: ['Nema boga osim Tebe! Slavljen neka si! Ja sam zaista bio od onih koji su sami sebi nepravdu činili. (Kur’an 21:87 – dova poslanika Junusa)'],
+    qadrDua: ['Allahu moj, Ti mnogo opraštaš i voliš opraštati – pa mi oprosti. (Tirmizi, od Aiše)'],
+    salawatShort: ['Allahu moj, blagoslovi našeg gospodina Muhammeda i porodicu našeg gospodina Muhammeda.'],
+    astaghfir: ['Tražim oprost od Allaha Veličanstvenog – nema boga osim Njega, Živoga i Vječnoga – i Njemu se pokajnički vraćam.'],
     talbiya: ['Odazivam Ti se, Allahu, odazivam. Odazivam Ti se, Ti nemaš druga, odazivam Ti se.', 'Sva hvala i sva blagodat pripadaju Tebi, i vlast. Ti nemaš druga.'],
     niyyaUmre: ['Allahu moj, želim obaviti umru – olakšaj mi je i primi je od mene.'],
     niyyaHajj: ['Allahu moj, želim obaviti hadž – olakšaj mi ga i primi ga od mene.'],
@@ -238,6 +260,7 @@ export default {
 
   // Duhovni način: unutarnje značenje, slobodno prema el-Gazaliju
   inner: {
+    tasbihp: 'Svako „Subḥāna llāh“ je kao jedan udah zahvalnosti. Mirno broji na prstima – i srce broji s tobom.',
     niyya: 'Pusti svijet na trenutak. Sada stojiš pred svojim Gospodarom – budi ovdje srcem, ne samo tijelom.',
     takbir: 'Podignutim rukama bacaš sve iza sebe: brige, planove, ometanja. Allah je veći od svega toga.',
     opening: 'Počni hvalom, kao gost koji pozdravi prije nego što nešto zamoli.',
@@ -427,6 +450,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Sada mnogo puta zaredom slaviš Allaha: „Subḥāna llāh, al-ḥamdu li-llāh, lā ilāha illa llāh, Allāhu akbar.“ Broji tiho na prstima – kao mala pjesmica kojom kažeš hvala.',
     sahw: 'Svako nekad nešto zaboravi – i u namazu. To nije strašno! Ako si, na primjer, zaboravio sjesti nakon drugog rekata, na kraju jednostavno učiniš dvije dodatne sedžde. I sve je opet u redu.',
     ghuslParts: {
       heart: 'Gusul je veliko pranje cijelog tijela. Odrasli ga uzimaju u određenim slučajevima, a mnogi i petkom ili prije bajrama. Reci u svom srcu: „Sada se kupam radi Allaha“ – a onda „Bismillāh“.',
@@ -600,6 +624,133 @@ export default {
     auto: 'Vođeni farz-namazi se automatski označavaju. Spremljeno samo na ovom uređaju.',
     kids: 'Za svaki dan sa svih 5 namaza dobiješ dodatnu zvjezdicu ⭐',
     older: '◀ Dan prije', newer: 'Dan poslije ▶',
+  },
+  nfl: {
+    menu: 'Nafile', title: 'Dobrovoljni namazi (nafile)',
+    note: 'Nafile su dobrovoljni namazi – nisu obaveza, ali su poklon tebi samome. Ne klanjaj ih u pokuđenim vremenima: dok sunce izlazi, kad je u podne u zenitu i dok zalazi (kod hanefija i poslije sabah-farza i poslije ikindija-farza). Teraviju i vitr naći ćeš pod „Ostali namazi“.',
+    when: {
+      tarawih: 'Teravija se klanja samo u ramazanu: svake noći nakon jacije, prije vitra. Klanja se po 2 rekata sa selamom – ovdje vježbaš jednu takvu cjelinu. Većina džemata (hanefije, šafije, hanbelije, i Islamska zajednica i Diyanet) klanja 20 rekata, dakle deset puta ovu cjelinu; drugi klanjaju 8 (prema predaji od Aiše). Nakon svaka 4 rekata kratko se sjedi i odmara – otuda i ime „teravija“ (odmori). U toj pauzi se slavi Allah, npr. sa „Subḥāna dhi l-mulki wa l-malakūt …“ ili salavatima. Na kraju džemat u ramazanu obično zajedno klanja i vitr. U džamiji je najljepše, ali i sam kod kuće namaz je jednako ispravan.',
+      tahajjud: 'Teheddžud je noćni namaz nakon spavanja: nakon jacije malo odspavaš, pa ustaneš prije sabaha. Najbolje vrijeme je posljednja trećina noći – tada, kako prenosi Buhari, Allah pita: „Ko Me moli da mu dam?“ Klanja se od 2 do 12 rekata, uvijek po dva, s dugim učenjem i dugim sedždama. Ko je siguran da će se probuditi, klanja vitr poslije toga, kao posljednji namaz u noći. (Kur’an 17:79)',
+      duha: 'Duha-namaz (u narodu i kušluk) klanja se prijepodne: otprilike 45 minuta nakon izlaska sunca, kad se sunce podigne „koliko koplje“, pa do malo prije podne (oko 15 minuta prije podne-namaza). 2, 4 ili 8 rekata, po dva. Prema hadisu kod Muslima, on je kao sadaka za svaki zglob tvog tijela – hvala za novi dan.',
+      ishraq: 'Išrak je rani duha-namaz: ko klanja sabah u džematu, ostane sjediti i spominje Allaha dok sunce ne izađe, pa onda klanja 2 rekata, ima nagradu kao za hadž i umru (Tirmizi). Sačekaj da sunce potpuno izađe (oko 15–20 minuta nakon izlaska, u Turskoj se često navodi 45 minuta) – dok sunce izlazi, ne klanja se.',
+      awwabin: 'Evvabin („oni koji se često Allahu vraćaju“) kod mnogih hanefija je dobrovoljni namaz između akšama i jacije: nakon sunneta akšama do 6 rekata, u tri cjeline po 2. Drugi učenjaci duha-namaz nazivaju „namazom evvabina“. Oboje je lijepo – miran trenutak navečer.',
+      wuduprayer: 'Odmah nakon abdesta – prije nego što se udovi osuše – klanjaj 2 rekata. Poslanik je u Džennetu čuo korake Bilala, jer je Bilal klanjao nakon svakog abdesta (Buhari). Kod hanefija: ne u pokuđenim vremenima, npr. ne poslije ikindija-namaza.',
+      istikhara: 'Istiharu klanjaš kad se moraš odlučiti između dozvoljenih stvari – škola, posao, selidba, brak. 2 rekata, npr. u prvom sa surom El-Kafirun, u drugom sa surom El-Ihlas. Zatim dova: na mjestu „ova stvar“ misliš na svoje pitanje. Ne moraš čekati san: u miru odluči kamo ti srce naginje i pitaj ljude kojima vjeruješ. Može se ponoviti više puta.',
+      hajat: 'Hadžet-namaz klanjaš kad te nešto tišti ili nešto jako želiš – zdravlje, ispit, briga u porodici. 2 rekata (neki klanjaju 4), zatim hvališ Allaha, učiš salavat i moliš svojim riječima. Predaje o tačno određenom obliku su slabe; ali dobrovoljni namaz s dovom uvijek je dobar.',
+      tawba: 'Tevba-namaz klanjaš kad se kaješ zbog neke greške. Ebu Bekr prenosi: ko počini grijeh, pa uzme abdest, klanja 2 rekata i zamoli Allaha za oprost, Allah mu oprosti (Ebu Davud, Tirmizi; Kur’an 3:135). Pravo pokajanje znači: žaliti, prestati, odlučiti da to više ne ponoviš – a ako si nekome nanio nepravdu, to kod njega ispraviti.',
+      tasbihp: 'Tesbih-namaz ima 4 rekata s ukupno 300 tesbiha – 75 u svakom rekatu. Poslanik ga je podučio svog amidžu Abbasa: ako možeš, svaki dan, inače svakog petka, svakog mjeseca, svake godine – ili barem jednom u životu (Ebu Davud, Ibn Madže). Mnogi ga klanjaju u mubarek noćima i u Lejletul-kadru. Broji na prstima, ne naglas. Ako zaboraviš neki broj, nadoknadi ga na sljedećem mjestu – ali ne u kratkom stajanju nakon rukua i ne u sjedenju između sedždi. Ne klanjaj ga u pokuđenim vremenima.',
+    },
+    duaTitle: { istikhara: 'Dova istihare', hajat: 'Dova u nevolji', tawba: 'Sejjidul-istigfar' },
+    duaInstr: {
+      istikhara: 'Nakon selama: podigni ruke, zahvali Allahu i prouči salavat. Zatim ovu dovu. Kod „ova stvar“ (hādha l-amr) misli na svoje pitanje – ili ga izgovori. Poslije toga u miru odluči i pitaj i ljude kojima vjeruješ.',
+      hajat: 'Nakon selama: podigni ruke, zahvali Allahu, prouči salavat i svojim riječima zamoli za ono što ti treba. Dova poslanika Junusa iz Kur’ana pristaje uz svaku brigu.',
+      tawba: 'Nakon selama: podigni ruke i iskreno zamoli Allaha za oprost – „najboljom dovom za oprost“ (Sejjidul-istigfar). Pokaj se, prestani s tim i odluči da to više ne činiš.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tesbih ${n}×`,
+    at: {
+      before: (n) => `Nakon početne dove (Subḥānaka), još prije Fatihe: tiho izgovori ${n}× „Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar“. Broji na prstima.`,
+      sura: (n) => `Nakon sure, još stojeći i prije rukua: tiho izgovori ${n}× tesbih.`,
+      ruku: (n) => `Ostani na rukuu: nakon „Subḥāna rabbiya l-ʿaẓīm“ (3×) izgovori ${n}× tesbih.`,
+      itidal: (n) => `Uspravno stojeći, nakon „Rabbanā wa laka l-ḥamd“: ${n}× tesbih.`,
+      sujud: (n) => `Ostani na sedždi: nakon „Subḥāna rabbiya l-aʿlā“ (3×) izgovori ${n}× tesbih.`,
+      jalsa: (n) => `Sjedeći između dvije sedžde: ${n}× tesbih.`,
+      after: (n) => `Nakon druge sedžde kratko sjedneš (prije ustajanja ili prije tešehhuda) i izgovoriš ${n}× tesbih.`,
+    },
+    school: {
+      hanafi: 'Hanefije (prema Abdullahu ibn el-Mubareku): 4 rekata s jednim selamom. U svakom rekatu 15× prije Fatihe, 10× nakon sure, po 10× na rukuu, u stajanju nakon njega, na obje sedžde i u sjedenju između njih – 75 u rekatu, ukupno 300.',
+      shafii: 'Šafije (prema hadisu Ibn Abbasa): 15× nakon sure, po 10× na rukuu, u stajanju nakon njega, na obje sedžde, u sjedenju između njih i još 10× u kratkom sjedenju nakon druge sedžde – 75 u rekatu. Danju se četiri rekata klanjaju zajedno ili 2 + 2, noću kao 2 + 2.',
+      maliki: 'U malikijskom mezhebu tesbih-namaz se malo prakticira; ko ga klanja, obično slijedi hadis Ibn Abbasa – kako je ovdje prikazano, kao 2 + 2 rekata.',
+      hanbali: 'Imam Ahmed je ovu predaju smatrao slabom; ali mnogi učenjaci (među njima hanefije i šafije) preporučuju ovaj namaz. Prikazan je oblik prema Ibn Abbasu.',
+    },
+  },
+  holy: {
+    menu: 'Mubarek dani', title: 'Mubarek dani i noći', sub: 'Mubarek noći, bajrami i posebni dani',
+    today: 'danas', tomorrowShort: 'sutra', inDays: (n) => `za ${n} ${pl(n, 'dan', 'dana', 'dana')}`, nightOf: (d) => `Noć počinje navečer: ${d}`, nightShort: 'noć',
+    sighting: 'Izračunato prema kalendaru Umm al-Qura. U Bosni i Hercegovini, Turskoj i drugim zemljama datum može odstupati za jedan dan. Noć počinje već prethodne večeri, s akšamom.',
+    remind: 'Podsjeti me na mubarek dane', remindSub: 'Mubarek noći istog dana u 10:00, bajrami uoči u 18:00',
+    cal: '📅 Svi datumi u kalendar', calName: 'NamazVR · Mubarek dani',
+    tonight: 'Večeras počinje ta noć.', tomorrow: 'Sutra je taj dan.',
+    doTitle: 'Šta možeš učiniti', duaTitle: 'Dove',
+    duaName: { astaghfir: 'Istigfar', istighfar: 'Sejjidul-istigfar', salawatShort: 'Salavat (kratki)', salawat: 'Salavat (Salli i Barik)', qadrDua: 'Dova Lejletul-kadra', tashriq: 'Tešrik-tekbiri', tahlil: 'Tehlil na dan Arefata' },
+    hijri: {
+      name: 'Nova hidžretska godina', short: '1. muharrem: počinje nova godina po Hidžri.',
+      about: ['S 1. muharremom počinje islamska godina. Računa se od Hidžre: 622. godine Poslanik ﷺ je sa svojim ashabima preselio iz Mekke u Medinu, gdje su muslimani mogli živjeti u miru. Kalendar je uveo halifa Omer.', 'Muharrem je jedan od četiri sveta mjeseca (Kur’an 9:36). Islamska godina ima samo 354 ili 355 dana – zato se ramazan i bajrami svake godine pomjeraju otprilike 11 dana unaprijed.'],
+      do: ['Osvrnuti se na prošlu godinu i zahvaliti Allahu', 'Donijeti lijepe odluke – započeti nešto dobro', 'Postiti u muharremu: najbolji mjesec za post poslije ramazana (Muslim)', 'Pročitati priču o Hidžri ili je poslušati u aplikaciji'],
+      kids: 'Danas počinje nova islamska godina! Broji se od dana kad je Poslanik ﷺ preselio iz Mekke u Medinu. Razmisli: Šta lijepo želim učiniti ove godine?',
+      note: 'Za Novu hidžretsku godinu nema posebnog namaza – to je dan da zastaneš i razmisliš.',
+    },
+    ashura: {
+      name: 'Ašura', short: '10. muharrem: post, dijeljenje i sjećanje.',
+      about: ['10. muharrema Allah je spasio poslanika Musaa i njegov narod od faraona. Poslanik ﷺ je postio taj dan i preporučio post; on briše male grijehe protekle godine (Muslim). Preporučuje se dodati još jedan dan: 9. ili 11.', '10. muharrema 680. godine na Kerbeli je ubijen Husejn, Poslanikov unuk, sa svojom porodicom. Šiije i aleviti ga se sjećaju u žalosti; mnogi aleviti poste 12 dana u muharremu. U Bosni i u Turskoj kuha se ašura – slatko jelo od mnogo sastojaka – i dijeli s komšijama, i u sjećanje na Nuha nakon potopa.'],
+      do: ['Postiti 9. i 10. (ili 10. i 11.) muharrema', 'Skuhati ašuru i podijeliti je s komšijama – sa svima, bez obzira na vjeru', 'Pomoći potrebnima, činiti dobro porodici', 'Sjetiti se Husejna i Kerbele: za pravdu, protiv nepravde'],
+      kids: 'Danas je dan ašure! Na ovaj dan Allah je spasio poslanika Musaa. Mnoge porodice danas kuhaju šareno slatko jelo, ašuru, i nose komšijama zdjelu – dijeljenje čini sretnim.',
+      note: 'Aleviti počinju muharremski post prema kalendaru svoje zajednice; više pod „Alevilik → Muharrem i ašura“.',
+    },
+    mevlid: {
+      name: 'Mevlud', short: 'Noć rođenja Poslanika ﷺ.',
+      about: ['U noći uoči 12. rebiul-evvela mnogi muslimani se sjećaju rođenja Poslanika Muhammeda ﷺ – 571. godine u Mekki, u „godini slona“. Allah ga naziva „milošću svjetovima“ (Kur’an 21:107).', 'U Bosni i u Turskoj uči se mevlud – spjev Sulejmana Čelebija (1409) i njegove kasnije verzije –, a u mnogim zemljama pripovijeda se o Poslanikovom životu. U Turskoj se mubarek noći zovu „kandil“, jer su se nekada munare osvjetljavale uljanim svjetiljkama (kandiljima).'],
+      do: ['Učiti mnogo salavata na Poslanika ﷺ', 'Čitati ili pričati o njegovom životu – o njegovoj dobroti prema djeci, životinjama i komšijama', 'Klanjati nafilu, npr. tesbih-namaz, ili naklanjati propuštene namaze (kada)', 'Čestitati porodici i prijateljima mubarek noć'],
+      kids: 'Večeras se sjećamo rođendana Poslanika Muhammeda ﷺ. Bio je ljubazan prema svima – prema djeci, životinjama i siromašnima. Danas često reci: „Allāhumma ṣalli ʿalā Muḥammad“ – i budi ljubazan kao on.',
+      note: 'Da li se Poslanikov rođendan posebno obilježava, učenjaci gledaju različito: mnogi (npr. Islamska zajednica, Diyanet, el-Azhar) u tome vide lijepu tradiciju, drugi odbacuju posebna obilježavanja. Svi se slažu: voljeti Poslanika i slijediti ga je dobro.',
+    },
+    regaib: {
+      name: 'Lejletul-regaib', short: 'Prva mubarek noć – počinju tri mubarek mjeseca.',
+      about: ['Lejletul-regaib je noć uoči prvog petka u mjesecu redžebu. S redžebom počinju „tri mjeseca“ – redžeb, ša’ban i ramazan – vrijeme pripreme za ramazan. Redžeb je jedan od četiri sveta mjeseca (Kur’an 9:36).', '„Regaib“ znači „veliki darovi“: u ovoj noći muslimani posebno mole za Allahovu milost i oprost.'],
+      do: ['Dove i istigfar (traženje oprosta)', 'Klanjati nafilu ili naklanjati propuštene namaze (kada)', 'Učiti Kur’an', 'Posjetiti ili nazvati roditelje i rodbinu, pomiriti se'],
+      kids: 'Večeras je Lejletul-regaib – prva od pet posebnih mubarek noći. Sada počinju tri mjeseca prije ramazana. Danas možeš zamoliti Allaha za nešto lijepo i obradovati svoje roditelje.',
+      note: 'Poseban „regaib-namaz“ od 12 rekata, prema mnogim učenjacima (npr. en-Nevevi), zasniva se na izmišljenoj predaji. Obične nafile, dove i dobra djela su, naprotiv, uvijek ispravni.',
+    },
+    mirac: {
+      name: 'Lejletul-miradž', short: 'Noć nebeskog putovanja – dar pet namaza.',
+      about: ['U jednoj noći Poslanik ﷺ je putovao iz Mekke u Jerusalem, do mesdžida el-Aksa (Isra, Kur’an 17:1), a odatle kroz nebesa (Miradž, Kur’an 53:13–18). Tamo mu je darovano pet dnevnih namaza – i posljednji ajeti sure El-Bekara (Muslim).', 'Zato se namaz naziva i „miradžom vjernika“: u svakom namazu si Allahu sasvim blizu.'],
+      do: ['Danas pet namaza klanjati posebno svjesno – oni su dar ove noći', 'Učiti suru El-Isra ili posljednje ajete El-Bekare', 'Klanjati nafilu, npr. teheddžud ili tesbih-namaz', 'Učiti salavat i zahvaliti Allahu'],
+      kids: 'Večeras se sjećamo divnog putovanja Poslanika ﷺ kroz nebesa. Odatle nam je donio poklon: pet namaza! Svaki put kad klanjaš, razgovaraš direktno s Allahom.',
+      note: '27. redžeb je uobičajeni datum; tačna noć nije pouzdano prenesena.',
+    },
+    berat: {
+      name: 'Lejletul-berat', short: 'Noć oprosta, sredinom ša’bana.',
+      about: ['Noć uoči 15. ša’bana (Lejletul-berat) smatra se noću oprosta i novog početka. Prema hadisu (Ibn Madže, različito ocijenjen) Allah u ovoj noći oprašta svima – osim onome ko Mu pripisuje druga i onome ko u srcu nosi mržnju prema drugima.', 'Ša’ban je mjesec prije ramazana; Poslanik ﷺ je u njemu posebno mnogo postio (Buhari).'],
+      do: ['Pomiriti se s nekim – pustiti ljutnju', 'Tražiti oprost (tevba, istigfar)', 'Klanjati nafilu, naklanjati propuštene namaze, učiti Kur’an', 'Postiti dan poslije (mnogi to čine) i pripremati se za ramazan'],
+      kids: 'Večeras je Lejletul-berat, noć oprosta. Ima li neko s kim si se posvađao? Danas je dobar dan da kažeš „izvini“ i da opet budete prijatelji.',
+      note: 'Predaje o ovoj noći različito se ocjenjuju; određeni oblici namaza (npr. „100 rekata“) nisu potvrđeni. Pomirenje, dova i dobrovoljni namazi uvijek su dobri.',
+    },
+    ramadan: {
+      name: 'Početak ramazana', short: 'Počinje mjesec posta – uoči prvog dana prva teravija.',
+      about: ['U ramazanu je objavljen Kur’an (Kur’an 2:185). Odrasli, zdravi muslimani poste od zore do zalaska sunca. Navečer prije prvog dana posta klanja se prva teravija, a u noći se jede sehur.'],
+      do: ['Donijeti nijjet i jesti sehur', 'Klanjati teraviju i vitr', 'Svaki dan proučiti dio Kur’ana', 'Davati sadaku, dijeliti, pozivati na iftar'],
+      kids: 'Uskoro je ramazan! Odrasli poste cijeli dan. Ti smiješ vježbati – možda do podne. A navečer na iftaru svi jedu zajedno.',
+      note: 'Sehur, iftar i odbrojavanje do bajrama naći ćeš na stranici Ramazan.',
+    },
+    qadr: {
+      name: 'Lejletul-kadr', short: 'Noć Kadr – bolja od hiljadu mjeseci.',
+      about: ['U ovoj noći počelo je objavljivanje Kur’ana. „Noć Kadr je bolja od hiljadu mjeseci. U njoj se spuštaju meleki i Džibril … Mir je u njoj sve do pojave zore!“ (Kur’an 97)', 'Poslanik ﷺ je rekao: „Tražite je u neparnim od posljednjih deset noći“ (Buhari). U Bosni, Turskoj i mnogim drugim zemljama obilježava se u noći uoči 27. ramazana.'],
+      do: ['Klanjati: teraviju, teheddžud, tesbih-namaz', 'Učiti i slušati Kur’an', 'Dova od Aiše: „Allāhumma innaka ʿafuwwun …“', 'Davati sadaku, praštati i moliti za sve ljude'],
+      kids: 'Večeras je možda najljepša noć u godini: Lejletul-kadr! Meleki silaze na Zemlju i svuda je mir. Ostani malo duže budan, klanjaj s porodicom i zamoli Allaha za sve dobro.',
+      note: 'Tačna noć je skrivena – da bi se iskoristilo svih posljednjih deset noći. 27. noć je raširena pretpostavka.',
+    },
+    fitr: {
+      name: 'Ramazanski bajram', short: 'Praznik nakon ramazana – tri dana radosti.',
+      about: ['1. ševvala muslimani slave kraj mjeseca posta. Prije bajram-namaza daje se sadekatul-fitr (fitra), da i siromašni mogu slaviti. Na sam dan bajrama post nije dozvoljen.'],
+      do: ['Dati fitru najkasnije prije bajram-namaza', 'Gusul, lijepa odjeća, prije namaza pojesti nešto slatko ili hurme', 'Bajram-namaz ujutro, usput učiti tekbire', 'Posjetiti roditelje i rodbinu, darivati djecu, pomiriti se', 'Poslije toga postiti 6 dana u ševvalu (Muslim)'],
+      kids: 'Bajram! Danas oblačiš lijepu odjeću, ljubiš ruku starijima i možda dobiješ slatkiše ili mali poklon. Ne zaboravi: podijeli i s djecom koja imaju malo.',
+      note: 'Bajram-namaz možeš vježbati pod „Ostali namazi → Bajram-namaz“.',
+    },
+    arafa: {
+      name: 'Dan Arefata', short: '9. zul-hidždžeta: najbolji dan za dovu.',
+      about: ['Na ovaj dan hadžije stoje na Arefatu – to je najvažniji dio hadža. Poslanik ﷺ je rekao: „Najbolja dova je dova na dan Arefata.“ (Tirmizi)', 'Ko nije na hadžu, posti ovaj dan: on briše grijehe prošle i naredne godine (Muslim). Od sabah-namaza počinju tešrik-tekbiri nakon svakog farz-namaza.'],
+      do: ['Postiti (ko nije na hadžu)', 'Mnogo moliti – za sebe, svoju porodicu i cijeli svijet', 'Učiti tehlil: „Lā ilāha illa llāhu waḥdahū …“', 'Od sabaha nakon svakog farz-namaza tešrik-tekbiri'],
+      kids: 'Danas mnogo hadžija u bijelim ihramima stoji na brdu Arefat i moli. I ti možeš moliti s njima – od kuće! Zamoli danas Allaha za sve što želiš.',
+      note: 'Hadž s Arefatom možeš doživjeti u simulatoru hadža u aplikaciji („Umra i hadž“).',
+    },
+    adha: {
+      name: 'Kurban-bajram', short: 'Praznik kurbana – četiri dana dijeljenja i zahvalnosti.',
+      about: ['Kurban-bajram podsjeća na Ibrahima, koji je bio spreman sve dati Allahu – i na Allahovu milost koja je spasila njegovog sina (Kur’an 37:102–107). Ko to može priuštiti, kolje kurban i dijeli meso: s porodicom, s rodbinom i komšijama i s potrebnima.', 'Od sabaha 9. do ikindije 13. zul-hidždžeta nakon svakog farz-namaza uče se tešrik-tekbiri.'],
+      do: ['Bajram-namaz ujutro – prije toga ništa ne jesti (sunnet)', 'Tešrik-tekbiri nakon svakog farz-namaza', 'Kurban nakon bajram-namaza, meso podijeliti na tri dijela', 'Posjetiti porodicu i komšije, darivati potrebne'],
+      kids: 'Danas je Kurban-bajram! Sjećamo se poslanika Ibrahima, koji se mnogo pouzdavao u Allaha. Mnoge porodice danas dijele hranu s ljudima koji imaju malo – tako je bajram lijep za sve.',
+      note: 'Ko želi klati kurban, prema mnogim učenjacima od 1. zul-hidždžeta do klanja ne šiša kosu i ne reže nokte (preporučeno).',
+    },
   },
   ram: {
     menu: '🌙 Ramazan', title: 'Ramazan', day: (d, n) => `Dan ${d} od ${n}`,

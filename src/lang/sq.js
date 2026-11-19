@@ -6,6 +6,8 @@ export default {
 
   // Emrat e namazeve dhe nëntitujt
   pn: {
+    tahajjud: 'Tehexhudi (namazi i natës)', duha: 'Namazi i duhasë (Ḍuḥā)', ishraq: 'Namazi i ishrakut (Ishrāq)', awwabin: 'Namazi evvabin (Awwābīn)',
+    wuduprayer: 'Namazi pas abdestit', istikhara: 'Istihareja (Istikhāra)', hajat: 'Namazi i haxhetit (Ḥājat)', tawba: 'Namazi i teubes (Tawba)', tasbihp: 'Namazi i tesbihut',
     tarawih: 'Teravia', sahw: 'Sehvi-sexhde', ghusl: 'Gusli', tayammum: 'Tejemumi',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'Umreja', hajj: 'Haxhi', ihramp: 'Namazi i ihramit', tawafp: 'Namazi i tavafit',
@@ -15,6 +17,9 @@ export default {
     sisha: 'Syneti i jacisë', witr: 'Vitri', jumua: 'Xhumaja', tahiyya: 'Tehijetul-mesxhid', wudu: 'Abdesti',
   },
   pd: {
+    tahajjud: 'namaz nate pas gjumit · 2–12 rekate', duha: 'paradite · 2–8 rekate', ishraq: 'pak pas lindjes së diellit',
+    awwabin: 'mes akshamit dhe jacisë · deri në 6 rekate', wuduprayer: 'menjëherë pas abdestit', istikhara: 'për të kërkuar vendimin e drejtë',
+    hajat: 'kur ke një brengë a një nevojë', tawba: 'namazi i pendimit', tasbihp: 'Salatu-t-tesbih · 300 herë tesbih',
     tarawih: 'netët e Ramazanit pas jacisë · 20 ose 8 rekate, nga dy e nga dy', sahw: 'sexhde kur gabon në namaz',
     wudu: 'pastrimi për namaz – para çdo namazi', ghusl: 'larja e gjithë trupit', tayammum: 'pastrim pa ujë, me dhé',
     cem: 'vizitë në një Cemevi (VR)', semah: 'merr pjesë në Meydan (VR)',
@@ -25,6 +30,9 @@ export default {
     sisha: 'pas farzit', witr: 'pas jacisë deri para sabahut', jumua: 'të premten, në vend të drekës', tahiyya: 'kur hyn në xhami',
   },
   niyya: {
+    tahajjud: 'dy rekatet e tehexhudit (namazit të natës)', duha: 'dy rekatet e namazit të duhasë', ishraq: 'dy rekatet e namazit të ishrakut',
+    awwabin: 'dy rekatet e namazit evvabin', wuduprayer: 'dy rekatet pas abdestit', istikhara: 'dy rekatet e namazit të istihares',
+    hajat: 'dy rekatet e namazit të haxhetit', tawba: 'dy rekatet e namazit të teubes', tasbihp: 'katër rekatet e namazit të tesbihut',
     tarawih: 'dy rekatet e teravisë',
     ihramp: 'dy rekatet synet të ihramit', tawafp: 'dy rekatet e tavafit pas Mekamit të Ibrahimit',
     eid: 'dy rekatet e namazit të Bajramit pas imamit', janaza: 'namazin e xhenazes dhe duanë për të ndjerin, pas imamit',
@@ -84,6 +92,20 @@ export default {
 
   // Kuptimi i teksteve arabe, rresht për rresht
   mean: {
+    tsp: ['I lartësuar është Allahu, falënderimi i takon Allahut, nuk ka zot tjetër përveç Allahut, dhe Allahu është më i madh.'],
+    istikhara: [
+      'O Allah, të kërkoj të mirën me dijen Tënde, të kërkoj fuqi me fuqinë Tënde dhe të lutem për mirësinë Tënde të madhe. Sepse Ti mundesh e unë nuk mundem; Ti di e unë nuk di; Ti i di të fshehtat.',
+      'O Allah, nëse Ti e di se kjo çështje është e mirë për mua – në fenë time, në jetën time dhe në përfundimin e punës sime –, atëherë ma cakto, ma lehtëso dhe ma beko.',
+      'E nëse Ti e di se kjo çështje është e keqe për mua – në fenë time, në jetën time dhe në përfundimin e punës sime –, atëherë largoje prej meje dhe më largo mua prej saj, më cakto të mirën kudo që është dhe më bëj të kënaqur me të. (Buhariu)',
+    ],
+    istighfar: [
+      'O Allah, Ti je Zoti im, nuk ka zot tjetër përveç Teje. Ti më krijove dhe unë jam robi Yt. Unë i përmbahem besës dhe premtimit ndaj Teje sa të mundem.',
+      'Kërkoj mbrojtje te Ti nga e keqja që kam bërë. E pranoj mirësinë Tënde ndaj meje dhe e pranoj gjynahun tim – andaj më fal, sepse gjynahet nuk i fal askush tjetër përveç Teje. (Buhariu)',
+    ],
+    yunus: ['Nuk ka zot tjetër përveç Teje! I lartësuar qofsh! Me të vërtetë unë kam qenë prej të padrejtëve. (Kur’ani 21:87 – lutja e pejgamberit Junus)'],
+    qadrDua: ['O Allah, Ti je Falës dhe e do faljen – andaj më fal. (Tirmidhiu, nga Aisheja)'],
+    salawatShort: ['O Allah, bekoje zotërinë tonë Muhamedin dhe familjen e zotërisë tonë Muhamed.'],
+    astaghfir: ['I kërkoj falje Allahut të Madhërishëm – nuk ka zot tjetër përveç Tij, të Gjallit, të Përhershmit – dhe tek Ai pendohem.'],
     talbiya: ['Ja ku jam, o Allah, ja ku jam. Ja ku jam, Ti nuk ke shok, ja ku jam.', 'Çdo falënderim dhe çdo mirësi janë të Tuat, edhe sundimi. Ti nuk ke shok.'],
     niyyaUmre: ['O Allah, unë dua ta kryej umren – ma lehtëso dhe pranoje prej meje.'],
     niyyaHajj: ['O Allah, unë dua ta kryej haxhin – ma lehtëso dhe pranoje prej meje.'],
@@ -230,6 +252,7 @@ export default {
 
   // Modi shpirtëror: kuptimi i brendshëm, i formuluar lirshëm sipas Gazaliut
   inner: {
+    tasbihp: 'Çdo „Subḥāna llāh“ është si një frymëmarrje mirënjohjeje. Numëro qetë me gishta – edhe zemra numëron bashkë me ty.',
     niyya: 'Lëre botën për një çast. Tani qëndron para Zotit tënd – ji këtu me zemër, jo vetëm me trup.',
     takbir: 'Me duart e ngritura i hedh të gjitha pas vetes: brengat, planet, shpërqendrimin. Allahu është më i madh se të gjitha këto.',
     opening: 'Fillo me lavdërim, si një mysafir që përshëndet para se të kërkojë.',
@@ -419,6 +442,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Tani e lartëson Allahun shumë herë radhazi: „Subḥāna llāh, al-ḥamdu li-llāh, lā ilāha illa llāh, Allāhu akbar.“ Numëro në heshtje me gishta – si një këngë e vogël me të cilën thua faleminderit.',
     sahw: 'Secili harron diçka ndonjëherë – edhe në namaz. Nuk është gjë e keqe! Nëse, për shembull, ke harruar të ulesh pas rekatit të dytë, në fund thjesht bën dy sexhde shtesë. Dhe gjithçka është sërish në rregull.',
     ghuslParts: {
       heart: 'Gusli është një larje e madhe e gjithë trupit. Të rriturit e marrin në raste të caktuara, shumë veta edhe të premten ose para Bajramit. Thuaj në zemër: „Tani po e laj gjithë trupin për hir të Allahut“ – dhe pastaj „Bismillāh“.',
@@ -592,6 +616,133 @@ export default {
     auto: 'Namazet farz të udhëhequra shënohen automatikisht. Ruhet vetëm në këtë pajisje.',
     kids: 'Për çdo ditë me të 5 namazet merr një yll shtesë ⭐',
     older: '◀ Dita më parë', newer: 'Dita pas ▶',
+  },
+  nfl: {
+    menu: 'Nafile', title: 'Namazet vullnetare (nafile)',
+    note: 'Namazet nafile janë vullnetare – jo detyrë, por një dhuratë për veten tënde. Mos i fal në kohët e mekruha: kur lind dielli, kur është në zenit në mesditë dhe kur perëndon (te hanefitë edhe pas farzit të sabahut dhe pas farzit të ikindisë). Teravinë dhe vitrin i gjen te „Namaze të tjera“.',
+    when: {
+      tarawih: 'Teravia falet vetëm në Ramazan: çdo natë pas jacisë, para vitrit. Falet nga 2 rekate me selam – këtu ushtron një njësi të tillë. Shumica e xhemateve (hanefitë, shafiitë, hanbelitë, edhe Bashkësia Islame dhe Diyaneti) falin 20 rekate, pra dhjetë herë këtë njësi; të tjerë falin 8 (sipas një transmetimi nga Aisheja). Pas çdo 4 rekateve ulesh pak dhe pushon – prandaj edhe emri „teravi“ (pushime). Në këtë pushim lavdërohet Allahu, p.sh. me „Subḥāna dhi l-mulki wa l-malakūt …“ ose me salavate. Në fund xhemati në Ramazan zakonisht e fal edhe vitrin së bashku. Në xhami është më bukur, por edhe vetëm në shtëpi është po aq i vlefshëm.',
+      tahajjud: 'Tehexhudi është namazi i natës pas gjumit: pas jacisë fle pak, pastaj zgjohesh para sabahut. Koha më e mirë është e treta e fundit e natës – atëherë, siç transmeton Buhariu, Allahu thotë: „Kush më lutet, që t’i jap?“ Falen 2 deri në 12 rekate, gjithmonë nga dy, me lexim të gjatë dhe sexhde të gjata. Kush është i sigurt se do të zgjohet, e fal vitrin pas tij, si namazin e fundit të natës. (Kur’ani 17:79)',
+      duha: 'Namazi i duhasë falet paradite: rreth 45 minuta pas lindjes së diellit, kur dielli ngrihet „sa një shtizë“, deri pak para mesditës (rreth 15 minuta para drekës). 2, 4 ose 8 rekate, nga dy. Sipas një hadithi te Muslimi, ai është si sadaka për çdo nyje të trupit tënd – një faleminderit për një ditë të re.',
+      ishraq: 'Ishraku është namazi i hershëm i duhasë: kush e fal sabahun me xhemat, qëndron ulur dhe e përmend Allahun derisa të lindë dielli, e pastaj fal 2 rekate, ka shpërblim si për haxh dhe umre (Tirmidhiu). Prit derisa dielli të ketë lindur plotësisht (rreth 15–20 minuta pas lindjes; në Turqi shpesh thuhet 45 minuta) – gjatë vetë lindjes nuk falet.',
+      awwabin: 'Evvabin („ata që i kthehen shpesh Allahut“) te shumë hanefitë quhet namazi vullnetar mes akshamit dhe jacisë: pas synetit të akshamit deri në 6 rekate, në tri njësi nga 2. Dijetarë të tjerë namazin e duhasë e quajnë „namazi i evvabinëve“. Të dyja janë të mira – një çast i qetë në mbrëmje.',
+      wuduprayer: 'Menjëherë pas abdestit – para se të thahen gjymtyrët – fal 2 rekate. Pejgamberi i dëgjoi në Xhenet hapat e Bilalit, sepse Bilali falej pas çdo abdesti (Buhariu). Te hanefitë: jo në kohët e mekruha, p.sh. jo pas namazit të ikindisë.',
+      istikhara: 'Istiharen e fal kur duhet të zgjedhësh mes gjërave të lejuara – shkolla, puna, shpërngulja, martesa. 2 rekate, p.sh. në të parin me suren El-Kafirun, në të dytin me suren El-Ihlas. Pastaj duaja: te fjalët „kjo çështje“ mendon për pyetjen tënde. Nuk ke nevojë të presësh ëndërr: vendos me qetësi nga anon zemra jote dhe pyet njerëzit që u beson. Mund të përsëritet disa herë.',
+      hajat: 'Namazin e haxhetit e fal kur diçka të rëndon ose kur dëshiron diçka shumë – shëndetin, një provim, një brengë në familje. 2 rekate (disa falin 4), pastaj lavdëro Allahun, thuaj salavatet dhe lutu me fjalët e tua. Transmetimet për një formë të caktuar janë të dobëta; por një namaz vullnetar me dua është gjithmonë i mirë.',
+      tawba: 'Namazin e teubes e fal kur pendohesh për një gabim. Ebu Bekri transmeton: kush bën një gjynah, pastaj merr abdest, fal 2 rekate dhe i kërkon falje Allahut, Allahu e fal (Ebu Davudi, Tirmidhiu; Kur’ani 3:135). Pendimi i vërtetë do të thotë: të pendohesh, të ndalesh, të vendosësh të mos e përsëritësh – dhe nëse i ke bërë padrejtësi dikujt, ta ndreqësh me të.',
+      tasbihp: 'Namazi i tesbihut ka 4 rekate me gjithsej 300 tesbihe – 75 në çdo rekat. Pejgamberi ia mësoi xhaxhait të tij Abbasit: nëse mundesh çdo ditë, përndryshe çdo të premte, çdo muaj, çdo vit – ose të paktën një herë në jetë (Ebu Davudi, Ibn Maxheja). Shumë veta e falin në netët e bekuara dhe në Natën e Kadrit. Numëro me gishta, jo me zë. Nëse harron një numër, e plotëson në vendin e ardhshëm – por jo në qëndrimin e shkurtër pas rukusë dhe jo në uljen mes dy sexhdeve. Mos e fal në kohët e mekruha.',
+    },
+    duaTitle: { istikhara: 'Duaja e istihares', hajat: 'Lutja në nevojë', tawba: 'Sejjidul-istigfar' },
+    duaInstr: {
+      istikhara: 'Pas selamit: ngriji duart, lavdëro Allahun dhe thuaj salavatet. Pastaj këtë dua. Te „kjo çështje“ (hādha l-amr) mendo për pyetjen tënde – ose përmende. Pastaj vendos me qetësi dhe pyet edhe njerëzit që u beson.',
+      hajat: 'Pas selamit: ngriji duart, lavdëro Allahun, thuaj salavatet dhe lutu me fjalët e tua për atë që të nevojitet. Duaja e pejgamberit Junus nga Kur’ani i përshtatet çdo brenge.',
+      tawba: 'Pas selamit: ngriji duart dhe kërkoji Allahut sinqerisht falje – me „zotërinë e kërkimit të faljes“ (Sejjidul-istigfar). Pendohu, ndalu dhe vendos të mos e bësh më.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tesbih ${n}×`,
+    at: {
+      before: (n) => `Pas duasë hapëse (Subḥānaka), ende para Fatihasë: thuaj në heshtje ${n}× „Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar“. Numëro me gishta.`,
+      sura: (n) => `Pas sures, ende në këmbë dhe para rukusë: thuaj në heshtje ${n}× tesbihun.`,
+      ruku: (n) => `Qëndro në ruku: pas „Subḥāna rabbiya l-ʿaẓīm“ (3×) thuaj ${n}× tesbihun.`,
+      itidal: (n) => `Drejt në këmbë, pas „Rabbanā wa laka l-ḥamd“: ${n}× tesbihun.`,
+      sujud: (n) => `Qëndro në sexhde: pas „Subḥāna rabbiya l-aʿlā“ (3×) thuaj ${n}× tesbihun.`,
+      jalsa: (n) => `Ulur mes dy sexhdeve: ${n}× tesbihun.`,
+      after: (n) => `Pas sexhdes së dytë ulesh shkurt (para se të ngrihesh ose para teshehhudit) dhe thua ${n}× tesbihun.`,
+    },
+    school: {
+      hanafi: 'Hanefitë (sipas Abdullah ibn Mubarekut): 4 rekate me një selam. Në çdo rekat 15× para Fatihasë, 10× pas sures, nga 10× në ruku, në qëndrimin pas saj, në të dyja sexhdet dhe në uljen mes tyre – 75 në rekat, 300 gjithsej.',
+      shafii: 'Shafiitë (sipas hadithit të Ibn Abbasit): 15× pas sures, nga 10× në ruku, në qëndrimin pas saj, në të dyja sexhdet, në uljen mes tyre dhe edhe 10× në uljen e shkurtër pas sexhdes së dytë – 75 në rekat. Ditën katër rekatet falen bashkë ose 2 + 2, natën si 2 + 2.',
+      maliki: 'Në medhhebin maliki namazi i tesbihut praktikohet pak; kush e fal, zakonisht ndjek hadithin e Ibn Abbasit – ashtu siç tregohet këtu, si 2 + 2 rekate.',
+      hanbali: 'Imam Ahmedi e konsideronte këtë transmetim të dobët; por shumë dijetarë (mes tyre hanefitë dhe shafiitë) e rekomandojnë këtë namaz. Tregohet forma sipas Ibn Abbasit.',
+    },
+  },
+  holy: {
+    menu: 'Ditët e shenjta', title: 'Ditë & net të shenjta', sub: 'Netët e bekuara, bajramet dhe ditë të veçanta',
+    today: 'sot', tomorrowShort: 'nesër', inDays: (n) => `pas ${n} ${n === 1 ? 'dite' : 'ditësh'}`, nightOf: (d) => `Nata nis në mbrëmje: ${d}`, nightShort: 'nata',
+    sighting: 'Llogaritur sipas kalendarit Umm al-Qura. Në Kosovë, Shqipëri, Maqedoni të Veriut, Turqi dhe vende të tjera data mund të ndryshojë për një ditë. Nata fillon që në mbrëmjen e mëparshme, me akshamin.',
+    remind: 'Më kujto ditët e shenjta', remindSub: 'Netët e bekuara po atë ditë në orën 10:00, bajramet një mbrëmje më parë në orën 18:00',
+    cal: '📅 Të gjitha datat në kalendar', calName: 'NamazVR · Ditët e shenjta',
+    tonight: 'Sonte fillon nata.', tomorrow: 'Nesër është dita.',
+    doTitle: 'Çfarë mund të bësh', duaTitle: 'Lutjet',
+    duaName: { astaghfir: 'Istigfari', istighfar: 'Sejjidul-istigfar', salawatShort: 'Salavati (i shkurtër)', salawat: 'Salavatet Ibrahimije', qadrDua: 'Duaja e Natës së Kadrit', tashriq: 'Tekbiri i teshrikut', tahlil: 'Tehlili i Arafatit' },
+    hijri: {
+      name: 'Viti i Ri Hixhri', short: '1 Muharrem: fillon një vit i ri sipas Hixhretit.',
+      about: ['Me 1 Muharrem fillon viti islam. Numërohet nga Hixhreti: në vitin 622 Pejgamberi ﷺ u shpërngul me shokët e tij nga Meka në Medine, ku muslimanët mund të jetonin në paqe. Kalendarin e futi halifi Omer.', 'Muharremi është një nga katër muajt e shenjtë (Kur’ani 9:36). Një vit islam ka vetëm 354 ose 355 ditë – prandaj Ramazani dhe bajramet çdo vit vijnë rreth 11 ditë më herët.'],
+      do: ['Të shikosh prapa vitin që kaloi dhe ta falënderosh Allahun', 'Të marrësh vendime të mira – të fillosh diçka të mirë', 'Të agjërosh në Muharrem: muaji më i mirë për agjërim pas Ramazanit (Muslimi)', 'Të lexosh historinë e Hixhretit ose ta dëgjosh në aplikacion'],
+      kids: 'Sot fillon viti i ri islam! Numërohet nga dita kur Pejgamberi ﷺ u shpërngul nga Meka në Medine. Mendo: Çfarë të mire dua të bëj këtë vit?',
+      note: 'Për Vitin e Ri nuk ka namaz të veçantë – është një ditë për t’u ndalur e për të menduar.',
+    },
+    ashura: {
+      name: 'Dita e Ashures', short: '10 Muharrem: agjërim, ndarje dhe përkujtim.',
+      about: ['Më 10 Muharrem Allahu e shpëtoi pejgamberin Musa dhe popullin e tij nga faraoni. Pejgamberi ﷺ e agjëroi këtë ditë dhe e rekomandoi; agjërimi i shlyen gabimet e vogla të vitit të kaluar (Muslimi). Rekomandohet të shtohet edhe një ditë: e 9-ta ose e 11-ta.', 'Më 10 Muharrem të vitit 680 në Qerbela u vra Husejni, nipi i Pejgamberit, bashkë me familjen e tij. Shiitët dhe alevitët e përkujtojnë me zi; shumë alevitë agjërojnë 12 ditë në Muharrem. Në trojet shqiptare dhe në Turqi gatuhet ashureja – një ëmbëlsirë me shumë përbërës – dhe ndahet me fqinjët, në kujtim edhe të Nuhut pas përmbytjes.'],
+      do: ['Të agjërosh më 9 dhe 10 (ose 10 dhe 11) Muharrem', 'Të gatuash ashure dhe ta ndash me fqinjët – me të gjithë, pavarësisht fesë', 'Të ndihmosh nevojtarët, t’i bësh mirë familjes', 'Të kujtosh Husejnin dhe Qerbelanë: për drejtësi, kundër padrejtësisë'],
+      kids: 'Sot është dita e Ashures! Në këtë ditë Allahu e shpëtoi pejgamberin Musa. Shumë familje sot gatuajnë një ëmbëlsirë shumëngjyrëshe, ashure, dhe u çojnë fqinjëve një tas – të ndash të gëzon.',
+      note: 'Alevitët e fillojnë agjërimin e Muharremit sipas kalendarit të bashkësisë së tyre; më shumë te „Alevilik → Muharremi & Aşure“.',
+    },
+    mevlid: {
+      name: 'Nata e Mevludit', short: 'Nata e lindjes së Pejgamberit ﷺ.',
+      about: ['Natën para 12 Rebiul-evvelit shumë muslimanë përkujtojnë lindjen e Pejgamberit Muhamed ﷺ – në vitin 571 në Mekë, në „Vitin e Elefantit“. Allahu e quan atë „mëshirë për botët“ (Kur’ani 21:107).', 'Në Turqi këndohet Mevludi i Sulejman Çelebiut (1409), në trojet shqiptare edhe mevlude në gjuhën shqipe; në shumë vende tregohet për jetën e tij. Netët e bekuara quhen edhe „Kandil“, sepse dikur minaret ndriçoheshin me kandilë vaji.'],
+      do: ['Të thuash shumë salavate për Pejgamberin ﷺ', 'Të lexosh ose të tregosh për jetën e tij – mirësinë e tij ndaj fëmijëve, kafshëve dhe fqinjëve', 'Të falësh nafile, p.sh. namazin e tesbihut, ose të kompensosh namazet e humbura (kaza)', 'T’i urosh familjen dhe shokët për natën e bekuar'],
+      kids: 'Sonte kujtojmë ditëlindjen e Pejgamberit Muhamed ﷺ. Ai ishte i mirë me të gjithë – me fëmijët, me kafshët dhe me të varfrit. Thuaj sot shpesh: „Allāhumma ṣalli ʿalā Muḥammad“ – dhe ji i mirë si ai.',
+      note: 'A duhet festuar ditëlindja në mënyrë të veçantë, dijetarët e shohin ndryshe: shumë (p.sh. Diyaneti, el-Az’hari) e shohin si traditë të bukur, të tjerë i refuzojnë festimet e veçanta. Të gjithë pajtohen: ta duash Pejgamberin dhe ta ndjekësh është mirë.',
+    },
+    regaib: {
+      name: 'Nata e Regaibit', short: 'Nata e parë e bekuar – fillojnë tre muajt e shenjtë.',
+      about: ['Nata e Regaibit është nata para së premtes së parë të muajit Rexheb. Me Rexhebin fillojnë „tre muajt“ – Rexhebi, Shabani dhe Ramazani – një kohë për t’u përgatitur për Ramazanin. Rexhebi është një nga katër muajt e shenjtë (Kur’ani 9:36).', '„Regaib“ do të thotë „dhurata të mëdha“: në këtë natë muslimanët luten veçanërisht për mëshirën dhe faljen e Allahut.'],
+      do: ['Lutje dhe istigfar (kërkim faljeje)', 'Të falësh nafile ose të kompensosh namazet e humbura (kaza)', 'Të lexosh Kur’an', 'Të vizitosh ose të telefonosh prindërit e të afërmit, të pajtohesh'],
+      kids: 'Sonte është Nata e Regaibit – e para nga pesë netët e bekuara. Tani fillojnë tre muajt para Ramazanit. Sot mund t’i lutesh Allahut për diçka të bukur dhe t’i gëzosh prindërit e tu.',
+      note: 'Një „namaz i Regaibit“ i veçantë me 12 rekate, sipas shumë dijetarëve (p.sh. Neveviu), mbështetet në një transmetim të shpikur. Namazet e zakonshme nafile, lutjet dhe veprat e mira, përkundrazi, janë gjithmonë të drejta.',
+    },
+    mirac: {
+      name: 'Nata e Miraxhit', short: 'Nata e udhëtimit qiellor – dhurata e pesë namazeve.',
+      about: ['Në një natë Pejgamberi ﷺ udhëtoi nga Meka në Jerusalem, te Xhamia el-Aksa (Isra, Kur’ani 17:1), e prej andej nëpër qiej (Miraxh, Kur’ani 53:13–18). Atje iu dhuruan pesë namazet ditore – dhe ajetet e fundit të sures El-Bekare (Muslimi).', 'Prandaj namazi quhet edhe „Miraxhi i besimtarit“: në çdo namaz je shumë afër Allahut.'],
+      do: ['Pesë namazet sot t’i falësh me vëmendje të veçantë – ato janë dhurata e kësaj nate', 'Të lexosh suren El-Isra ose ajetet e fundit të El-Bekares', 'Të falësh nafile, p.sh. tehexhudin ose namazin e tesbihut', 'Të thuash salavate dhe ta falënderosh Allahun'],
+      kids: 'Sonte kujtojmë udhëtimin e mrekullueshëm të Pejgamberit ﷺ nëpër qiej. Prej andej na solli një dhuratë: pesë namazet! Sa herë që falesh, flet drejtpërdrejt me Allahun.',
+      note: '27 Rexhebi është data e përhapur; nata e saktë nuk është transmetuar me siguri.',
+    },
+    berat: {
+      name: 'Nata e Beratit', short: 'Nata e faljes, në mes të Shabanit.',
+      about: ['Nata para 15 Shabanit (Lejletul-Bera’a) konsiderohet nata e faljes dhe e fillimit të ri. Sipas një hadithi (Ibn Maxheja, i vlerësuar ndryshe) Allahu në këtë natë i fal të gjithë – përveç atij që i shoqëron Atij dikë tjetër dhe atij që mban mëri në zemër ndaj të tjerëve.', 'Shabani është muaji para Ramazanit; Pejgamberi ﷺ agjëronte në të veçanërisht shumë (Buhariu).'],
+      do: ['Të pajtohesh me dikë – ta lësh mërinë', 'Të kërkosh falje (teube, istigfar)', 'Të falësh nafile, të kompensosh namazet e humbura, të lexosh Kur’an', 'Të agjërosh ditën pas (shumë e bëjnë) dhe të përgatitesh për Ramazanin'],
+      kids: 'Sonte është Nata e Beratit, nata e faljes. A ka dikë me të cilin je grindur? Sot është ditë e mirë të thuash „më fal“ dhe të bëheni sërish shokë.',
+      note: 'Transmetimet për këtë natë vlerësohen ndryshe; format e caktuara të namazit (p.sh. „100 rekate“) nuk janë të vërtetuara. Pajtimi, lutja dhe namazet vullnetare janë gjithmonë të mira.',
+    },
+    ramadan: {
+      name: 'Fillimi i Ramazanit', short: 'Fillon muaji i agjërimit – në mbrëmjen e mëparshme teravia e parë.',
+      about: ['Në Ramazan u zbrit Kur’ani (Kur’ani 2:185). Muslimanët e rritur dhe të shëndetshëm agjërojnë nga agimi deri në perëndimin e diellit. Në mbrëmjen para ditës së parë të agjërimit falet teravia e parë, e natën hahet syfyri.'],
+      do: ['Të bësh nijet dhe të hash syfyr', 'Të falësh teravinë dhe vitrin', 'Çdo ditë të lexosh një pjesë nga Kur’ani', 'Të japësh sadaka, të ndash, të ftosh në iftar'],
+      kids: 'Së shpejti vjen Ramazani! Të rriturit agjërojnë gjithë ditën. Ti mund të ushtrosh – ndoshta deri në drekë. E në mbrëmje në iftar të gjithë hanë bashkë.',
+      note: 'Syfyrin, iftarin dhe numërimin deri në Bajram i gjen në faqen e Ramazanit.',
+    },
+    qadr: {
+      name: 'Nata e Kadrit (Lejletul-Kadr)', short: 'Nata e Kadrit – më e mirë se një mijë muaj.',
+      about: ['Në këtë natë filloi zbritja e Kur’anit. „Nata e Kadrit është më e mirë se një mijë muaj. Në të zbresin engjëjt dhe Shpirti (Xhibrili) … Ajo është paqe deri në agim.“ (Kur’ani 97)', 'Pejgamberi ﷺ tha: „Kërkojeni në netët tek të dhjetë netëve të fundit“ (Buhariu). Në trojet shqiptare, në Turqi dhe në shumë vende ajo shënohet natën para 27 Ramazanit.'],
+      do: ['Të falesh: teravinë, tehexhudin, namazin e tesbihut', 'Të lexosh dhe të dëgjosh Kur’an', 'Duaja e Aishes: „Allāhumma innaka ʿafuwwun …“', 'Të japësh sadaka, të falësh të tjerët dhe të lutesh për të gjithë njerëzit'],
+      kids: 'Sonte është ndoshta nata më e bukur e vitit: Nata e Kadrit! Engjëjt zbresin në Tokë dhe kudo ka paqe. Qëndro pak më gjatë zgjuar, falu me familjen dhe lute Allahun për çdo të mirë.',
+      note: 'Nata e saktë është e fshehur – që të shfrytëzohen të dhjetë netët e fundit. Nata e 27-të është një supozim i përhapur.',
+    },
+    fitr: {
+      name: 'Bajrami i Ramazanit (Fitër Bajrami)', short: 'Festa pas Ramazanit – tri ditë gëzim.',
+      about: ['Më 1 Sheval muslimanët festojnë fundin e muajit të agjërimit. Para namazit të Bajramit jepet fitrja (sadakatul-fitri), që edhe të varfrit të mund të festojnë. Në vetë ditën e Bajramit agjërimi nuk lejohet.'],
+      do: ['Të japësh fitren më së voni para namazit të Bajramit', 'Gusl, rroba të bukura, para namazit të hash diçka të ëmbël ose hurma', 'Namazi i Bajramit në mëngjes, rrugës të thuash tekbire', 'Të vizitosh prindërit e të afërmit, t’u bësh dhurata fëmijëve, të pajtohesh', 'Pastaj të agjërosh 6 ditë në Sheval (Muslimi)'],
+      kids: 'Bajram! Sot vesh rroba të bukura, u puth dorën të mëdhenjve dhe ndoshta merr ëmbëlsira ose një dhuratë të vogël. Mos harro: ndaj edhe me fëmijët që kanë pak.',
+      note: 'Namazin e Bajramit mund ta ushtrosh te „Namaze të tjera → Namazi i Bajramit“.',
+    },
+    arafa: {
+      name: 'Dita e Arafatit (Arefja)', short: '9 Dhul-Hixhxhe: dita më e mirë për lutje.',
+      about: ['Në këtë ditë haxhinjtë qëndrojnë në Arafat – pjesa më e rëndësishme e haxhit. Pejgamberi ﷺ tha: „Lutja më e mirë është lutja në Ditën e Arafatit.“ (Tirmidhiu)', 'Kush nuk është në haxh, e agjëron këtë ditë: ajo i shlyen gabimet e vitit të kaluar dhe të vitit që vjen (Muslimi). Nga sabahu fillon tekbiri i teshrikut pas çdo namazi farz.'],
+      do: ['Të agjërosh (kush nuk është në haxh)', 'Të lutesh shumë – për veten, familjen tënde dhe gjithë botën', 'Të thuash tehlilin: „Lā ilāha illa llāhu waḥdahū …“', 'Nga sabahu, pas çdo namazi farz, tekbiri i teshrikut'],
+      kids: 'Sot shumë haxhinj me rroba të bardha qëndrojnë në malin e Arafatit dhe luten. Edhe ti mund të lutesh me ta – nga shtëpia! Lute Allahun sot për gjithçka që dëshiron.',
+      note: 'Haxhin me Arafatin mund ta përjetosh në simulatorin e haxhit në aplikacion („Umreja & haxhi“).',
+    },
+    adha: {
+      name: 'Kurban Bajrami', short: 'Festa e kurbanit – katër ditë ndarje dhe falënderimi.',
+      about: ['Kurban Bajrami të kujton Ibrahimin, që ishte gati t’i jepte Allahut gjithçka – dhe mëshirën e Allahut që e shpëtoi djalin e tij (Kur’ani 37:102–107). Kush ka mundësi, pret një kurban dhe e ndan mishin: me familjen, me të afërmit e fqinjët dhe me nevojtarët.', 'Nga sabahu i datës 9 deri te ikindia e datës 13 Dhul-Hixhxhe, pas çdo namazi farz thuhet tekbiri i teshrikut.'],
+      do: ['Namazi i Bajramit në mëngjes – para tij mos ha asgjë (synet)', 'Tekbiri i teshrikut pas çdo namazi farz', 'Kurbani pas namazit të Bajramit, mishi ndahet në tri pjesë', 'Të vizitosh familjen dhe fqinjët, t’u dhurosh nevojtarëve'],
+      kids: 'Sot është Kurban Bajrami! Kujtojmë pejgamberin Ibrahim, që i besonte shumë Allahut. Shumë familje sot ndajnë ushqim me njerëz që kanë pak – kështu festa bëhet e bukur për të gjithë.',
+      note: 'Kush dëshiron të presë kurban, sipas shumë dijetarëve nga 1 Dhul-Hixhxhe deri te kurbani nuk i shkurton as flokët, as thonjtë (e rekomanduar).',
+    },
   },
   ram: {
     menu: '🌙 Ramazani', title: 'Ramazani', day: (d, n) => `Dita ${d} nga ${n}`,
