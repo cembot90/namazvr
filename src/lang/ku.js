@@ -6,6 +6,8 @@ export default {
 
   // Navên nimêjan û binnivîs
   pn: {
+    tahajjud: 'Tehecud (Tahajjud)', duha: 'Nimêja çêştê (Ḍuḥā)', ishraq: 'Îşraq (Ishrāq)', awwabin: 'Ewwabîn (Awwābīn)',
+    wuduprayer: 'Nimêja piştî destnimêjê', istikhara: 'Îstixare (Istikhāra)', hajat: 'Nimêja hacetê (Ḥājat)', tawba: 'Nimêja tobeyê (Tawba)', tasbihp: 'Nimêja Tesbîhê',
     tarawih: 'Teravîh', sahw: 'Secdeya sehwê', ghusl: 'Serşok (xusl)', tayammum: 'Teyemum',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'Umre', hajj: 'Hec', ihramp: 'Nimêja ihramê', tawafp: 'Nimêja tewafê',
@@ -15,6 +17,9 @@ export default {
     sisha: 'Sunet piştî Eşa', witr: 'Wîtir', jumua: 'Înî', tahiyya: 'Silava mizgeftê (Tehiyyetul-mescid)', wudu: 'Destnimêj',
   },
   pd: {
+    tahajjud: 'nimêja şevê piştî xewê · 2–12 rekat', duha: 'berî nîvro · 2–8 rekat', ishraq: 'hinekî piştî hilatina rojê',
+    awwabin: 'di navbera Mexrib û Eşayê de · heta 6 rekatan', wuduprayer: 'yekser piştî destnimêjê', istikhara: 'ji bo biryara rast dua kirin',
+    hajat: 'dema xemek an daxwazek li ser dilê te be', tawba: 'nimêja poşmaniyê', tasbihp: 'Ṣalāt at-Tasbīḥ · 300× pesn',
     tarawih: 'şevên Remezanê piştî Eşa · 20 an 8 rekat, du bi du', sahw: 'secde ji bo şaşiyekê di nimêjê de',
     wudu: 'paqijiya ji bo nimêjê – berî her nimêjê', ghusl: 'şuştina tevahiya laş', tayammum: 'paqijî bê av, bi axê',
     cem: 'gera di Cemeviyekê de (VR)', semah: 'tevlî bibe li Meydanê (VR)',
@@ -25,6 +30,9 @@ export default {
     sisha: 'piştî nimêja ferz', witr: 'piştî Eşa heta berî Sibê', jumua: 'roja înê, li şûna Nîvro', tahiyya: 'dema ku tu dikevî mizgeftê',
   },
   niyya: {
+    tahajjud: '2 rekatên Tehecudê (nimêja şevê)', duha: '2 rekatên nimêja çêştê (Ḍuḥā)', ishraq: '2 rekatên nimêja Îşraqê',
+    awwabin: '2 rekatên nimêja Ewwabînê', wuduprayer: '2 rekatên piştî destnimêjê', istikhara: '2 rekatên nimêja Îstixareyê',
+    hajat: '2 rekatên nimêja hacetê', tawba: '2 rekatên nimêja tobeyê', tasbihp: '4 rekatên nimêja Tesbîhê',
     tarawih: '2 rekatên Teravîhê',
     ihramp: '2 rekatên suneta ihramê', tawafp: '2 rekatên tewafê li pişt Meqamê Îbrahîm',
     eid: '2 rekatên nimêja cejnê li pişt îmam', janaza: 'nimêja miriyan û duaya ji bo mirî, li pişt îmam',
@@ -84,6 +92,20 @@ export default {
 
   // Wateya nivîsên erebî, rêz bi rêz
   mean: {
+    tsp: ['Allah pak e, hemû pesn ji Allah re ye, ji Allah pêve tu xwedê nîne, û Allah mezintir e.'],
+    istikhara: [
+      'Ya Allah, ez bi zanîna Te xêrê ji Te dixwazim, bi qudreta Te hêzê ji Te dixwazim, û ji keremê Te yê mezin dixwazim. Ji ber ku Tu dikarî û ez nikarim; Tu dizanî û ez nizanim; û Tu yê ku tiştên veşartî dizane yî.',
+      'Ya Allah, eger Tu dizanî ku ev kar ji bo min xêr e – di dînê min de, di jiyana min de û di dawiya karê min de –, wê ji min re nesîb bike, ji min re hêsan bike û bereketê bide wê.',
+      'Û eger Tu dizanî ku ev kar ji bo min xerab e – di dînê min de, di jiyana min de û di dawiya karê min de –, wî ji min dûr bixe û min jî ji wî dûr bixe, xêrê li ku be ji min re nesîb bike û min pê razî bike. (Buxarî)',
+    ],
+    istighfar: [
+      'Ya Allah, Tu Xudanê min î, ji Te pêve tu xwedê nîne. Te ez afirandim û ez evdê Te me. Bi qasî ku ji destê min tê, ez li ser peyman û soza Te me.',
+      'Ez xwe diavêjim bextê Te ji xerabiya ku min kiriye. Ez nîmeta Te ya li ser xwe qebûl dikim û gunehê xwe jî qebûl dikim – îcar min bibexşîne, ji ber ku ji Te pêve tu kes gunehan nabexşîne. (Buxarî)',
+    ],
+    yunus: ['Ji Te pêve tu xwedê nîne. Tu pak î! Bi rastî ez ji zaliman bûm. (Quran 21:87 – duaya Pêxember Yûnus)'],
+    qadrDua: ['Ya Allah, Tu bexşînder î û ji bexşandinê hez dikî – îcar min bibexşîne. (Tirmizî, ji Hz. Aîşe)'],
+    salawatShort: ['Ya Allah, rehma xwe bibarîne ser serwerê me Muhammed û ser malbata serwerê me Muhammed.'],
+    astaghfir: ['Ez ji Allahê Mezin lêborînê dixwazim – ji Wî pêve tu xwedê nîne, Yê Zindî, Yê Herdemî –, û ez bi tobe li Wî vedigerim.'],
     talbiya: ['Va ez li vir im, ya Allah, va ez li vir im. Va ez li vir im, tu şirîkê Te tune, va ez li vir im.', 'Hemû pesn û hemû nîmet ji Te re ne, û mulk jî. Tu şirîkê Te tune.'],
     niyyaUmre: ['Ya Allah, ez dixwazim Umreyê bikim – wê ji min re hêsan bike û ji min qebûl bike.'],
     niyyaHajj: ['Ya Allah, ez dixwazim Hecê bikim – wê ji min re hêsan bike û ji min qebûl bike.'],
@@ -230,6 +252,7 @@ export default {
 
   // Moda giyanî: wateya hundirîn, bi azadî li gorî el-Xezalî
   inner: {
+    tasbihp: 'Her “Subḥāna llāh” wek bêhneke spasiyê ye. Bi tiliyên xwe hêdî bijmêre – dil jî bi te re dijmêre.',
     niyya: 'Ji bo demekê dinyayê berde. Tu niha li ber Xudanê xwe yî – bi dilê xwe li vir be, ne tenê bi laşê xwe.',
     takbir: 'Bi destên bilindkirî tu her tiştî diavêjî pişt xwe: xem, plan, mijûlbûn. Allah ji van hemûyan mezintir e.',
     opening: 'Bi pesnê dest pê bike, wek mêvanekî ku berî ku tiştekî bixwaze silav dide.',
@@ -419,6 +442,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Niha tu gelek caran li pey hev pesnê Allah didî: “Subḥāna llāh, al-ḥamdu li-llāh, lā ilāha illa llāh, Allāhu akbar.” Bi tiliyên xwe bêdeng bijmêre – wek straneke biçûk ku tu pê spas dikî.',
     sahw: 'Her kes carinan tiştekî ji bîr dike – di nimêjê de jî. Ev ne tiştekî xerab e! Eger wek mînak te ji bîr kiribe ku piştî rekata duyem rûnî, tu di dawiyê de tenê du secdeyên zêde dikî. Bi vî awayî her tişt dîsa baş dibe.',
     ghuslParts: {
       heart: 'Serşok şuştineke mezin e ji bo tevahiya laş. Mezin wê di hin rewşan de dikin, gelek kes roja înê an berî cejnê jî dikin. Di dilê xwe de bêje: “Ez niha ji bo Allah xwe bi temamî dişom” – û paşê “Bismillāh”.',
@@ -592,6 +616,133 @@ export default {
     auto: 'Nimêjên ferz ên bi rêber bixweber tên nîşankirin. Tenê li ser vê cîhazê tê tomarkirin.',
     kids: 'Ji bo her rojek bi hemû 5 nimêjan stêreke zêde heye ⭐',
     older: '◀ Roja berê', newer: 'Roja paşê ▶',
+  },
+  nfl: {
+    menu: 'Nafile', title: 'Nimêjên dilxwazî (Nafile)',
+    note: 'Nimêjên nafile dilxwazî ne – ne mecbûrî ne, lê diyariyek in ji bo te bi xwe. Di demên mekrûh de nimêj neke: dema ku roj hiltê, dema ku nîvro roj li herî jor e, û dema ku roj diçe ava (li gorî Henefiyan herwiha piştî nimêja Sibê û piştî nimêja Esrê). Teravîh û Wîtir di bin “Nimêjên din” de ne.',
+    when: {
+      tarawih: 'Teravîh tenê di Remezanê de tê kirin: her şev piştî nimêja Eşayê, berî Wîtirê. Ew du rekat bi du rekat bi selamê tê kirin – li vir tu yek ji van beşan hîn dibî. Piraniya civakan (Henefî, Şafiî, Henbelî, Diyanet jî) 20 rekatan dikin, yanî deh caran ev beş; hinek jî 8 rekatan dikin (li gorî rîwayeteke Hz. Aîşe). Piştî her 4 rekatan mirov hinekî rûdine û bêhna xwe vedide – navê “Teravîh” (bêhnvedan) ji vir tê. Di vê navberê de mirov pesnê Allah dide, wek mînak li Tirkiyeyê bi “Subḥāna dhi l-mulki wa l-malakūt …” an bi selawatan. Di dawiyê de civat di Remezanê de pir caran Wîtirê jî bi hev re dike. Li mizgeftê herî xweş e, lê li malê bi tena serê xwe jî bi heman awayî derbasdar e.',
+      tahajjud: 'Tehecud nimêja şevê ye piştî xewê: piştî nimêja Eşayê hinekî razê, paşê berî Sibê rabe. Dema herî baş sêyeka dawî ya şevê ye – wê demê, wek ku Buxarî vedibêje, Allah dibêje: “Kî ji Min dixwaze, da ku Ez bidimê?” 2 heta 12 rekat tên kirin, her car du bi du, bi xwendineke dirêj û secdeyên dirêj. Yê ku bawer e ku dê şiyar bibe, Wîtirê piştî wê wek nimêja dawî ya şevê dike. (Quran 17:79)',
+      duha: 'Nimêja çêştê (Ḍuḥā) berî nîvro tê kirin: nêzîkî 45 deqîqe piştî hilatina rojê, gava ku roj “bi qasî rimekê” bilind bûye, heta hinekî berî nîvro (nêzîkî 15 deqîqe berî Nîvro). 2, 4 an 8 rekat, du bi du. Li gorî hedîseke li cem Muslim, ew wek xêrekê ye ji bo her movikeke laşê te – spasiyek ji bo rojeke nû.',
+      ishraq: 'Îşraq nimêja çêştê ya zû ye: yê ku nimêja Sibê bi cemaetê re dike, rûniştî dimîne û zikrê Allah dike heta ku roj hiltê, û paşê 2 rekatan dike, xelata wî wek ya Hec û Umreyê ye (Tirmizî). Bisekine heta ku roj bi temamî hilat (nêzîkî 15–20 deqîqe piştî hilatina rojê; li Tirkiyeyê pir caran 45 deqîqe tê gotin) – di dema hilatinê bi xwe de nimêj nayê kirin.',
+      awwabin: 'Ewwabîn (“yên ku gelek caran li Allah vedigerin”) li cem gelek Henefiyan nimêja dilxwazî ye di navbera Mexrib û Eşayê de: piştî suneta Mexribê heta 6 rekatan, di sê beşan de, her yek 2 rekat. Hin zanyarên din ji nimêja çêştê (Ḍuḥā) re dibêjin “nimêja Ewwabînan”. Herdu jî baş in – demeke aram a êvarê.',
+      wuduprayer: 'Yekser piştî destnimêjê – berî ku endam hişk bibin – 2 rekatan bike. Pêxember ﷺ li Bihuştê dengê lingên Bilal bihîst, ji ber ku Bilal piştî her destnimêjê nimêj dikir (Buxarî). Li gorî Henefiyan: ne di demên mekrûh de, yanî wek mînak ne piştî nimêja Esrê.',
+      istikhara: 'Îstixareyê dikî gava ku divê tu di navbera tiştên helal de biryarekê bidî – dibistan, kar, barkirin, zewac. 2 rekat, wek mînak di ya yekem de bi sûreya El-Kafirûn, di ya duyem de bi El-Ixlas. Paşê dua: li cihê “ev kar” tu li pirsa xwe difikirî. Ne hewce ye ku tu li benda xewnekê bî: bi aramî biryarê bide, ka dilê te ber bi ku ve diçe, û ji kesên ku tu bawerî bi wan dikî bipirse. Mirov dikare wê çend caran dubare bike.',
+      hajat: 'Nimêja hacetê dikî gava ku tiştek li ser dilê te giran e an tu tiştekî pir dixwazî – tenduristî, ezmûnek, xemeke di malbatê de. 2 rekat (hin kes 4 dikin), paşê pesnê Allah bide, selawatan bêje û bi gotinên xwe dua bike. Rîwayetên li ser şêweyeke diyar qels in; lê nimêjeke dilxwazî bi duayê re her tim baş e.',
+      tawba: 'Nimêja tobeyê dikî gava ku tu ji şaşiyekê poşman î. Hz. Ebûbekir vedibêje: Yê ku gunehekê bike, paşê destnimêj bigire, 2 rekatan bike û ji Allah lêborînê bixwaze, Allah wî dibexşîne (Ebû Dawûd, Tirmizî; Quran 3:135). Tobeya rastîn ev e: poşman bibe, dev jê berde, biryar bide ku careke din neke – û eger te neheqî li kesekî kiribe, li cem wî jî telafî bike.',
+      tasbihp: 'Nimêja Tesbîhê 4 rekat e, bi tevahî 300× pesn – di her rekatê de 75×. Pêxember ﷺ ew hînî apê xwe Ebbas kir: eger ji destê te bê her roj, an her înê, her meh, her sal – an qet nebe carekê di jiyanê de (Ebû Dawûd, Ibn Mace). Gelek kes wê di şevên Kandîlê û di Şeva Qedrê de dikin. Bi tiliyan bijmêre, ne bi dengê bilind. Eger tu hejmarekê ji bîr bikî, li cihê paşê wê temam bike – lê ne di rawestana kurt a piştî rukûyê de û ne di rûniştina navbera herdu secdeyan de. Di demên mekrûh de neke.',
+    },
+    duaTitle: { istikhara: 'Duaya Îstixareyê', hajat: 'Dua di tengasiyê de', tawba: 'Seyyidul-Îstixfar' },
+    duaInstr: {
+      istikhara: 'Piştî selamê: destên xwe bilind bike, pesnê Allah bide û selawatan bêje. Paşê vê duayê bike. Li cihê “ev kar” (hādha l-amr) tu li pirsa xwe difikirî – an tu navê wê dibêjî. Paşê bi aramî biryarê bide û ji kesên ku tu bawerî bi wan dikî jî bipirse.',
+      hajat: 'Piştî selamê: destên xwe bilind bike, pesnê Allah bide, selawatan bêje û bi gotinên xwe tiştê ku hewceyê te ye bixwaze. Duaya Pêxember Yûnus ji Quranê ji bo her xemê guncaw e.',
+      tawba: 'Piştî selamê: destên xwe bilind bike û ji dil ji Allah lêborînê bixwaze – bi “serwerê duayên lêborînê” (Seyyidul-Îstixfar). Poşman bibe, dev jê berde û biryar bide ku careke din neke.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tesbîh ${n}×`,
+    at: {
+      before: (n) => `Piştî duaya destpêkê (Subḥānaka), hîn berî Fatîhayê: bi dengê nizm ${n}× “Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar” bêje. Bi tiliyan bijmêre.`,
+      sura: (n) => `Piştî sûreyê, hîn li ser piyan û berî rukûyê: bi dengê nizm ${n}× tesbîhê bêje.`,
+      ruku: (n) => `Di rukûyê de bimîne: piştî “Subḥāna rabbiya l-ʿaẓīm” (3×) ${n}× tesbîhê bêje.`,
+      itidal: (n) => `Rast bisekine, piştî “Rabbanā wa laka l-ḥamd”: ${n}× tesbîhê bêje.`,
+      sujud: (n) => `Di secdeyê de bimîne: piştî “Subḥāna rabbiya l-aʿlā” (3×) ${n}× tesbîhê bêje.`,
+      jalsa: (n) => `Di rûniştina navbera herdu secdeyan de: ${n}× tesbîhê bêje.`,
+      after: (n) => `Piştî secdeya duyem hinekî rûne (berî rabûnê an berî Teşehhudê) û ${n}× tesbîhê bêje.`,
+    },
+    school: {
+      hanafi: 'Henefî (li gorî ʿAbdullāh ibn al-Mubārak): 4 rekat bi yek selamê. Di her rekatê de 15× berî Fatîhayê, 10× piştî sûreyê, û her yek 10× di rukûyê de, di rawestana piştî wê de, di herdu secdeyan de û di rûniştina navbera wan de – di her rekatê de 75, bi tevahî 300.',
+      shafii: 'Şafiî (li gorî hedîsa Ibn ʿAbbās): 15× piştî sûreyê, her yek 10× di rukûyê de, di rawestana piştî wê de, di herdu secdeyan de, di rûniştina navbera wan de, û careke din 10× di rûniştina kurt a piştî secdeya duyem de – di her rekatê de 75. Bi roj her çar rekat li pey hev an 2 + 2 tên kirin, bi şev 2 + 2.',
+      maliki: 'Di mezheba Malikî de nimêja Tesbîhê kêm tê kirin; yê ku wê dike, pir caran li pey hedîsa Ibn ʿAbbās diçe – wek ku li vir tê nîşandan, 2 + 2 rekat.',
+      hanbali: 'Îmam Ehmed ev rîwayet qels didît; lê gelek zanyar (ji wan Henefî û Şafiî) vê nimêjê pêşniyar dikin. Li vir şêweya li gorî Ibn ʿAbbās tê nîşandan.',
+    },
+  },
+  holy: {
+    menu: 'Rojên pîroz', title: 'Roj û şevên pîroz', sub: 'Şevên Kandîlê, cejn û rojên taybet',
+    today: 'îro', tomorrowShort: 'sibê', inDays: (n) => (n === 1 ? 'piştî rojekê' : `piştî ${n} rojan`), nightOf: (d) => `Şev ji êvarê dest pê dike: ${d}`, nightShort: 'Şev',
+    sighting: 'Li gorî salnameya Umm al-Qura hatiye hesibandin. Li Tirkiyeyê (Diyanet) û li welatên din dîrok dikare rojekê cuda be. Şevek ji êvara berê, bi Mexribê re, dest pê dike.',
+    remind: 'Rojên pîroz bîne bîra min', remindSub: 'Şevên Kandîlê heman rojê saet 10:00, cejn êvara berê saet 18:00',
+    cal: '📅 Hemû dîrokan têxe salnameyê', calName: 'NamazVR · Rojên pîroz',
+    tonight: 'Îşev ev şev dest pê dike.', tomorrow: 'Sibê dem tê.',
+    doTitle: 'Tu dikarî çi bikî', duaTitle: 'Dua',
+    duaName: { astaghfir: 'Îstixfar', istighfar: 'Seyyidul-Îstixfar', salawatShort: 'Selawat (kurt)', salawat: 'Selawatên Îbrahîmî', qadrDua: 'Duaya Şeva Qedrê', tashriq: 'Tekbîra Teşrîqê', tahlil: 'Tehlîla Erefeyê' },
+    hijri: {
+      name: 'Sersala hicrî', short: '1ê Muharremê: saleke nû ya hicrî dest pê dike.',
+      about: ['Bi 1ê Muharremê sala îslamî dest pê dike. Hejmartin ji Hicretê ye: di sala 622an de Pêxember ﷺ bi hevalên xwe re ji Mekkeyê koçî Medîneyê kir, cihê ku misilman lê bi aştî dikarîn bijîn. Ev salname ji aliyê Xelîfe Umer ve hate danîn.', 'Muharrem yek ji çar mehên heram (pîroz) e (Quran 9:36). Saleke îslamî tenê 354 an 355 roj e – ji ber vê yekê Remezan û cejn her sal nêzîkî 11 rojan zûtir tên.'],
+      do: ['Li sala çûyî binêre û spasiya Allah bike', 'Biryarên baş bide – dest bi tiştekî baş ê nû bike', 'Di Muharremê de rojiyê bigire: piştî Remezanê meha rojiyê ya herî baş e (Muslim)', 'Çîroka Hicretê bixwîne an di sepanê de guhdarî bike'],
+      kids: 'Îro sala nû ya îslamî dest pê dike! Ew ji wê rojê tê hejmartin ku Pêxember ﷺ ji Mekkeyê koçî Medîneyê kir. Bifikire: Ez dixwazim îsal çi qenciyê bikim?',
+      note: 'Ji bo sersalê nimêjeke taybet tune – ew rojek e ji bo rawestan û fikirînê.',
+    },
+    ashura: {
+      name: 'Aşûra (Roja Aşûreyê)', short: '10ê Muharremê: rojî, parvekirin û bîranîn.',
+      about: ['Di 10ê Muharremê de Allah Pêxember Mûsa û gelê wî ji Fîrewn xilas kir. Pêxember ﷺ di vê rojê de rojî girt û pêşniyar kir; ev rojî şaşiyên biçûk ên sala çûyî dibexşîne (Muslim). Pêşniyar e ku rojek jî lê were zêdekirin: 9ê an 11ê.', 'Di 10ê Muharrema sala 680an de li Kerbelayê Huseyn, neviyê Pêxember, bi malbata xwe re hate kuştin. Şîe û elewî bi şînê wî bi bîr tînin; gelek elewî di Muharremê de 12 rojan rojiyê digirin. Li Tirkiyeyê û li gelek herêmên kurdan Aşûre – şîranîyek ji gelek tiştan – tê çêkirin û bi cîranan re tê parvekirin, herwiha ji bo bîranîna Nûh piştî tofanê.'],
+      do: ['Di 9ê û 10ê (an 10ê û 11ê) Muharremê de rojiyê bigire', 'Aşûre çêke û bi cîranan re parve bike – bi her kesî re, çi dînê wî be', 'Alîkariya hewcedaran bike, ji malbatê re qenciyê bike', 'Huseyn û Kerbelayê bîne bîra xwe: ji bo edaletê, li dijî neheqiyê'],
+      kids: 'Îro Roja Aşûreyê ye! Di vê rojê de Allah Pêxember Mûsa xilas kir. Gelek malbat îro şîranîyeke rengîn, Aşûre, çêdikin û tasekê dibin ji cîranan re – parvekirin mirov dilşa dike.',
+      note: 'Elewî rojiya Muharremê li gorî salnameya civaka xwe dest pê dikin; hûrgilî di bin “Elewîtî → Muharrem & Aşure” de ne.',
+    },
+    mevlid: {
+      name: 'Şeva Mewlûdê (Mevlid Kandili)', short: 'Şeva ku Pêxember ﷺ hatiye dinyayê.',
+      about: ['Di şeva 12ê Rebîulewelê de gelek misilman hatina dinyayê ya Pêxember Muhammed ﷺ bi bîr tînin – di sala 571ê de li Mekkeyê, di “Sala Fîlê” de. Allah wî wek “rehmet ji bo cîhanan” bi nav dike (Quran 21:107).', 'Li Tirkiyeyê Mewlûda Süleyman Çelebî (1409) tê xwendin, di nav kurdan de pir caran Mewlûda Melayê Bateyî; li gelek welatan behsa jiyana wî tê kirin. Ji şevên Kandîlê re wisa tê gotin, ji ber ku berê minare bi çirayên rûn (qendîl) dihatin ronîkirin.'],
+      do: ['Gelek selawatan ji bo Pêxember ﷺ bêje', 'Li ser jiyana wî bixwîne an vebêje – dilovaniya wî bi zarokan, ajalan û cîranan re', 'Nafile bike, wek mînak nimêja Tesbîhê, an nimêjên qeza bike', 'Silavê bide malbat û hevalan: “Kandîla we pîroz be”'],
+      kids: 'Îşev em rojbûna Pêxember Muhammed ﷺ tînin bîra xwe. Ew bi her kesî re dilovan bû – bi zarokan, bi ajalan û bi mirovên feqîr re. Îro gelek caran bêje: “Allāhumma ṣalli ʿalā Muḥammad” – û wek wî dilovan be.',
+      note: 'Gelo rojbûna wî bi taybetî tê pîrozkirin an na, zanyar cuda dibînin: gelek (wek Diyanet, el-Ezher) wê wek kevneşopiyeke xweş dibînin, hinekên din li dijî pîrozbahiyên taybet in. Hemû li ser vê yekê hemfikir in: hezkirina Pêxember û şopandina wî baş e.',
+    },
+    regaib: {
+      name: 'Şeva Regaibê (Regaib Kandili)', short: 'Şeva Kandîlê ya yekem – sê mehên pîroz dest pê dikin.',
+      about: ['Şeva Regaibê şeva berî înê ya yekem a meha Recebê ye. Bi Recebê re “sê meh” dest pê dikin: Receb, Şeban û Remezan – demek ji bo amadekirina Remezanê. Receb yek ji çar mehên heram e (Quran 9:36).', '“Regaib” tê wateya “diyariyên mezin”: di vê şevê de misilman bi taybetî rehm û lêborîna Allah dixwazin.'],
+      do: ['Dua û Îstixfar (lêborîn xwestin)', 'Nafile bike an nimêjên qeza bike', 'Quranê bixwîne', 'Serdana dê û bav û xizman bike an telefonî wan bike, li hev were'],
+      kids: 'Îro Şeva Regaibê ye – ya yekem ji pênc şevên Kandîlê yên taybet. Niha sê mehên berî Remezanê dest pê dikin. Tu dikarî îro tiştekî xweş ji Allah bixwazî û dê û bavê xwe kêfxweş bikî.',
+      note: 'Li gorî gelek zanyaran (wek en-Newewî), “nimêja Regaibê” ya taybet bi 12 rekatan li ser rîwayeteke çêkirî ye. Lê nimêjên nafile yên asayî, dua û karên baş her tim rast in.',
+    },
+    mirac: {
+      name: 'Şeva Mîracê (Miraç Kandili)', short: 'Şeva rêwîtiya ezmanan – diyariya pênc nimêjan.',
+      about: ['Di şevekê de Pêxember ﷺ ji Mekkeyê çû Qudsê, bo Mizgefta El-Eqsa (Îsra, Quran 17:1), û ji wir di nav ezmanan re derbas bû (Mîrac, Quran 53:13–18). Li wir pênc nimêjên rojane diyarî wî hatin kirin – û ayetên dawî yên sûreya El-Beqere (Muslim).', 'Ji ber vê yekê ji nimêjê re “Mîraca bawermendan” tê gotin: di her nimêjê de tu pir nêzîkî Allah yî.'],
+      do: ['Pênc nimêjan îro bi hişmendiyeke taybet bike – ew diyariya vê şevê ne', 'Sûreya El-Îsra an ayetên dawî yên El-Beqereyê bixwîne', 'Nafile bike, wek mînak Tehecud an nimêja Tesbîhê', 'Selawatan bêje û spasiya Allah bike'],
+      kids: 'Îşev em rêwîtiya ecêb a Pêxember ﷺ di nav ezmanan re tînin bîra xwe. Ji wir wî diyariyek ji me re anî: pênc nimêj! Her carê ku tu nimêj dikî, tu rasterast bi Allah re dipeyivî.',
+      note: '27ê Recebê dîroka belav e; şeva rastîn bi teqez nehatiye vegotin.',
+    },
+    berat: {
+      name: 'Şeva Beratê (Berat Kandili)', short: 'Şeva lêborînê, nîvê Şebanê.',
+      about: ['Şeva 15ê Şebanê (Leyletul-Bera’e) wek şeva lêborîn û destpêkeke nû tê dîtin. Li gorî hedîsekê (Ibn Mace, bi nirxandinên cuda), Allah di vê şevê de her kesî dibexşîne – ji bilî yê ku şirîkan ji Wî re çêdike û yê ku kîn li hember kesên din di dilê xwe de hildigire.', 'Şeban meha berî Remezanê ye; Pêxember ﷺ tê de bi taybetî gelek rojî digirt (Buxarî).'],
+      do: ['Bi kesekî re li hev were – kînê berde', 'Lêborînê bixwaze (Tobe, Îstixfar)', 'Nafile bike, nimêjên qeza bike, Quranê bixwîne', 'Roja piştî wê rojiyê bigire (gelek kes dikin) û xwe ji Remezanê re amade bike'],
+      kids: 'Îro Şeva Beratê ye, şeva lêborînê. Gelo kesek heye ku tu pê re li hev ketiye? Îro rojeke baş e ku tu bêjî “Bibore” û hûn dîsa bibin heval.',
+      note: 'Rîwayetên li ser vê şevê bi awayên cuda tên nirxandin; şêweyên nimêjê yên diyar (wek “100 rekat”) ne piştrast in. Lihevhatin, dua û nimêjên dilxwazî her tim baş in.',
+    },
+    ramadan: {
+      name: 'Destpêka Remezanê', short: 'Meha rojiyê dest pê dike – êvara berê Teravîha yekem.',
+      about: ['Di Remezanê de Quran hate xwarê (Quran 2:185). Misilmanên mezin û saxlem ji berbangê heta rojavabûnê rojiyê digirin. Êvara berî roja rojiyê ya yekem Teravîha yekem tê kirin, bi şev jî paşîv tê xwarin.'],
+      do: ['Niyet bike û paşîv bixwe', 'Teravîh û Wîtirê bike', 'Her roj beşek ji Quranê bixwîne', 'Xêr bide, parve bike, mirovan ji bo fitarê vexwîne'],
+      kids: 'Remezan nêzîk e! Mezin tevahiya rojê rojiyê digirin. Tu dikarî biceribînî – belkî heta nîvro. Û êvarê li ser fitarê hemû bi hev re dixwin.',
+      note: 'Paşîv, fitar û hejmartina heta cejnê di rûpela Remezanê de ne.',
+    },
+    qadr: {
+      name: 'Şeva Qedrê (Laylat al-Qadr)', short: 'Şeva qederê – ji hezar mehan çêtir.',
+      about: ['Di vê şevê de daxistina Quranê dest pê kir. “Şeva Qedrê ji hezar mehan çêtir e. Melek û Ruh tê de dadikevin … Ew heta derketina berbangê aştî ye.” (Quran 97)', 'Pêxember ﷺ got: “Li wê di şevên fer ên deh şevên dawî de bigerin” (Buxarî). Li Tirkiyeyê û li gelek welatan ew di şeva 27ê Remezanê de tê pîrozkirin.'],
+      do: ['Nimêj bike: Teravîh, Tehecud, nimêja Tesbîhê', 'Quranê bixwîne û guhdarî bike', 'Duaya Hz. Aîşe: “Allāhumma innaka ʿafuwwun …”', 'Xêr bide, bibexşîne û ji bo hemû mirovan dua bike'],
+      kids: 'Îro dibe ku şeva herî xweş a salê be: Şeva Qedrê! Melek tên ser rûyê erdê û her der aştî ye. Hinekî dirêjtir şiyar bimîne, bi malbata xwe re nimêj bike û ji Allah her tiştê baş bixwaze.',
+      note: 'Şeva rastîn veşartî ye – da ku mirov hemû deh şevên dawî binirxîne. Şeva 27an texmîneke belav e.',
+    },
+    fitr: {
+      name: 'Cejna Remezanê (ʿĪd al-Fiṭr)', short: 'Cejna piştî Remezanê – sê rojên şahiyê.',
+      about: ['Di 1ê Şewalê de misilman dawiya meha rojiyê pîroz dikin. Berî nimêja cejnê fitre (Zekata fitrê) tê dayîn, da ku feqîr jî bikarin cejnê bikin. Di roja cejnê bi xwe de rojî girtin ne destûr e.'],
+      do: ['Fitreyê herî dereng berî nimêja cejnê bide', 'Serşok, kincên xweş, berî nimêjê tiştekî şîrîn an xurme bixwe', 'Sibehê nimêja cejnê, di rê de tekbîran bêje', 'Serdana dê û bav û xizman bike, diyariyan bide zarokan, li hev were', 'Paşê 6 rojan di Şewalê de rojiyê bigire (Muslim)'],
+      kids: 'Cejn e! Îro tu kincên xweş li xwe dikî, destê mezinan maç dikî û belkî şîranî an diyariyeke biçûk distînî. Ji bîr neke: bi zarokên ku tiştê wan kêm e re jî parve bike.',
+      note: 'Tu dikarî nimêja cejnê di bin “Nimêjên din → Nimêja cejnê” de hîn bibî.',
+    },
+    arafa: {
+      name: 'Roja Erefeyê', short: '9ê Zilhicceyê: roja herî baş ji bo duayê.',
+      about: ['Di vê rojê de hecî li Çiyayê Erefatê disekinin – beşa herî girîng a Hecê. Pêxember ﷺ got: “Duaya herî baş duaya Roja Erefeyê ye.” (Tirmizî)', 'Yê ku naçe Hecê, vê rojê rojiyê digire: ew şaşiyên sala çûyî û sala bê dibexşîne (Muslim). Ji nimêja Sibê ve, piştî her nimêja ferz Tekbîra Teşrîqê dest pê dike.'],
+      do: ['Rojiyê bigire (yê ku ne li Hecê ye)', 'Gelek dua bike – ji bo xwe, malbata xwe û tevahiya cîhanê', 'Tehlîlê bêje: “Lā ilāha illa llāhu waḥdahū …”', 'Ji Sibê ve piştî her nimêja ferz Tekbîra Teşrîqê bêje'],
+      kids: 'Îro gelek hecî bi cilên spî li Çiyayê Erefatê disekinin û dua dikin. Tu jî dikarî bi wan re dua bikî – ji malê! Îro her tiştê ku tu dixwazî ji Allah bixwaze.',
+      note: 'Tu dikarî Hecê bi Erefatê re di simulatora Hecê ya sepanê de biceribînî.',
+    },
+    adha: {
+      name: 'Cejna Qurbanê (ʿĪd al-Aḍḥā)', short: 'Cejna qurbanê – çar roj parvekirin û spas.',
+      about: ['Cejna Qurbanê Îbrahîm tîne bîra me, yê ku amade bû her tiştî bide Allah – û rehma Allah, ku kurê wî xilas kir (Quran 37:102–107). Yê ku ji destê wî tê, heywanekî qurban dike û goşt parve dike: bi malbatê, bi xizm û cîranan û bi hewcedaran re.', 'Ji nimêja Sibê ya 9an heta Esra 13ê Zilhicceyê, piştî her nimêja ferz Tekbîra Teşrîqê tê gotin.'],
+      do: ['Sibehê nimêja cejnê – berê tiştekî nexwe (sunet)', 'Piştî her nimêja ferz Tekbîra Teşrîqê', 'Piştî nimêja cejnê qurbanê serjê bike, goşt bike sê par', 'Serdana malbat û cîranan bike, diyariyan bide hewcedaran'],
+      kids: 'Îro Cejna Qurbanê ye! Em Pêxember Îbrahîm tînin bîra xwe, yê ku pir bawerî bi Allah dianî. Gelek malbat îro xwarinê bi mirovên ku tiştê wan kêm e re parve dikin – bi vî awayî cejn ji bo her kesî xweş dibe.',
+      note: 'Li gorî gelek zanyaran, yê ku dixwaze qurbanê bike, ji 1ê Zilhicceyê heta qurbanê porê xwe û neynûkên xwe nabire (pêşniyar e).',
+    },
   },
   ram: {
     menu: '🌙 Remezan', title: 'Remezan', day: (d, n) => `Roj ${d} ji ${n}`,
