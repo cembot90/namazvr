@@ -6,6 +6,8 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Alle 5 Pflichtgebete (Fajr 2, Dhuhr 4, Asr 4, Maghrib 3, Isha 4 Rakʿāt) mit korrektem Ablauf
 - Sprachen: Deutsch, Türkçe, English, العربية, Bosanski, Shqip, Kurdî (Kurmancî), فارسی/دری, Français, اردو, Bahasa Indonesia (Arabisch, Persisch und Urdu von rechts nach links) – in den Einstellungen wählbar, beim ersten Start nach der Gerätesprache; jede Sprache wird erst geladen, wenn sie gewählt wird
 - Waschungen: Wuḍūʾ, Ghusl und Tayammum; dazu Sajdat as-Sahw und Tarāwīḥ
+- Nafile: Teheccüd, Kuşluk (Ḍuḥā), İşrak, Evvabin, Gebet nach dem Wuḍūʾ, Istikhāra, Hacet, Tövbe und das Tesbih-Gebet (300× Lobpreis, Ḥanafī nach Ibn al-Mubārak, sonst nach Ibn ʿAbbās)
+- Heilige Tage & Nächte: Kandil-Nächte, Kadir Gecesi, Bayram, ʿArafa, ʿĀschūrā, Neujahr – mit Datum, Erklärung, Bittgebeten, Erinnerung und Kalenderdatei
 - Eltern-Übersicht mit Fortschritt und Tipps je Familienmitglied; große Schrift und ruhiger Modus
 - Jeder Schritt mit Arabisch, Umschrift und Bedeutung; auf Türkisch mit türkischer Umschrift und den in der Türkei üblichen Begriffen (Sübhâneke, Tahiyyât, Salli-Bârik, Rabbenâ)
 - Gesichtslose Vorbeter-Figur zeigt die Haltung (Takbīr, Qiyām, Rukūʿ, Sujūd, Sitzen, Taslīm)

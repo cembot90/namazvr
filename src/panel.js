@@ -589,7 +589,8 @@ export class Panel extends CanvasPlane {
       const x = 60 + (i % 2) * (w + gap), y = 130 + Math.floor(i / 2) * (h + 10);
       this.btn(p.name, x, y, w, h, `prayer:${p.id}`, { size: h < 100 ? 30 : 34, sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de, subSize: h < 100 ? 20 : 24 });
     });
-    this.paragraphs([v.note || t('ui.moreNote')], H - 200, { size: 24, color: C.muted, gap: 0 });
+    const note = v.note || t('ui.moreNote');
+    this.paragraphs([note], note.length > 220 ? H - 232 : H - 200, { size: note.length > 220 ? 20 : 24, color: C.muted, gap: 0 });
     this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
   }
 
