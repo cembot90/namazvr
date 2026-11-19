@@ -10,6 +10,8 @@ export default {
 
   // Noms des prières et sous-titres
   pn: {
+    tahajjud: 'Tahajjoud (Tahajjud)', duha: 'Ḍuḥā (prière du matin)', ishraq: 'Ichrāq (Ishrāq)', awwabin: 'Awwābīn',
+    wuduprayer: 'Prière après le woudou', istikhara: 'Istikhāra', hajat: 'Prière du besoin (Ḥājat)', tawba: 'Prière du repentir (Tawba)', tasbihp: 'Prière du Tasbīḥ',
     tarawih: 'Tarāwīḥ', sahw: 'Soujoud as-sahw', ghusl: 'Ghousl', tayammum: 'Tayammoum',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'ʿOumra', hajj: 'Hajj', ihramp: 'Prière de l’iḥrām', tawafp: 'Prière du ṭawāf',
@@ -19,6 +21,9 @@ export default {
     sisha: 'Sunna après ʿIchā', witr: 'Witr', jumua: 'Joumouʿa', tahiyya: 'Taḥiyyat al-masjid', wudu: 'Woudou',
   },
   pd: {
+    tahajjud: 'prière de nuit après avoir dormi · 2 à 12 rakʿāt', duha: 'en matinée · 2 à 8 rakʿāt', ishraq: 'peu après le lever du soleil',
+    awwabin: 'entre Maghrib et ʿIchā · jusqu’à 6 rakʿāt', wuduprayer: 'juste après les ablutions', istikhara: 'demander à Allah de guider ton choix',
+    hajat: 'quand un souci ou un besoin te pèse', tawba: 'la prière du repentir', tasbihp: 'Ṣalāt at-Tasbīḥ · 300 louanges',
     tarawih: 'nuits du Ramadan après ʿIchā · 20 ou 8 rakʿāt, deux par deux', sahw: 'prosternation après une erreur dans la prière',
     wudu: 'les ablutions – avant chaque prière', ghusl: 'les grandes ablutions (tout le corps)', tayammum: 'purification sans eau, avec de la terre',
     cem: 'visite d’un cemevi (VR)', semah: 'à faire ensemble dans le meydan (VR)',
@@ -29,6 +34,9 @@ export default {
     sisha: 'après la prière obligatoire', witr: 'après ʿIchā, jusqu’avant Fajr', jumua: 'le vendredi, à la place de Dhohr', tahiyya: 'en entrant dans la mosquée',
   },
   niyya: {
+    tahajjud: 'les 2 rakʿāt de Tahajjoud (prière de nuit)', duha: 'les 2 rakʿāt de la prière du Ḍuḥā', ishraq: 'les 2 rakʿāt de la prière d’Ichrāq',
+    awwabin: 'les 2 rakʿāt de la prière des Awwābīn', wuduprayer: 'les 2 rakʿāt après le woudou', istikhara: 'les 2 rakʿāt de la prière d’Istikhāra',
+    hajat: 'les 2 rakʿāt de la prière du besoin', tawba: 'les 2 rakʿāt de la prière du repentir', tasbihp: 'les 4 rakʿāt de la prière du Tasbīḥ',
     tarawih: 'les 2 rakʿāt de Tarāwīḥ',
     ihramp: 'les 2 rakʿāt sunna de l’iḥrām', tawafp: 'les 2 rakʿāt du ṭawāf derrière le Maqām Ibrāhīm',
     eid: 'les 2 rakʿāt de la prière de l’Aïd derrière l’imam', janaza: 'la prière funéraire pour Allah et l’invocation pour le défunt, derrière l’imam',
@@ -88,6 +96,20 @@ export default {
 
   // Sens des textes arabes, ligne par ligne
   mean: {
+    tsp: ['Gloire à Allah, louange à Allah, il n’y a de dieu qu’Allah, et Allah est plus grand.'],
+    istikhara: [
+      'Ô Allah, je Te demande le bien par Ta science, je Te demande la force par Ta puissance, et je Te demande de Ta grâce immense. Car Tu peux et je ne peux pas ; Tu sais et je ne sais pas ; Tu connais parfaitement l’invisible.',
+      'Ô Allah, si Tu sais que cette affaire est un bien pour moi – dans ma religion, ma vie et l’issue de mes affaires –, alors décrète-la pour moi, facilite-la-moi et bénis-la pour moi.',
+      'Et si Tu sais que cette affaire est un mal pour moi – dans ma religion, ma vie et l’issue de mes affaires –, alors écarte-la de moi et écarte-moi d’elle, décrète pour moi le bien où qu’il soit, et rends-moi satisfait de lui. (al-Boukhārī)',
+    ],
+    istighfar: [
+      'Ô Allah, Tu es mon Seigneur, il n’y a de dieu que Toi. Tu m’as créé et je suis Ton serviteur. Je reste fidèle à Ton pacte et à Ta promesse autant que je le peux.',
+      'Je cherche refuge auprès de Toi contre le mal que j’ai commis. Je reconnais Tes bienfaits envers moi et je reconnais ma faute – pardonne-moi donc, car nul ne pardonne les péchés en dehors de Toi. (al-Boukhārī)',
+    ],
+    yunus: ['Il n’y a de dieu que Toi. Gloire à Toi ! J’ai été du nombre des injustes. (Coran 21:87 – l’invocation du prophète Yūnus, Jonas)'],
+    qadrDua: ['Ô Allah, Tu es Celui qui pardonne et Tu aimes pardonner – alors pardonne-moi. (at-Tirmidhī, d’après ʿĀʾicha)'],
+    salawatShort: ['Ô Allah, prie sur notre maître Muhammad et sur la famille de notre maître Muhammad.'],
+    astaghfir: ['Je demande pardon à Allah, l’Immense – il n’y a de dieu que Lui, le Vivant, Celui qui subsiste par Lui-même –, et je reviens à Lui en me repentant.'],
     talbiya: ['Me voici, ô Allah, me voici. Me voici, Tu n’as pas d’associé, me voici.', 'La louange et la grâce T’appartiennent, ainsi que la royauté. Tu n’as pas d’associé.'],
     niyyaUmre: ['Ô Allah, je veux accomplir la ʿoumra – facilite-la-moi et accepte-la de moi.'],
     niyyaHajj: ['Ô Allah, je veux accomplir le hajj – facilite-le-moi et accepte-le de moi.'],
@@ -234,6 +256,7 @@ export default {
 
   // Mode spirituel : sens intérieur, librement inspiré d’al-Ghazālī
   inner: {
+    tasbihp: 'Chaque « Subḥāna llāh » est comme une respiration de gratitude. Compte tranquillement sur tes doigts – le cœur compte avec toi.',
     niyya: 'Laisse le monde de côté un instant. Tu te tiens maintenant devant ton Seigneur – sois présent avec ton cœur, pas seulement avec ton corps.',
     takbir: 'En levant les mains, tu jettes tout derrière toi : soucis, projets, distractions. Allah est plus grand que tout cela.',
     opening: 'Commence par la louange, comme un invité qui salue avant de demander.',
@@ -423,6 +446,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Maintenant, tu loues Allah plein de fois de suite : « Subḥāna llāh, al-ḥamdu li-llāh, lā ilāha illa llāh, Allāhu akbar. » Compte doucement sur tes doigts – comme une petite chanson pour dire merci.',
     sahw: 'Tout le monde oublie quelque chose de temps en temps – même dans la prière. Ce n’est pas grave ! Si, par exemple, tu as oublié de t’asseoir après la deuxième rakʿa, tu fais simplement deux prosternations en plus à la fin. Et tout est réparé.',
     ghuslParts: {
       heart: 'Le ghousl est un grand lavage de tout le corps. Les adultes le font dans certains cas, beaucoup aussi le vendredi ou avant la fête. Dis dans ton cœur : « Je me lave entièrement pour Allah » – puis « Bismillāh ».',
@@ -596,6 +620,133 @@ export default {
     auto: 'Les prières obligatoires guidées sont cochées automatiquement. Enregistré uniquement sur cet appareil.',
     kids: 'Pour chaque jour avec les 5 prières, tu gagnes une étoile en plus ⭐',
     older: '◀ Jour précédent', newer: 'Jour suivant ▶',
+  },
+  nfl: {
+    menu: 'Nawāfil', title: 'Prières surérogatoires (nawāfil)',
+    note: 'Les prières surérogatoires sont facultatives – pas une obligation, mais un cadeau que tu te fais. On ne prie pas aux moments déconseillés : pendant que le soleil se lève, quand il est au zénith à midi, et pendant qu’il se couche (chez les hanafites, aussi après la prière de Fajr et après celle de ʿAsr). Tarāwīḥ et witr se trouvent sous « Autres prières ».',
+    when: {
+      tarawih: 'On ne prie les tarāwīḥ que pendant le Ramadan : chaque nuit après la prière de ʿIchā, avant le witr. On les prie par unités de 2 rakʿāt avec salām – ici, tu t’entraînes sur une de ces unités. La plupart des communautés (hanafites, chaféites, hanbalites, et aussi la Diyanet) prient 20 rakʿāt, soit dix fois cette unité ; d’autres en prient 8 (d’après un récit de ʿĀʾicha). Après chaque série de 4 rakʿāt, on s’assoit un moment pour se reposer – d’où le nom « tarāwīḥ » (les pauses). Pendant cette pause, on glorifie Allah, en Turquie par exemple avec « Subḥāna dhi l-mulki wa l-malakūt … » ou avec des ṣalawāt. À la fin, pendant le Ramadan, la communauté prie le plus souvent aussi le witr ensemble. C’est à la mosquée que c’est le plus beau, mais seul à la maison, c’est tout aussi valable.',
+      tahajjud: 'Le Tahajjoud est la prière de nuit après avoir dormi : après la prière de ʿIchā, on dort un peu, puis on se lève avant Fajr. Le meilleur moment est le dernier tiers de la nuit – c’est alors, rapporte al-Boukhārī, qu’Allah demande : « Qui M’invoque, pour que Je lui réponde ? » On prie de 2 à 12 rakʿāt, toujours deux par deux, avec une longue récitation et de longues prosternations. Celui qui est sûr de se réveiller prie le witr ensuite, en dernier dans la nuit. (Coran 17:79)',
+      duha: 'La prière du Ḍuḥā se prie en matinée : environ 45 minutes après le lever du soleil, quand il est monté « de la hauteur d’une lance », jusqu’un peu avant midi (environ 15 minutes avant Dhohr). 2, 4 ou 8 rakʿāt, deux par deux. D’après un ḥadīth rapporté par Mouslim, c’est comme une aumône pour chaque articulation de ton corps – un merci pour un nouveau jour.',
+      ishraq: 'L’Ichrāq est la prière du Ḍuḥā faite tôt : celui qui prie Fajr en groupe, reste assis à invoquer Allah jusqu’au lever du soleil, puis prie 2 rakʿāt, reçoit une récompense comme pour un hajj et une ʿoumra (at-Tirmidhī). Attends que le soleil soit bien levé (environ 15 à 20 minutes après le lever ; en Turquie, on dit souvent 45 minutes) – pendant le lever lui-même, on ne prie pas.',
+      awwabin: 'Awwābīn (« ceux qui reviennent souvent vers Allah ») : c’est ainsi que beaucoup de hanafites appellent la prière surérogatoire entre Maghrib et ʿIchā – après la sunna du Maghrib, jusqu’à 6 rakʿāt, en trois unités de 2. D’autres savants appellent la prière du Ḍuḥā « prière des Awwābīn ». Les deux sont bien – un moment de calme le soir.',
+      wuduprayer: 'Juste après le woudou – avant même que tes membres soient secs –, prie 2 rakʿāt. Le Prophète ﷺ a entendu au Paradis les pas de Bilāl, parce que Bilāl priait après chaque ablution (al-Boukhārī). Chez les hanafites : pas aux moments déconseillés, donc par exemple pas après la prière de ʿAsr.',
+      istikhara: 'Tu pries l’Istikhāra quand tu dois choisir entre des choses permises – école, travail, déménagement, mariage. 2 rakʿāt, par exemple avec al-Kāfirūn dans la première et al-Ikhlāṣ dans la seconde. Ensuite l’invocation : au moment de « cette affaire », tu penses à ta question. Tu n’as pas besoin d’attendre un rêve : décide calmement vers quoi penche ton cœur, et demande conseil à des personnes de confiance. On peut la refaire plusieurs fois.',
+      hajat: 'Tu pries la prière du besoin quand quelque chose te pèse ou que tu souhaites très fort quelque chose – la santé, un examen, un souci dans la famille. 2 rakʿāt (certains en prient 4), puis tu loues Allah, tu dis les ṣalawāt et tu demandes avec tes propres mots. Les récits sur une forme précise sont faibles ; mais une prière surérogatoire suivie d’une invocation est toujours une bonne chose.',
+      tawba: 'Tu pries la prière du repentir quand tu regrettes une faute. Abou Bakr rapporte : celui qui commet un péché, puis fait ses ablutions, prie 2 rakʿāt et demande pardon à Allah, Allah lui pardonne (Abou Dāwoud, at-Tirmidhī ; Coran 3:135). Le vrai repentir, c’est : regretter, arrêter, décider de ne pas recommencer – et si tu as fait du tort à quelqu’un, le réparer auprès de lui.',
+      tasbihp: 'La prière du Tasbīḥ compte 4 rakʿāt avec 300 louanges en tout – 75 dans chaque rakʿa. Le Prophète ﷺ l’a enseignée à son oncle al-ʿAbbās : si possible chaque jour, sinon chaque vendredi, chaque mois, chaque année – ou au moins une fois dans la vie (Abou Dāwoud, Ibn Māja). Beaucoup la prient pendant les nuits bénies et pendant Laylat al-Qadr. Compte sur tes doigts, pas à voix haute. Si tu oublies un nombre, tu le rattrapes à la position suivante – mais pas dans la courte station debout après le roukouʿ ni dans l’assise entre les deux prosternations. Ne pas prier aux moments déconseillés.',
+    },
+    duaTitle: { istikhara: 'Invocation de l’Istikhāra', hajat: 'Invocation dans la détresse', tawba: 'Sayyid al-Istighfār' },
+    duaInstr: {
+      istikhara: 'Après le salām : lève les mains, loue Allah et dis les ṣalawāt. Puis cette invocation. À « cette affaire » (hādha l-amr), tu penses à ta question – ou tu la nommes. Ensuite, décide calmement et demande aussi conseil à des personnes de confiance.',
+      hajat: 'Après le salām : lève les mains, loue Allah, dis les ṣalawāt et demande avec tes propres mots ce dont tu as besoin. L’invocation du prophète Yūnus tirée du Coran convient à tous les soucis.',
+      tawba: 'Après le salām : lève les mains et demande sincèrement pardon à Allah – avec le « maître des demandes de pardon » (Sayyid al-Istighfār). Regrette, arrête et décide de ne pas recommencer.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tasbīḥ ${n}×`,
+    at: {
+      before: (n) => `Après l’invocation d’ouverture (Subḥānaka), avant la Fātiḥa : dis doucement ${n}× « Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar ». Compte sur tes doigts.`,
+      sura: (n) => `Après la sourate, encore debout et avant le roukouʿ : dis doucement ${n}× la louange.`,
+      ruku: (n) => `Reste en roukouʿ : après « Subḥāna rabbiya l-ʿaẓīm » (3×), dis ${n}× la louange.`,
+      itidal: (n) => `Debout, redressé, après « Rabbanā wa laka l-ḥamd » : ${n}× la louange.`,
+      sujud: (n) => `Reste en prosternation : après « Subḥāna rabbiya l-aʿlā » (3×), dis ${n}× la louange.`,
+      jalsa: (n) => `Assis entre les deux prosternations : ${n}× la louange.`,
+      after: (n) => `Après la deuxième prosternation, assieds-toi un court instant (avant de te relever ou avant le tachahhoud) et dis ${n}× la louange.`,
+    },
+    school: {
+      hanafi: 'Hanafite (d’après ʿAbdallāh ibn al-Moubārak) : 4 rakʿāt avec un seul salām. Dans chaque rakʿa : 15× avant la Fātiḥa, 10× après la sourate, puis 10× chacun dans le roukouʿ, debout après, dans les deux prosternations et dans l’assise entre elles – 75 par rakʿa, 300 en tout.',
+      shafii: 'Chaféite (d’après le ḥadīth d’Ibn ʿAbbās) : 15× après la sourate, puis 10× chacun dans le roukouʿ, debout après, dans les deux prosternations, dans l’assise entre elles et encore 10× dans la courte assise après la deuxième prosternation – 75 par rakʿa. Le jour, on prie les quatre d’un seul tenant ou en 2 + 2 ; la nuit, en 2 + 2.',
+      maliki: 'Dans l’école malékite, la prière du Tasbīḥ est peu pratiquée ; ceux qui la prient suivent le plus souvent le ḥadīth d’Ibn ʿAbbās – comme montré ici, en 2 + 2 rakʿāt.',
+      hanbali: 'L’imam Aḥmad jugeait le récit faible ; mais beaucoup de savants (notamment hanafites et chaféites) recommandent cette prière. La forme montrée est celle d’Ibn ʿAbbās.',
+    },
+  },
+  holy: {
+    menu: 'Jours saints', title: 'Jours & nuits bénis', sub: 'Nuits bénies, fêtes et jours particuliers',
+    today: 'aujourd’hui', tomorrowShort: 'demain', inDays: (n) => `dans ${n} ${pl(n, 'jour', 'jours')}`, nightOf: (d) => `Nuit à partir du soir : ${d}`, nightShort: 'Nuit',
+    sighting: 'Calculé selon le calendrier Umm al-Qura. En Turquie (Diyanet), en France et dans d’autres pays, une date peut varier d’un jour. Une nuit commence déjà la veille au soir, au Maghrib.',
+    remind: 'Me rappeler les jours saints', remindSub: 'Nuits bénies le jour même à 10 h, fêtes la veille à 18 h',
+    cal: '📅 Ajouter toutes les dates au calendrier', calName: 'NamazVR · Jours saints',
+    tonight: 'La nuit commence ce soir.', tomorrow: 'C’est demain !',
+    doTitle: 'Ce que tu peux faire', duaTitle: 'Invocations',
+    duaName: { astaghfir: 'Istighfār', istighfar: 'Sayyid al-Istighfār', salawatShort: 'Ṣalawāt (courte)', salawat: 'Ṣalawāt Ibrāhīmiyya', qadrDua: 'Douʿāʾ de Laylat al-Qadr', tashriq: 'Takbīr at-Tachrīq', tahlil: 'Tahlīl de ʿArafa' },
+    hijri: {
+      name: 'Nouvel an de l’hégire', short: 'Le 1er Muharram : une nouvelle année de l’hégire commence.',
+      about: ['Avec le 1er Muharram commence l’année islamique. On compte à partir de l’hégire : en 622, le Prophète ﷺ et ses compagnons ont émigré de La Mecque à Médine, où les musulmans pouvaient vivre en paix. C’est le calife ʿOmar qui a instauré ce calendrier.', 'Muharram est l’un des quatre mois sacrés (Coran 9:36). Une année islamique ne compte que 354 ou 355 jours – c’est pourquoi le Ramadan et les fêtes avancent d’environ 11 jours chaque année.'],
+      do: ['Repenser à l’année passée et remercier Allah', 'Prendre de bonnes résolutions – commencer quelque chose de bien', 'Jeûner pendant Muharram : le meilleur mois de jeûne après le Ramadan (Mouslim)', 'Lire l’histoire de l’hégire ou l’écouter dans l’application'],
+      kids: 'Aujourd’hui commence la nouvelle année islamique ! On la compte à partir du jour où le Prophète ﷺ est parti de La Mecque pour Médine. Réfléchis : qu’est-ce que je veux faire de bien cette année ?',
+      note: 'Il n’y a pas de prière particulière pour le nouvel an – c’est un jour pour s’arrêter et réfléchir.',
+    },
+    ashura: {
+      name: 'ʿĀchoūrā', short: 'Le 10 Muharram : jeûner, partager et se souvenir.',
+      about: ['Le 10 Muharram, Allah a sauvé le prophète Moūsā (Moïse) et son peuple de Pharaon. Le Prophète ﷺ jeûnait ce jour-là et le recommandait ; ce jeûne efface les petites fautes de l’année passée (Mouslim). Il est recommandé d’y ajouter un jour : le 9 ou le 11.', 'Le 10 Muharram 680, à Kerbala, Ḥousayn, le petit-fils du Prophète, a été tué avec sa famille. Les chiites et les Alévis se souviennent de lui dans le deuil ; beaucoup d’Alévis jeûnent 12 jours pendant Muharrem. En Turquie, on prépare l’aşure – un dessert fait de nombreux ingrédients – et on le partage avec les voisins, aussi en souvenir de Noūḥ (Noé) après le Déluge.'],
+      do: ['Jeûner le 9 et le 10 (ou le 10 et le 11) Muharram', 'Préparer de l’aşure et la partager avec les voisins – avec tous, quelle que soit leur religion', 'Aider ceux qui sont dans le besoin, faire du bien à sa famille', 'Penser à Ḥousayn et à Kerbala : pour la justice, contre l’injustice'],
+      kids: 'Aujourd’hui, c’est ʿĀchoūrā ! Ce jour-là, Allah a sauvé le prophète Moūsā. En Turquie, beaucoup de familles préparent un dessert plein de couleurs, l’aşure, et en apportent un bol aux voisins – partager rend heureux.',
+      note: 'Les Alévis commencent le jeûne de Muharrem selon le calendrier de leur communauté ; plus d’infos sous « Alevilik → Muharrem & Aşure ».',
+    },
+    mevlid: {
+      name: 'Mawlid (naissance du Prophète ﷺ)', short: 'La nuit de la naissance du Prophète ﷺ.',
+      about: ['Dans la nuit du 12 Rabīʿ al-awwal, beaucoup de musulmans se souviennent de la naissance du Prophète Muhammad ﷺ – en 571 à La Mecque, l’« année de l’Éléphant ». Allah l’appelle « une miséricorde pour les mondes » (Coran 21:107).', 'En Turquie, on écoute le poème du Mevlid de Süleyman Çelebi (1409) ; au Maghreb et dans beaucoup de pays, on chante des louanges et on raconte sa vie. En Turquie, les nuits bénies s’appellent « Kandil », parce qu’autrefois on illuminait les minarets avec des lampes à huile (kandil).'],
+      do: ['Dire beaucoup de ṣalawāt sur le Prophète ﷺ', 'Lire ou raconter sa vie – sa bonté envers les enfants, les animaux et les voisins', 'Faire des prières surérogatoires, par exemple la prière du Tasbīḥ, ou rattraper des prières manquées', 'Saluer la famille et les amis : « Mawlid moubārak ! »'],
+      kids: 'Cette nuit, nous pensons à l’anniversaire du Prophète Muhammad ﷺ. Il était gentil avec tout le monde – avec les enfants, avec les animaux et avec les pauvres. Dis souvent aujourd’hui : « Allāhumma ṣalli ʿalā Muḥammad » – et sois aussi gentil que lui.',
+      note: 'Les savants ont des avis différents sur le fait de fêter spécialement la naissance du Prophète : beaucoup (par exemple la Diyanet ou al-Azhar) y voient une belle tradition, d’autres refusent les célébrations particulières. Tous sont d’accord sur un point : aimer le Prophète et suivre son exemple, c’est bien.',
+    },
+    regaib: {
+      name: 'Nuit de Raghāʾib (Regaib Kandili)', short: 'La première nuit bénie – les trois mois sacrés commencent.',
+      about: ['La nuit de Raghāʾib est la nuit du premier vendredi du mois de Rajab (la veille au soir). Avec Rajab commencent les « trois mois » Rajab, Chaʿbān et Ramadan – un temps pour se préparer au Ramadan. Rajab est l’un des quatre mois sacrés (Coran 9:36).', '« Raghāʾib » signifie « grands dons » : cette nuit-là, les musulmans demandent particulièrement la grâce et le pardon d’Allah.'],
+      do: ['Invocations et istighfār (demander pardon)', 'Faire des prières surérogatoires ou rattraper des prières manquées (qaḍāʾ)', 'Lire le Coran', 'Rendre visite à ses parents et à sa famille ou les appeler, se réconcilier'],
+      kids: 'Aujourd’hui, c’est la nuit de Raghāʾib – la première des cinq nuits bénies qu’on fête en Turquie. Maintenant commencent les trois mois avant le Ramadan. Tu peux demander à Allah quelque chose de beau et faire plaisir à tes parents.',
+      note: 'Selon beaucoup de savants (par exemple an-Nawawī), une « prière de Raghāʾib » particulière de 12 rakʿāt repose sur un récit inventé. Les prières surérogatoires ordinaires, les invocations et les bonnes actions, elles, sont toujours justes.',
+    },
+    mirac: {
+      name: 'Isrāʾ et Miʿrāj', short: 'La nuit du voyage céleste – le cadeau des cinq prières.',
+      about: ['En une nuit, le Prophète ﷺ a voyagé de La Mecque à Jérusalem, jusqu’à la mosquée al-Aqṣā (Isrāʾ, Coran 17:1), et de là à travers les cieux (Miʿrāj, Coran 53:13–18). C’est là que lui ont été offertes les cinq prières quotidiennes – ainsi que les derniers versets de la sourate al-Baqara (Mouslim).', 'C’est pourquoi on appelle aussi la prière « le Miʿrāj du croyant » : dans chaque prière, tu es tout près d’Allah.'],
+      do: ['Prier aujourd’hui les cinq prières avec une attention particulière – elles sont le cadeau de cette nuit', 'Lire la sourate al-Isrāʾ ou les derniers versets d’al-Baqara', 'Faire des prières surérogatoires, par exemple le Tahajjoud ou la prière du Tasbīḥ', 'Dire des ṣalawāt et remercier Allah'],
+      kids: 'Cette nuit, nous pensons au merveilleux voyage du Prophète ﷺ à travers les cieux. De là-haut, il nous a rapporté un cadeau : les cinq prières ! Chaque fois que tu pries, tu parles directement à Allah.',
+      note: 'Le 27 Rajab est la date la plus répandue ; la nuit exacte n’est pas rapportée avec certitude.',
+    },
+    berat: {
+      name: 'Nuit du milieu de Chaʿbān (Laylat al-Barāʾa)', short: 'La nuit du pardon, à la mi-Chaʿbān.',
+      about: ['La nuit du 15 Chaʿbān (Laylat al-Barāʾa, en Turquie « Berat Kandili ») est considérée comme une nuit de pardon et de nouveau départ. D’après un ḥadīth (Ibn Māja, diversement authentifié), Allah pardonne cette nuit-là à tous – sauf à celui qui Lui donne des associés et à celui qui garde de la rancune contre les autres dans son cœur.', 'Chaʿbān est le mois avant le Ramadan ; le Prophète ﷺ y jeûnait particulièrement souvent (al-Boukhārī).'],
+      do: ['Se réconcilier avec quelqu’un – lâcher la rancune', 'Demander pardon (tawba, istighfār)', 'Faire des prières surérogatoires, rattraper des prières manquées, lire le Coran', 'Jeûner le lendemain (beaucoup le font) et préparer le Ramadan'],
+      kids: 'Aujourd’hui, c’est la nuit du milieu de Chaʿbān, la nuit du pardon. Y a-t-il quelqu’un avec qui tu t’es disputé ? C’est un bon jour pour dire « pardon » et redevenir amis.',
+      note: 'Les récits sur cette nuit sont évalués différemment ; des formes de prière précises (par exemple « 100 rakʿāt ») ne sont pas établies. La réconciliation, l’invocation et les prières surérogatoires sont toujours bonnes.',
+    },
+    ramadan: {
+      name: 'Début du Ramadan', short: 'Le mois de jeûne commence – la veille au soir, le premier tarāwīḥ.',
+      about: ['C’est pendant le Ramadan que le Coran a été révélé (Coran 2:185). Les musulmans adultes et en bonne santé jeûnent de l’aube jusqu’au coucher du soleil. La veille du premier jour de jeûne, on prie la première prière de tarāwīḥ, et dans la nuit, on prend le sahour.'],
+      do: ['Formuler l’intention et prendre le sahour', 'Prier les tarāwīḥ et le witr', 'Lire chaque jour un peu de Coran', 'Donner, partager, inviter à l’iftar'],
+      kids: 'Bientôt le Ramadan ! Les grands jeûnent toute la journée. Toi, tu peux t’entraîner – peut-être jusqu’à midi. Et le soir, à l’iftar, tout le monde mange ensemble.',
+      note: 'Sahour, iftar et compte à rebours jusqu’à la fête se trouvent sur la page Ramadan.',
+    },
+    qadr: {
+      name: 'Laylat al-Qadr (Nuit du Destin)', short: 'La nuit du Destin – meilleure que mille mois.',
+      about: ['C’est durant cette nuit qu’a commencé la révélation du Coran. « La nuit du Destin est meilleure que mille mois. Durant celle-ci descendent les anges ainsi que l’Esprit … Elle est paix, jusqu’à l’apparition de l’aube. » (Coran 97)', 'Le Prophète ﷺ a dit : « Cherchez-la dans les nuits impaires des dix dernières » (al-Boukhārī). En Turquie et dans beaucoup de pays, on la célèbre dans la nuit du 27 Ramadan.'],
+      do: ['Prier : tarāwīḥ, Tahajjoud, la prière du Tasbīḥ', 'Lire et écouter le Coran', 'L’invocation de ʿĀʾicha : « Allāhumma innaka ʿafuwwun … »', 'Donner, pardonner et invoquer pour tous les êtres humains'],
+      kids: 'Cette nuit est peut-être la plus belle de l’année : Laylat al-Qadr ! Les anges descendent sur la Terre, et partout règne la paix. Reste éveillé un peu plus longtemps, prie avec ta famille et demande à Allah tout ce qui est bien.',
+      note: 'La nuit exacte est cachée – pour qu’on profite de toutes les dix dernières nuits. La 27e nuit est une supposition répandue.',
+    },
+    fitr: {
+      name: 'Aïd al-Fitr (Aïd es-Seghir)', short: 'La fête après le Ramadan – trois jours de joie.',
+      about: ['Le 1er Chawwāl, les musulmans fêtent la fin du mois de jeûne. Avant la prière de l’Aïd, on donne la zakāt al-fiṭr, pour que les pauvres puissent aussi faire la fête. Le jour de l’Aïd lui-même, il n’est pas permis de jeûner.'],
+      do: ['Donner la zakāt al-fiṭr au plus tard avant la prière de l’Aïd', 'Ghousl, beaux vêtements, manger quelque chose de sucré ou des dattes avant la prière', 'Prière de l’Aïd le matin, dire le takbīr en chemin', 'Rendre visite aux parents et à la famille, offrir des cadeaux aux enfants, se réconcilier', 'Ensuite, jeûner 6 jours en Chawwāl (Mouslim)'],
+      kids: 'C’est l’Aïd ! Aujourd’hui, tu mets de beaux habits, tu embrasses les grands et tu reçois peut-être des bonbons ou un petit cadeau. N’oublie pas : partage aussi avec les enfants qui ont peu.',
+      note: 'Tu peux t’entraîner à la prière de l’Aïd sous « Autres prières → Prière de l’Aïd ».',
+    },
+    arafa: {
+      name: 'Jour de ʿArafa', short: 'Le 9 Dhou l-Ḥijja : le meilleur jour pour les invocations.',
+      about: ['Ce jour-là, les pèlerins se tiennent sur le mont ʿArafāt – le moment le plus important du hajj. Le Prophète ﷺ a dit : « La meilleure invocation est l’invocation du jour de ʿArafa. » (at-Tirmidhī)', 'Ceux qui ne sont pas en pèlerinage jeûnent ce jour-là : cela efface les fautes de l’année passée et de l’année à venir (Mouslim). À partir de la prière de Fajr commence le takbīr at-tachrīq après chaque prière obligatoire.'],
+      do: ['Jeûner (si l’on n’est pas en pèlerinage)', 'Beaucoup invoquer – pour toi, ta famille et le monde entier', 'Dire le tahlīl : « Lā ilāha illa llāhu waḥdahū … »', 'À partir de Fajr, le takbīr at-tachrīq après chaque prière obligatoire'],
+      kids: 'Aujourd’hui, des tas de pèlerins habillés de blanc se tiennent sur le mont ʿArafāt et prient. Tu peux prier avec eux – depuis chez toi ! Demande aujourd’hui à Allah tout ce que tu souhaites.',
+      note: 'Tu peux vivre le hajj avec ʿArafāt dans le simulateur de hajj de l’application.',
+    },
+    adha: {
+      name: 'Aïd al-Adha (Aïd el-Kebir)', short: 'La fête du sacrifice – quatre jours pour partager et remercier.',
+      about: ['La fête du sacrifice rappelle Ibrāhīm, qui était prêt à tout donner à Allah – et la miséricorde d’Allah, qui a sauvé son fils (Coran 37:102–107). Celui qui en a les moyens sacrifie une bête et partage la viande : avec sa famille, ses proches et ses voisins, et avec ceux qui sont dans le besoin.', 'Du Fajr du 9 jusqu’au ʿAsr du 13 Dhou l-Ḥijja, on dit le takbīr at-tachrīq après chaque prière obligatoire.'],
+      do: ['Prière de l’Aïd le matin – ne rien manger avant (sunna)', 'Takbīr at-tachrīq après chaque prière obligatoire', 'Le sacrifice après la prière de l’Aïd, partager la viande en trois parts', 'Rendre visite à la famille et aux voisins, offrir aux personnes dans le besoin'],
+      kids: 'Aujourd’hui, c’est l’Aïd al-Adha ! Nous pensons au prophète Ibrāhīm, qui avait une très grande confiance en Allah. Beaucoup de familles partagent aujourd’hui leur repas avec des personnes qui ont peu – comme ça, la fête est belle pour tout le monde.',
+      note: 'Selon beaucoup de savants, celui qui veut sacrifier ne coupe ni ses cheveux ni ses ongles du 1er Dhou l-Ḥijja jusqu’au sacrifice (recommandé).',
+    },
   },
   ram: {
     menu: '🌙 Ramadan', title: 'Ramadan', day: (d, n) => `Jour ${d} sur ${n}`,

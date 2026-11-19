@@ -6,6 +6,8 @@ export default {
 
   // Nama salat dan subjudul
   pn: {
+    tahajjud: 'Tahajud', duha: 'Duha', ishraq: 'Isyrak', awwabin: 'Awwabin',
+    wuduprayer: 'Salat sunah wudu', istikhara: 'Istikharah', hajat: 'Salat hajat', tawba: 'Salat taubat', tasbihp: 'Salat tasbih',
     tarawih: 'Tarawih', sahw: 'Sujud Sahwi', ghusl: 'Mandi wajib', tayammum: 'Tayamum',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'Umrah', hajj: 'Haji', ihramp: 'Salat ihram', tawafp: 'Salat tawaf',
@@ -15,6 +17,9 @@ export default {
     sisha: 'Sunah sesudah Isya', witr: 'Witir', jumua: 'Salat Jumat', tahiyya: 'Tahiyatul masjid', wudu: 'Wudu',
   },
   pd: {
+    tahajjud: 'salat malam setelah tidur · 2–12 rakaat', duha: 'pagi hari · 2–8 rakaat', ishraq: 'tak lama setelah matahari terbit',
+    awwabin: 'antara Magrib dan Isya · sampai 6 rakaat', wuduprayer: 'langsung setelah berwudu', istikhara: 'memohon petunjuk untuk pilihan yang tepat',
+    hajat: 'saat ada kesusahan atau keperluan', tawba: 'salat untuk bertobat', tasbihp: 'Ṣalāt at-Tasbīḥ · 300× tasbih',
     tarawih: 'malam-malam Ramadan sesudah Isya · 20 atau 8 rakaat, dua-dua', sahw: 'sujud karena ada kekeliruan dalam salat',
     wudu: 'bersuci sebelum setiap salat', ghusl: 'mandi membasahi seluruh tubuh', tayammum: 'bersuci tanpa air, dengan tanah/debu',
     cem: 'tur keliling sebuah Cemevi (VR)', semah: 'ikut serta di Meydan (VR)',
@@ -25,6 +30,9 @@ export default {
     sisha: 'sesudah salat fardu', witr: 'sesudah Isya sampai sebelum Subuh', jumua: 'hari Jumat, pengganti Zuhur', tahiyya: 'saat masuk masjid',
   },
   niyya: {
+    tahajjud: '2 rakaat salat Tahajud (salat malam)', duha: '2 rakaat salat Duha', ishraq: '2 rakaat salat Isyrak',
+    awwabin: '2 rakaat salat Awwabin', wuduprayer: '2 rakaat salat sunah wudu', istikhara: '2 rakaat salat Istikharah',
+    hajat: '2 rakaat salat Hajat', tawba: '2 rakaat salat Taubat', tasbihp: '4 rakaat salat Tasbih',
     tarawih: '2 rakaat salat Tarawih',
     ihramp: '2 rakaat salat sunah ihram', tawafp: '2 rakaat salat tawaf di belakang Maqam Ibrahim',
     eid: '2 rakaat salat Id sebagai makmum', janaza: 'salat jenazah karena Allah dan mendoakan almarhum, sebagai makmum',
@@ -84,6 +92,20 @@ export default {
 
   // Arti teks Arab, baris demi baris
   mean: {
+    tsp: ['Mahasuci Allah, segala puji bagi Allah, tiada Tuhan selain Allah, dan Allah Mahabesar.'],
+    istikhara: [
+      'Ya Allah, aku memohon pilihan yang baik kepada-Mu dengan ilmu-Mu, aku memohon kekuatan dengan kekuasaan-Mu, dan aku memohon karunia-Mu yang agung. Sungguh Engkau Mahakuasa sedangkan aku tidak kuasa; Engkau Maha Mengetahui sedangkan aku tidak mengetahui; Engkaulah Yang Maha Mengetahui perkara gaib.',
+      'Ya Allah, jika Engkau mengetahui bahwa urusan ini baik bagiku – dalam agamaku, kehidupanku, dan akibat urusanku –, maka takdirkanlah ia untukku, mudahkanlah bagiku, dan berkahilah aku di dalamnya.',
+      'Dan jika Engkau mengetahui bahwa urusan ini buruk bagiku – dalam agamaku, kehidupanku, dan akibat urusanku –, maka jauhkanlah ia dariku dan jauhkanlah aku darinya, takdirkanlah kebaikan untukku di mana pun ia berada, lalu jadikanlah aku rida dengannya. (Bukhari)',
+    ],
+    istighfar: [
+      'Ya Allah, Engkau Tuhanku, tiada Tuhan selain Engkau. Engkau telah menciptakanku dan aku adalah hamba-Mu. Aku berpegang pada perjanjian dan janji-Mu semampuku.',
+      'Aku berlindung kepada-Mu dari keburukan yang telah aku perbuat. Aku mengakui nikmat-Mu kepadaku dan aku mengakui dosaku – maka ampunilah aku, karena tiada yang mengampuni dosa selain Engkau. (Bukhari)',
+    ],
+    yunus: ['Tiada Tuhan selain Engkau. Mahasuci Engkau! Sungguh aku termasuk orang-orang yang zalim. (Al-Qur’an 21:87 – doa Nabi Yunus)'],
+    qadrDua: ['Ya Allah, sesungguhnya Engkau Maha Pemaaf dan menyukai pemaafan – maka maafkanlah aku. (Tirmidzi, dari Aisyah)'],
+    salawatShort: ['Ya Allah, limpahkanlah rahmat kepada junjungan kami Nabi Muhammad dan kepada keluarga junjungan kami Nabi Muhammad.'],
+    astaghfir: ['Aku memohon ampun kepada Allah Yang Mahaagung – tiada Tuhan selain Dia, Yang Mahahidup lagi Maha Berdiri Sendiri –, dan aku bertobat kepada-Nya.'],
     talbiya: ['Aku penuhi panggilan-Mu, ya Allah, aku penuhi panggilan-Mu. Aku penuhi panggilan-Mu, tiada sekutu bagi-Mu, aku penuhi panggilan-Mu.', 'Sesungguhnya segala puji, nikmat, dan kerajaan adalah milik-Mu. Tiada sekutu bagi-Mu.'],
     niyyaUmre: ['Ya Allah, aku ingin melaksanakan umrah – mudahkanlah bagiku dan terimalah dariku.'],
     niyyaHajj: ['Ya Allah, aku ingin melaksanakan haji – mudahkanlah bagiku dan terimalah dariku.'],
@@ -230,6 +252,7 @@ export default {
 
   // Mode spiritual: makna batin, dirumuskan bebas dengan merujuk pada al-Ghazali
   inner: {
+    tasbihp: 'Setiap “Subḥāna llāh” seperti satu tarikan napas rasa syukur. Hitunglah dengan jari dengan tenang – hatimu ikut menghitung.',
     niyya: 'Lepaskan dunia sejenak. Sekarang kamu berdiri di hadapan Tuhanmu – hadirkan hatimu di sini, bukan hanya badanmu.',
     takbir: 'Dengan tangan yang terangkat, kamu meninggalkan semuanya di belakang: kekhawatiran, rencana, gangguan. Allah lebih besar dari semua itu.',
     opening: 'Mulailah dengan pujian, seperti tamu yang memberi salam sebelum meminta.',
@@ -419,6 +442,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Sekarang kamu memuji Allah berkali-kali: “Subḥāna llāh, al-ḥamdu li-llāh, lā ilāha illa llāh, Allāhu akbar.” Hitung pelan-pelan dengan jarimu – seperti lagu kecil untuk berterima kasih.',
     sahw: 'Semua orang pernah lupa – juga waktu salat. Itu tidak apa-apa! Misalnya kamu lupa duduk setelah rakaat kedua, di akhir salat kamu cukup sujud dua kali tambahan. Dengan begitu semuanya beres lagi.',
     ghuslParts: {
       heart: 'Mandi wajib adalah mandi besar untuk seluruh tubuh. Orang dewasa melakukannya dalam keadaan tertentu, dan banyak juga yang mandi pada hari Jumat atau sebelum hari raya. Katakan di dalam hatimu: “Aku mandi sekarang karena Allah” – lalu “Bismillāh”.',
@@ -592,6 +616,133 @@ export default {
     auto: 'Salat fardu yang dipandu otomatis dicentang. Hanya disimpan di perangkat ini.',
     kids: 'Untuk setiap hari dengan kelima salat ada bintang tambahan ⭐',
     older: '◀ Hari sebelumnya', newer: 'Hari berikutnya ▶',
+  },
+  nfl: {
+    menu: 'Salat sunah', title: 'Salat sunah (nafilah)',
+    note: 'Salat sunah itu tidak wajib – bukan keharusan, melainkan hadiah untuk dirimu sendiri. Jangan salat pada waktu-waktu terlarang: saat matahari terbit, saat matahari tepat di atas kepala pada siang hari, dan saat matahari terbenam (menurut Hanafi juga setelah salat Subuh dan setelah salat Asar). Tarawih dan Witir ada di menu “Salat lainnya”.',
+    when: {
+      tarawih: 'Tarawih hanya dikerjakan di bulan Ramadan: setiap malam setelah salat Isya, sebelum Witir. Tarawih dikerjakan dua rakaat-dua rakaat dengan salam – di sini kamu berlatih satu bagian seperti itu. Kebanyakan jamaah (Hanafi, Syafi’i, Hambali, juga Diyanet) mengerjakan 20 rakaat, yaitu sepuluh kali bagian ini; yang lain 8 rakaat (berdasarkan riwayat dari Aisyah). Setiap selesai 4 rakaat, orang duduk sebentar untuk beristirahat – karena itulah namanya “tarawih” (istirahat-istirahat). Saat istirahat ini orang berzikir memuji Allah, di Indonesia misalnya dengan selawat atau bacaan bilal, di Turki dengan “Subḥāna dhi l-mulki wa l-malakūt …”. Di akhir, pada bulan Ramadan jamaah biasanya juga salat Witir bersama-sama. Paling indah di masjid, tetapi sendirian di rumah pun sama sahnya.',
+      tahajjud: 'Tahajud adalah salat malam setelah tidur: sesudah salat Isya tidur sebentar, lalu bangun sebelum Subuh. Waktu terbaik adalah sepertiga malam terakhir – saat itu, menurut riwayat Bukhari, Allah berfirman: “Siapa yang berdoa kepada-Ku, akan Aku kabulkan?” Dikerjakan 2 sampai 12 rakaat, selalu dua-dua, dengan bacaan panjang dan sujud yang lama. Siapa yang yakin akan bangun, mengerjakan Witir sesudahnya sebagai salat terakhir di malam itu. (Al-Qur’an 17:79)',
+      duha: 'Salat Duha dikerjakan pada pagi hari: sekitar 45 menit setelah matahari terbit, ketika matahari sudah naik “setinggi tombak”, sampai menjelang tengah hari (sekitar 15 menit sebelum Zuhur). 2, 4, atau 8 rakaat, dua-dua. Menurut hadis riwayat Muslim, salat ini seperti sedekah untuk setiap persendian tubuhmu – ucapan terima kasih untuk hari yang baru.',
+      ishraq: 'Isyrak adalah salat Duha di awal waktu: siapa yang salat Subuh berjamaah, lalu tetap duduk berzikir kepada Allah sampai matahari terbit, kemudian salat 2 rakaat, mendapat pahala seperti haji dan umrah (Tirmidzi). Tunggulah sampai matahari benar-benar terbit (sekitar 15–20 menit setelah terbit; di Turki sering disebut 45 menit) – saat matahari sedang terbit, jangan salat.',
+      awwabin: 'Awwabin (“orang-orang yang banyak kembali kepada Allah”) adalah sebutan banyak ulama Hanafi untuk salat sunah antara Magrib dan Isya: setelah sunah Magrib, sampai 6 rakaat, dalam tiga bagian masing-masing 2 rakaat. Ulama lain menyebut salat Duha sebagai “salat Awwabin”. Keduanya baik – saat yang tenang di petang hari.',
+      wuduprayer: 'Langsung setelah berwudu – sebelum anggota wudu kering – salatlah 2 rakaat. Nabi ﷺ mendengar suara langkah Bilal di surga, karena Bilal selalu salat setiap selesai berwudu (Bukhari). Menurut Hanafi: tidak pada waktu-waktu terlarang, misalnya tidak setelah salat Asar.',
+      istikhara: 'Salat Istikharah kamu kerjakan saat harus memilih di antara hal-hal yang halal – sekolah, pekerjaan, pindah rumah, menikah. 2 rakaat, misalnya rakaat pertama dengan surah al-Kafirun dan rakaat kedua dengan al-Ikhlas. Sesudah itu doa istikharah: pada kata “urusan ini” kamu memikirkan pertanyaanmu. Kamu tidak harus menunggu mimpi: putuskan dengan tenang ke mana hatimu condong, dan bermusyawarahlah dengan orang yang kamu percayai. Salat ini boleh diulang beberapa kali.',
+      hajat: 'Salat Hajat kamu kerjakan saat ada yang membuatmu susah atau kamu sangat menginginkan sesuatu – kesehatan, ujian, masalah di keluarga. 2 rakaat (ada yang 4), lalu memuji Allah, membaca selawat, dan berdoa dengan kata-katamu sendiri. Riwayat tentang tata cara khususnya lemah; tetapi salat sunah yang diikuti doa selalu baik.',
+      tawba: 'Salat Taubat kamu kerjakan saat menyesali sebuah kesalahan. Abu Bakar meriwayatkan: siapa yang berbuat dosa, lalu berwudu, salat 2 rakaat, dan memohon ampun kepada Allah, maka Allah akan mengampuninya (Abu Dawud, Tirmidzi; Al-Qur’an 3:135). Tobat yang sungguh-sungguh adalah: menyesal, berhenti, bertekad tidak mengulanginya – dan jika kamu pernah berbuat salah kepada seseorang, perbaikilah dengannya.',
+      tasbihp: 'Salat Tasbih terdiri dari 4 rakaat dengan 300× tasbih – 75× di setiap rakaat. Nabi ﷺ mengajarkannya kepada pamannya, Abbas: jika bisa setiap hari, kalau tidak setiap Jumat, setiap bulan, setiap tahun – atau paling tidak sekali seumur hidup (Abu Dawud, Ibnu Majah). Banyak orang mengerjakannya pada malam-malam mulia dan pada malam Lailatulqadar. Hitunglah dengan jari, jangan dengan suara keras. Kalau lupa jumlahnya, tambahkan pada posisi berikutnya – tetapi tidak saat iktidal dan tidak saat duduk di antara dua sujud. Jangan dikerjakan pada waktu-waktu terlarang.',
+    },
+    duaTitle: { istikhara: 'Doa istikharah', hajat: 'Doa saat kesusahan', tawba: 'Sayyidul Istigfar' },
+    duaInstr: {
+      istikhara: 'Setelah salam: angkat tangan, pujilah Allah, dan bacalah selawat. Lalu doa ini. Pada kata “urusan ini” (hādha l-amr) kamu memikirkan pertanyaanmu – atau menyebutkannya. Sesudah itu putuskan dengan tenang dan bermusyawarahlah juga dengan orang yang kamu percayai.',
+      hajat: 'Setelah salam: angkat tangan, pujilah Allah, bacalah selawat, dan mintalah apa yang kamu perlukan dengan kata-katamu sendiri. Doa Nabi Yunus dari Al-Qur’an cocok untuk setiap kesusahan.',
+      tawba: 'Setelah salam: angkat tangan dan mohonlah ampun kepada Allah dengan tulus – dengan “penghulu istigfar” (Sayyidul Istigfar). Menyesallah, berhentilah, dan bertekadlah untuk tidak mengulanginya.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tasbih ${n}×`,
+    at: {
+      before: (n) => `Setelah doa iftitah (Subḥānaka), sebelum al-Fatihah: ucapkan pelan ${n}× “Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar”. Hitung dengan jari.`,
+      sura: (n) => `Setelah surah, masih berdiri dan sebelum rukuk: ucapkan pelan ${n}× tasbih.`,
+      ruku: (n) => `Tetap dalam rukuk: setelah “Subḥāna rabbiya l-ʿaẓīm” (3×) ucapkan ${n}× tasbih.`,
+      itidal: (n) => `Berdiri tegak (iktidal), setelah “Rabbanā wa laka l-ḥamd”: ${n}× tasbih.`,
+      sujud: (n) => `Tetap dalam sujud: setelah “Subḥāna rabbiya l-aʿlā” (3×) ucapkan ${n}× tasbih.`,
+      jalsa: (n) => `Saat duduk di antara dua sujud: ${n}× tasbih.`,
+      after: (n) => `Setelah sujud kedua, duduklah sebentar (duduk istirahat sebelum berdiri, atau sebelum tasyahud) dan ucapkan ${n}× tasbih.`,
+    },
+    school: {
+      hanafi: 'Hanafi (menurut Abdullah bin al-Mubarak): 4 rakaat dengan satu salam. Di setiap rakaat 15× sebelum al-Fatihah, 10× setelah surah, lalu masing-masing 10× saat rukuk, iktidal, kedua sujud, dan duduk di antaranya – 75 per rakaat, 300 seluruhnya.',
+      shafii: 'Syafi’i (menurut hadis Ibnu Abbas): 15× setelah surah, lalu masing-masing 10× saat rukuk, iktidal, kedua sujud, duduk di antara dua sujud, dan sekali lagi 10× saat duduk istirahat setelah sujud kedua – 75 per rakaat. Pada siang hari keempat rakaat boleh dikerjakan bersambung atau 2 + 2, pada malam hari 2 + 2.',
+      maliki: 'Dalam mazhab Maliki salat Tasbih jarang diamalkan; yang mengerjakannya biasanya mengikuti hadis Ibnu Abbas – seperti yang ditampilkan di sini, 2 + 2 rakaat.',
+      hanbali: 'Imam Ahmad menilai riwayatnya lemah; tetapi banyak ulama (antara lain Hanafi dan Syafi’i) menganjurkan salat ini. Yang ditampilkan adalah tata cara menurut Ibnu Abbas.',
+    },
+  },
+  holy: {
+    menu: 'Hari besar', title: 'Hari & malam mulia', sub: 'Malam-malam mulia, hari raya, dan hari istimewa',
+    today: 'hari ini', tomorrowShort: 'besok', inDays: (n) => `${n} hari lagi`, nightOf: (d) => `Malam mulai petang: ${d}`, nightShort: 'Malam',
+    sighting: 'Dihitung menurut kalender Umm al-Qura. Di Indonesia (Kemenag), di Turki (Diyanet), dan di negara lain tanggalnya bisa berbeda satu hari. Malam dimulai sejak petang sebelumnya, saat Magrib.',
+    remind: 'Ingatkan hari-hari besar', remindSub: 'Malam mulia pada hari yang sama pukul 10.00, hari raya pada petang sebelumnya pukul 18.00',
+    cal: '📅 Masukkan semua tanggal ke kalender', calName: 'NamazVR · Hari besar Islam',
+    tonight: 'Malam ini malamnya dimulai.', tomorrow: 'Besok saatnya tiba.',
+    doTitle: 'Yang bisa kamu lakukan', duaTitle: 'Doa-doa',
+    duaName: { astaghfir: 'Istigfar', istighfar: 'Sayyidul Istigfar', salawatShort: 'Selawat (pendek)', salawat: 'Selawat Ibrahimiyah', qadrDua: 'Doa Lailatulqadar', tashriq: 'Takbir tasyrik', tahlil: 'Tahlil hari Arafah' },
+    hijri: {
+      name: 'Tahun Baru Islam', short: '1 Muharam: tahun Hijriah yang baru dimulai.',
+      about: ['Dengan 1 Muharam dimulailah tahun Islam. Tahun dihitung sejak hijrah: pada tahun 622 Nabi ﷺ bersama para sahabat berhijrah dari Makkah ke Madinah, tempat kaum muslim bisa hidup dengan damai. Kalender ini ditetapkan oleh Khalifah Umar.', 'Muharam adalah salah satu dari empat bulan haram (Al-Qur’an 9:36). Satu tahun Hijriah hanya 354 atau 355 hari – karena itu Ramadan dan hari raya maju sekitar 11 hari setiap tahun.'],
+      do: ['Merenungkan tahun yang lalu dan bersyukur kepada Allah', 'Membuat niat baik – memulai sesuatu yang baik', 'Berpuasa di bulan Muharam: bulan puasa terbaik setelah Ramadan (Muslim)', 'Membaca kisah hijrah atau mendengarkannya di aplikasi'],
+      kids: 'Hari ini tahun baru Islam dimulai! Tahunnya dihitung sejak hari Nabi ﷺ berhijrah dari Makkah ke Madinah. Coba pikirkan: kebaikan apa yang ingin aku lakukan tahun ini?',
+      note: 'Tidak ada salat khusus untuk tahun baru – ini hari untuk merenung sejenak.',
+    },
+    ashura: {
+      name: 'Hari Asyura', short: '10 Muharam: berpuasa, berbagi, dan mengenang.',
+      about: ['Pada 10 Muharam Allah menyelamatkan Nabi Musa dan kaumnya dari Firaun. Nabi ﷺ berpuasa pada hari itu dan menganjurkannya; puasa ini menghapus dosa-dosa kecil setahun yang lalu (Muslim). Dianjurkan menambah satu hari: tanggal 9 (Tasua) atau tanggal 11.', 'Pada 10 Muharam tahun 680, di Karbala, Husain, cucu Nabi, terbunuh bersama keluarganya. Kaum Syiah dan Alevi mengenangnya dengan duka; banyak orang Alevi berpuasa 12 hari di bulan Muharrem. Di Turki orang memasak aşure – hidangan manis dari banyak bahan – dan membagikannya kepada tetangga, juga untuk mengenang Nabi Nuh setelah banjir besar. Di Indonesia ada tradisi serupa, misalnya bubur Asyura atau bubur Suro.'],
+      do: ['Berpuasa tanggal 9 dan 10 (atau 10 dan 11) Muharam', 'Memasak bubur Asyura atau aşure dan membagikannya kepada tetangga – kepada semua, apa pun agamanya', 'Menolong yang membutuhkan, berbuat baik kepada keluarga (banyak yang menyantuni anak yatim)', 'Mengenang Husain dan Karbala: untuk keadilan, melawan kezaliman'],
+      kids: 'Hari ini Hari Asyura! Pada hari ini Allah menyelamatkan Nabi Musa. Banyak keluarga memasak bubur atau hidangan manis yang berwarna-warni dan membawakan semangkuk untuk tetangga – berbagi itu membuat bahagia.',
+      note: 'Orang Alevi memulai puasa Muharrem menurut kalender komunitas mereka; selengkapnya di “Alevilik → Muharrem & Aşure”.',
+    },
+    mevlid: {
+      name: 'Maulid Nabi ﷺ', short: 'Malam kelahiran Nabi ﷺ.',
+      about: ['Pada malam 12 Rabiulawal banyak muslim mengenang kelahiran Nabi Muhammad ﷺ – pada tahun 571 di Makkah, pada “Tahun Gajah”. Allah menyebut beliau “rahmat bagi seluruh alam” (Al-Qur’an 21:107).', 'Di Indonesia orang membaca kitab Maulid seperti al-Barzanji atau Simtud Durar dan bershalawat bersama; di Turki orang mendengarkan syair Mevlid karya Süleyman Çelebi (1409). Di Turki malam-malam mulia disebut “Kandil”, karena dulu menara masjid diterangi dengan pelita minyak (kandil).'],
+      do: ['Memperbanyak selawat kepada Nabi ﷺ', 'Membaca atau menceritakan kisah hidup beliau – kebaikannya kepada anak-anak, hewan, dan tetangga', 'Salat sunah, misalnya salat Tasbih, atau mengqada salat yang tertinggal', 'Menyapa keluarga dan teman: “Selamat memperingati Maulid Nabi”'],
+      kids: 'Malam ini kita mengenang hari lahir Nabi Muhammad ﷺ. Beliau ramah kepada semua – kepada anak-anak, kepada hewan, dan kepada orang miskin. Hari ini sering-seringlah mengucapkan: “Allāhumma ṣalli ʿalā Muḥammad” – dan jadilah ramah seperti beliau.',
+      note: 'Para ulama berbeda pendapat tentang perayaan khusus hari kelahiran Nabi: banyak (misalnya Diyanet, al-Azhar, dan banyak ulama di Indonesia) melihatnya sebagai tradisi yang baik, sebagian lain menolak perayaan khusus. Semua sepakat: mencintai Nabi dan mengikuti teladannya itu baik.',
+    },
+    regaib: {
+      name: 'Malam Raghaib', short: 'Malam mulia pertama – tiga bulan mulia dimulai.',
+      about: ['Malam Raghaib adalah malam Jumat pertama di bulan Rajab. Dengan Rajab dimulailah “tiga bulan” Rajab, Syakban, dan Ramadan – waktu untuk bersiap menyambut Ramadan. Rajab adalah salah satu dari empat bulan haram (Al-Qur’an 9:36).', '“Raghaib” berarti “anugerah-anugerah besar”: pada malam ini kaum muslim terutama memohon rahmat dan ampunan Allah.'],
+      do: ['Berdoa dan beristigfar (memohon ampun)', 'Salat sunah atau mengqada salat yang tertinggal', 'Membaca Al-Qur’an', 'Mengunjungi atau menelepon orang tua dan kerabat, saling memaafkan'],
+      kids: 'Hari ini Malam Raghaib – yang pertama dari lima malam istimewa yang dirayakan di Turki. Sekarang dimulai tiga bulan sebelum Ramadan. Hari ini kamu bisa meminta sesuatu yang indah kepada Allah dan membuat orang tuamu senang.',
+      note: 'Menurut banyak ulama (misalnya Imam an-Nawawi), “salat Raghaib” khusus 12 rakaat bersandar pada riwayat palsu. Salat sunah biasa, doa, dan perbuatan baik selalu benar.',
+    },
+    mirac: {
+      name: 'Isra Mikraj', short: 'Malam perjalanan ke langit – hadiah salat lima waktu.',
+      about: ['Dalam satu malam Nabi ﷺ diperjalankan dari Makkah ke Yerusalem, ke Masjid al-Aqsa (Isra, Al-Qur’an 17:1), lalu dari sana naik menembus langit (Mikraj, Al-Qur’an 53:13–18). Di sana beliau dianugerahi salat lima waktu – dan ayat-ayat terakhir surah al-Baqarah (Muslim).', 'Karena itu salat juga disebut “mikrajnya orang beriman”: dalam setiap salat kamu sangat dekat dengan Allah.'],
+      do: ['Mengerjakan salat lima waktu hari ini dengan lebih khusyuk – itulah hadiah malam ini', 'Membaca surah al-Isra atau ayat-ayat terakhir al-Baqarah', 'Salat sunah, misalnya Tahajud atau salat Tasbih', 'Membaca selawat dan bersyukur kepada Allah'],
+      kids: 'Malam ini kita mengenang perjalanan Nabi ﷺ yang menakjubkan menembus langit. Dari sana beliau membawa hadiah untuk kita: salat lima waktu! Setiap kali kamu salat, kamu berbicara langsung dengan Allah.',
+      note: 'Tanggal 27 Rajab adalah tanggal yang umum diperingati; malam yang pasti tidak diriwayatkan dengan yakin.',
+    },
+    berat: {
+      name: 'Nisfu Syakban', short: 'Malam pengampunan, pertengahan Syakban.',
+      about: ['Malam 15 Syakban (Lailatul Bara’ah, di Turki “Berat Kandili”) dikenal sebagai malam pengampunan dan awal yang baru. Menurut sebuah hadis (Ibnu Majah, dinilai berbeda-beda), pada malam ini Allah mengampuni semua orang – kecuali yang menyekutukan-Nya dan yang menyimpan dendam terhadap orang lain di dalam hatinya.', 'Syakban adalah bulan sebelum Ramadan; Nabi ﷺ paling banyak berpuasa sunah di bulan ini (Bukhari).'],
+      do: ['Berdamai dengan seseorang – melepaskan dendam', 'Memohon ampun (taubat, istigfar)', 'Salat sunah, mengqada salat yang tertinggal, membaca Al-Qur’an (banyak yang membaca Yasin)', 'Berpuasa keesokan harinya (banyak yang melakukannya) dan bersiap menyambut Ramadan'],
+      kids: 'Hari ini malam Nisfu Syakban, malam pengampunan. Adakah seseorang yang pernah bertengkar denganmu? Hari ini hari yang baik untuk bilang “maaf” dan berteman lagi.',
+      note: 'Riwayat tentang malam ini dinilai berbeda-beda oleh para ulama; tata cara salat khusus (misalnya “100 rakaat”) tidak kuat dasarnya. Berdamai, berdoa, dan salat sunah selalu baik.',
+    },
+    ramadan: {
+      name: 'Awal Ramadan', short: 'Bulan puasa dimulai – malam sebelumnya Tarawih pertama.',
+      about: ['Di bulan Ramadan Al-Qur’an diturunkan (Al-Qur’an 2:185). Muslim yang dewasa dan sehat berpuasa sejak fajar sampai matahari terbenam. Pada malam sebelum hari puasa pertama dikerjakan salat Tarawih yang pertama, dan pada dini hari orang makan sahur.'],
+      do: ['Berniat dan makan sahur', 'Salat Tarawih dan Witir', 'Membaca sedikit Al-Qur’an setiap hari', 'Bersedekah, berbagi, mengundang berbuka puasa'],
+      kids: 'Sebentar lagi Ramadan! Orang dewasa berpuasa sepanjang hari. Kamu boleh berlatih – mungkin sampai tengah hari (puasa bedug). Dan petang harinya semua berbuka bersama.',
+      note: 'Waktu sahur, berbuka, dan hitung mundur menuju hari raya ada di halaman Ramadan.',
+    },
+    qadr: {
+      name: 'Lailatulqadar', short: 'Malam kemuliaan – lebih baik daripada seribu bulan.',
+      about: ['Pada malam ini Al-Qur’an mulai diturunkan. “Malam kemuliaan itu lebih baik daripada seribu bulan. Pada malam itu turun para malaikat dan Ruh (Jibril) … Sejahteralah malam itu sampai terbit fajar.” (Al-Qur’an 97)', 'Nabi ﷺ bersabda: “Carilah ia pada malam-malam ganjil dari sepuluh malam terakhir” (Bukhari). Di Turki dan banyak negara, malam ini diperingati pada malam ke-27 Ramadan; di Indonesia banyak orang beriktikaf di masjid pada sepuluh malam terakhir.'],
+      do: ['Salat: Tarawih, Tahajud, salat Tasbih', 'Membaca dan mendengarkan Al-Qur’an', 'Doa dari Aisyah: “Allāhumma innaka ʿafuwwun …”', 'Bersedekah, memaafkan, dan berdoa untuk semua manusia'],
+      kids: 'Malam ini mungkin malam terindah sepanjang tahun: Lailatulqadar! Para malaikat turun ke bumi, dan di mana-mana ada kedamaian. Tetaplah bangun sedikit lebih lama, salatlah bersama keluargamu, dan mintalah semua kebaikan kepada Allah.',
+      note: 'Malam yang pasti dirahasiakan – supaya orang memanfaatkan seluruh sepuluh malam terakhir. Malam ke-27 adalah perkiraan yang umum.',
+    },
+    fitr: {
+      name: 'Idulfitri (Lebaran)', short: 'Hari raya setelah Ramadan – hari-hari penuh kegembiraan.',
+      about: ['Pada 1 Syawal kaum muslim merayakan berakhirnya bulan puasa. Sebelum salat Id dibayarkan zakat fitrah, supaya orang miskin juga bisa ikut bergembira. Pada hari raya itu sendiri tidak boleh berpuasa.'],
+      do: ['Membayar zakat fitrah paling lambat sebelum salat Id', 'Mandi, berpakaian bagus, makan sesuatu yang manis atau kurma sebelum salat', 'Salat Id pada pagi hari, bertakbir di perjalanan', 'Bersilaturahmi ke orang tua dan kerabat, memberi hadiah kepada anak-anak, saling memaafkan', 'Sesudahnya berpuasa 6 hari di bulan Syawal (Muslim)'],
+      kids: 'Lebaran! Hari ini kamu memakai baju bagus, salim dan mencium tangan orang yang lebih tua, dan mungkin mendapat kue atau angpau kecil. Jangan lupa: berbagilah juga dengan anak-anak yang hidupnya kekurangan.',
+      note: 'Salat Id bisa kamu latih di “Salat lainnya → Salat Id”.',
+    },
+    arafa: {
+      name: 'Hari Arafah', short: '9 Zulhijah: hari terbaik untuk berdoa.',
+      about: ['Pada hari ini para jemaah haji wukuf di Padang Arafah – bagian terpenting dari ibadah haji. Nabi ﷺ bersabda: “Doa yang paling baik adalah doa pada hari Arafah.” (Tirmidzi)', 'Yang tidak berhaji berpuasa pada hari ini: puasa Arafah menghapus dosa setahun yang lalu dan setahun yang akan datang (Muslim). Mulai salat Subuh dimulailah takbir tasyrik setelah setiap salat fardu.'],
+      do: ['Berpuasa Arafah (bagi yang tidak berhaji)', 'Banyak berdoa – untukmu, keluargamu, dan seluruh dunia', 'Membaca tahlil: “Lā ilāha illa llāhu waḥdahū …”', 'Mulai Subuh, takbir tasyrik setelah setiap salat fardu'],
+      kids: 'Hari ini banyak sekali jemaah haji berpakaian putih berdiri di Padang Arafah dan berdoa. Kamu bisa ikut berdoa – dari rumah! Mintalah kepada Allah hari ini semua yang kamu inginkan.',
+      note: 'Ibadah haji dengan wukuf di Arafah bisa kamu alami di simulator haji dalam aplikasi.',
+    },
+    adha: {
+      name: 'Iduladha (Idul Kurban)', short: 'Hari raya kurban – empat hari untuk berbagi dan bersyukur.',
+      about: ['Hari raya kurban mengingatkan kita kepada Nabi Ibrahim, yang siap memberikan segalanya kepada Allah – dan kepada rahmat Allah yang menyelamatkan putranya (Al-Qur’an 37:102–107). Siapa yang mampu, menyembelih hewan kurban dan membagikan dagingnya: kepada keluarga, kerabat dan tetangga, serta kepada yang membutuhkan.', 'Sejak Subuh tanggal 9 sampai Asar tanggal 13 Zulhijah, takbir tasyrik diucapkan setelah setiap salat fardu.'],
+      do: ['Salat Id pada pagi hari – sebelumnya tidak makan (sunah)', 'Takbir tasyrik setelah setiap salat fardu', 'Menyembelih kurban setelah salat Id, membagi daging menjadi tiga bagian', 'Bersilaturahmi ke keluarga dan tetangga, memberi kepada yang membutuhkan'],
+      kids: 'Hari ini Iduladha! Kita mengenang Nabi Ibrahim, yang sangat percaya kepada Allah. Banyak keluarga hari ini berbagi makanan dengan orang-orang yang kekurangan – dengan begitu hari raya menjadi indah untuk semua.',
+      note: 'Menurut banyak ulama, yang ingin berkurban tidak memotong rambut dan kuku sejak 1 Zulhijah sampai hewan kurbannya disembelih (dianjurkan).',
+    },
   },
   ram: {
     menu: '🌙 Ramadan', title: 'Ramadan', day: (d, n) => `Hari ke-${d} dari ${n}`,
