@@ -82,11 +82,11 @@ export function buildIcs(loc, method, asr, before = 10, days = 30, now = new Dat
   return lines.join('\r\n');
 }
 
-export function downloadIcs(text) {
+export function downloadIcs(text, name = 'namazvr-gebetszeiten.ics') {
   const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'namazvr-gebetszeiten.ics';
+  a.download = name;
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);

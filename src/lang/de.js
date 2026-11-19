@@ -6,6 +6,8 @@ export default {
 
   // Gebetsnamen und Untertitel
   pn: {
+    tahajjud: 'Teheccüd (Tahajjud)', duha: 'Kuşluk (Ḍuḥā)', ishraq: 'İşrak (Ishrāq)', awwabin: 'Evvabin (Awwābīn)',
+    wuduprayer: 'Gebet nach dem Wuḍūʾ', istikhara: 'Istikhāra', hajat: 'Hacet (Ḥājat)', tawba: 'Tövbe (Tawba)', tasbihp: 'Tesbih-Gebet',
     tarawih: 'Tarāwīḥ', sahw: 'Sajdat as-Sahw', ghusl: 'Ghusl', tayammum: 'Tayammum',
     cem: 'Cemevi & Cem', semah: 'Semah',
     umre: 'Umre', hajj: 'Hac', ihramp: 'Iḥrām-Gebet', tawafp: 'Tavaf-Gebet',
@@ -15,6 +17,9 @@ export default {
     sisha: 'Sunnah nach Isha', witr: 'Witr', jumua: 'Jumuʿa', tahiyya: 'Taḥiyyat al-Masjid', wudu: 'Wuḍūʾ',
   },
   pd: {
+    tahajjud: 'Nachtgebet nach dem Schlafen · 2–12 Rakʿāt', duha: 'Vormittag · 2–8 Rakʿāt', ishraq: 'kurz nach Sonnenaufgang',
+    awwabin: 'zwischen Maghrib und Isha · bis 6 Rakʿāt', wuduprayer: 'direkt nach der Waschung', istikhara: 'um die richtige Entscheidung bitten',
+    hajat: 'bei einer Sorge oder einem Anliegen', tawba: 'Gebet der Reue', tasbihp: 'Ṣalāt at-Tasbīḥ · 300× Lobpreis',
     tarawih: 'Ramadan-Nächte nach Isha · 20 oder 8 Rakʿāt in Zweierschritten', sahw: 'Niederwerfung bei einem Fehler im Gebet',
     wudu: 'Gebetswaschung – vor jedem Gebet', ghusl: 'Ganzkörperwaschung', tayammum: 'Reinigung ohne Wasser, mit Erde',
     cem: 'Rundgang durch ein Cemevi (VR)', semah: 'zum Mitmachen im Meydan (VR)',
@@ -25,6 +30,9 @@ export default {
     sisha: 'nach dem Pflichtgebet', witr: 'nach Isha bis vor Fajr', jumua: 'Freitag, statt Dhuhr', tahiyya: 'beim Betreten der Moschee',
   },
   niyya: {
+    tahajjud: 'die 2 Rakʿāt Teheccüd (Nachtgebet)', duha: 'die 2 Rakʿāt Kuşluk-Gebet (Ḍuḥā)', ishraq: 'die 2 Rakʿāt İşrak-Gebet',
+    awwabin: 'die 2 Rakʿāt Evvabin-Gebet', wuduprayer: 'die 2 Rakʿāt nach dem Wuḍūʾ', istikhara: 'die 2 Rakʿāt Istikhāra-Gebet',
+    hajat: 'die 2 Rakʿāt Hacet-Gebet', tawba: 'die 2 Rakʿāt Tövbe-Gebet', tasbihp: 'die 4 Rakʿāt Tesbih-Gebet',
     tarawih: 'die 2 Rakʿāt Tarāwīḥ',
     ihramp: 'die 2 Rakʿāt Sunnah des Iḥrām', tawafp: 'die 2 Rakʿāt des Tavaf hinter dem Maqām Ibrāhīm',
     eid: 'die 2 Rakʿāt des Festgebets hinter dem Imam', janaza: 'das Totengebet für Allah und das Bittgebet für den Verstorbenen, hinter dem Imam',
@@ -84,6 +92,20 @@ export default {
 
   // Bedeutung der arabischen Texte, Zeile für Zeile
   mean: {
+    tsp: ['Gepriesen sei Allah, alles Lob gebührt Allah, es gibt keinen Gott außer Allah, und Allah ist größer.'],
+    istikhara: [
+      'O Allah, ich bitte Dich durch Dein Wissen um das Gute und durch Deine Macht um Kraft, und ich bitte Dich um Deine gewaltige Huld. Denn Du vermagst, und ich vermag nicht; Du weißt, und ich weiß nicht; Du kennst das Verborgene.',
+      'O Allah, wenn Du weißt, dass diese Sache gut für mich ist – in meiner Religion, meinem Leben und dem Ausgang meiner Angelegenheit –, dann bestimme sie mir, mache sie mir leicht und segne sie mir.',
+      'Und wenn Du weißt, dass diese Sache schlecht für mich ist – in meiner Religion, meinem Leben und dem Ausgang meiner Angelegenheit –, dann wende sie von mir ab und mich von ihr, bestimme mir das Gute, wo immer es ist, und lass mich damit zufrieden sein. (Buḫārī)',
+    ],
+    istighfar: [
+      'O Allah, Du bist mein Herr, es gibt keinen Gott außer Dir. Du hast mich erschaffen, und ich bin Dein Diener. Ich halte an Deinem Bund und Versprechen fest, so gut ich kann.',
+      'Ich suche Zuflucht bei Dir vor dem Schlechten, das ich getan habe. Ich erkenne Deine Gnade an mir an, und ich bekenne meine Schuld – so vergib mir, denn niemand vergibt die Sünden außer Dir. (Buḫārī)',
+    ],
+    yunus: ['Es gibt keinen Gott außer Dir. Gepriesen seist Du! Ich war einer der Ungerechten. (Koran 21:87 – das Bittgebet des Propheten Yūnus)'],
+    qadrDua: ['O Allah, Du bist voller Vergebung und liebst das Vergeben – so vergib mir. (Tirmiḏī, von ʿĀʾisha)'],
+    salawatShort: ['O Allah, segne unseren Meister Muḥammad und die Familie unseres Meisters Muḥammad.'],
+    astaghfir: ['Ich bitte Allah, den Gewaltigen, um Vergebung – es gibt keinen Gott außer Ihm, dem Lebendigen, dem Beständigen –, und ich kehre reumütig zu Ihm zurück.'],
     talbiya: ['Hier bin ich, o Allah, hier bin ich. Hier bin ich, Du hast keinen Teilhaber, hier bin ich.', 'Alles Lob und alle Gnade gehören Dir, und die Herrschaft. Du hast keinen Teilhaber.'],
     niyyaUmre: ['O Allah, ich will die Umre vollziehen – mache sie mir leicht und nimm sie von mir an.'],
     niyyaHajj: ['O Allah, ich will den Hac vollziehen – mache ihn mir leicht und nimm ihn von mir an.'],
@@ -230,6 +252,7 @@ export default {
 
   // Spiritueller Modus: innere Bedeutung, frei formuliert in Anlehnung an al-Ghazālī
   inner: {
+    tasbihp: 'Jedes „Subḥāna llāh“ ist wie ein Atemzug der Dankbarkeit. Zähl ruhig mit den Fingern – das Herz zählt mit.',
     niyya: 'Lass die Welt für einen Moment los. Du stehst jetzt vor deinem Herrn – sei mit dem Herzen hier, nicht nur mit dem Körper.',
     takbir: 'Mit den erhobenen Händen wirfst du alles hinter dich: Sorgen, Pläne, Ablenkung. Allah ist größer als all das.',
     opening: 'Beginne mit Lobpreis, wie ein Gast, der grüßt, bevor er bittet.',
@@ -419,6 +442,7 @@ export default {
   },
 
   kids: {
+    tasbihp: 'Jetzt lobst du Allah ganz oft hintereinander: „Subḥāna llāh, al-ḥamdu li-llāh, lā ilāha illa llāh, Allāhu akbar.“ Zähl leise mit den Fingern – wie ein kleines Lied, mit dem du Danke sagst.',
     sahw: 'Jeder vergisst mal etwas – auch im Gebet. Das ist nicht schlimm! Wenn du zum Beispiel vergessen hast, nach der zweiten Rakʿa zu sitzen, machst du am Ende einfach zwei extra Niederwerfungen. Damit ist alles wieder gut.',
     ghuslParts: {
       heart: 'Der Ghusl ist eine große Waschung für den ganzen Körper. Erwachsene machen ihn in bestimmten Fällen, viele auch am Freitag oder vor dem Fest. Sag in deinem Herzen: „Ich wasche mich jetzt ganz für Allah“ – und dann „Bismillāh“.',
@@ -592,6 +616,133 @@ export default {
     auto: 'Geführte Pflichtgebete werden automatisch abgehakt. Nur auf diesem Gerät gespeichert.',
     kids: 'Für jeden Tag mit allen 5 Gebeten gibt es einen Extra-Stern ⭐',
     older: '◀ Tag davor', newer: 'Tag danach ▶',
+  },
+  nfl: {
+    menu: 'Nafile', title: 'Freiwillige Gebete (Nafile)',
+    note: 'Nafile-Gebete sind freiwillig – kein Muss, aber ein Geschenk an dich selbst. Nicht in den verpönten Zeiten beten: während die Sonne aufgeht, wenn sie mittags im Zenit steht, und während sie untergeht (Ḥanafī auch nach dem Fajr- und nach dem ʿAṣr-Gebet). Tarāwīḥ und Witr findest du unter „Weitere Gebete“.',
+    when: {
+      tarawih: 'Tarāwīḥ betet man nur im Ramadan: jede Nacht nach dem Isha-Gebet, vor dem Witr. Man betet sie in Einheiten von je 2 Rakʿāt mit Salām – hier übst du eine solche Einheit. Die meisten Gemeinden (Ḥanafī, Shāfiʿī, Ḥanbalī, auch Diyanet) beten 20 Rakʿāt, also zehnmal diese Einheit; andere beten 8 (nach einem Bericht von ʿĀʾisha). Nach je 4 Rakʿāt sitzt man kurz und ruht aus – daher der Name „Tarāwīḥ“ (Pausen). In dieser Pause lobt man Allah, in der Türkei z. B. mit „Subḥāna dhi l-mulki wa l-malakūt …“ oder mit Salawāt. Zum Schluss betet die Gemeinde im Ramadan meist auch den Witr gemeinsam. In der Moschee ist es am schönsten, zu Hause allein ist es aber genauso gültig.',
+      tahajjud: 'Teheccüd ist das Nachtgebet nach dem Schlafen: nach dem Isha-Gebet ein wenig schlafen, dann vor dem Fajr aufstehen. Die beste Zeit ist das letzte Drittel der Nacht – dann, so überliefert Buḫārī, fragt Allah: „Wer bittet Mich, damit Ich ihm gebe?“ Man betet 2 bis 12 Rakʿāt, immer in Zweierschritten, mit langer Rezitation und langen Niederwerfungen. Wer sicher aufwacht, betet den Witr danach als Letztes in der Nacht. (Koran 17:79)',
+      duha: 'Das Kuşluk-Gebet (Ḍuḥā) betet man am Vormittag: etwa 45 Minuten nach Sonnenaufgang, wenn die Sonne „eine Speerlänge“ hoch steht, bis kurz vor dem Mittag (etwa 15 Minuten vor Dhuhr). 2, 4 oder 8 Rakʿāt in Zweierschritten. Nach einem Ḥadīṯ bei Muslim ist es wie eine Spende für jedes Gelenk deines Körpers – ein Dankeschön für einen neuen Tag.',
+      ishraq: 'İşrak ist das frühe Ḍuḥā-Gebet: Wer das Fajr-Gebet in Gemeinschaft betet, sitzen bleibt und Allah gedenkt, bis die Sonne aufgegangen ist, und dann 2 Rakʿāt betet, hat einen Lohn wie für Hac und Umre (Tirmiḏī). Warte, bis die Sonne ganz aufgegangen ist (etwa 15–20 Minuten nach Sonnenaufgang, in der Türkei nennt man oft 45 Minuten) – während des Aufgangs selbst betet man nicht.',
+      awwabin: 'Evvabin („die sich Allah oft Zuwendenden“) heißt bei vielen Ḥanafī das freiwillige Gebet zwischen Maghrib und Isha: nach der Sunnah des Maghrib bis zu 6 Rakʿāt, in drei Einheiten zu je 2. Andere Gelehrte nennen das Ḍuḥā-Gebet „Gebet der Awwābīn“. Beides ist gut – ein ruhiger Moment am Abend.',
+      wuduprayer: 'Direkt nach dem Wuḍūʾ – noch bevor die Glieder trocken sind – 2 Rakʿāt beten. Der Prophet hörte im Paradies die Schritte von Bilāl, weil Bilāl nach jeder Waschung betete (Buḫārī). Ḥanafī: nicht in den verpönten Zeiten, also z. B. nicht nach dem ʿAṣr-Gebet.',
+      istikhara: 'Istikhāra betest du, wenn du dich zwischen erlaubten Dingen entscheiden musst – Schule, Arbeit, Umzug, Heirat. 2 Rakʿāt, z. B. in der ersten mit Al-Kāfirūn, in der zweiten mit Al-Ikhlāṣ. Danach das Bittgebet: an der Stelle „diese Sache“ denkst du an deine Frage. Du musst keinen Traum abwarten: entscheide in Ruhe, wohin dein Herz neigt, und frag Menschen, denen du vertraust. Man kann es mehrmals wiederholen.',
+      hajat: 'Das Hacet-Gebet betest du, wenn dich etwas bedrückt oder du dir etwas sehr wünschst – Gesundheit, eine Prüfung, eine Sorge in der Familie. 2 Rakʿāt (manche beten 4), dann Allah loben, die Salawāt sprechen und mit eigenen Worten bitten. Die Überlieferungen zu einer festen Form sind schwach; ein freiwilliges Gebet mit Bittgebet ist aber immer gut.',
+      tawba: 'Das Tövbe-Gebet betest du, wenn du einen Fehler bereust. Abū Bakr überliefert: Wer eine Sünde begeht, dann die Waschung vollzieht, 2 Rakʿāt betet und Allah um Vergebung bittet, dem vergibt Allah (Abū Dāwūd, Tirmiḏī; Koran 3:135). Zur echten Reue gehört: bedauern, aufhören, sich vornehmen, es nicht zu wiederholen – und wenn du jemandem Unrecht getan hast, es bei ihm wiedergutmachen.',
+      tasbihp: 'Das Tesbih-Gebet hat 4 Rakʿāt mit insgesamt 300× Lobpreis – 75× in jeder Rakʿa. Der Prophet lehrte es seinem Onkel ʿAbbās: wenn möglich jeden Tag, sonst jeden Freitag, jeden Monat, jedes Jahr – oder wenigstens einmal im Leben (Abū Dāwūd, Ibn Māja). Viele beten es in den Kandil-Nächten und in der Kadir-Nacht. Zähle mit den Fingern, nicht laut. Vergisst du eine Zahl, holst du sie an der nächsten Stelle nach – aber nicht im kurzen Stehen nach dem Rukūʿ und nicht im Sitzen zwischen den Niederwerfungen. Nicht in den verpönten Zeiten beten.',
+    },
+    duaTitle: { istikhara: 'Bittgebet der Istikhāra', hajat: 'Bittgebet in der Not', tawba: 'Sayyid al-Istighfār' },
+    duaInstr: {
+      istikhara: 'Nach dem Salām: Hebe die Hände, lobe Allah und sprich die Salawāt. Dann dieses Bittgebet. Bei „diese Sache“ (hādha l-amr) denkst du an deine Frage – oder du nennst sie. Danach entscheide in Ruhe und frag auch Menschen, denen du vertraust.',
+      hajat: 'Nach dem Salām: Hebe die Hände, lobe Allah, sprich die Salawāt und bitte mit deinen eigenen Worten um das, was du brauchst. Das Bittgebet des Propheten Yūnus aus dem Koran passt zu jeder Sorge.',
+      tawba: 'Nach dem Salām: Hebe die Hände und bitte Allah aufrichtig um Vergebung – mit dem „Herrn der Bitten um Vergebung“ (Sayyid al-Istighfār). Bereue, hör auf damit und nimm dir vor, es nicht wieder zu tun.',
+    },
+  },
+  tsp: {
+    title: (n) => `Tesbih ${n}×`,
+    at: {
+      before: (n) => `Nach dem Eröffnungs-Bittgebet (Subḥānaka), noch vor der Fātiḥa: sprich leise ${n}× „Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar“. Zähle mit den Fingern.`,
+      sura: (n) => `Nach der Sure, noch im Stehen und vor dem Rukūʿ: sprich leise ${n}× den Lobpreis.`,
+      ruku: (n) => `Bleib im Rukūʿ: nach „Subḥāna rabbiya l-ʿaẓīm“ (3×) sprichst du ${n}× den Lobpreis.`,
+      itidal: (n) => `Aufgerichtet stehen, nach „Rabbanā wa laka l-ḥamd“: ${n}× den Lobpreis.`,
+      sujud: (n) => `Bleib in der Niederwerfung: nach „Subḥāna rabbiya l-aʿlā“ (3×) sprichst du ${n}× den Lobpreis.`,
+      jalsa: (n) => `Im Sitzen zwischen den beiden Niederwerfungen: ${n}× den Lobpreis.`,
+      after: (n) => `Nach der zweiten Niederwerfung setzt du dich kurz auf (vor dem Aufstehen oder vor dem Tashahhud) und sprichst ${n}× den Lobpreis.`,
+    },
+    school: {
+      hanafi: 'Ḥanafī (nach ʿAbdullāh ibn al-Mubārak): 4 Rakʿāt mit einem Salām. In jeder Rakʿa 15× vor der Fātiḥa, 10× nach der Sure, je 10× im Rukūʿ, im Stehen danach, in beiden Niederwerfungen und im Sitzen dazwischen – 75 je Rakʿa, 300 zusammen.',
+      shafii: 'Shāfiʿī (nach dem Ḥadīṯ des Ibn ʿAbbās): 15× nach der Sure, je 10× im Rukūʿ, im Stehen danach, in beiden Niederwerfungen, im Sitzen dazwischen und noch einmal 10× im kurzen Sitzen nach der zweiten Niederwerfung – 75 je Rakʿa. Am Tag betet man die vier am Stück oder 2 + 2, nachts als 2 + 2.',
+      maliki: 'In der Mālikī-Schule wird das Tesbih-Gebet wenig gepflegt; wer es betet, folgt meist dem Ḥadīṯ des Ibn ʿAbbās – so wie hier gezeigt, als 2 + 2 Rakʿāt.',
+      hanbali: 'Imam Aḥmad hielt die Überlieferung für schwach; viele Gelehrte (u. a. Ḥanafī und Shāfiʿī) empfehlen das Gebet aber. Gezeigt wird die Form nach Ibn ʿAbbās.',
+    },
+  },
+  holy: {
+    menu: 'Heilige Tage', title: 'Heilige Tage & Nächte', sub: 'Kandil-Nächte, Feste und besondere Tage',
+    today: 'heute', tomorrowShort: 'morgen', inDays: (n) => `in ${n} Tagen`, nightOf: (d) => `Nacht ab dem Abend: ${d}`, nightShort: 'Nacht',
+    sighting: 'Berechnet nach dem Umm-al-Qura-Kalender. In der Türkei (Diyanet) und anderen Ländern kann ein Datum um einen Tag abweichen. Eine Nacht beginnt schon am Abend davor, mit dem Maghrib.',
+    remind: 'An heilige Tage erinnern', remindSub: 'Kandil-Nächte am selben Tag um 10 Uhr, Feste am Vorabend um 18 Uhr',
+    cal: '📅 Alle Termine in den Kalender', calName: 'NamazVR · Heilige Tage',
+    tonight: 'Heute Abend beginnt die Nacht.', tomorrow: 'Morgen ist es so weit.',
+    doTitle: 'Was du tun kannst', duaTitle: 'Bittgebete',
+    duaName: { astaghfir: 'Istighfār', istighfar: 'Sayyid al-Istighfār', salawatShort: 'Salawāt (kurz)', salawat: 'Salawāt Ibrāhīmiyya', qadrDua: 'Duʿāʾ der Kadir-Nacht', tashriq: 'Takbīr at-Tashrīq', tahlil: 'Tahlīl von ʿArafa' },
+    hijri: {
+      name: 'Islamisches Neujahr', short: 'Der 1. Muharram: ein neues Jahr nach der Hidschra beginnt.',
+      about: ['Mit dem 1. Muharram beginnt das islamische Jahr. Gezählt wird ab der Hidschra: 622 wanderte der Prophet ﷺ mit seinen Gefährten von Mekka nach Medina, wo die Muslime in Frieden leben konnten. Den Kalender führte der Kalif ʿUmar ein.', 'Muharram ist einer der vier heiligen Monate (Koran 9:36). Ein islamisches Jahr hat nur 354 oder 355 Tage – deshalb wandern Ramadan und die Feste jedes Jahr etwa 11 Tage nach vorn.'],
+      do: ['Auf das vergangene Jahr zurückschauen und Allah danken', 'Gute Vorsätze fassen – etwas Gutes neu beginnen', 'Im Muharram fasten: der beste Fastenmonat nach Ramadan (Muslim)', 'Die Geschichte der Hidschra lesen oder in der App anhören'],
+      kids: 'Heute beginnt das islamische neue Jahr! Es zählt ab dem Tag, an dem der Prophet ﷺ von Mekka nach Medina gewandert ist. Überleg dir: Was möchte ich in diesem Jahr Gutes tun?',
+      note: 'Für das Neujahr gibt es kein besonderes Gebet – es ist ein Tag zum Innehalten.',
+    },
+    ashura: {
+      name: 'ʿĀschūrā (Aşure-Tag)', short: 'Der 10. Muharram: Fasten, Teilen und Gedenken.',
+      about: ['Am 10. Muharram rettete Allah den Propheten Mūsā und sein Volk vor dem Pharao. Der Prophet ﷺ fastete an diesem Tag und empfahl es; das Fasten sühnt die kleinen Fehler des vergangenen Jahres (Muslim). Empfohlen ist, einen Tag dazuzunehmen: den 9. oder den 11.', 'Am 10. Muharram 680 wurde in Kerbela Ḥusayn, der Enkel des Propheten, mit seiner Familie getötet. Schiiten und Aleviten gedenken seiner in Trauer; viele Aleviten fasten 12 Tage im Muharrem. In der Türkei kocht man Aşure – eine Süßspeise aus vielen Zutaten – und teilt sie mit Nachbarn, in Erinnerung auch an Nūḥ nach der Flut.'],
+      do: ['Am 9. und 10. (oder 10. und 11.) Muharram fasten', 'Aşure kochen und mit Nachbarn teilen – mit allen, egal welcher Religion', 'Bedürftigen helfen, der Familie Gutes tun', 'An Ḥusayn und Kerbela denken: für Gerechtigkeit, gegen Unrecht'],
+      kids: 'Heute ist Aşure-Tag! An diesem Tag hat Allah den Propheten Mūsā gerettet. Viele Familien kochen heute eine bunte Süßspeise, die Aşure, und bringen den Nachbarn eine Schüssel – Teilen macht froh.',
+      note: 'Aleviten beginnen das Muharrem-Fasten nach dem Kalender ihrer Gemeinde; Näheres unter „Alevilik → Muharrem & Aşure“.',
+    },
+    mevlid: {
+      name: 'Mevlid Kandili', short: 'Die Nacht der Geburt des Propheten ﷺ.',
+      about: ['In der Nacht zum 12. Rabīʿ al-awwal gedenken viele Muslime der Geburt des Propheten Muḥammad ﷺ – im Jahr 571 in Mekka, im „Jahr des Elefanten“. Allah nennt ihn „eine Barmherzigkeit für die Welten“ (Koran 21:107).', 'In der Türkei hört man das Mevlid-Gedicht von Süleyman Çelebi (1409), in vielen Ländern wird aus seinem Leben erzählt. Die Kandil-Nächte heißen so, weil man früher die Minarette mit Öllampen (Kandil) erleuchtete.'],
+      do: ['Viele Salawāt für den Propheten ﷺ sprechen', 'Über sein Leben lesen oder erzählen – seine Güte zu Kindern, Tieren und Nachbarn', 'Nafile beten, z. B. das Tesbih-Gebet, oder verpasste Gebete nachholen', 'Familie und Freunde grüßen: „Kandiliniz mübarek olsun“'],
+      kids: 'Heute Nacht denken wir an den Geburtstag des Propheten Muḥammad ﷺ. Er war freundlich zu allen – zu Kindern, zu Tieren und zu armen Menschen. Sag heute oft: „Allāhumma ṣalli ʿalā Muḥammad“ – und sei so freundlich wie er.',
+      note: 'Ob man den Geburtstag besonders feiert, sehen Gelehrte unterschiedlich: viele (z. B. Diyanet, al-Azhar) sehen darin eine schöne Tradition, andere lehnen besondere Feiern ab. Einig sind sich alle: den Propheten zu lieben und ihm zu folgen ist gut.',
+    },
+    regaib: {
+      name: 'Regaib Kandili', short: 'Die erste Kandil-Nacht – die drei heiligen Monate beginnen.',
+      about: ['Die Regaib-Nacht ist die Nacht zum ersten Freitag im Monat Rajab. Mit Rajab beginnen die „drei Monate“ (üç aylar) Rajab, Shaʿbān und Ramadan – eine Zeit, um sich auf den Ramadan vorzubereiten. Rajab ist einer der vier heiligen Monate (Koran 9:36).', '„Raghāʾib“ bedeutet „große Gaben“: In dieser Nacht bitten Muslime besonders um Allahs Gnade und Vergebung.'],
+      do: ['Bittgebete und Istighfār (um Vergebung bitten)', 'Nafile beten oder verpasste Gebete (Kaza) nachholen', 'Koran lesen', 'Eltern und Verwandte besuchen oder anrufen, sich versöhnen'],
+      kids: 'Heute ist Regaib-Nacht – die erste von fünf besonderen Kandil-Nächten. Jetzt beginnen die drei Monate vor dem Ramadan. Du kannst heute Allah um etwas Schönes bitten und deinen Eltern eine Freude machen.',
+      note: 'Ein besonderes „Regaib-Gebet“ mit 12 Rakʿāt beruht laut vielen Gelehrten (z. B. an-Nawawī) auf einer erfundenen Überlieferung. Ganz normale Nafile-Gebete, Bittgebete und gute Taten sind dagegen immer richtig.',
+    },
+    mirac: {
+      name: 'Miraç Kandili', short: 'Die Nacht der Himmelsreise – das Geschenk der fünf Gebete.',
+      about: ['In einer Nacht reiste der Prophet ﷺ von Mekka nach Jerusalem zur al-Aqṣā-Moschee (Isrāʾ, Koran 17:1) und von dort durch die Himmel (Miʿrāǧ, Koran 53:13–18). Dort wurden ihm die fünf täglichen Gebete geschenkt – und die letzten Verse der Sure al-Baqara (Muslim).', 'Darum nennt man das Gebet auch „den Miʿrāǧ des Gläubigen“: in jedem Gebet bist du Allah ganz nah.'],
+      do: ['Die fünf Gebete heute besonders bewusst beten – sie sind das Geschenk dieser Nacht', 'Sure al-Isrāʾ oder die letzten Verse der Baqara lesen', 'Nafile beten, z. B. Teheccüd oder das Tesbih-Gebet', 'Salawāt sprechen und Allah danken'],
+      kids: 'Heute Nacht denken wir an die wunderbare Reise des Propheten ﷺ durch die Himmel. Von dort brachte er uns ein Geschenk mit: die fünf Gebete! Jedes Mal, wenn du betest, sprichst du direkt mit Allah.',
+      note: 'Der 27. Rajab ist das verbreitete Datum; die genaue Nacht ist nicht sicher überliefert.',
+    },
+    berat: {
+      name: 'Berat Kandili', short: 'Die Nacht der Vergebung, Mitte Shaʿbān.',
+      about: ['Die Nacht zum 15. Shaʿbān (Laylat al-Barāʾa) gilt als Nacht der Vergebung und des Neuanfangs. Nach einem Ḥadīṯ (Ibn Māja, unterschiedlich bewertet) vergibt Allah in dieser Nacht allen – außer dem, der Ihm etwas beigesellt, und dem, der Groll gegen andere im Herzen trägt.', 'Shaʿbān ist der Monat vor dem Ramadan; der Prophet ﷺ fastete in ihm besonders viel (Buḫārī).'],
+      do: ['Sich mit jemandem versöhnen – Groll loslassen', 'Um Vergebung bitten (Tövbe, Istighfār)', 'Nafile beten, verpasste Gebete nachholen, Koran lesen', 'Am Tag danach fasten (viele tun es) und den Ramadan vorbereiten'],
+      kids: 'Heute ist Berat-Nacht, die Nacht der Vergebung. Gibt es jemanden, mit dem du dich gestritten hast? Heute ist ein guter Tag, „Entschuldigung“ zu sagen und wieder Freunde zu sein.',
+      note: 'Die Überlieferungen zu dieser Nacht werden unterschiedlich bewertet; feste Gebetsformen (z. B. „100 Rakʿāt“) sind nicht gesichert. Versöhnung, Bittgebet und freiwillige Gebete sind immer gut.',
+    },
+    ramadan: {
+      name: 'Beginn des Ramadan', short: 'Der Fastenmonat beginnt – am Vorabend das erste Tarāwīḥ.',
+      about: ['Im Ramadan wurde der Koran herabgesandt (Koran 2:185). Erwachsene, gesunde Muslime fasten von der Morgendämmerung bis zum Sonnenuntergang. Am Abend vor dem ersten Fastentag betet man das erste Tarāwīḥ-Gebet, in der Nacht isst man das Sahur.'],
+      do: ['Absicht fassen und Sahur essen', 'Tarāwīḥ und Witr beten', 'Jeden Tag ein Stück Koran lesen', 'Spenden, teilen, zum Iftar einladen'],
+      kids: 'Bald ist Ramadan! Die Großen fasten den ganzen Tag. Du darfst üben – vielleicht bis zum Mittag. Und abends beim Iftar essen alle zusammen.',
+      note: 'Sahur, Iftar und den Countdown zum Fest findest du auf der Ramadan-Seite.',
+    },
+    qadr: {
+      name: 'Kadir Gecesi (Laylat al-Qadr)', short: 'Die Nacht der Bestimmung – besser als tausend Monate.',
+      about: ['In dieser Nacht begann die Herabsendung des Koran. „Die Nacht der Bestimmung ist besser als tausend Monate. Die Engel und der Geist steigen in ihr herab … Friede ist sie bis zum Anbruch der Morgendämmerung.“ (Koran 97)', 'Der Prophet ﷺ sagte: „Sucht sie in den ungeraden der letzten zehn Nächte“ (Buḫārī). In der Türkei und vielen Ländern begeht man sie in der Nacht zum 27. Ramadan.'],
+      do: ['Beten: Tarāwīḥ, Teheccüd, das Tesbih-Gebet', 'Koran lesen und anhören', 'Das Bittgebet von ʿĀʾisha: „Allāhumma innaka ʿafuwwun …“', 'Spenden, verzeihen und für alle Menschen bitten'],
+      kids: 'Heute ist vielleicht die schönste Nacht des Jahres: die Kadir-Nacht! Die Engel kommen auf die Erde, und überall ist Frieden. Bleib ein bisschen länger wach, bete mit deiner Familie und bitte Allah um alles Gute.',
+      note: 'Die genaue Nacht ist verborgen – damit man alle letzten zehn Nächte nutzt. Die 27. Nacht ist eine verbreitete Annahme.',
+    },
+    fitr: {
+      name: 'Ramazan Bayramı (ʿĪd al-Fiṭr)', short: 'Das Fest nach dem Ramadan – drei Tage Freude.',
+      about: ['Am 1. Shawwāl feiern Muslime das Ende des Fastenmonats. Vor dem Festgebet gibt man die Fiṭra (Zakāt al-Fiṭr), damit auch Arme feiern können. Am Festtag selbst ist Fasten nicht erlaubt.'],
+      do: ['Fiṭra spätestens vor dem Festgebet geben', 'Ghusl, schöne Kleidung, vor dem Gebet etwas Süßes oder Datteln essen', 'Festgebet am Morgen, auf dem Weg Takbīr sprechen', 'Eltern und Verwandte besuchen, Kinder beschenken, sich versöhnen', 'Danach 6 Tage im Shawwāl fasten (Muslim)'],
+      kids: 'Bayram! Heute ziehst du schöne Kleider an, küsst den Großen die Hand und bekommst vielleicht Süßigkeiten oder ein kleines Geschenk. Vergiss nicht: Teile auch mit Kindern, die wenig haben.',
+      note: 'Das Festgebet kannst du unter „Weitere Gebete → Festgebet“ üben.',
+    },
+    arafa: {
+      name: 'Tag von ʿArafa', short: 'Der 9. Dhu l-Ḥijja: der beste Tag für Bittgebete.',
+      about: ['An diesem Tag stehen die Pilger auf dem Berg ʿArafāt – der wichtigste Teil des Hac. Der Prophet ﷺ sagte: „Das beste Bittgebet ist das Bittgebet am Tag von ʿArafa.“ (Tirmiḏī)', 'Wer nicht pilgert, fastet an diesem Tag: es sühnt die Fehler des vergangenen und des kommenden Jahres (Muslim). Ab dem Fajr-Gebet beginnt der Takbīr at-Tashrīq nach jedem Pflichtgebet.'],
+      do: ['Fasten (wer nicht auf Pilgerfahrt ist)', 'Viel bitten – für dich, deine Familie und die ganze Welt', 'Tahlīl sprechen: „Lā ilāha illa llāhu waḥdahū …“', 'Ab Fajr nach jedem Pflichtgebet den Takbīr at-Tashrīq'],
+      kids: 'Heute stehen ganz viele Pilger in weißen Tüchern auf dem Berg ʿArafāt und beten. Du kannst mitbeten – von zu Hause aus! Bitte Allah heute um alles, was du dir wünschst.',
+      note: 'Den Hac mit ʿArafāt kannst du im Hac-Simulator der App erleben.',
+    },
+    adha: {
+      name: 'Kurban Bayramı (ʿĪd al-Aḍḥā)', short: 'Das Opferfest – vier Tage teilen und danken.',
+      about: ['Das Opferfest erinnert an Ibrāhīm, der bereit war, Allah alles zu geben – und an Allahs Barmherzigkeit, die seinen Sohn rettete (Koran 37:102–107). Wer es sich leisten kann, opfert ein Tier und teilt das Fleisch: mit der Familie, mit Verwandten und Nachbarn und mit Bedürftigen.', 'Vom Fajr des 9. bis zum ʿAṣr des 13. Dhu l-Ḥijja spricht man nach jedem Pflichtgebet den Takbīr at-Tashrīq.'],
+      do: ['Festgebet am Morgen – vorher nichts essen (Sunna)', 'Takbīr at-Tashrīq nach jedem Pflichtgebet', 'Kurban nach dem Festgebet, das Fleisch in drei Teile teilen', 'Familie und Nachbarn besuchen, Bedürftige beschenken'],
+      kids: 'Heute ist Kurban Bayramı! Wir denken an den Propheten Ibrāhīm, der Allah sehr vertraut hat. Viele Familien teilen heute Essen mit Menschen, die wenig haben – so wird das Fest für alle schön.',
+      note: 'Wer opfern möchte, schneidet nach vielen Gelehrten ab dem 1. Dhu l-Ḥijja bis zum Opfer weder Haare noch Nägel (empfohlen).',
+    },
   },
   ram: {
     menu: '🌙 Ramadan', title: 'Ramadan', day: (d, n) => `Tag ${d} von ${n}`,

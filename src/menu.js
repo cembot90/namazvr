@@ -12,6 +12,7 @@ export function menuGroups(v, { mobile = false } = {}) {
       item('💧', t('pure.menu'), 'purify', { primary: !v.wuduDone }),
       item('🧭', mobile ? t('ui.menuQiblaMobile') : t('ui.menuQibla'), 'qibla'),
       item('🤲', t('ui.menuMore'), 'more'),
+      item('📿', t('nfl.menu'), 'nafile'),
       item('🕌', t('ui.menuMosque'), 'mosque'),
     ] },
     { label: t('ui.grp.learn'), items: [
@@ -25,6 +26,7 @@ export function menuGroups(v, { mobile = false } = {}) {
     { label: t('ui.grp.explore'), items: [
       item('🕋', t('hajj.menu'), 'pilgrim'),
       item('🌙', t('ram.menu'), 'ramadan'),
+      item('⭐', t('holy.menu'), 'holy'),
       item('🕯️', t('alevi.menu'), 'alevi'),
       item('✨', t('sky.menu'), 'sky'),
     ] },

@@ -85,7 +85,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
   const { ctx, page, errors } = await open('mobile');
   const problems = await page.evaluate(async (LANGS) => {
     const out = [];
-    const { PRAYERS, EXTRA_PRAYERS, PILGRIMAGES, ALEVI, MADHABS, buildSteps } = await import('/src/prayer.js');
+    const { PRAYERS, EXTRA_PRAYERS, NAFILE, PILGRIMAGES, ALEVI, MADHABS, buildSteps } = await import('/src/prayer.js');
     const { buildWuduSteps } = await import('/src/wudu.js');
     const { buildPilgrimage } = await import('/src/hajj.js');
     const { STORY_LIST, buildStory, storyQuestion } = await import('/src/stories.js');
@@ -111,7 +111,7 @@ test('inhalte: Gebete, Waschung, Umre, Hac, Cem, Semah und Geschichten bauen in 
       await loadLang(lang);
       setLang(lang);
       for (const m of MADHABS) for (const g of ['m', 'f']) {
-        for (const p of [...PRAYERS, ...EXTRA_PRAYERS]) {
+        for (const p of [...PRAYERS, ...EXTRA_PRAYERS, ...NAFILE]) {
           const steps = buildSteps(p, m.id, g, 'ikhlas');
           check(`${lang}/${m.id}/${g}/${p.id}`, steps);
           if (raw(p.name)) out.push(`${lang}: Name von ${p.id} fehlt`);
@@ -255,9 +255,9 @@ test('inhalte: Gebetszeiten, Qibla und islamischer Kalender', async () => {
 });
 
 // ---------- Oberfläche ----------
-const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
+const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'nafile', 'holy', 'holy:qadr', 'holy:mevlid', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
 // Auf dem Bildschirm darf kein unübersetzter Schlüssel und kein „undefined“ stehen
-const BAD = /\b(?:pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
+const BAD = /\b(?:nfl|tsp|holy|pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
 
 for (const mode of ['mobile', 'desktop']) {
   test(`oberfläche (${mode}): jede Ansicht in jeder Sprache ohne Fehler`, async () => {
@@ -315,10 +315,10 @@ const run = (page, id) => page.evaluate(async (id) => {
 
 test('abläufe (Handy): jedes Gebet und die Waschung bis zum Ende', async () => {
   const { ctx, page, errors } = await open('mobile');
-  const ids = ['wudu', 'ghusl', 'tayammum', 'fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'sfajr', 'witr', 'jumua', 'eid', 'janaza', 'tahiyya', 'tarawih', 'sahw'];
+  const ids = ['wudu', 'ghusl', 'tayammum', 'fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'sfajr', 'witr', 'jumua', 'eid', 'janaza', 'tahiyya', 'tarawih', 'sahw', 'tahajjud', 'istikhara', 'tawba', 'tasbihp'];
   for (const madhab of ['hanafi', 'shafii', 'maliki', 'hanbali']) {
     await page.evaluate((m) => { salah.act('menu'); salah.act(`madhab:${m}`); }, madhab);
-    for (const id of madhab === 'hanafi' ? ids : ['fajr', 'maghrib', 'witr', 'sahw', 'tayammum']) {
+    for (const id of madhab === 'hanafi' ? ids : ['fajr', 'maghrib', 'witr', 'sahw', 'tayammum', 'tasbihp']) {
       const r = await run(page, id);
       if (r.view !== 'done') throw new Error(`${madhab}/${id}: endet in „${r.view}“ nach ${r.n} Schritten`);
     }

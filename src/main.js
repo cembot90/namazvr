@@ -8,7 +8,8 @@ import { Guide, setFaces } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
-import { ALEVI, EXTRA_PRAYERS, MADHABS, PILGRIMAGES, PRAYERS, PURIFY, TASBIH, buildSteps, findPrayer } from './prayer.js';
+import { ALEVI, EXTRA_PRAYERS, MADHABS, NAFILE, PILGRIMAGES, PRAYERS, PURIFY, TASBIH, buildSteps, findPrayer, text as prayerText } from './prayer.js';
+import { HOLY_LINKS, buildHolyIcs, dueHoly, holyList, holyText } from './holy.js';
 import { LANGS, deviceLang, getLang, isLoaded, isRTL, langInfo, loadLang, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
 import { BADGES, emptyProgress, newQuiz, recordPractice, streak } from './learn.js';
@@ -27,7 +28,7 @@ import { JAMARAT, setCemStep, setSemah, updateCrowd } from './hajjworld.js';
 import { Ambience } from './ambient.js';
 import { Graphics, envFor } from './graphics.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
-import { formatDay, ramadanInfo } from './ramadan.js';
+import { formatDay, formatHijri, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
 import { ALL_PRAYERS, BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
 import { STORY_LIST, buildStory, findStory, storyQuestion } from './stories.js';
@@ -188,7 +189,9 @@ const state = {
   progress: loadProgress(profileId),
   pDel: null,
   // Erinnerung: an/aus und wie viele Minuten vorher
-  remind: { on: false, before: 10, prayers: ALL_PRAYERS, ...store.get('remind', {}) },
+  remind: { on: false, before: 10, prayers: ALL_PRAYERS, holy: true, ...store.get('remind', {}) },
+  holySel: null,
+  holyDua: null,
   remMsg: '',
   // Weiter ohne Tippen: Apple Watch / Kopfhörer bzw. Hand über die Kamera
   remoteMedia: store.get('remoteMedia', false),
@@ -606,7 +609,7 @@ function view() {
     case 'pilgrim':
       return { type: 'pilgrim', list: PILGRIMAGES, walkAlong: state.walkAlong, sounds: state.sounds, madhab: madhab().name, gender: state.gender };
     case 'remind':
-      return { type: 'remind', back: state.remFrom === 'settings' ? 'settings' : 'times', ...state.remind, prayerList: PRAYERS.map((p) => ({ id: p.id, name: p.name, on: state.remind.prayers.includes(p.id) })), msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
+      return { type: 'remind', back: ['settings', 'holy'].includes(state.remFrom) ? state.remFrom : 'times', ...state.remind, prayerList: PRAYERS.map((p) => ({ id: p.id, name: p.name, on: state.remind.prayers.includes(p.id) })), msg: state.remMsg, supported: canNotify(), perm: canNotify() ? Notification.permission : 'unsupported',
         ios: /iPhone|iPad/.test(navigator.userAgent) && !navigator.standalone, next: timesInfo().next };
     case 'tracker': {
       const p = state.progress, key = keyFor(state.trackBack);
@@ -632,6 +635,28 @@ function view() {
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'purify':
       return { type: 'more', title: t('pure.title'), note: t('pure.note'), prayers: PURIFY, madhab: madhab().name };
+    case 'nafile':
+      return { type: 'more', title: t('nfl.title'), note: t('nfl.note'), prayers: NAFILE, madhab: madhab().name };
+    case 'holy': {
+      const tz = state.location.timeZone || deviceZone;
+      const when = (e) => (e.days === 0 ? t('holy.today') : e.days === -1 ? t('holy.today') : e.days === 1 ? t('holy.tomorrowShort') : t('holy.inDays', e.days));
+      const list = holyList(new Date(), tz).map((e) => ({
+        id: e.id, icon: e.icon, night: !!e.night, days: e.days, name: t(`holy.${e.id}.name`), short: t(`holy.${e.id}.short`), when: when(e),
+        dateText: e.night ? t('holy.nightOf', formatDay(e.eve)) : formatDay(e.day), hijriText: formatHijri(e.day),
+      }));
+      const sel = list.find((e) => e.id === state.holySel);
+      let detail = null;
+      if (sel) {
+        const L = HOLY_LINKS[sel.id];
+        const label = (a) => (a.startsWith('prayer:') ? findPrayer(a.slice(7)).name : a === 'tasbih' ? t('ui.menuTasbih') : a === 'muharrem' ? t('alevi.muharremBtn') : a === 'ramadan' ? t('ram.menu') : t('story.menu'));
+        detail = {
+          ...sel, about: t(`holy.${sel.id}.about`), todo: t(`holy.${sel.id}.do`), kidsText: t(`holy.${sel.id}.kids`), note: t(`holy.${sel.id}.note`),
+          acts: L.acts.map((a) => ({ action: a, label: label(a) })), duas: L.duas.map((k) => ({ key: k, label: t(`holy.duaName.${k}`) })),
+          dua: state.holyDua && L.duas.includes(state.holyDua) ? prayerText(state.holyDua) : null, duaKey: state.holyDua,
+        };
+      }
+      return { type: 'holy', list, detail, kids: state.kids, remindOn: state.remind.on && state.remind.holy, msg: state.remMsg };
+    }
     case 'parents':
       return { type: 'parents', list: profiles.map((p) => parentReport(p, p.id === profileId ? state.progress : loadProgress(p.id))) };
     case 'settings':
@@ -871,6 +896,14 @@ function act(action) {
     case 'wudu': start(WUDU); break;
     case 'more': state.view = 'more'; break;
     case 'purify': state.view = 'purify'; break;
+    case 'nafile': state.view = 'nafile'; break;
+    case 'holy': state.view = 'holy'; state.holySel = arg || null; state.holyDua = null; state.remMsg = ''; break;
+    case 'hdua': state.holyDua = state.holyDua === arg ? null : arg; break;
+    case 'holycal':
+      downloadIcs(buildHolyIcs(new Date(), state.location.timeZone || deviceZone), 'namazvr-heilige-tage.ics');
+      state.remMsg = t('rem.calDone');
+      break;
+    case 'remholy': state.remind.holy = !state.remind.holy; store.set('remind', state.remind); break;
     case 'parents': state.view = 'parents'; break;
     case 'big': state.big = !state.big; store.set('big', state.big); applyComfort(); break;
     case 'calmmode': state.quiet = !state.quiet; store.set('calm', state.quiet); applyComfort(); break;
@@ -1597,6 +1630,18 @@ function checkReminder() {
   const { title, body } = reminderText(due.id, due.at, state.remind.before, loc.timeZone);
   notify(title, body);
 }
+// Erinnerung an heilige Tage und Nächte (am Vorabend bzw. Vortag)
+function checkHoly() {
+  if (!state.remind.on || !state.remind.holy || !canNotify() || Notification.permission !== 'granted') return;
+  const sent = new Set(store.get('holySent', []));
+  const due = dueHoly(new Date(), state.location.timeZone || deviceZone, sent);
+  if (!due) return;
+  sent.add(due.key);
+  store.set('holySent', [...sent].slice(-30));
+  const { title, body } = holyText(due.e, due.when);
+  notify(title, body);
+}
+setInterval(checkHoly, 60000);
 // Auch wenn der Bildschirm still steht (keine Animation, z. B. Tab im Hintergrund)
 setInterval(checkReminder, 30000);
 

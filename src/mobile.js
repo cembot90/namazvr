@@ -301,6 +301,30 @@ export class MobileUI {
       ${btn(t('ui.back'), 'menu', { cls: 'wide' })}`;
   }
 
+  // Heilige Tage und Nächte: Liste mit Datum, darunter je Tag eine Seite mit Erklärung, Gebeten und Bittgebeten
+  v_holy(v) {
+    const d = v.detail;
+    if (d) {
+      const list = (arr) => `<ul>${[].concat(arr).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
+      return `${head(`${d.icon} ${d.name}`, d.hijriText)}
+        <p class="gold"><b>${esc(d.dateText)}</b> <span class="muted">· ${esc(d.when)}</span></p>
+        ${v.kids ? `<p>${esc(d.kidsText)}</p>` : [].concat(d.about).map((x) => `<p>${esc(x)}</p>`).join('')}
+        <h3>${esc(t('holy.doTitle'))}</h3>${list(d.todo)}
+        ${d.note ? `<p class="muted small">${esc(d.note)}</p>` : ''}
+        ${d.acts.length ? `<div class="grid2">${d.acts.map((a) => btn(a.label, a.action)).join('')}</div>` : ''}
+        ${d.duas.length ? `<h3>${esc(t('holy.duaTitle'))}</h3><div class="grid2">${d.duas.map((x) => btn(`🔊 ${x.label}`, `hdua:${x.key}`, { cls: x.key === d.duaKey ? 'active' : '' })).join('')}</div>` : ''}
+        ${d.dua ? recitation(d.dua) : ''}
+        ${btn(t('ui.back'), 'holy', { cls: 'wide' })}`;
+    }
+    return `${head(t('holy.title'), t('holy.sub'))}
+      <div class="list">${v.list.map((e) => btn(`${e.icon} ${e.name}`, `holy:${e.id}`, { sub: `${e.dateText} · ${e.when}`, cls: e.days <= 0 ? 'active' : '' })).join('')}</div>
+      <p class="muted small">${esc(t('holy.sighting'))}</p>
+      <div class="setting"><div><b>${esc(t('holy.remind'))}</b><small>${esc(t('holy.remindSub'))}</small></div>${btn(v.remindOn ? t('ui.on') : t('ui.off'), 'remind', { cls: v.remindOn ? 'active' : '' })}</div>
+      ${btn(t('holy.cal'), 'holycal', { cls: 'primary wide' })}
+      ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
   // Eltern-Übersicht: je Familienmitglied eine Karte mit Zahlen und Tipps
   v_parents(v) {
     const card = (r) => `<div class="pcard">
@@ -540,6 +564,8 @@ export class MobileUI {
       <p class="muted small">${esc(t('rem.calSub'))}</p>
       <h3>${esc(t('rem.which'))}</h3>
       <div class="grid5">${v.prayerList.map((p) => btn(`${p.on ? '✓ ' : ''}${p.name}`, `remp:${p.id}`, { cls: p.on ? 'active' : '' })).join('')}</div>
+      <div class="setting"><div><b>${esc(t('holy.remind'))}</b><small>${esc(t('holy.remindSub'))}</small></div>${btn(v.holy ? t('ui.on') : t('ui.off'), 'remholy', { cls: v.holy ? 'active' : '' })}</div>
+      ${btn(t('holy.cal'), 'holycal', { cls: 'wide' })}
       ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
       ${btn(t('ui.back'), v.back, { cls: 'wide' })}`;
   }

@@ -26,8 +26,22 @@ export const EXTRA_PRAYERS = [
   { id: 'tahiyya', rakat: 2, kind: 'sunnah' },
   { id: 'eid', rakat: 2, kind: 'eid' },
   { id: 'janaza', rakat: 0, kind: 'janaza' },
-  { id: 'tarawih', rakat: 2, kind: 'sunnah' },
+  { id: 'tarawih', rakat: 2, kind: 'sunnah', note: true },
   { id: 'sahw', rakat: 0, kind: 'sahw' },
+].map(named);
+
+// Freiwillige Gebete (Nāfila / Nafile): wann, wie viele Rakʿāt, und bei manchen ein Bittgebet am Ende.
+// note: Hinweis „wann und wie viele“ (nfl.when.<id>) beim Schritt der Absicht; duaAfter: Bittgebet nach dem Salām.
+export const NAFILE = [
+  { id: 'tahajjud', rakat: 2, kind: 'sunnah', note: true },
+  { id: 'duha', rakat: 2, kind: 'sunnah', note: true },
+  { id: 'ishraq', rakat: 2, kind: 'sunnah', note: true },
+  { id: 'awwabin', rakat: 2, kind: 'sunnah', note: true },
+  { id: 'wuduprayer', rakat: 2, kind: 'sunnah', note: true },
+  { id: 'istikhara', rakat: 2, kind: 'sunnah', note: true, duaAfter: 'istikhara' },
+  { id: 'hajat', rakat: 2, kind: 'sunnah', note: true, duaAfter: 'yunus' },
+  { id: 'tawba', rakat: 2, kind: 'sunnah', note: true, duaAfter: 'istighfar' },
+  { id: 'tasbihp', rakat: 4, kind: 'sunnah', note: true, tasbih: true },
 ].map(named);
 
 // Waschungen: kleine Waschung (Wuḍūʾ), Ganzkörperwaschung (Ghusl), Reinigung ohne Wasser (Tayammum)
@@ -40,7 +54,7 @@ export const ALEVI = [{ id: 'cem', kind: 'cem' }, { id: 'semah', kind: 'semah' }
 export const IHRAM_PRAYER = named({ id: 'ihramp', rakat: 2, kind: 'sunnah' });
 export const TAWAF_PRAYER = named({ id: 'tawafp', rakat: 2, kind: 'sunnah' });
 
-export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...PURIFY, ...PILGRIMAGES, ...ALEVI, ...STORY_LIST].find((p) => p.id === id);
+export const findPrayer = (id) => [...PRAYERS, ...EXTRA_PRAYERS, ...NAFILE, ...PURIFY, ...PILGRIMAGES, ...ALEVI, ...STORY_LIST].find((p) => p.id === id);
 
 // Vereinfachte Unterschiede der vier sunnitischen Rechtsschulen (für Männer; Details bei Gelehrten erfragen).
 // Texte (hands, takbir, notes) stehen in der Sprachdatei unter madhab.<id>.
@@ -367,6 +381,55 @@ Object.assign(TXT, {
     ar: ['بِسْمِ اللَّهِ، اللَّهُ أَكْبَرُ'],
     tr: ['Bismi llāh, Allāhu akbar'],
   },
+  // Tesbih-Gebet: der vierteilige Lobpreis, 75× in jeder Rakʿa
+  tsp: {
+    ar: ['سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ'],
+    tr: ['Subḥāna llāhi wa l-ḥamdu li-llāhi wa lā ilāha illa llāhu wa llāhu akbar'],
+  },
+  // Bittgebet um die rechte Wahl (Buḫārī)
+  istikhara: {
+    ar: [
+      'اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ، وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ، وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ، فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ، وَتَعْلَمُ وَلَا أَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ',
+      'اللَّهُمَّ إِنْ كُنْتَ تَعْلَمُ أَنَّ هَٰذَا الْأَمْرَ خَيْرٌ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي، فَاقْدُرْهُ لِي وَيَسِّرْهُ لِي، ثُمَّ بَارِكْ لِي فِيهِ',
+      'وَإِنْ كُنْتَ تَعْلَمُ أَنَّ هَٰذَا الْأَمْرَ شَرٌّ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي، فَاصْرِفْهُ عَنِّي وَاصْرِفْنِي عَنْهُ، وَاقْدُرْ لِيَ الْخَيْرَ حَيْثُ كَانَ، ثُمَّ أَرْضِنِي بِهِ',
+    ],
+    tr: [
+      'Allāhumma innī astakhīruka bi-ʿilmika, wa astaqdiruka bi-qudratika, wa asʾaluka min faḍlika l-ʿaẓīm, fa-innaka taqdiru wa lā aqdir, wa taʿlamu wa lā aʿlam, wa anta ʿallāmu l-ghuyūb.',
+      'Allāhumma in kunta taʿlamu anna hādha l-amra khayrun lī fī dīnī wa maʿāshī wa ʿāqibati amrī, fa-qdurhu lī wa yassirhu lī, thumma bārik lī fīh.',
+      'Wa in kunta taʿlamu anna hādha l-amra sharrun lī fī dīnī wa maʿāshī wa ʿāqibati amrī, fa-ṣrifhu ʿannī wa-ṣrifnī ʿanh, wa-qdur liya l-khayra ḥaythu kān, thumma arḍinī bih.',
+    ],
+  },
+  // Sayyid al-Istighfār, das „beste Bittgebet um Vergebung“ (Buḫārī)
+  istighfar: {
+    ar: [
+      'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَٰهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَىٰ عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ',
+      'أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي، فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',
+    ],
+    tr: [
+      'Allāhumma anta rabbī lā ilāha illā ant, khalaqtanī wa ana ʿabduk, wa ana ʿalā ʿahdika wa waʿdika mā staṭaʿt.',
+      'Aʿūdhu bika min sharri mā ṣanaʿt, abūʾu laka bi-niʿmatika ʿalayya, wa abūʾu laka bi-dhanbī, fa-ghfir lī, fa-innahū lā yaghfiru dh-dhunūba illā ant.',
+    ],
+  },
+  // Bittgebet des Propheten Yūnus im Bauch des Fisches (Koran 21:87)
+  yunus: {
+    ar: ['لَا إِلَٰهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ'],
+    tr: ['Lā ilāha illā anta subḥānaka innī kuntu mina ẓ-ẓālimīn.'],
+  },
+  // Bittgebet für die Nacht der Bestimmung (Tirmiḏī)
+  qadrDua: {
+    ar: ['اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي'],
+    tr: ['Allāhumma innaka ʿafuwwun tuḥibbu l-ʿafwa fa-ʿfu ʿannī.'],
+  },
+  // Kurze Segensbitte für den Propheten
+  salawatShort: {
+    ar: ['اللَّهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ وَعَلَىٰ آلِ سَيِّدِنَا مُحَمَّدٍ'],
+    tr: ['Allāhumma ṣalli ʿalā sayyidinā Muḥammadin wa ʿalā āli sayyidinā Muḥammad.'],
+  },
+  // Kurze Bitte um Vergebung
+  astaghfir: {
+    ar: ['أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ الْحَيَّ الْقَيُّومَ وَأَتُوبُ إِلَيْهِ'],
+    tr: ['Astaghfiru llāha l-ʿaẓīma lladhī lā ilāha illā huwa l-ḥayya l-qayyūma wa atūbu ilayh.'],
+  },
   tashriq: {
     ar: ['اللَّهُ أَكْبَرُ اللَّهُ أَكْبَرُ، لَا إِلَٰهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ وَلِلَّهِ الْحَمْدُ'],
     tr: ['Allāhu akbar, Allāhu akbar, lā ilāha illa llāhu wa llāhu akbar, Allāhu akbar wa li-llāhi l-ḥamd'],
@@ -487,6 +550,8 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
       instr: t('instr.niyya', unit.niyya),
       de: [
         kind === 'jumua' ? t('instr.jumua', f) : kind === 'eid' ? t('ext.eidNote') : t('instr.heart'),
+        ...(prayer.note && ui === 0 ? [t(`nfl.when.${prayer.id}`)] : []),
+        ...(prayer.tasbih && ui === 0 ? [t(`tsp.school.${m.id}`)] : []),
         ...(ui === 0 ? [t(`awra.${gender}`) || t('awra.m')] : []),
       ],
     });
@@ -553,5 +618,35 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
       }
     }
   }
-  return steps;
+  // Istikhāra, Ḥājat, Tawba: nach dem Salām mit erhobenen Händen das passende Bittgebet
+  if (prayer.duaAfter) {
+    const last = steps[steps.length - 1];
+    add({ unit: last.unit, of: last.of, rakah: last.rakah, key: 'dua', title: t(`nfl.duaTitle.${prayer.id}`), pose: 'sitDua', how: sitText(true, prayer.rakat), dur: prayer.duaAfter === 'istikhara' ? 40 : 16, instr: t(`nfl.duaInstr.${prayer.id}`), ...text(prayer.duaAfter) });
+  }
+  return prayer.tasbih ? withTasbih(steps, m) : steps;
+}
+
+// Tesbih-Gebet (Ṣalāt at-Tasbīḥ): in jeder Rakʿa 75× „Subḥāna llāh, wa l-ḥamdu li-llāh, wa lā ilāha illa llāh, wa llāhu akbar“,
+// zusammen 300. Ḥanafī (nach ʿAbdullāh ibn al-Mubārak): 15× vor der Fātiḥa, 10× nach der Sure, je 10× in Rukūʿ, Stehen,
+// beiden Niederwerfungen und dem Sitzen dazwischen. Sonst (nach dem Ḥadīṯ des Ibn ʿAbbās): 15× nach der Sure,
+// je 10× in Rukūʿ, Stehen, Niederwerfungen, Sitzen dazwischen und 10× im Sitzen nach der zweiten Niederwerfung.
+function withTasbih(steps, m) {
+  const hanafi = m.id === 'hanafi', out = [];
+  const add = (s, n, where, pose = s.pose, how = s.how) => out.push({
+    unit: s.unit, of: s.of, rakah: s.rakah, key: 'tasbihp', title: t('tsp.title', n), pose, how, dur: Math.round(n * 2.6), instr: t(`tsp.at.${where}`, n), ...text('tsp'),
+  });
+  const seenFatiha = new Set();
+  for (const s of steps) {
+    const r = `${s.unit}|${s.rakah}`;
+    if (hanafi && s.key === 'fatiha' && !seenFatiha.has(r)) { seenFatiha.add(r); add(s, 15, 'before'); }
+    out.push(s);
+    if (s.key === 'sura') add(s, hanafi ? 10 : 15, 'sura');
+    else if (s.key === 'ruku' || s.key === 'itidal' || s.key === 'jalsa') add(s, 10, s.key);
+    else if (s.key === 'sujud') {
+      add(s, 10, 'sujud');
+      // nach der 2. Niederwerfung (Ibn ʿAbbās): noch kurz sitzen und 10× sprechen
+      if (!hanafi && s.title === t('title.sujud2')) add(s, 10, 'after', 'sit', t('iftirash'));
+    }
+  }
+  return out;
 }

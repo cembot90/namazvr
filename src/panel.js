@@ -584,10 +584,10 @@ export class Panel extends CanvasPlane {
   v_more(v) {
     const { W, H } = this;
     this.heading(v.title || t('ui.menuMore'), v.madhab);
-    const gap = 20, w = (W - 120 - gap) / 2, h = 112;
+    const gap = 20, w = (W - 120 - gap) / 2, rows = Math.ceil(v.prayers.length / 2), h = Math.min(112, Math.floor((H - 350) / rows) - 10);
     v.prayers.forEach((p, i) => {
-      const x = 60 + (i % 2) * (w + gap), y = 130 + Math.floor(i / 2) * (h + 12);
-      this.btn(p.name, x, y, w, h, `prayer:${p.id}`, { size: 34, sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de, subSize: 24 });
+      const x = 60 + (i % 2) * (w + gap), y = 130 + Math.floor(i / 2) * (h + 10);
+      this.btn(p.name, x, y, w, h, `prayer:${p.id}`, { size: h < 100 ? 30 : 34, sub: p.rakat ? `${t('ui.rakat', p.rakat)} · ${p.de}` : p.de, subSize: h < 100 ? 20 : 24 });
     });
     this.paragraphs([v.note || t('ui.moreNote')], H - 200, { size: 24, color: C.muted, gap: 0 });
     this.btn(t('ui.back'), 60, H - 140, W - 120, 96, 'menu');
@@ -644,6 +644,40 @@ export class Panel extends CanvasPlane {
     row(742, t('ui.takt'), t('ui.taktSub'), [[t('ui.natural'), 'ctakt:natural', v.natural], [t('ui.sync'), 'ctakt:sync', !v.natural]]);
     row(817, t('gal.title'), t('gal.sub'), [[t('gal.screen'), 'women:screen', v.womenPlace !== 'gallery'], [t('gal.gallery'), 'women:gallery', v.womenPlace === 'gallery']]);
     this.btn(t('ui.back'), 60, H - 98, W - 120, 80, 'menu');
+  }
+
+  // Heilige Tage und Nächte: Liste (zwei Spalten) oder ein Tag mit Erklärung, Gebeten und Bittgebeten
+  v_holy(v) {
+    const { W, H } = this, d = v.detail, gap = 20, half = (W - 120 - gap) / 2;
+    if (d) {
+      this.heading(`${d.icon} ${d.name}`, d.hijriText);
+      this.text(`${d.dateText} · ${d.when}`, 60, 160, { size: 27, weight: 600, color: C.gold });
+      if (d.dua) this.recitation(d.dua, 190, 640, true);
+      else {
+        let y = this.paragraphs([v.kids ? d.kidsText : [].concat(d.about)[0]], 205, { size: 23, gap: 8 });
+        this.text(t('holy.doTitle'), 60, y + 8, { size: 25, weight: 700, color: C.gold });
+        y = this.paragraphs([].concat(d.todo).map((x) => `• ${x}`), y + 42, { size: 22, gap: 2 });
+        if (d.note && y < 600) this.paragraphs([d.note], y + 6, { size: 20, color: C.muted, gap: 0 });
+      }
+      const row = (items, y) => {
+        const n = Math.max(1, items.length), w = (W - 120 - 14 * (n - 1)) / n;
+        items.forEach((it, i) => this.btn(it.label, 60 + i * (w + 14), y, w, 70, it.action, { size: 24, active: it.active }));
+      };
+      row(d.acts, 660);
+      if (d.duas.length) row(d.duas.map((x) => ({ label: `🔊 ${x.label}`, action: `hdua:${x.key}`, active: x.key === d.duaKey })), 745);
+      this.btn(t('ui.back'), 60, H - 120, W - 120, 88, 'holy');
+      return;
+    }
+    this.heading(t('holy.title'), t('holy.sub'));
+    v.list.forEach((e, i) => {
+      const x = 60 + (i % 2) * (half + gap), y = 122 + Math.floor(i / 2) * 92;
+      this.btn(`${e.icon} ${e.name}`, x, y, half, 84, `holy:${e.id}`, { size: 27, sub: `${e.dateText} · ${e.when}`, subSize: 19, active: e.days <= 0 });
+    });
+    this.paragraphs([t('holy.sighting')], 690, { size: 19, color: C.muted, gap: 0 });
+    this.switchRow(730, t('holy.remind'), t('holy.remindSub'), [[v.remindOn ? t('ui.on') : t('ui.off'), 'remind', v.remindOn]]);
+    if (v.msg) this.text(v.msg, 60, 832, { size: 22, color: C.gold });
+    this.btn(t('holy.cal'), 60, H - 120, half, 88, 'holycal', { primary: true, size: 26 });
+    this.btn(t('ui.menu'), 60 + half + gap, H - 120, half, 88, 'menu');
   }
 
   // Eltern-Übersicht: je Familienmitglied eine Spalte mit Zahlen und den nächsten Schritten
@@ -973,7 +1007,8 @@ export class Panel extends CanvasPlane {
     this.text(t('rem.which'), 60, y + 30, { size: 26, weight: 600 });
     const gap = 16, w = (W - 120 - gap * 4) / 5;
     v.prayerList.forEach((p, i) => this.btn(`${p.on ? '✓ ' : ''}${p.name}`, 60 + i * (w + gap), y + 50, w, 66, `remp:${p.id}`, { active: p.on, size: 26 }));
-    if (v.msg) this.paragraphs([v.msg], y + 150, { size: 24, color: C.gold, gap: 0 });
+    this.switchRow(y + 128, t('holy.remind'), t('holy.remindSub'), [[v.holy ? t('ui.on') : t('ui.off'), 'remholy', v.holy]]);
+    if (v.msg) this.paragraphs([v.msg], y + 220, { size: 24, color: C.gold, gap: 0 });
     this.btn(t('ui.back'), 60, H - 128, W - 120, 96, v.back);
   }
 
