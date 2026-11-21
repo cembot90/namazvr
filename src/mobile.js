@@ -536,9 +536,20 @@ export class MobileUI {
     return `${head(t('hajj.title'), `${v.madhab} · ${v.gender === 'f' ? t('ui.women') : t('ui.men')}`)}
       ${t('hajj.intro').map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
       <div class="list">${v.list.map((p, i) => btn(`${i ? '🕋' : '🤍'} ${p.name}`, `prayer:${p.id}`, { cls: 'primary', sub: p.de })).join('')}</div>
+      ${btn(t('hinfo.btn'), 'hajjinfo', { cls: 'wide' })}
       ${toggle}${sounds}
       <p class="muted small">${esc(t('hajj.note'))}</p>
       ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Wissen zu Hac und Umre: Reiter mit Grundlagen, Pflichtteilen, Zeitplan, Iḥrām, Medina, Vorbereitung, Geschichte
+  v_hajjinfo(v) {
+    const tabs = Object.entries(t('hinfo.tabs'));
+    return `${head(t('hinfo.title'), v.nextText)}
+      <div class="grid3">${tabs.map(([id, l]) => btn(l, `hajjinfo:${id}`, { cls: v.part === id ? 'active' : '' })).join('')}</div>
+      ${v.kids ? `<p class="gold">${esc(t(`hinfo.kid.${v.part}`))}</p>` : ''}
+      ${t(`hinfo.${v.part}`).map((p) => `<p>${esc(p)}</p>`).join('')}
+      <div class="grid2">${btn(t('hajj.title'), 'pilgrim')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   v_profiles(v) {

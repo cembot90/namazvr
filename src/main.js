@@ -28,7 +28,7 @@ import { JAMARAT, setCemStep, setSemah, updateCrowd } from './hajjworld.js';
 import { Ambience } from './ambient.js';
 import { Graphics, envFor } from './graphics.js';
 import { TRACK_DAYS, dayDone, fullStreak, keyFor, markPrayed, prayedOn, toggle as toggleTrack, week } from './tracker.js';
-import { formatDay, formatHijri, ramadanInfo } from './ramadan.js';
+import { addDays, formatDay, formatHijri, ramadanInfo } from './ramadan.js';
 import { dayKey } from './learn.js';
 import { ALL_PRAYERS, BEFORE, askPermission, buildIcs, canNotify, downloadIcs, dueReminder, notify, reminderText } from './remind.js';
 import { STORY_LIST, buildStory, findStory, storyQuestion } from './stories.js';
@@ -635,6 +635,11 @@ function view() {
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'purify':
       return { type: 'more', title: t('pure.title'), note: t('pure.note'), prayers: PURIFY, madhab: madhab().name };
+    case 'hajjinfo': {
+      const arafa = holyList(new Date(), state.location.timeZone || deviceZone).find((e) => e.id === 'arafa');
+      const start = arafa && addDays(arafa.day, -1);
+      return { type: 'hajjinfo', part: state.hajjPart || 'basics', kids: state.kids, nextText: arafa ? t('hinfo.next', formatDay(start), Math.max(0, arafa.days - 1)) : '' };
+    }
     case 'nafile':
       return { type: 'more', title: t('nfl.title'), note: t('nfl.note'), prayers: NAFILE, madhab: madhab().name };
     case 'holy': {
@@ -648,7 +653,7 @@ function view() {
       let detail = null;
       if (sel) {
         const L = HOLY_LINKS[sel.id];
-        const label = (a) => (a.startsWith('prayer:') ? findPrayer(a.slice(7)).name : a === 'tasbih' ? t('ui.menuTasbih') : a === 'muharrem' ? t('alevi.muharremBtn') : a === 'ramadan' ? t('ram.menu') : t('story.menu'));
+        const label = (a) => (a.startsWith('prayer:') ? findPrayer(a.slice(7)).name : a === 'tasbih' ? t('ui.menuTasbih') : a === 'muharrem' ? t('alevi.muharremBtn') : a === 'ramadan' ? t('ram.menu') : a === 'hajjinfo' ? t('hinfo.btn') : a === 'pilgrim' ? t('hajj.menu') : t('story.menu'));
         detail = {
           ...sel, about: t(`holy.${sel.id}.about`), todo: t(`holy.${sel.id}.do`), kidsText: t(`holy.${sel.id}.kids`), note: t(`holy.${sel.id}.note`),
           acts: L.acts.map((a) => ({ action: a, label: label(a) })), duas: L.duas.map((k) => ({ key: k, label: t(`holy.duaName.${k}`) })),
@@ -897,6 +902,7 @@ function act(action) {
     case 'more': state.view = 'more'; break;
     case 'purify': state.view = 'purify'; break;
     case 'nafile': state.view = 'nafile'; break;
+    case 'hajjinfo': state.view = 'hajjinfo'; state.hajjPart = arg || 'basics'; break;
     case 'holy': state.view = 'holy'; state.holySel = arg || null; state.holyDua = null; state.remMsg = ''; break;
     case 'hdua': state.holyDua = state.holyDua === arg ? null : arg; break;
     case 'holycal':

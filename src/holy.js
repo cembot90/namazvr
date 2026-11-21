@@ -29,7 +29,7 @@ export const HOLY_LINKS = {
   ramadan: { acts: ['ramadan', 'prayer:tarawih', 'prayer:witr'], duas: [] },
   qadr: { acts: ['prayer:tasbihp', 'prayer:tahajjud', 'prayer:tarawih'], duas: ['qadrDua', 'istighfar'] },
   fitr: { acts: ['prayer:eid', 'tasbih'], duas: ['tashriq'] },
-  arafa: { acts: ['prayer:dhuhr', 'tasbih'], duas: ['tahlil', 'tashriq'] },
+  arafa: { acts: ['hajjinfo', 'pilgrim', 'tasbih'], duas: ['tahlil', 'tashriq'] },
   adha: { acts: ['prayer:eid', 'tasbih'], duas: ['tashriq'] },
 };
 

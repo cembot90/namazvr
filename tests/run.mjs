@@ -255,9 +255,9 @@ test('inhalte: Gebetszeiten, Qibla und islamischer Kalender', async () => {
 });
 
 // ---------- Oberfläche ----------
-const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'nafile', 'holy', 'holy:qadr', 'holy:mevlid', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
+const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'nafile', 'holy', 'holy:qadr', 'holy:mevlid', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'hajjinfo', 'hajjinfo:pillars', 'hajjinfo:days', 'hajjinfo:ihram', 'hajjinfo:medina', 'hajjinfo:prep', 'hajjinfo:history', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
 // Auf dem Bildschirm darf kein unübersetzter Schlüssel und kein „undefined“ stehen
-const BAD = /\b(?:nfl|tsp|holy|pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
+const BAD = /\b(?:hinfo|nfl|tsp|holy|pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
 
 for (const mode of ['mobile', 'desktop']) {
   test(`oberfläche (${mode}): jede Ansicht in jeder Sprache ohne Fehler`, async () => {

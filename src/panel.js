@@ -965,7 +965,23 @@ export class Panel extends CanvasPlane {
     this.switchRow(y, t('hajj.walk'), t('hajj.walkSub'), [[v.walkAlong ? t('ui.on') : t('ui.off'), 'walkalong', v.walkAlong]]);
     this.switchRow(y + 90, t('hajj.sounds'), t('hajj.soundsSub'), [[v.sounds ? t('ui.on') : t('ui.off'), 'sounds', v.sounds]]);
     this.paragraphs([t('hajj.note')], y + 200, { size: 21, color: C.muted, gap: 0 });
-    this.btn(t('ui.menu'), 60, H - 128, W - 120, 96, 'menu');
+    const half = (W - 140) / 2;
+    this.btn(t('hinfo.btn'), 60, H - 128, half, 96, 'hajjinfo', { size: 28 });
+    this.btn(t('ui.menu'), 80 + half, H - 128, half, 96, 'menu');
+  }
+
+  // Wissen zu Hac und Umre: sieben Reiter, darunter der Text
+  v_hajjinfo(v) {
+    const { W, H } = this;
+    this.heading(t('hinfo.title'), v.nextText);
+    const tabs = Object.entries(t('hinfo.tabs')), gap = 10, w = (W - 120 - gap * (tabs.length - 1)) / tabs.length;
+    tabs.forEach(([id, label], i) => this.btn(label, 60 + i * (w + gap), 130, w, 64, `hajjinfo:${id}`, { active: v.part === id, size: 20 }));
+    let y = 240;
+    if (v.kids) y = this.paragraphs([t(`hinfo.kid.${v.part}`)], y, { size: 23, color: C.gold, gap: 12 });
+    this.paragraphs(t(`hinfo.${v.part}`), y, { size: 22, gap: 10 });
+    const half = (W - 140) / 2;
+    this.btn(t('hajj.title'), 60, H - 120, half, 88, 'pilgrim');
+    this.btn(t('ui.menu'), 80 + half, H - 120, half, 88, 'menu');
   }
 
   // Familie: Profile wechseln, hinzufügen, umbenennen, löschen
