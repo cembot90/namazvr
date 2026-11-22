@@ -255,9 +255,9 @@ test('inhalte: Gebetszeiten, Qibla und islamischer Kalender', async () => {
 });
 
 // ---------- Oberfläche ----------
-const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'nafile', 'holy', 'holy:qadr', 'holy:mevlid', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'hajjinfo', 'hajjinfo:pillars', 'hajjinfo:days', 'hajjinfo:ihram', 'hajjinfo:medina', 'hajjinfo:prep', 'hajjinfo:history', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
+const VIEWS = ['menu', 'times', 'qibla', 'more', 'purify', 'nafile', 'elif', 'elif:marks', 'elif:words', 'elif:quiz', 'esma', 'esma:list', 'esma:quiz', 'adapt', 'kaza', 'zakat', 'cuma', 'siyer', 'certs', 'hoca', 'tasks', 'holy', 'holy:qadr', 'holy:mevlid', 'parents', 'settings', 'mosque', 'voice', 'profiles', 'remind', 'tracker', 'ramadan', 'learn', 'quiz', 'suras', 'sura:fatiha', 'sura:ezan', 'duas', 'peace', 'calm', 'tasbih', 'info', 'pilgrim', 'hajjinfo', 'hajjinfo:pillars', 'hajjinfo:days', 'hajjinfo:ihram', 'hajjinfo:medina', 'hajjinfo:prep', 'hajjinfo:history', 'alevi', 'muharrem', 'muharrem:asure', 'alevival', 'stories', 'sky'];
 // Auf dem Bildschirm darf kein unübersetzter Schlüssel und kein „undefined“ stehen
-const BAD = /\b(?:hinfo|nfl|tsp|holy|pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
+const BAD = /\b(?:elif|esma|sit|sefer|kaza|zakat|cuma|siyer|cert|hoca|hinfo|nfl|tsp|holy|pure|sahw|par|comfort|ui|hajj|story|sky|alevi|duas|rem|prof|track|ram|voice|gal|ghost|ext|gfx|wudu|quiz|peace|kids|suras|hands|pn|pd)\.[A-Za-z][\w.]*\b|undefined|NaN|\[object/;
 
 for (const mode of ['mobile', 'desktop']) {
   test(`oberfläche (${mode}): jede Ansicht in jeder Sprache ohne Fehler`, async () => {
@@ -323,6 +323,20 @@ test('abläufe (Handy): jedes Gebet und die Waschung bis zum Ende', async () => 
       if (r.view !== 'done') throw new Error(`${madhab}/${id}: endet in „${r.view}“ nach ${r.n} Schritten`);
     }
   }
+  // Im Sitzen (Boden, Stuhl), unterwegs und als Kaza
+  for (const mode of ['floor', 'chair']) {
+    await page.evaluate((m) => { salah.act('menu'); salah.act(`sitting:${m}`); }, mode);
+    for (const id of ['fajr', 'isha', 'witr', 'istikhara']) {
+      const r = await run(page, id);
+      if (r.view !== 'done') throw new Error(`sitzend ${mode}/${id}: endet in „${r.view}“`);
+    }
+  }
+  await page.evaluate(() => { salah.act('sitting:off'); salah.act('travel'); });
+  const travel = await page.evaluate(() => { salah.act('prayer:dhuhr'); return Math.max(...salah.state.steps.map((s) => s.rakah || 0)); });
+  if (travel !== 2) throw new Error(`unterwegs: Dhuhr hat ${travel} statt 2 Rakʿāt`);
+  await page.evaluate(() => { salah.act('menu'); salah.act('travel'); salah.act('kz:fajr:3'); });
+  const kz = await run(page, 'fajr').then(() => page.evaluate(async () => { salah.act('menu'); salah.act('kazapray:fajr'); salah.state.auto = false; for (let i = 0; i < 200 && salah.state.view === 'step'; i++) salah.act('next'); return salah.state.progress.kaza; }));
+  if (kz.fajr !== 2 || kz.made !== 1) throw new Error(`Kaza: ${JSON.stringify(kz)}`);
   const p = await page.evaluate(() => { salah.act('madhab:hanafi'); return salah.state.progress; });
   for (const id of ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha']) if (!p.done[id]) throw new Error(`Fortschritt: ${id} nicht gezählt`);
   if (!(p.wudu > 0)) throw new Error('Fortschritt: Waschung nicht gezählt');

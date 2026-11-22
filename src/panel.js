@@ -709,9 +709,11 @@ export class Panel extends CanvasPlane {
         yy += 8;
       }
     });
-    const by = H - 120, bw = (W - 120 - gap) / 2;
-    this.btn(t('par.profiles'), 60, by, bw, 90, 'profiles');
-    this.btn(t('ui.back'), 60 + bw + gap, by, bw, 90, 'menu');
+    const by = H - 120, bw = (W - 120 - gap * 3) / 4;
+    this.btn(t('par.profiles'), 60, by, bw, 90, 'profiles', { size: 26 });
+    this.btn(`📄 ${t('cert.menu')}`, 60 + (bw + gap), by, bw, 90, 'certs', { size: 26 });
+    this.btn(`🎓 ${t('hoca.menu')}`, 60 + 2 * (bw + gap), by, bw, 90, 'hoca', { size: 26 });
+    this.btn(t('ui.back'), 60 + 3 * (bw + gap), by, bw, 90, 'menu', { size: 26 });
   }
 
   v_learn(v) {
@@ -1034,6 +1036,46 @@ export class Panel extends CanvasPlane {
     this.btn(t('elif.say'), 70 + bw, H - 210, bw, 84, 'sisay', { primary: true, size: 28 });
     this.btn('▶', 80 + 2 * bw, H - 210, bw, 84, 'sinext', { size: 36 });
     this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
+  }
+
+  // Urkunden, Hoca-Modus und Aufgaben auf der Tafel
+  v_certs(v) {
+    const { W, H } = this;
+    this.heading(t('cert.menu'), t('cert.sub'));
+    const cw = (W - 140) / 2;
+    v.list.forEach((b, i) => {
+      const x = 60 + (i % 2) * (cw + 20), y = 125 + Math.floor(i / 2) * 84;
+      this.btn(`${b.ok ? '★' : '☆'} ${b.name}`, x, y, cw, 74, b.ok ? `cert:${b.i}` : 'noop', { primary: b.ok, size: 24 });
+    });
+    this.paragraphs([v.msg || (v.vr ? t('cert.vr') : t('cert.save'))], H - 170, { size: 21, color: C.muted, gap: 0 });
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
+  }
+
+  v_hoca(v) {
+    const { W, H } = this;
+    this.heading(t('hoca.title'), t('hoca.sub'));
+    const y0 = this.paragraphs([t('hoca.intro')], 150, { size: 20, color: C.muted, gap: 0 });
+    const cw = (W - 120 - 30) / 4;
+    v.all.forEach((x, i) => this.btn(`${x.on ? '✓ ' : ''}${x.label}`, 60 + (i % 4) * (cw + 10), y0 + 10 + Math.floor(i / 4) * 66, cw, 58, `hpick:${x.id}`, { active: x.on, size: 19 }));
+    const y = y0 + 10 + Math.ceil(v.all.length / 4) * 66 + 10;
+    if (v.link) this.paragraphs([v.link], y + 20, { size: 18, color: C.gold, gap: 0 });
+    if (v.msg) this.text(v.msg, 60, y + 70, { size: 22, color: C.gold });
+    const half = (W - 140) / 2;
+    this.btn(t('hoca.share'), 60, H - 110, half, 84, 'hshare', { primary: true });
+    this.btn(t('ui.menu'), 80 + half, H - 110, half, 84, 'menu');
+  }
+
+  v_tasks(v) {
+    const { W, H } = this;
+    this.heading(t('hoca.tasks'), t('hoca.from', v.from));
+    this.text(`${v.done} / ${v.list.length}${v.done === v.list.length && v.list.length ? `  ·  ${t('hoca.allDone')}` : ''}`, 60, 175, { size: 34, weight: 700, color: C.gold });
+    const cw = (W - 140) / 2;
+    v.list.forEach((x, i) => this.btn(`${x.ok ? '✅' : '⬜'} ${x.label}`, 60 + (i % 2) * (cw + 20), 205 + Math.floor(i / 2) * 76, cw, 68, x.action, { active: x.ok, size: 22 }));
+    if (v.msg) this.text(v.msg, 60, H - 140, { size: 22, color: C.gold });
+    const third = (W - 160) / 3;
+    this.btn(t('hoca.result'), 60, H - 110, third, 84, 'tresult', { primary: true, size: 24 });
+    this.btn(t('hoca.clear'), 80 + third, H - 110, third, 84, 'tclear', { size: 24 });
+    this.btn(t('ui.menu'), 100 + 2 * third, H - 110, third, 84, 'menu');
   }
 
   // Gebet anpassen: Sitzen und Reise

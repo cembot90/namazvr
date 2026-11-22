@@ -47,6 +47,15 @@ export function sentences(text) {
   return out;
 }
 
+// Echte Rezitation statt Computerstimme: Liegt für einen arabischen Text eine Aufnahme in audio/ar/ (Verzeichnis
+// audio/ar/index.json: { "<Schlüssel>": "<Datei>" }), wird sie abgespielt. Schlüssel = recKey(Text), siehe tools/recordings.mjs.
+export function recKey(text) {
+  const s = String(text).normalize('NFC').replace(/[\s\u200c\u200f]+/g, ' ').trim();
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, '0');
+}
+
 export class Voices {
   constructor({ onChange = () => {}, enabled = true } = {}) {
     this.onChange = onChange;
@@ -62,6 +71,22 @@ export class Voices {
     this.worker = null;
     this.supported = typeof Worker !== 'undefined' && typeof caches !== 'undefined' && typeof WebAssembly !== 'undefined';
     if (this.supported) this.checkStored();
+    this.rec = new Map();
+    this.audioEl = null;
+    if (typeof fetch !== 'undefined') {
+      fetch('./audio/ar/index.json').then((r) => (r.ok ? r.json() : {})).then((m) => { for (const [k, f] of Object.entries(m || {})) this.rec.set(k, f); }).catch(() => {});
+    }
+  }
+
+  recorded(text) { return this.rec.get(recKey(text)) || null; }
+
+  playFile(file) {
+    return new Promise((resolve) => {
+      const a = new Audio(`./audio/ar/${file}`);
+      this.audioEl = a;
+      a.onended = a.onerror = () => { if (this.audioEl === a) this.audioEl = null; resolve(true); };
+      a.play().catch(() => resolve(false));
+    });
   }
 
   async checkStored() {
@@ -119,6 +144,7 @@ export class Voices {
   // Gibt es für diese Sprache überhaupt eine Stimme (frei oder auf dem Gerät)?
   has(lang) {
     if (this.usesPiper(lang)) return true;
+    if (lang === 'ar' && this.rec?.size) return true;
     if (!hasSystem()) return false;
     const voices = window.speechSynthesis.getVoices();
     return voices.some((v) => v.lang?.toLowerCase().startsWith(lang));
@@ -218,6 +244,8 @@ export class Voices {
     // Verworfene Aufträge nicht weiter im Zwischenspeicher halten
     for (const [k, p] of [...this.cache]) if (!p.settled) this.cache.delete(k);
     try { this.source?.stop(); } catch { /* schon beendet */ }
+    try { this.audioEl?.pause(); } catch { /* schon beendet */ }
+    this.audioEl = null;
     this.source = null;
     if (hasSystem()) window.speechSynthesis.cancel();
   }
@@ -239,6 +267,8 @@ export class Voices {
   async sayParts(segments, gen) {
     const parts = [];
     for (const s of segments) {
+      const file = s.lang === 'ar' && this.rec.size ? this.recorded(s.text) : null;
+      if (file) { parts.push({ ...s, file }); continue; }
       const text = cleanText(s.text, s.lang);
       if (!text) continue;
       if (this.usesPiper(s.lang)) for (const x of sentences(text)) parts.push({ ...s, text: x, piper: true });
@@ -256,6 +286,7 @@ export class Voices {
       if (gen !== this.gen) return ok;
       const p = parts[i];
       this.edgeAt = performance.now(); // Beginn eines Abschnitts (für die Fernbedienung)
+      if (p.file) { ok = (await this.playFile(p.file)) && ok; continue; }
       if (p.piper) {
         try {
           const audio = await pending[i];

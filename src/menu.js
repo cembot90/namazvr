@@ -40,6 +40,7 @@ export function menuGroups(v, { mobile = false } = {}) {
       item(v.profile.icon, v.profile.name, 'profiles'),
       item('🧒', t('ui.kidsBtn', v.kids), 'kids', { active: v.kids }),
       item('📒', t('kaza.menu'), 'kaza'),
+      ...(v.tasks ? [item('📝', t('hoca.tasks'), 'tasks', { primary: true })] : []),
       item('👪', t('par.menu'), 'parents'),
       item('⚙️', t('ui.menuSettings'), 'settings'),
     ] },

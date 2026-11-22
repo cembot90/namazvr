@@ -678,3 +678,4 @@ function withTasbih(steps, m) {
   }
   return out;
 }
+export const TXT_KEYS = Object.keys(TXT);

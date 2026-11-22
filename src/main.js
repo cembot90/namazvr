@@ -11,6 +11,7 @@ import { classifyHead, matchesPose, moveFor } from './movement.js';
 import { ALEVI, EXTRA_PRAYERS, MADHABS, NAFILE, PILGRIMAGES, PRAYERS, PURIFY, TASBIH, buildSteps, findPrayer, text as prayerText } from './prayer.js';
 import { LETTERS, MARKS, WORDS, elifQuiz } from './alphabet.js';
 import { ESMA, esmaQuiz } from './esma.js';
+import { downloadCertificate, today as certDate } from './certificate.js';
 import { HOLY_LINKS, buildHolyIcs, dueHoly, holyList, holyText } from './holy.js';
 import { LANGS, deviceLang, getLang, isLoaded, isRTL, langInfo, loadLang, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
@@ -197,6 +198,8 @@ const state = {
   // Erinnerung: an/aus und wie viele Minuten vorher
   remind: { on: false, before: 10, prayers: ALL_PRAYERS, holy: true, ...store.get('remind', {}) },
   holySel: null,
+  hocaPick: [],
+  hocaName: '',
   elif: { part: 'letters', i: 0, quiz: null },
   esma: { i: 0, quiz: null, list: false },
   holyDua: null,
@@ -214,6 +217,24 @@ const state = {
 const voices = new Voices({ enabled: store.get('piper', true), onChange: () => refresh() });
 
 const saveProgress = () => store.set(progKey(profileId), state.progress);
+// Hoca-Modus: Aufgaben, die ein Lehrer per Link schickt (?tasks=fajr,sura:ikhlas,elif&from=Klasse)
+const HOCA_SURAS = ['fatiha', 'ikhlas', 'kawthar', 'asr', 'falaq', 'nas', 'fil', 'quraysh', 'maun', 'kafirun', 'nasr', 'masad'];
+const TASK_IDS = ['wudu', 'fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'witr', ...HOCA_SURAS.map((x) => `sura:${x}`), 'elif', 'esma', 'story', 'fullDay', 'quiz'];
+function taskInfo(id, p = state.progress) {
+  if (id.startsWith('sura:')) { const s = id.slice(5); return { id, label: `📖 ${t(`suras.names.${s}`)}`, ok: !!p.suras?.[s], action: `sura:${s}` }; }
+  if (id === 'wudu') return { id, label: `💧 ${t('pn.wudu')}`, ok: p.wudu > 0, action: 'wudu' };
+  if (['fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'witr'].includes(id)) return { id, label: `🕌 ${findPrayer(id).name}`, ok: !!p.done[id], action: `prayer:${id}` };
+  const ok = { elif: (p.elifBest || 0) >= 8, esma: (p.esmaSeen || []).length >= 10, story: Object.keys(p.stories || {}).length > 0, fullDay: BADGES[9].test(p), quiz: p.quizBest >= 7 }[id];
+  const action = { elif: 'elif:quiz', esma: 'esma', story: 'stories', fullDay: 'tracker', quiz: 'quiz' }[id];
+  return { id, label: `⭐ ${t(`hoca.t.${id}`)}`, ok: !!ok, action };
+}
+try {
+  const q = new URLSearchParams(location.search);
+  if (q.has('tasks')) {
+    const ids = q.get('tasks').split(',').filter((x) => TASK_IDS.includes(x));
+    if (ids.length) store.set('tasks', { ids, from: (q.get('from') || '').slice(0, 40) });
+  }
+} catch { /* kein Fenster */ }
 // Kaza: offene (nachzuholende) Gebete und Fastentage je Profil
 const KAZA_IDS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'witr', 'fast'];
 const kazaOf = () => ({ ...Object.fromEntries(KAZA_IDS.map((k) => [k, 0])), made: 0, ...(state.progress.kaza || {}) });
@@ -221,6 +242,12 @@ function kazaDone(id) {
   const k = kazaOf();
   if (k[id] > 0) { k[id]--; k.made++; }
   state.progress.kaza = k; saveProgress();
+}
+// Teilen (Handy) oder in die Zwischenablage kopieren
+function shareText(text, url) {
+  const done = () => { state.hocaMsg = t('hoca.copied'); refresh(); };
+  if (navigator.share) { navigator.share(url ? { text, url } : { text }).catch(() => {}); return; }
+  navigator.clipboard?.writeText(text).then(done, () => {});
 }
 // Angesehene Namen Allahs zählen (für Eltern-Übersicht und Urkunden)
 function markEsma() {
@@ -693,6 +720,17 @@ function view() {
       const ev = t('siyer.events');
       return { type: 'siyer', i: state.siyer, n: ev.length, ev: ev[state.siyer], kids: state.kids };
     }
+    case 'certs': {
+      const p = state.progress;
+      return { type: 'certs', list: BADGES.map((b, i) => ({ i, name: b.name, ok: b.test(p) })), msg: state.certMsg || '', vr: !mobileUI && !!renderer.xr.isPresenting };
+    }
+    case 'hoca':
+      return { type: 'hoca', all: TASK_IDS.map((id) => ({ ...taskInfo(id), on: state.hocaPick.includes(id) })), name: state.hocaName, link: state.hocaLink || '', msg: state.hocaMsg || '' };
+    case 'tasks': {
+      const T = store.get('tasks', null);
+      const list = T ? T.ids.map((id) => taskInfo(id)) : [];
+      return { type: 'tasks', from: T?.from || '', list, done: list.filter((x) => x.ok).length, msg: state.hocaMsg || '' };
+    }
     case 'adapt':
       return { type: 'adapt', sitting: state.sitting, travel: state.travel, madhab: madhab() };
     case 'kaza': {
@@ -794,7 +832,7 @@ function view() {
       return { type: 'times', ...timesInfo() };
     default:
       return {
-        type: 'menu', adapted: !!state.sitting || state.travel,
+        type: 'menu', adapted: !!state.sitting || state.travel, tasks: !!store.get('tasks', null),
         prayers: PRAYERS,
         qibla: t('ui.qiblaLine', locationName(), Math.round(bearing())),
         calibrated: isCalibrated(),
@@ -931,7 +969,7 @@ function speak() {
   // Geschichte: einfach erzählen, danach der Koranvers auf Arabisch
   if (step.story) {
     const parts = [{ text: `${step.title}. ${step.instr}`, lang, rate: state.kids ? 0.92 : 1 }];
-    if (step.ar.length && voices.has('ar') && lang !== 'ar') parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
+    if (step.ar.length && voices.has('ar') && lang !== 'ar') parts.push(...step.ar.map((l) => ({ text: l, lang: 'ar', rate: 0.8 })));
     voices.say(parts);
     return;
   }
@@ -945,9 +983,9 @@ function speak() {
   // Im Kinder-Text steht schon, wie oft – dann nur noch, ob es Pflicht ist
   const said = [`${m.cue}.`, ...body, ...(kid && step.wudu ? [`${step.fard ? t('wudu.fard') : t('wudu.sunnah')}.`] : [])].filter(Boolean);
   const rate = (state.kids ? 0.92 : 1) * (state.quiet ? 0.88 : 1);
-  if (lang === 'ar') { voices.say([{ text: [...said, ...step.ar].join(' '), lang: 'ar', rate: 0.9 }]); return; }
+  if (lang === 'ar') { voices.say([...said, ...step.ar].map((l) => ({ text: l, lang: 'ar', rate: 0.9 }))); return; }
   const parts = [{ text: [...said, ...step.de].join(' '), lang, rate }];
-  if (step.ar.length && voices.has('ar')) parts.push({ text: step.ar.join('، '), lang: 'ar', rate: 0.8 });
+  if (step.ar.length && voices.has('ar')) parts.push(...step.ar.map((l) => ({ text: l, lang: 'ar', rate: 0.8 })));
   voices.say(parts);
 }
 
@@ -1003,6 +1041,31 @@ function act(action) {
     case 'siyer': state.view = 'siyer'; if (arg) state.siyer = Number(arg) || 0; break;
     case 'sinext': case 'siprev': { const n = t('siyer.events').length; state.siyer = (state.siyer + (key === 'sinext' ? 1 : n - 1)) % n; break; }
     case 'sisay': { const e = t('siyer.events')[state.siyer]; voices.say([{ text: `${e[1]}. ${state.kids ? e[3] : e[2]}`, lang: langInfo().speech }]); break; }
+    case 'certs': state.view = 'certs'; state.certMsg = ''; break;
+    case 'cert': {
+      const b = BADGES[Number(arg)];
+      if (b && b.test(state.progress)) { downloadCertificate({ name: profName(profile()), title: b.name, date: certDate() }); state.certMsg = t('cert.saved'); }
+      break;
+    }
+    case 'hoca': state.view = 'hoca'; state.hocaMsg = ''; break;
+    case 'hpick': state.hocaPick = state.hocaPick.includes(arg) ? state.hocaPick.filter((x) => x !== arg) : TASK_IDS.filter((x) => x === arg || state.hocaPick.includes(x)); state.hocaLink = ''; break;
+    case 'hname': { let v = null; try { v = window.prompt(t('hoca.askName'), state.hocaName); } catch { /* kein Dialog */ } if (v != null) state.hocaName = v.trim().slice(0, 40); state.hocaLink = ''; break; }
+    case 'hshare': {
+      if (!state.hocaPick.length) { state.hocaMsg = t('hoca.none'); break; }
+      const url = `${location.origin}${location.pathname}?tasks=${state.hocaPick.join(',')}${state.hocaName ? `&from=${encodeURIComponent(state.hocaName)}` : ''}`;
+      state.hocaLink = url;
+      shareText(`${t('hoca.shareText', state.hocaName)} ${url}`, url);
+      break;
+    }
+    case 'tasks': state.view = 'tasks'; state.hocaMsg = ''; break;
+    case 'tresult': {
+      const T = store.get('tasks', null);
+      if (!T) break;
+      const list = T.ids.map((id) => taskInfo(id));
+      shareText(`${t('hoca.resultText', profName(profile()), list.filter((x) => x.ok).length, list.length)}\n${list.map((x) => `${x.ok ? '✓' : '○'} ${x.label}`).join('\n')}`);
+      break;
+    }
+    case 'tclear': store.set('tasks', null); state.view = 'menu'; break;
     case 'adapt': state.view = 'adapt'; break;
     case 'sitting': state.sitting = arg === 'off' ? '' : arg; store.set('sitting', state.sitting); break;
     case 'travel': state.travel = !state.travel; store.set('travel', state.travel); break;
@@ -1069,7 +1132,7 @@ function act(action) {
     case 'holy': state.view = 'holy'; state.holySel = arg || null; state.holyDua = null; state.remMsg = ''; break;
     case 'hdua':
       state.holyDua = state.holyDua === arg && state.view === 'holy' ? null : arg;
-      if (state.holyDua) voices.say([{ text: prayerText(arg).ar.join(' '), lang: 'ar', rate: 0.8 }]);
+      if (state.holyDua) voices.say(prayerText(arg).ar.map((l) => ({ text: l, lang: 'ar', rate: 0.8 })));
       break;
     case 'holycal':
       downloadIcs(buildHolyIcs(new Date(), state.location.timeZone || deviceZone), 'namazvr-heilige-tage.ics');

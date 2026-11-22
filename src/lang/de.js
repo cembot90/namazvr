@@ -309,7 +309,7 @@ export default {
     ],
     rakat: (name) => `Wie viele Pflicht-Rakʿāt hat das ${name}-Gebet?`,
   },
-  badges: ['Erstes Gebet', 'Alle 5 Pflichtgebete', 'Wuḍūʾ gelernt', 'Quiz-Profi (10/10)', '7 Tage in Folge', 'Sunnah & Witr', 'Erste Sure gelernt', 'Alle 6 Suren', '10 Sterne', 'Ein Tag mit allen 5 Gebeten', '7 Tage alle 5 Gebete'],
+  badges: ['Erstes Gebet', 'Alle 5 Pflichtgebete', 'Wuḍūʾ gelernt', 'Quiz-Profi (10/10)', '7 Tage in Folge', 'Sunnah & Witr', 'Erste Sure gelernt', 'Alle 6 Suren', '10 Sterne', 'Ein Tag mit allen 5 Gebeten', '7 Tage alle 5 Gebete', 'Elif-Ba-Quiz geschafft', '33 Namen Allahs', 'Alle 99 Namen Allahs'],
 
   styles: {
     klassisch: ['Klassisch', 'Weite Halle mit Säulenreihen, zwei Kuppeln, Laternen und Minbar'],
@@ -957,6 +957,20 @@ export default {
       ['632', 'Der Abschieds-Hac', 'Bei seiner einzigen Pilgerfahrt predigt er auf ʿArafāt: Euer Leben und Besitz sind heilig; behandelt Frauen gut; kein Araber ist besser als ein Nicht-Araber, kein Weißer besser als ein Schwarzer – außer durch Gottesfurcht.', 'Auf dem Berg ʿArafāt sagt der Prophet ﷺ: Alle Menschen sind gleich – egal welche Hautfarbe oder Sprache.'],
       ['632', 'Abschied', 'Kurz darauf stirbt der Prophet ﷺ in Medina, 63 Jahre alt, im Zimmer von ʿĀʾisha. Abū Bakr sagt: „Wer Muḥammad verehrt hat – Muḥammad ist gestorben. Wer Allah anbetet – Allah lebt und stirbt nicht.“ Er ist bei seiner Moschee begraben.', 'Der Prophet ﷺ stirbt in Medina. Die Menschen sind sehr traurig. Aber seine Worte und sein gutes Beispiel bleiben – bis heute.'],
     ],
+  },
+  cert: {
+    menu: 'Urkunden', title: 'Urkunde', sub: 'für jedes Abzeichen eine Urkunde zum Ausdrucken',
+    line: 'Hiermit wird bestätigt, dass', done: 'erfolgreich geschafft hat:', wish: 'Möge Allah dein Lernen segnen und dir Freude daran schenken.',
+    save: '📄 Urkunde speichern', locked: 'noch nicht geschafft', saved: 'Urkunde gespeichert – du kannst sie jetzt ausdrucken.', vr: 'In der Brille kann man nichts drucken: öffne NamazVR am Handy oder Computer, um die Urkunde zu speichern.',
+  },
+  hoca: {
+    menu: 'Hoca-Modus', title: 'Hoca-Modus', sub: 'Aufgaben für Kinder in der Moschee- oder Koranschule',
+    intro: 'Wähle Aufgaben aus und teile den Link mit deinen Schülerinnen und Schülern (z. B. über WhatsApp). Sie öffnen ihn auf ihrem Gerät, sehen ihre Aufgaben und können dir ihr Ergebnis zurückschicken. Es wird nichts auf einem Server gespeichert.',
+    pick: 'Aufgaben auswählen', share: '🔗 Link teilen', copied: 'Link kopiert – jetzt einfügen und verschicken.', none: 'Bitte mindestens eine Aufgabe auswählen.',
+    name: 'Name der Klasse (optional)', askName: 'Name der Klasse oder Gruppe:', shareText: (n) => `Deine Aufgaben in NamazVR${n ? ` (${n})` : ''}:`,
+    tasks: 'Meine Aufgaben', from: (n) => (n ? `von ${n}` : 'von deinem Hoca'), result: '📤 Ergebnis schicken', resultText: (name, d, n) => `NamazVR – ${name}: ${d} von ${n} Aufgaben geschafft ✓`,
+    clear: 'Aufgaben entfernen', allDone: 'Alles geschafft – māshāʾ Allāh! ⭐',
+    t: { elif: 'Elif-Ba-Quiz (8 von 10)', esma: '10 Namen Allahs ansehen', story: 'Eine Prophetengeschichte erleben', fullDay: 'Einen Tag alle 5 Gebete abhaken', quiz: 'Gebets-Quiz mit 7 von 10' },
   },
   hinfo: {
     btn: '📘 Wissen zu Hac & Umre', title: 'Wissen: Hac & Umre',

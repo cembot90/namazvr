@@ -342,6 +342,7 @@ export class MobileUI {
     return `${head(t('par.title'), t('par.sub'))}
       <p class="muted small">${esc(t('par.intro'))}</p>
       ${v.list.map(card).join('')}
+      <div class="grid2">${btn(`📄 ${t('cert.menu')}`, 'certs')}${btn(`🎓 ${t('hoca.menu')}`, 'hoca')}</div>
       <div class="grid2">${btn(t('par.profiles'), 'profiles')}${btn(t('ui.back'), 'menu')}</div>`;
   }
 
@@ -437,6 +438,7 @@ export class MobileUI {
       <h3>${esc(t('ui.badges'))}</h3>
       <div class="badges">${v.badges.map((b) => `<span class="${b.ok ? 'ok' : ''}">${b.ok ? '★' : '☆'} ${esc(b.name)}</span>`).join('')}</div>
       ${btn(t('ui.quizStart'), 'quiz', { cls: 'primary wide' })}
+      ${btn(`📄 ${t('cert.menu')}`, 'certs', { cls: 'wide' })}
       <div class="grid2">${btn(t('ui.reset'), 'resetprogress')}${btn(t('ui.back'), 'menu')}</div>`;
   }
 
@@ -582,6 +584,38 @@ export class MobileUI {
       <div class="grid3">${btn('◀', 'siprev')}${btn(t('elif.say'), 'sisay', { cls: 'primary' })}${btn('▶', 'sinext')}</div>
       <p class="muted small">${esc(t('siyer.intro'))}</p>
       <div class="grid2">${btn(t('story.menu'), 'stories')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  // Urkunden: für jedes geschaffte Abzeichen eine Urkunde als Bild
+  v_certs(v) {
+    return `${head(t('cert.menu'), t('cert.sub'))}
+      <div class="list">${v.list.map((b) => btn(`${b.ok ? '★' : '☆'} ${b.name}`, b.ok ? `cert:${b.i}` : 'noop', { cls: b.ok ? 'primary' : '', sub: b.ok ? t('cert.save') : t('cert.locked') })).join('')}</div>
+      ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
+      <div class="grid2">${btn(t('par.menu'), 'parents')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  // Hoca-Modus: Aufgaben wählen und als Link teilen
+  v_hoca(v) {
+    return `${head(t('hoca.title'), t('hoca.sub'))}
+      <p class="small">${esc(t('hoca.intro'))}</p>
+      ${btn(`${t('hoca.name')}: ${v.name || '–'}`, 'hname', { cls: 'wide' })}
+      <h3>${esc(t('hoca.pick'))}</h3>
+      <div class="grid2">${v.all.map((x) => btn(`${x.on ? '✓ ' : ''}${x.label}`, `hpick:${x.id}`, { cls: x.on ? 'active' : '' })).join('')}</div>
+      ${btn(t('hoca.share'), 'hshare', { cls: 'primary wide' })}
+      ${v.link ? `<p class="small" style="word-break:break-all">${esc(v.link)}</p>` : ''}
+      ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
+      <div class="grid2">${btn(t('par.menu'), 'parents')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  // Aufgaben vom Hoca: Liste mit Haken, Ergebnis zurückschicken
+  v_tasks(v) {
+    return `${head(t('hoca.tasks'), t('hoca.from', v.from))}
+      <p class="count">${v.done} / ${v.list.length}</p>
+      ${v.done === v.list.length && v.list.length ? `<p class="center gold">${esc(t('hoca.allDone'))}</p>` : ''}
+      <div class="list">${v.list.map((x) => btn(`${x.ok ? '✅' : '⬜'} ${x.label}`, x.action, { cls: x.ok ? 'active' : '' })).join('')}</div>
+      ${btn(t('hoca.result'), 'tresult', { cls: 'primary wide' })}
+      ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
+      <div class="grid2">${btn(t('hoca.clear'), 'tclear')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   // Gebet anpassen: im Sitzen (Boden/Stuhl) und unterwegs (Seferî)

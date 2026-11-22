@@ -82,5 +82,9 @@ const BADGE_TESTS = [
     while (n < 7 && full(d)) { n++; d.setDate(d.getDate() - 1); }
     return n >= 7;
   },
+  // Elif-Ba-Quiz (8 von 10), 33 und 99 Namen Allahs angesehen
+  (p) => (p.elifBest || 0) >= 8,
+  (p) => (p.esmaSeen || []).length >= 33,
+  (p) => (p.esmaSeen || []).length >= 99,
 ];
 export const BADGES = BADGE_TESTS.map((test, i) => ({ test, get name() { return t('badges')[i]; } }));
