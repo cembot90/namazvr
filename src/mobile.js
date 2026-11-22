@@ -1,5 +1,6 @@
 // Handy-Oberfläche: dieselben Ansichten wie das VR-Panel, als HTML unter der 3D-Szene.
 import { drawPictogram, moveFor } from './movement.js';
+import { LETTERS as LETTERS_ALL } from './alphabet.js';
 import { drawBody } from './wudu.js';
 import { taqabbal } from './prayer.js';
 import { isRTL, t } from './i18n.js';
@@ -540,6 +541,67 @@ export class MobileUI {
       ${toggle}${sounds}
       <p class="muted small">${esc(t('hajj.note'))}</p>
       ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Elif-Ba: Reiter Buchstaben, Vokalzeichen, erste Wörter, Quiz
+  v_elif(v) {
+    const tabs = Object.entries(t('elif.tabs')).map(([id, l]) => btn(l, `elif:${id}`, { cls: v.part === id ? 'active' : '' })).join('');
+    let body = '';
+    if (v.part === 'letters') {
+      const L = v.letter, forms = t('elif.forms');
+      body = `<p class="center muted small">${esc(t('elif.letterOf', v.i + 1, v.total))}</p>
+        <p class="ar huge" dir="rtl">${esc(L.ch)}</p>
+        <p class="center"><b>${esc(L.name)}</b> · <span class="ar" dir="rtl">${esc(L.arName)}</span></p>
+        <p class="center muted small">${esc(L.tip)}${L.joins ? '' : ` · ${esc(t('elif.noJoin'))}`}</p>
+        <div class="forms">${L.forms.map((f, k) => `<div><b>${esc(f)}</b><small>${esc(forms[k])}</small></div>`).join('')}</div>
+        <div class="grid3">${btn('→', 'elprev')}${btn(t('elif.say'), 'elsay', { cls: 'primary' })}${btn('←', 'elnext')}</div>
+        <div class="abc">${LETTERS_ALL.map((x) => btn(x.ch, `elgo:${x.i}`, { cls: x.i === v.i ? 'active' : '' })).join('')}</div>
+        <p class="muted small">${esc(v.kids ? t('elif.kids') : t('elif.intro'))}</p>`;
+    } else if (v.part === 'marks') {
+      body = `<p class="muted small">${esc(t('elif.marksIntro'))}</p>
+        <div class="list">${v.marks.map((m, k) => btn(`${m.ar}   ${m.tr}`, `elsay:m:${k}`, { sub: `${m.name} – ${m.desc}` })).join('')}</div>`;
+    } else if (v.part === 'words') {
+      body = `<p class="muted small">${esc(t('elif.wordsIntro'))}</p>
+        <div class="grid2">${v.words.map((w, k) => btn(w.ar, `elsay:w:${k}`, { sub: `${w.tr} · ${w.de}` })).join('')}</div>`;
+    } else {
+      const z = v.quiz;
+      if (!z || !z.cur) {
+        body = `<p class="count">${esc(z ? t('elif.done', z.score, z.q.length) : '')}</p><p class="center muted">${esc(t('elif.best', v.best))}</p>${btn(t('elif.again'), 'elif:quiz', { cls: 'primary wide' })}`;
+      } else {
+        const c = z.cur, ok = z.picked === c.ans;
+        body = `<p class="center muted small">${esc(t('elif.quizOf', z.i + 1, z.q.length))} · ⭐ ${z.score}</p>
+          <p class="ar huge" dir="rtl">${esc(c.letter.forms[c.form])}</p><p class="center">${esc(t('elif.quizQ'))}</p>
+          <div class="grid2">${c.opts.map((o) => btn(o.name, `elq:${o.k}`, { cls: z.picked == null ? '' : o.k === c.ans ? 'active' : o.k === z.picked ? 'wrong' : '' })).join('')}</div>
+          ${z.picked == null ? '' : `<p class="center gold">${esc(ok ? t('elif.right') : t('elif.wrong', c.letter.name))}</p>${btn(t('elif.nextQ'), 'elq:0', { cls: 'primary wide' })}`}`;
+      }
+    }
+    return `${head(t('elif.title'), t('elif.sub'))}<div class="grid2">${tabs}</div>${body}${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Die 99 Namen Allahs: ein Name groß, Liste aller Namen, Quiz
+  v_esma(v) {
+    const tabs = `<div class="grid3">${btn(t('esma.name'), 'esma', { cls: !v.all && !v.quiz ? 'active' : '' })}${btn(t('esma.list'), 'esma:list', { cls: v.all ? 'active' : '' })}${btn(t('esma.quiz'), 'esma:quiz', { cls: v.quiz ? 'active' : '' })}</div>`;
+    let body;
+    if (v.all) body = `<div class="list">${v.all.map((e) => btn(`${e.i + 1}. ${e.ar}`, `esma:${e.i}`, { sub: [e.tr, e.mean].filter(Boolean).join(' – ') })).join('')}</div>`;
+    else if (v.quiz) {
+      const z = v.quiz;
+      if (!z.cur) body = `<p class="count">${esc(t('elif.done', z.score, z.q.length))}</p><p class="center muted">${esc(t('elif.best', v.best))}</p>${btn(t('elif.again'), 'esma:quiz', { cls: 'primary wide' })}`;
+      else {
+        const c = z.cur;
+        body = `<p class="center muted small">${esc(t('elif.quizOf', z.i + 1, z.q.length))} · ⭐ ${z.score}</p>
+          <p class="ar big" dir="rtl">${esc(c.name.ar)}</p><p class="center gold">${esc(c.name.tr)}</p><p class="center">${esc(t('esma.quizQ'))}</p>
+          <div class="list">${c.opts.map((o) => btn(o.mean, `esq:${o.k}`, { cls: z.picked == null ? '' : o.k === c.ans ? 'active' : o.k === z.picked ? 'wrong' : '' })).join('')}</div>
+          ${z.picked == null ? '' : `<p class="center gold">${esc(z.picked === c.ans ? t('elif.right') : t('elif.wrong', c.name.mean))}</p>${btn(t('elif.nextQ'), 'esq:0', { cls: 'primary wide' })}`}`;
+      }
+    } else {
+      const e = v.name;
+      body = `<p class="center muted small">${esc(t('esma.nameOf', e.i + 1))} · ${esc(t('esma.learned', v.seen))}</p>
+        <p class="ar big" dir="rtl" style="font-size:64px">${esc(e.ar)}</p>
+        ${e.tr ? `<p class="center gold"><b>${esc(e.tr)}</b></p>` : ''}<p class="center">${esc(e.mean)}</p>
+        <div class="grid3">${btn('←', 'esprev')}${btn(t('elif.say'), 'essay', { cls: 'primary' })}${btn('→', 'esnext')}</div>
+        <p class="muted small">${esc(v.kids ? t('esma.kids') : t('esma.intro'))}</p>`;
+    }
+    return `${head(t('esma.title'), t('esma.sub'))}${tabs}${body}${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
   // Wissen zu Hac und Umre: Reiter mit Grundlagen, Pflichtteilen, Zeitplan, Iḥrām, Medina, Vorbereitung, Geschichte

@@ -9,6 +9,8 @@ import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
 import { classifyHead, matchesPose, moveFor } from './movement.js';
 import { ALEVI, EXTRA_PRAYERS, MADHABS, NAFILE, PILGRIMAGES, PRAYERS, PURIFY, TASBIH, buildSteps, findPrayer, text as prayerText } from './prayer.js';
+import { LETTERS, MARKS, WORDS, elifQuiz } from './alphabet.js';
+import { ESMA, esmaQuiz } from './esma.js';
 import { HOLY_LINKS, buildHolyIcs, dueHoly, holyList, holyText } from './holy.js';
 import { LANGS, deviceLang, getLang, isLoaded, isRTL, langInfo, loadLang, setLang, t } from './i18n.js';
 import { WUDU, buildWuduSteps } from './wudu.js';
@@ -191,6 +193,8 @@ const state = {
   // Erinnerung: an/aus und wie viele Minuten vorher
   remind: { on: false, before: 10, prayers: ALL_PRAYERS, holy: true, ...store.get('remind', {}) },
   holySel: null,
+  elif: { part: 'letters', i: 0, quiz: null },
+  esma: { i: 0, quiz: null, list: false },
   holyDua: null,
   remMsg: '',
   // Weiter ohne Tippen: Apple Watch / Kopfhörer bzw. Hand über die Kamera
@@ -206,6 +210,12 @@ const state = {
 const voices = new Voices({ enabled: store.get('piper', true), onChange: () => refresh() });
 
 const saveProgress = () => store.set(progKey(profileId), state.progress);
+// Angesehene Namen Allahs zählen (für Eltern-Übersicht und Urkunden)
+function markEsma() {
+  const seen = new Set(state.progress.esmaSeen || []);
+  if (seen.has(state.esma.i)) return;
+  seen.add(state.esma.i); state.progress.esmaSeen = [...seen]; saveProgress();
+}
 const profName = (p) => p.name || (p.id === 'main' ? t('prof.me') : t('prof.child', Math.max(1, profiles.indexOf(p))));
 
 // Weiter ohne Tippen (siehe remote.js); Anzeige oben links, solange etwas aktiv ist
@@ -635,6 +645,17 @@ function view() {
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'purify':
       return { type: 'more', title: t('pure.title'), note: t('pure.note'), prayers: PURIFY, madhab: madhab().name };
+    case 'elif': {
+      const e = state.elif, z = e.quiz;
+      return { type: 'elif', part: e.part, i: e.i, letter: LETTERS[e.i], total: LETTERS.length, marks: MARKS, words: WORDS, kids: state.kids,
+        best: state.progress.elifBest || 0,
+        quiz: z && { ...z, cur: z.q[z.i] && { ...z.q[z.i], letter: LETTERS[z.q[z.i].ans], opts: z.q[z.i].opts.map((k) => ({ k, name: LETTERS[k].name })) } } };
+    }
+    case 'esma': {
+      const e = state.esma, z = e.quiz;
+      return { type: 'esma', i: e.i, name: ESMA[e.i], all: e.list ? ESMA : null, kids: state.kids, seen: (state.progress.esmaSeen || []).length, best: state.progress.esmaBest || 0,
+        quiz: z && { ...z, cur: z.q[z.i] && { ...z.q[z.i], name: ESMA[z.q[z.i].ans], opts: z.q[z.i].opts.map((k) => ({ k, mean: ESMA[k].mean })) } } };
+    }
     case 'hajjinfo': {
       const arafa = holyList(new Date(), state.location.timeZone || deviceZone).find((e) => e.id === 'arafa');
       const start = arafa && addDays(arafa.day, -1);
@@ -895,13 +916,60 @@ function fullDayStar(key) {
 }
 
 function act(action) {
-  const [key, arg] = action.split(':');
+  const [key, arg, arg2] = action.split(':');
   switch (key) {
     case 'prayer': start(findPrayer(arg)); break;
     case 'wudu': start(WUDU); break;
     case 'more': state.view = 'more'; break;
     case 'purify': state.view = 'purify'; break;
     case 'nafile': state.view = 'nafile'; break;
+    case 'elif':
+      state.view = 'elif';
+      if (arg) { state.elif.part = arg; state.elif.quiz = arg === 'quiz' ? elifQuiz() : null; }
+      break;
+    case 'elnext': case 'elprev': {
+      const n = LETTERS.length;
+      state.elif.i = (state.elif.i + (key === 'elnext' ? 1 : n - 1)) % n;
+      break;
+    }
+    case 'elgo': state.elif.i = Number(arg) || 0; state.elif.part = 'letters'; break;
+    case 'elsay': {
+      const L = LETTERS[state.elif.i];
+      voices.say([{ text: arg === 'w' ? WORDS[Number(arg2)]?.ar : arg === 'm' ? MARKS[Number(arg2)]?.ar : L.arName, lang: 'ar', rate: 0.75 }]);
+      break;
+    }
+    case 'elq': case 'esq': {
+      const box = key === 'elq' ? state.elif : state.esma, z = box.quiz;
+      if (!z) break;
+      if (z.picked == null && z.i < z.q.length) {
+        z.picked = Number(arg);
+        if (z.picked === z.q[z.i].ans) z.score++;
+      } else {
+        z.i++; z.picked = null;
+        if (z.i >= z.q.length) {
+          const k = key === 'elq' ? 'elifBest' : 'esmaBest';
+          state.progress[k] = Math.max(state.progress[k] || 0, z.score);
+          saveProgress();
+        }
+      }
+      break;
+    }
+    case 'esma':
+      state.view = 'esma';
+      state.esma.list = arg === 'list';
+      state.esma.quiz = arg === 'quiz' ? esmaQuiz() : null;
+      if (arg && /^\d+$/.test(arg)) { state.esma.i = Number(arg); state.esma.list = false; }
+      markEsma();
+      break;
+    case 'esnext': case 'esprev':
+      state.esma.i = (state.esma.i + (key === 'esnext' ? 1 : ESMA.length - 1)) % ESMA.length;
+      markEsma();
+      break;
+    case 'essay': {
+      const e = ESMA[state.esma.i];
+      voices.say([{ text: e.ar, lang: 'ar', rate: 0.8 }, ...(langInfo().speech === 'ar' ? [] : [{ text: e.mean, lang: langInfo().speech }])]);
+      break;
+    }
     case 'hajjinfo': state.view = 'hajjinfo'; state.hajjPart = arg || 'basics'; break;
     case 'holy': state.view = 'holy'; state.holySel = arg || null; state.holyDua = null; state.remMsg = ''; break;
     case 'hdua': state.holyDua = state.holyDua === arg ? null : arg; break;

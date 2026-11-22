@@ -108,7 +108,8 @@ export class Panel extends CanvasPlane {
     ctx.fillStyle = opt.primary ? (hov ? C.primaryHover : C.primary) : opt.active ? (hov ? C.activeHover : C.active) : (hov ? C.btnHover : C.btn);
     ctx.fill();
     ctx.lineWidth = hov || opt.active ? 3 : 2;
-    ctx.strokeStyle = hov || opt.active ? C.gold : opt.primary ? 'rgba(255,255,255,0.22)' : C.line;
+    ctx.strokeStyle = opt.wrong ? '#e06a5a' : hov || opt.active ? C.gold : opt.primary ? 'rgba(255,255,255,0.22)' : C.line;
+    if (opt.wrong) ctx.lineWidth = 4;
     ctx.stroke();
     const cy = y + h / 2;
     let size = opt.size || 32;
@@ -968,6 +969,108 @@ export class Panel extends CanvasPlane {
     const half = (W - 140) / 2;
     this.btn(t('hinfo.btn'), 60, H - 128, half, 96, 'hajjinfo', { size: 28 });
     this.btn(t('ui.menu'), 80 + half, H - 128, half, 96, 'menu');
+  }
+
+  // Elif-Ba auf der Tafel: Reiter, darunter Buchstabe mit Formen, Vokalzeichen, Wörter oder Quiz
+  v_elif(v) {
+    const { W, H } = this;
+    this.heading(t('elif.title'), t('elif.sub'));
+    const tabs = Object.entries(t('elif.tabs')), tw = (W - 120 - 30) / 4;
+    tabs.forEach(([id, l], i) => this.btn(l, 60 + i * (tw + 10), 125, tw, 62, `elif:${id}`, { active: v.part === id, size: 24 }));
+    const cx = W / 2;
+    if (v.part === 'letters') {
+      const L = v.letter, forms = t('elif.forms');
+      this.text(L.ch, cx, 340, { size: 190, font: AR, align: 'center', rtl: true, color: C.gold });
+      this.text(`${L.name} · ${L.arName}`, cx, 440, { size: 34, weight: 700, align: 'center' });
+      this.text(L.tip + (L.joins ? '' : ` · ${t('elif.noJoin')}`), cx, 482, { size: 22, color: C.muted, align: 'center' });
+      const fw = (W - 120 - 30) / 4;
+      L.forms.forEach((f, k) => {
+        const x = W - 60 - (k + 1) * fw - k * 10;
+        this.btn('', x, 510, fw, 130, 'noop');
+        this.text(f, x + fw / 2, 585, { size: 64, font: AR, align: 'center', rtl: true });
+        this.text(forms[k], x + fw / 2, 625, { size: 20, color: C.muted, align: 'center' });
+      });
+      const bw = (W - 140) / 3;
+      this.btn('→', 60, 665, bw, 80, 'elprev', { size: 40 });
+      this.btn(t('elif.say'), 70 + bw, 665, bw, 80, 'elsay', { primary: true, size: 28 });
+      this.btn('←', 80 + 2 * bw, 665, bw, 80, 'elnext', { size: 40 });
+      this.paragraphs([v.kids ? t('elif.kids') : t('elif.intro')], 790, { size: 20, color: C.muted, gap: 0 });
+    } else if (v.part === 'marks') {
+      this.paragraphs([t('elif.marksIntro')], 225, { size: 21, color: C.muted, gap: 0 });
+      v.marks.forEach((m, k) => {
+        const y = 290 + k * 78;
+        this.btn('', 60, y, W - 120, 70, `elsay:m:${k}`);
+        this.text(m.ar, W - 90, y + 50, { size: 44, font: AR, align: 'right', rtl: true, color: C.gold });
+        this.text(`${m.name} · ${m.tr}`, 90, y + 30, { size: 25, weight: 700 });
+        this.text(m.desc, 90, y + 56, { size: 19, color: C.muted });
+      });
+    } else if (v.part === 'words') {
+      this.paragraphs([t('elif.wordsIntro')], 225, { size: 21, color: C.muted, gap: 0 });
+      const ww = (W - 120 - 20) / 3;
+      v.words.forEach((w, k) => {
+        const x = 60 + (k % 3) * (ww + 10), y = 290 + Math.floor(k / 3) * 128;
+        this.btn('', x, y, ww, 118, `elsay:w:${k}`);
+        this.text(w.ar, x + ww / 2, y + 62, { size: 50, font: AR, align: 'center', rtl: true, color: C.gold });
+        this.text(`${w.tr} · ${w.de}`, x + ww / 2, y + 100, { size: 21, align: 'center' });
+      });
+    } else this.quizBoard(v, 'elq', (c) => [c.letter.forms[c.form], ''], (o) => o.name, (c) => c.letter.name, t('elif.quizQ'));
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
+  }
+
+  // Gemeinsames Quiz-Brett (Elif-Ba und 99 Namen)
+  quizBoard(v, act, show, label, answer, question) {
+    const { W } = this, z = v.quiz, cx = W / 2;
+    if (!z || !z.cur) {
+      this.text(z ? t('elif.done', z.score, z.q.length) : '', cx, 380, { size: 60, weight: 700, color: C.gold, align: 'center' });
+      this.text(t('elif.best', v.best), cx, 440, { size: 28, color: C.muted, align: 'center' });
+      this.btn(t('elif.again'), 360, 500, W - 720, 96, `${act === 'elq' ? 'elif' : 'esma'}:quiz`, { primary: true });
+      return;
+    }
+    const c = z.cur, [big, small] = show(c);
+    this.text(`${t('elif.quizOf', z.i + 1, z.q.length)} · ⭐ ${z.score}`, cx, 225, { size: 22, color: C.muted, align: 'center' });
+    this.text(big, cx, act === 'esq' ? 320 : 340, { size: act === 'esq' ? (big.length > 12 ? 64 : 92) : 150, font: AR, align: 'center', rtl: true, color: C.gold });
+    if (small) this.text(small, cx, 395, { size: 28, color: C.gold, align: 'center' });
+    this.text(question, cx, 435, { size: 26, align: 'center' });
+    const ow = (W - 140) / 2;
+    c.opts.forEach((o, k) => {
+      const state = z.picked == null ? {} : o.k === c.ans ? { active: true } : o.k === z.picked ? { primary: false, active: false, wrong: true } : {};
+      this.btn(label(o), 60 + (k % 2) * (ow + 20), 460 + Math.floor(k / 2) * 92, ow, 82, `${act}:${o.k}`, { size: 22, ...state });
+    });
+    if (z.picked != null) {
+      this.text(z.picked === c.ans ? t('elif.right') : t('elif.wrong', answer(c)), cx, 680, { size: 26, color: C.gold, align: 'center' });
+      this.btn(t('elif.nextQ'), 360, 705, W - 720, 78, `${act}:0`, { primary: true });
+    }
+  }
+
+  v_esma(v) {
+    const { W, H } = this;
+    this.heading(t('esma.title'), t('esma.sub'));
+    const tw = (W - 140) / 3, cx = W / 2;
+    [[t('esma.name'), 'esma', !v.all && !v.quiz], [t('esma.list'), 'esma:list', !!v.all], [t('esma.quiz'), 'esma:quiz', !!v.quiz]]
+      .forEach(([l, a, on], i) => this.btn(l, 60 + i * (tw + 10), 125, tw, 62, a, { active: on, size: 24 }));
+    if (v.all) {
+      // Tafel: 33 Namen je Seite wären zu klein – zeige 15 um den aktuellen Namen herum
+      const start = Math.max(0, Math.min(99 - 15, v.i - 7)), cw = (W - 140) / 3;
+      v.all.slice(start, start + 15).forEach((e, k) => {
+        const x = 60 + (k % 3) * (cw + 10), y = 205 + Math.floor(k / 3) * 112;
+        this.btn('', x, y, cw, 102, `esma:${e.i}`, { active: e.i === v.i });
+        this.text(`${e.i + 1}. ${e.ar}`, x + cw / 2, y + 48, { size: 34, font: AR, align: 'center', rtl: true, color: C.gold });
+        this.text(e.mean.length > 34 ? `${e.mean.slice(0, 33)}…` : e.mean, x + cw / 2, y + 84, { size: 18, align: 'center' });
+      });
+    } else if (v.quiz) this.quizBoard(v, 'esq', (c) => [c.name.ar, c.name.tr], (o) => o.mean, (c) => c.name.mean, t('esma.quizQ'));
+    else {
+      const e = v.name;
+      this.text(`${t('esma.nameOf', e.i + 1)} · ${t('esma.learned', v.seen)}`, cx, 230, { size: 22, color: C.muted, align: 'center' });
+      this.text(e.ar, cx, 380, { size: e.ar.length > 12 ? 80 : 120, font: AR, align: 'center', rtl: true, color: C.gold });
+      if (e.tr) this.text(e.tr, cx, 450, { size: 36, weight: 700, align: 'center' });
+      this.paragraphs([e.mean], 500, { size: 28, gap: 0 });
+      const bw = (W - 140) / 3;
+      this.btn('←', 60, 600, bw, 84, 'esprev', { size: 40 });
+      this.btn(t('elif.say'), 70 + bw, 600, bw, 84, 'essay', { primary: true, size: 28 });
+      this.btn('→', 80 + 2 * bw, 600, bw, 84, 'esnext', { size: 40 });
+      this.paragraphs([v.kids ? t('esma.kids') : t('esma.intro')], 730, { size: 20, color: C.muted, gap: 0 });
+    }
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
   }
 
   // Wissen zu Hac und Umre: sieben Reiter, darunter der Text
