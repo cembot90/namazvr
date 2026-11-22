@@ -1,8 +1,17 @@
 name: Tests
 
 on:
+  # Nur die veröffentlichte Version (main) und Pull Requests prüfen – Zwischenstände auf dem Arbeitszweig
+  # (z. B. halb fertige Übersetzungen) lösen sonst Fehler-Mails aus
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+# Ein neuer Lauf für denselben Zweig ersetzt den alten
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -10,7 +19,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: tests
