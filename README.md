@@ -7,6 +7,11 @@ Web-App, die Schritt für Schritt durch das islamische Gebet führt – in VR (M
 - Sprachen: Deutsch, Türkçe, English, العربية, Bosanski, Shqip, Kurdî (Kurmancî), فارسی/دری, Français, اردو, Bahasa Indonesia (Arabisch, Persisch und Urdu von rechts nach links) – in den Einstellungen wählbar, beim ersten Start nach der Gerätesprache; jede Sprache wird erst geladen, wenn sie gewählt wird
 - Waschungen: Wuḍūʾ, Ghusl und Tayammum; dazu Sajdat as-Sahw und Tarāwīḥ
 - Nafile: Teheccüd, Kuşluk (Ḍuḥā), İşrak, Evvabin, Gebet nach dem Wuḍūʾ, Istikhāra, Hacet, Tövbe und das Tesbih-Gebet (300× Lobpreis, Ḥanafī nach Ibn al-Mubārak, sonst nach Ibn ʿAbbās)
+- Elif-Ba (arabisches Alphabet mit Formen, Vokalzeichen, Wörtern, Quiz) und die 99 Namen Allahs mit Quiz
+- Beten im Sitzen (Boden oder Stuhl, je Rechtsschule), Seferî (Kürzen auf Reisen), Kaza-Zähler
+- Zakat- und Fitra-Rechner, Cuma-Seite mit Erinnerung, Lebensweg des Propheten in 17 Stationen
+- Urkunden zum Ausdrucken, Hoca-Modus (Aufgaben per Link, ohne Server)
+- Werkzeuge: `tools/review.mjs` (Prüfbögen je Sprache), `tools/recordings.mjs` (Liste für Aufnahmen eines Kāriʾ)
 - Wissen zu Hac & Umre: Grundlagen, Pflichtteile je Rechtsschule, Zeitplan, Iḥrām & Mīqāt, Medina, Vorbereitung, Geschichte
 - Heilige Tage & Nächte: Kandil-Nächte, Kadir Gecesi, Bayram, ʿArafa, ʿĀschūrā, Neujahr – mit Datum, Erklärung, Bittgebeten, Erinnerung und Kalenderdatei
 - Eltern-Übersicht mit Fortschritt und Tipps je Familienmitglied; große Schrift und ruhiger Modus
