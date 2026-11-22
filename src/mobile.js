@@ -543,6 +543,39 @@ export class MobileUI {
       ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
+  // Gebet anpassen: im Sitzen (Boden/Stuhl) und unterwegs (Seferî)
+  v_adapt(v) {
+    const modes = [['off', t('sit.off')], ['floor', t('sit.floor')], ['chair', t('sit.chair')]];
+    const cur = v.sitting || 'off';
+    return `${head(t('sit.title'), t('sit.sub'))}
+      <p>${esc(t('sit.intro'))}</p>
+      <h3>${esc(t('sit.label'))}</h3>
+      <div class="grid3">${modes.map(([id, l]) => btn(l, `sitting:${id}`, { cls: cur === id ? 'active' : '' })).join('')}</div>
+      ${v.sitting ? `<p class="gold small">${esc(t(`sit.mode.${v.sitting}`))}</p>` : ''}
+      <p class="muted small">${esc(t(`sit.note.${v.madhab.id}`))}</p>
+      <p class="muted small">${esc(t('sit.lying'))}</p>
+      <div class="setting"><div><b>${esc(t('sit.travel'))}</b><small>${esc(t('sit.travelSub'))}</small></div>${btn(v.travel ? t('ui.on') : t('ui.off'), 'travel', { cls: v.travel ? 'active' : '' })}</div>
+      <h3>${esc(t('sefer.title'))}</h3>
+      ${t('sefer.about').map((p) => `<p class="small">${esc(p)}</p>`).join('')}
+      <p class="gold small">${esc(t(`sefer.qasr.${v.madhab.id}`))}</p>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Kaza: Zähler für verpasste Gebete und Fastentage
+  v_kaza(v) {
+    const row = (id) => `<div class="setting"><div><b>${esc(v.names[id])}</b><small>${esc(t('kaza.open', v.k[id]))}</small></div>
+      <div class="grid3" style="min-width:190px">${btn('−', `kz:${id}:-1`)}${btn('+', `kz:${id}:1`)}${id === 'fast' ? '' : btn('▶', `kazapray:${id}`, { cls: 'primary' })}</div></div>`;
+    return `${head(t('kaza.title'), t('kaza.sub'))}
+      <p class="small">${esc(t('kaza.intro'))}</p>
+      <p class="count">${v.open}</p><p class="center muted">${esc(t('kaza.made', v.k.made))}</p>
+      ${v.ids.map(row).join('')}
+      <h3>${esc(t('kaza.estimate'))}</h3><p class="muted small">${esc(t('kaza.estimateSub'))}</p>
+      <div class="grid3">${btn('−', 'kz:years:-1')}${btn(t('kaza.years', v.years), 'noop', { cls: 'active' })}${btn('+', 'kz:years:1')}</div>
+      <div class="grid2">${btn(t('kaza.fill'), 'kz:fill', { cls: 'primary' })}${btn(t('kaza.reset'), 'kz:reset')}</div>
+      ${t('kaza.tips').map((p) => `<p class="muted small">• ${esc(p)}</p>`).join('')}
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
   // Elif-Ba: Reiter Buchstaben, Vokalzeichen, erste Wörter, Quiz
   v_elif(v) {
     const tabs = Object.entries(t('elif.tabs')).map(([id, l]) => btn(l, `elif:${id}`, { cls: v.part === id ? 'active' : '' })).join('');

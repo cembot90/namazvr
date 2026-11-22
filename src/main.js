@@ -144,6 +144,8 @@ const state = {
   auto: false,
   autoT: 0,
   big: store.get('big', false), // große Schrift
+  sitting: store.get('sitting', ''), // im Sitzen beten: '' | 'floor' | 'chair'
+  travel: store.get('travel', false), // unterwegs (Seferî): 4 Rakʿāt werden 2
   quiet: store.get('calm', false), // ruhiger Modus: keine Musik und Geräusche, langsamer vorlesen
   location: store.get('location', CITIES[0]),
   northYaw: store.get('northYaw', null),
@@ -210,6 +212,14 @@ const state = {
 const voices = new Voices({ enabled: store.get('piper', true), onChange: () => refresh() });
 
 const saveProgress = () => store.set(progKey(profileId), state.progress);
+// Kaza: offene (nachzuholende) Gebete und Fastentage je Profil
+const KAZA_IDS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'witr', 'fast'];
+const kazaOf = () => ({ ...Object.fromEntries(KAZA_IDS.map((k) => [k, 0])), made: 0, ...(state.progress.kaza || {}) });
+function kazaDone(id) {
+  const k = kazaOf();
+  if (k[id] > 0) { k[id]--; k.made++; }
+  state.progress.kaza = k; saveProgress();
+}
 // Angesehene Namen Allahs zählen (für Eltern-Übersicht und Urkunden)
 function markEsma() {
   const seen = new Set(state.progress.esmaSeen || []);
@@ -515,6 +525,27 @@ function placeWuduFigures(snap = false) {
   sendTo(guide, feet ? new THREE.Vector3(st[0][0], 0, st[0][1]) : new THREE.Vector3(1.1, 0, 0), feet ? Math.PI / 2 : Math.PI, snap);
 }
 // Haltung setzen; wer gerade geht, nimmt sie erst am Ziel ein
+// Stuhl unter der Figur, wenn im Sitzen auf dem Stuhl gebetet wird
+let chairMesh = null;
+function setChair(on) {
+  if (!on && !chairMesh) return;
+  if (!chairMesh) {
+    chairMesh = new THREE.Group();
+    const wood = new THREE.MeshStandardMaterial({ color: 0x6b4a2e, roughness: 0.7 });
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.05, 0.44), wood);
+    seat.position.set(0, 0.45, 0.06);
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.42, 0.04), wood);
+    back.position.set(0, 0.7, -0.17);
+    chairMesh.add(seat, back);
+    for (const [x, z] of [[-0.2, -0.14], [0.2, -0.14], [-0.2, 0.26], [0.2, 0.26]]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.45, 0.035), wood);
+      leg.position.set(x, 0.225, z);
+      chairMesh.add(leg);
+    }
+    guide.group.add(chairMesh);
+  }
+  chairMesh.visible = on;
+}
 function posePerson(fig, pose) {
   fig.wantPose = pose;
   if (!movers.has(fig)) fig.setPose(pose);
@@ -645,6 +676,12 @@ function view() {
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'purify':
       return { type: 'more', title: t('pure.title'), note: t('pure.note'), prayers: PURIFY, madhab: madhab().name };
+    case 'adapt':
+      return { type: 'adapt', sitting: state.sitting, travel: state.travel, madhab: madhab() };
+    case 'kaza': {
+      const k = kazaOf(), open = KAZA_IDS.reduce((a, id) => a + k[id], 0);
+      return { type: 'kaza', k, open, ids: KAZA_IDS, names: Object.fromEntries(KAZA_IDS.map((id) => [id, id === 'fast' ? t('kaza.fast') : findPrayer(id).name])), years: state.kazaYears || 1, madhab: madhab() };
+    }
     case 'elif': {
       const e = state.elif, z = e.quiz;
       return { type: 'elif', part: e.part, i: e.i, letter: LETTERS[e.i], total: LETTERS.length, marks: MARKS, words: WORDS, kids: state.kids,
@@ -740,7 +777,7 @@ function view() {
       return { type: 'times', ...timesInfo() };
     default:
       return {
-        type: 'menu',
+        type: 'menu', adapted: !!state.sitting || state.travel,
         prayers: PRAYERS,
         qibla: t('ui.qiblaLine', locationName(), Math.round(bearing())),
         calibrated: isCalibrated(),
@@ -794,7 +831,8 @@ function refresh() {
     state.atStools = feet;
   }
   updateCast();
-  if (cong.group.visible && v.type === 'step') cong.lead(v.step.pose, v.step.rakah);
+  if (cong.group.visible && v.type === 'step') cong.lead(v.step.basePose || v.step.pose, v.step.rakah);
+  setChair(v.type === 'step' && v.step.seated === 'chair' && !state.wuduRoom && !state.scene);
   syncRemote();
   // Geschichten und Sternenhimmel: keine Figur (Propheten werden nicht gezeigt); Szene zeigt den Abschnitt des Schritts
   const noGuide = storyActive() || state.scene === 'starsky';
@@ -824,7 +862,12 @@ function onStep() {
 const stepsFor = (prayer) => (prayer.kind === 'wudu' ? buildWuduSteps(state.madhab, prayer.variant)
   : prayer.kind === 'story' ? buildStory(prayer.id)
   : isPilgrimage(prayer) ? buildPilgrimage(prayer.kind, state.madhab, state.gender, state.prayerSura)
-    : buildSteps(prayer, state.madhab, state.gender, state.prayerSura));
+    : buildSteps(prayerVariant(prayer), state.madhab, state.gender, state.prayerSura, { sitting: state.sitting }));
+// Unterwegs (Seferî): Pflichtgebete mit 4 Rakʿāt werden zu 2 (Qaṣr)
+function prayerVariant(prayer) {
+  if (!state.travel || prayer.kind || prayer.rakat !== 4) return prayer;
+  return Object.assign(Object.create(prayer), { rakat: 2, travel: true });
+}
 
 function start(prayer) {
   state.prayer = prayer;
@@ -923,6 +966,21 @@ function act(action) {
     case 'more': state.view = 'more'; break;
     case 'purify': state.view = 'purify'; break;
     case 'nafile': state.view = 'nafile'; break;
+    case 'adapt': state.view = 'adapt'; break;
+    case 'sitting': state.sitting = arg === 'off' ? '' : arg; store.set('sitting', state.sitting); break;
+    case 'travel': state.travel = !state.travel; store.set('travel', state.travel); break;
+    case 'kaza': state.view = 'kaza'; break;
+    case 'kz': {
+      // kz:<id>:+1 / -1 – Zähler ändern; kz:years:+1 – Jahre für die Schätzung; kz:fill – Schätzung übernehmen
+      const k = kazaOf();
+      if (arg === 'years') state.kazaYears = Math.max(1, Math.min(60, (state.kazaYears || 1) + Number(arg2)));
+      else if (arg === 'fill') { const n = (state.kazaYears || 1) * 354; for (const id of KAZA_IDS) k[id] += id === 'fast' ? (state.kazaYears || 1) * 30 : n; }
+      else if (arg === 'reset') { for (const id of KAZA_IDS) k[id] = 0; k.made = 0; }
+      else if (KAZA_IDS.includes(arg)) { const d = Number(arg2); if (d < 0 && k[arg] > 0) { k[arg]--; k.made++; } else if (d > 0) k[arg] += d; }
+      state.progress.kaza = k; saveProgress();
+      break;
+    }
+    case 'kazapray': start(Object.assign(Object.create(findPrayer(arg)), { kaza: true })); break;
     case 'elif':
       state.view = 'elif';
       if (arg) { state.elif.part = arg; state.elif.quiz = arg === 'quiz' ? elifQuiz() : null; }
@@ -1201,8 +1259,9 @@ function act(action) {
         state.auto = false;
         if (cong.group.visible) cong.finish();
         recordPractice(state.progress, state.prayer.id);
-        // Pflichtgebet geschafft: im Gebets-Tracker für heute abhaken
-        if (markPrayed(state.progress, state.prayer.id)) fullDayStar(dayKey());
+        if (state.prayer.kaza) kazaDone(state.prayer.id);
+        // Pflichtgebet geschafft: im Gebets-Tracker für heute abhaken (nicht beim Nachholen)
+        else if (markPrayed(state.progress, state.prayer.id)) fullDayStar(dayKey());
         // Kinder bekommen für jedes geschaffte Gebet einen Stern
         if (state.kids) state.progress.stars = (state.progress.stars || 0) + 1;
         saveProgress();

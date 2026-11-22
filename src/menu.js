@@ -13,6 +13,7 @@ export function menuGroups(v, { mobile = false } = {}) {
       item('🧭', mobile ? t('ui.menuQiblaMobile') : t('ui.menuQibla'), 'qibla'),
       item('🤲', t('ui.menuMore'), 'more'),
       item('🌠', t('nfl.menu'), 'nafile'),
+      item('🪑', t('sit.menu'), 'adapt', { active: !!v.adapted }),
       item('🕌', t('ui.menuMosque'), 'mosque'),
     ] },
     { label: t('ui.grp.learn'), items: [
@@ -36,6 +37,7 @@ export function menuGroups(v, { mobile = false } = {}) {
       item('✅', t('track.menu', v.tracked), 'tracker', { active: v.tracked === 5 }),
       item(v.profile.icon, v.profile.name, 'profiles'),
       item('🧒', t('ui.kidsBtn', v.kids), 'kids', { active: v.kids }),
+      item('📒', t('kaza.menu'), 'kaza'),
       item('👪', t('par.menu'), 'parents'),
       item('⚙️', t('ui.menuSettings'), 'settings'),
     ] },

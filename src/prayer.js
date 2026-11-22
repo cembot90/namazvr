@@ -485,7 +485,34 @@ function buildJanaza(m, gender) {
   return steps;
 }
 
-export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 'ikhlas') {
+// Im Sitzen beten (auf dem Boden oder auf dem Stuhl): Haltungen und Hinweise je Schritt.
+// Wer stehen kann, steht nach Shāfiʿī, Mālikī und Ḥanbalī im Qiyām; Ḥanafī: wer sich nicht niederwerfen kann, darf ganz sitzen.
+const SEAT = {
+  floor: { stand: 'sit', takbir: 'floorTakbir', qiyam: 'floorQiyam', dua: 'sitDua', ruku: 'floorRuku', sujud: 'floorSujud', sit: 'sit', sitDua: 'sitDua', taslimR: 'taslimR', taslimL: 'taslimL' },
+  chair: { stand: 'chair', takbir: 'chairTakbir', qiyam: 'chairQiyam', dua: 'chairDua', ruku: 'chairRuku', sujud: 'chairSujud', sit: 'chair', sitDua: 'chairDua', taslimR: 'chairTaslimR', taslimL: 'chairTaslimL' },
+};
+function seated(steps, mode, m) {
+  const map = SEAT[mode];
+  return steps.map((s, i) => {
+    const pose = map[s.pose] || s.pose;
+    const out = { ...s, basePose: s.pose, pose, seated: mode };
+    if (s.key === 'niyya' && i === 0) out.de = [t(`sit.note.${m.id}`), t(`sit.mode.${mode}`), ...s.de];
+    if (s.pose === 'ruku') { out.how = t('sit.how.ruku'); out.instr = `${t('sit.lead.ruku')} ${s.instr}`; }
+    else if (s.pose === 'sujud') { out.how = t('sit.how.sujud'); out.instr = `${t('sit.lead.sujud')} ${s.instr}`; }
+    else if (s.pose === 'sit') out.how = t(`sit.how.sit.${mode}`);
+    else if (['stand', 'qiyam', 'takbir'].includes(s.pose)) {
+      out.how = t('sit.how.upright');
+      if (s.key === 'itidal' || s.key === 'rise') out.instr = `${t('sit.lead.upright')} ${s.instr}`;
+    }
+    return out;
+  });
+}
+
+export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 'ikhlas', opts = {}) {
+  if (opts.sitting && SEAT[opts.sitting]) {
+    const m = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
+    return seated(buildSteps(prayer, madhabId, gender, suraKey), opts.sitting, m);
+  }
   const m = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
   if (prayer.kind === 'janaza') return buildJanaza(m, gender);
   const f = gender === 'f';
@@ -499,7 +526,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
   const kind = prayer.kind || 'fard';
   const steps = [];
   const add = (step) => steps.push({ ar: [], tr: [], de: [], ...step });
-  const niyyaOf = (p) => (p.kind ? t(`niyya.${p.id}`) : t('niyya.fard', p.rakat, p.name));
+  const niyyaOf = (p) => (p.kaza ? t('kaza.niyya', p.rakat, p.name) : p.kind ? t(`niyya.${p.id}`) : t('niyya.fard', p.rakat, p.name));
 
   // Witr und 4 Rakʿāt Sunnah betet man je nach Schule am Stück oder als 2 + 1 bzw. 2 + 2.
   let units = [{ n: prayer.rakat, niyya: niyyaOf(prayer), label: '' }];
@@ -551,6 +578,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
       de: [
         kind === 'jumua' ? t('instr.jumua', f) : kind === 'eid' ? t('ext.eidNote') : t('instr.heart'),
         ...(prayer.note && ui === 0 ? [t(`nfl.when.${prayer.id}`)] : []),
+        ...(prayer.travel && ui === 0 ? [t(`sefer.qasr.${m.id}`)] : []),
         ...(prayer.tasbih && ui === 0 ? [t(`tsp.school.${m.id}`)] : []),
         ...(ui === 0 ? [t(`awra.${gender}`) || t('awra.m')] : []),
       ],

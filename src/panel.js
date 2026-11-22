@@ -971,6 +971,46 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.menu'), 80 + half, H - 128, half, 96, 'menu');
   }
 
+  // Gebet anpassen: Sitzen und Reise
+  v_adapt(v) {
+    const { W, H } = this;
+    this.heading(t('sit.title'), t('sit.sub'));
+    let y = this.paragraphs([t('sit.intro')], 160, { size: 22, color: C.muted, gap: 0 });
+    const cur = v.sitting || 'off', bw = (W - 140) / 3;
+    this.text(t('sit.label'), 60, y + 30, { size: 28, weight: 700 });
+    [['off', t('sit.off')], ['floor', t('sit.floor')], ['chair', t('sit.chair')]].forEach(([id, l], i) => this.btn(l, 60 + i * (bw + 10), y + 50, bw, 70, `sitting:${id}`, { active: cur === id, size: 26 }));
+    y = this.paragraphs([v.sitting ? t(`sit.mode.${v.sitting}`) : t('sit.lying'), t(`sit.note.${v.madhab.id}`)], y + 160, { size: 21, gap: 6 });
+    this.switchRow(y + 4, t('sit.travel'), t('sit.travelSub'), [[v.travel ? t('ui.on') : t('ui.off'), 'travel', v.travel]]);
+    this.paragraphs([t(`sefer.qasr.${v.madhab.id}`), t('sefer.about')[2]], y + 96, { size: 20, color: C.muted, gap: 4 });
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
+  }
+
+  v_kaza(v) {
+    const { W, H } = this;
+    this.heading(t('kaza.title'), t('kaza.sub'));
+    this.text(String(v.open), 140, 200, { size: 64, weight: 700, color: C.gold, align: 'center' });
+    this.text(t('kaza.made', v.k.made), 230, 200, { size: 24, color: C.muted });
+    const cw = (W - 120 - 20) / 2;
+    v.ids.forEach((id, i) => {
+      const x = 60 + (i % 2) * (cw + 20), y = 235 + Math.floor(i / 2) * 92;
+      this.text(v.names[id], x, y + 32, { size: 25, weight: 700 });
+      this.text(t('kaza.open', v.k[id]), x, y + 62, { size: 21, color: C.muted });
+      const bx = x + cw - 3 * 78;
+      this.btn('−', bx, y + 6, 70, 70, `kz:${id}:-1`, { size: 34 });
+      this.btn('+', bx + 78, y + 6, 70, 70, `kz:${id}:1`, { size: 34 });
+      if (id !== 'fast') this.btn('▶', bx + 156, y + 6, 70, 70, `kazapray:${id}`, { primary: true, size: 28 });
+    });
+    const y = 235 + 4 * 92;
+    this.text(`${t('kaza.estimate')}: ${t('kaza.estimateSub')}`, 60, y + 24, { size: 21, color: C.muted });
+    this.btn('−', 60, y + 40, 70, 64, 'kz:years:-1', { size: 30 });
+    this.btn(t('kaza.years', v.years), 140, y + 40, 200, 64, 'noop', { active: true, size: 24 });
+    this.btn('+', 350, y + 40, 70, 64, 'kz:years:1', { size: 30 });
+    this.btn(t('kaza.fill'), 440, y + 40, 360, 64, 'kz:fill', { primary: true, size: 24 });
+    this.btn(t('kaza.reset'), 810, y + 40, W - 870, 64, 'kz:reset', { size: 24 });
+    this.paragraphs([t('kaza.tips')[0]], y + 140, { size: 20, color: C.muted, gap: 0 });
+    this.btn(t('ui.menu'), 60, H - 100, W - 120, 76, 'menu');
+  }
+
   // Elif-Ba auf der Tafel: Reiter, darunter Buchstabe mit Formen, Vokalzeichen, Wörter oder Quiz
   v_elif(v) {
     const { W, H } = this;

@@ -38,6 +38,19 @@ export const POSES = {
   face:    { y: 0.95, spine: 0.1,  headX: 0.1,  headY: 0,    shX: -0.75, shZ: 0.05, elX: -2.35, elZ: -0.45, hip: 0,    knee: 0 },
   head:    { y: 0.95, spine: 0.05, headX: 0.2,  headY: 0,    shX: -2.3,  shZ: 0.45, elX: -1.5,  elZ: -0.3, hip: 0,     knee: 0 },
   // Bittgebet im Sitzen nach dem Gebet (Gemeinde)
+  // Im Sitzen beten: auf dem Boden (Beine wie beim Sitzen) und auf dem Stuhl (Oberschenkel waagerecht)
+  floorTakbir: { y: 0.24, spine: 0.02, headX: 0.15, headY: 0, shX: -0.25, shZ: 0.55, elX: -2.6, elZ: 0, hip: -1.25, knee: 2.82 },
+  floorQiyam:  { y: 0.24, spine: 0.02, headX: 0.25, headY: 0, shX: -0.25, shZ: -0.1, elX: -1.45, elZ: -0.9, hip: -1.25, knee: 2.82 },
+  floorRuku:   { y: 0.24, spine: 0.55, headX: 0.15, headY: 0, shX: -0.75, shZ: 0.05, elX: -0.35, elZ: 0, hip: -1.25, knee: 2.82 },
+  floorSujud:  { y: 0.24, spine: 0.95, headX: 0.1, headY: 0, shX: -1.05, shZ: 0.08, elX: -0.25, elZ: 0, hip: -1.25, knee: 2.82 },
+  chair:       { y: 0.5, spine: 0.05, headX: 0.25, headY: 0, shX: -0.5, shZ: 0.05, elX: -0.9, elZ: 0, hip: -1.57, knee: 1.57 },
+  chairTakbir: { y: 0.5, spine: 0.02, headX: 0.15, headY: 0, shX: -0.25, shZ: 0.55, elX: -2.6, elZ: 0, hip: -1.57, knee: 1.57 },
+  chairQiyam:  { y: 0.5, spine: 0.02, headX: 0.25, headY: 0, shX: -0.25, shZ: -0.1, elX: -1.45, elZ: -0.9, hip: -1.57, knee: 1.57 },
+  chairDua:    { y: 0.5, spine: 0.05, headX: 0.35, headY: 0, shX: -0.6, shZ: 0.15, elX: -1.5, elZ: 0.1, hip: -1.57, knee: 1.57 },
+  chairRuku:   { y: 0.5, spine: 0.5, headX: 0.15, headY: 0, shX: -0.85, shZ: 0.05, elX: -0.45, elZ: 0, hip: -1.57, knee: 1.57 },
+  chairSujud:  { y: 0.5, spine: 0.95, headX: 0.1, headY: 0, shX: -1.2, shZ: 0.08, elX: -0.35, elZ: 0, hip: -1.57, knee: 1.57 },
+  chairTaslimR: { y: 0.5, spine: 0.05, headX: 0.1, headY: -1.1, shX: -0.5, shZ: 0.05, elX: -0.9, elZ: 0, hip: -1.57, knee: 1.57 },
+  chairTaslimL: { y: 0.5, spine: 0.05, headX: 0.1, headY: 1.1, shX: -0.5, shZ: 0.05, elX: -0.9, elZ: 0, hip: -1.57, knee: 1.57 },
   sitDua:  { y: 0.24, spine: 0.05, headX: 0.35, headY: 0,    shX: -0.6,  shZ: 0.15, elX: -1.5,  elZ: 0.1,  hip: -1.25, knee: 2.82 },
   // Füße waschen im Sitzen auf dem Hocker: Oberschenkel waagerecht, vorgebeugt, Hände an den Füßen
   footWash:{ y: 0.5,  spine: 0.75, headX: 0.35, headY: 0,    shX: -0.95, shZ: 0.12, elX: -0.25, elZ: 0,    hip: -1.55, knee: 1.55 },
