@@ -927,9 +927,10 @@ export class Panel extends CanvasPlane {
     });
     y += 6 + 3 * (h + 14);
     this.switchRow(y, t('hajj.sounds'), t('story.soundsSub'), [[v.sounds ? t('ui.on') : t('ui.off'), 'sounds', v.sounds]]);
-    const by = H - 118, w2 = (W - 120 - gap) / 2;
-    this.btn(t('sky.menu'), 60, by, w2, 90, 'sky', { primary: true });
-    this.btn(t('ui.menu'), 60 + w2 + gap, by, w2, 90, 'menu');
+    const by = H - 118, w3 = (W - 120 - 2 * gap) / 3;
+    this.btn(t('sky.menu'), 60, by, w3, 90, 'sky', { primary: true, size: 26 });
+    this.btn(`🕰️ ${t('siyer.menu')}`, 60 + w3 + gap, by, w3, 90, 'siyer', { primary: true, size: 24 });
+    this.btn(t('ui.menu'), 60 + 2 * (w3 + gap), by, w3, 90, 'menu');
   }
 
   // Sternenhimmel: was schon leuchtet und was als Nächstes kommt
@@ -969,6 +970,70 @@ export class Panel extends CanvasPlane {
     const half = (W - 140) / 2;
     this.btn(t('hinfo.btn'), 60, H - 128, half, 96, 'hajjinfo', { size: 28 });
     this.btn(t('ui.menu'), 80 + half, H - 128, half, 96, 'menu');
+  }
+
+  // Zakat-Rechner auf der Tafel: Werte mit − / + (in der Brille gibt es keine Tastatur)
+  v_zakat(v) {
+    const { W, H } = this, z = v.z, F = t('zakat.fields');
+    this.heading(t('zakat.title'), t('zakat.sub'));
+    const step = { cash: 100, other: 100, debts: 100, gold: 1, silver: 10, goldPrice: 1, silverPrice: 0.1, persons: 1, perPerson: 1 };
+    const rows = ['cash', 'other', 'debts', 'gold', 'silver', 'goldPrice', 'silverPrice'];
+    const cw = (W - 140) / 2;
+    rows.forEach((id, i) => {
+      const x = 60 + (i % 2) * (cw + 20), y = 130 + Math.floor(i / 2) * 82;
+      this.btn('', x, y, cw, 74, `zset:${id}`);
+      this.text(F[id], x + 18, y + 30, { size: 21, color: C.muted });
+      this.text(id === 'gold' || id === 'silver' ? `${z[id]} g` : v.money(z[id]), x + 18, y + 60, { size: 26, weight: 700 });
+      this.btn('−', x + cw - 150, y + 10, 64, 54, `zset:${id}:-${step[id]}`, { size: 30 });
+      this.btn('+', x + cw - 78, y + 10, 64, 54, `zset:${id}:${step[id]}`, { size: 30 });
+    });
+    this.btn(`${t('zakat.currency')}: ${z.cur}`, 60 + cw + 20, 130 + 3 * 82, cw, 74, 'zset:cur', { size: 24 });
+    const y = 130 + 4 * 82 + 6;
+    this.btn(`${t('zakat.nisabBy')}: ${z.by === 'gold' ? t('zakat.byGold') : t('zakat.bySilver')}`, 60, y, cw, 64, 'zset:by', { active: true, size: 22 });
+    this.text(`${t('zakat.total')}: ${v.money(v.net)} · ${t('zakat.nisab')}: ${v.priced ? v.money(v.nisab) : '–'}`, 60 + cw + 20, y + 40, { size: 22 });
+    this.text(`${t('zakat.due')}: ${v.money(v.due)}`, W / 2, y + 120, { size: 44, weight: 700, color: C.gold, align: 'center' });
+    this.text(!v.priced ? t('zakat.noPrice') : v.due ? '' : t('zakat.below'), W / 2, y + 160, { size: 22, color: C.muted, align: 'center' });
+    // Fitra
+    const fy = y + 190;
+    this.text(`${t('zakat.fitra')}: ${t('zakat.persons')} ${z.persons} × ${v.money(z.perPerson)} = ${v.money(v.fitra)}`, 60, fy + 40, { size: 24, weight: 600 });
+    this.btn('−', W - 60 - 4 * 74, fy + 8, 66, 54, 'zset:persons:-1', { size: 28 });
+    this.btn('+', W - 60 - 3 * 74, fy + 8, 66, 54, 'zset:persons:1', { size: 28 });
+    this.btn('−1', W - 60 - 2 * 74, fy + 8, 66, 54, 'zset:perPerson:-1', { size: 22 });
+    this.btn('+1', W - 60 - 74, fy + 8, 66, 54, 'zset:perPerson:1', { size: 22 });
+    this.btn(t('ui.menu'), 60, H - 96, W - 120, 72, 'menu');
+  }
+
+  v_cuma(v) {
+    const { W, H } = this;
+    this.heading(t('cuma.title'), t('cuma.sub'));
+    this.text(t('cuma.nextIn', v.inDays), 60, 170, { size: 30, weight: 700, color: C.gold });
+    let y = this.paragraphs([v.kids ? t('cuma.kids') : t('cuma.about')], 215, { size: 23, gap: 8 });
+    y = this.paragraphs(t('cuma.sunnah').map((x) => `• ${x}`), y + 6, { size: 22, gap: 2 });
+    const half = (W - 140) / 2;
+    this.btn(t('pn.jumua'), 60, y + 16, half, 76, 'prayer:jumua', { primary: true });
+    this.btn(`🔊 ${t('holy.duaName.salawatShort')}`, 80 + half, y + 16, half, 76, 'hdua:salawatShort', { size: 26 });
+    this.switchRow(y + 110, t('cuma.remind'), t('cuma.remindSub'), [[v.remindOn ? t('ui.on') : t('ui.off'), v.remindOn ? 'remcuma' : 'remind', v.remindOn]]);
+    this.btn(t('ui.menu'), 60, H - 100, W - 120, 76, 'menu');
+  }
+
+  v_siyer(v) {
+    const { W, H } = this, [year, title, text, kid] = v.ev;
+    this.heading(t('siyer.title'), t('siyer.stepOf', v.i + 1, v.n));
+    // Zeitstrahl: ein Punkt je Ereignis
+    const x0 = 80, x1 = W - 80, ly = 175;
+    this.ctx.fillStyle = C.line; this.ctx.fillRect(x0, ly - 2, x1 - x0, 4);
+    for (let k = 0; k < v.n; k++) {
+      const x = x0 + (k / (v.n - 1)) * (x1 - x0);
+      this.btn('', x - 16, ly - 16, 32, 32, `siyer:${k}`, { active: k === v.i, primary: k < v.i });
+    }
+    this.text(year, W / 2, 270, { size: 54, weight: 700, color: C.gold, align: 'center' });
+    this.text(title, W / 2, 330, { size: 36, weight: 700, align: 'center' });
+    this.paragraphs([v.kids ? kid : text], 380, { size: 27, gap: 0 });
+    const bw = (W - 140) / 3;
+    this.btn('◀', 60, H - 210, bw, 84, 'siprev', { size: 36 });
+    this.btn(t('elif.say'), 70 + bw, H - 210, bw, 84, 'sisay', { primary: true, size: 28 });
+    this.btn('▶', 80 + 2 * bw, H - 210, bw, 84, 'sinext', { size: 36 });
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
   }
 
   // Gebet anpassen: Sitzen und Reise

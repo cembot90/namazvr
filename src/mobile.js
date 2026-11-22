@@ -518,6 +518,7 @@ export class MobileUI {
     return `${head(t('story.title'), t('story.sub'))}
       ${t('story.intro').map((p) => `<p class="muted small">${esc(p)}</p>`).join('')}
       <div class="list">${v.list.map((s) => btn(`${s.icon} ${s.name}${s.done ? ' ⭐' : ''}`, `prayer:${s.id}`, { cls: s.done ? 'active' : 'primary', sub: s.sub })).join('')}</div>
+      ${btn(`🕰️ ${t('siyer.menu')}`, 'siyer', { cls: 'wide' })}
       ${sounds}
       <div class="grid2">${btn(t('sky.menu'), 'sky', { cls: 'primary' })}${btn(t('ui.menu'), 'menu')}</div>`;
   }
@@ -541,6 +542,46 @@ export class MobileUI {
       ${toggle}${sounds}
       <p class="muted small">${esc(t('hajj.note'))}</p>
       ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Zakat- und Fitra-Rechner: Felder antippen zum Eingeben
+  v_zakat(v) {
+    const z = v.z, F = t('zakat.fields');
+    const field = (id, label, val) => btn(label, `zset:${id}`, { sub: `${val} · ${t('zakat.tap')}` });
+    const unit = (id) => (id === 'gold' || id === 'silver' ? `${z[id]} g` : v.money(z[id]));
+    return `${head(t('zakat.title'), t('zakat.sub'))}
+      <p class="small">${esc(t('zakat.intro'))}</p>
+      <div class="grid2">${['cash', 'other', 'gold', 'silver', 'goldPrice', 'silverPrice', 'debts'].map((id) => field(id, F[id], unit(id))).join('')}${btn(`${t('zakat.currency')}: ${z.cur}`, 'zset:cur')}</div>
+      <div class="setting"><div><b>${esc(t('zakat.nisabBy'))}</b><small>${esc(t('zakat.schools'))}</small></div>${btn(z.by === 'gold' ? t('zakat.byGold') : t('zakat.bySilver'), 'zset:by', { cls: 'active' })}</div>
+      <div class="stats"><div><b>${esc(v.money(v.net))}</b><small>${esc(t('zakat.total'))}</small></div><div><b>${esc(v.priced ? v.money(v.nisab) : '–')}</b><small>${esc(t('zakat.nisab'))}</small></div></div>
+      <p class="count">${esc(v.money(v.due))}</p><p class="center gold">${esc(!v.priced ? t('zakat.noPrice') : v.due ? t('zakat.due') : t('zakat.below'))}</p>
+      <p class="muted small">${esc(t('zakat.hawl'))}</p>
+      <h3>${esc(t('zakat.fitra'))}</h3>
+      <div class="grid2">${field('persons', t('zakat.persons'), z.persons)}${field('perPerson', t('zakat.perPerson'), v.money(z.perPerson))}</div>
+      <p class="center gold"><b>${esc(t('zakat.fitraDue'))}: ${esc(v.money(v.fitra))}</b></p>
+      <p class="muted small">${esc(t('zakat.fitraNote'))}</p><p class="muted small">${esc(t('zakat.who'))}</p>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_cuma(v) {
+    return `${head(t('cuma.title'), t('cuma.sub'))}
+      <p class="count" style="font-size:22px">${esc(t('cuma.nextIn', v.inDays))}</p>
+      <p>${esc(v.kids ? t('cuma.kids') : t('cuma.about'))}</p>
+      <ul>${t('cuma.sunnah').map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+      <div class="grid2">${btn(t('pn.jumua'), 'prayer:jumua', { cls: 'primary' })}${btn(`🔊 ${t('holy.duaName.salawatShort')}`, 'hdua:salawatShort')}</div>
+      <div class="setting"><div><b>${esc(t('cuma.remind'))}</b><small>${esc(t('cuma.remindSub'))}</small></div>${btn(v.remindOn ? t('ui.on') : t('ui.off'), v.remindOn ? 'remcuma' : 'remind', { cls: v.remindOn ? 'active' : '' })}</div>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  v_siyer(v) {
+    const [year, title, text, kid] = v.ev;
+    return `${head(t('siyer.title'), t('siyer.stepOf', v.i + 1, v.n))}
+      ${progressBar((v.i + 1) / v.n)}
+      <p class="count" style="font-size:30px">${esc(year)}</p><h3 class="center">${esc(title)}</h3>
+      <p>${esc(v.kids ? kid : text)}</p>
+      <div class="grid3">${btn('◀', 'siprev')}${btn(t('elif.say'), 'sisay', { cls: 'primary' })}${btn('▶', 'sinext')}</div>
+      <p class="muted small">${esc(t('siyer.intro'))}</p>
+      <div class="grid2">${btn(t('story.menu'), 'stories')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   // Gebet anpassen: im Sitzen (Boden/Stuhl) und unterwegs (Seferî)

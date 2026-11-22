@@ -30,6 +30,8 @@ export function menuGroups(v, { mobile = false } = {}) {
       item('🕋', t('hajj.menu'), 'pilgrim'),
       item('🌙', t('ram.menu'), 'ramadan'),
       item('⭐', t('holy.menu'), 'holy'),
+      item('🕌', t('cuma.menu'), 'cuma', { active: new Date().getDay() === 5 }),
+      item('💰', t('zakat.menu'), 'zakat'),
       item('🕯️', t('alevi.menu'), 'alevi'),
       item('✨', t('sky.menu'), 'sky'),
     ] },

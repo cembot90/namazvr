@@ -144,6 +144,8 @@ const state = {
   auto: false,
   autoT: 0,
   big: store.get('big', false), // große Schrift
+  zakat: { cash: 0, gold: 0, silver: 0, other: 0, debts: 0, goldPrice: 0, silverPrice: 0, by: 'gold', persons: 1, perPerson: 0, cur: 'EUR', ...store.get('zakat', {}) },
+  siyer: 0,
   sitting: store.get('sitting', ''), // im Sitzen beten: '' | 'floor' | 'chair'
   travel: store.get('travel', false), // unterwegs (Seferî): 4 Rakʿāt werden 2
   quiet: store.get('calm', false), // ruhiger Modus: keine Musik und Geräusche, langsamer vorlesen
@@ -676,6 +678,21 @@ function view() {
       return { type: 'more', prayers: EXTRA_PRAYERS, madhab: madhab().name };
     case 'purify':
       return { type: 'more', title: t('pure.title'), note: t('pure.note'), prayers: PURIFY, madhab: madhab().name };
+    case 'zakat': {
+      const z = state.zakat;
+      const net = z.cash + z.other + z.gold * z.goldPrice + z.silver * z.silverPrice - z.debts;
+      const nisab = z.by === 'gold' ? 85 * z.goldPrice : 595 * z.silverPrice;
+      const money = (n) => { try { return new Intl.NumberFormat(langInfo().locale, { style: 'currency', currency: z.cur, maximumFractionDigits: 2 }).format(n); } catch { return `${n.toFixed(2)} ${z.cur}`; } };
+      return { type: 'zakat', z, money, net, nisab, priced: nisab > 0, due: nisab > 0 && net >= nisab ? net * 0.025 : 0, fitra: z.persons * z.perPerson };
+    }
+    case 'cuma': {
+      const day = new Date().getDay();
+      return { type: 'cuma', kids: state.kids, inDays: (5 - day + 7) % 7, remindOn: state.remind.cuma !== false && state.remind.on };
+    }
+    case 'siyer': {
+      const ev = t('siyer.events');
+      return { type: 'siyer', i: state.siyer, n: ev.length, ev: ev[state.siyer], kids: state.kids };
+    }
     case 'adapt':
       return { type: 'adapt', sitting: state.sitting, travel: state.travel, madhab: madhab() };
     case 'kaza': {
@@ -966,6 +983,26 @@ function act(action) {
     case 'more': state.view = 'more'; break;
     case 'purify': state.view = 'purify'; break;
     case 'nafile': state.view = 'nafile'; break;
+    case 'zakat': state.view = 'zakat'; break;
+    case 'zset': {
+      const z = state.zakat;
+      if (arg === 'by') z.by = z.by === 'gold' ? 'silver' : 'gold';
+      else if (arg === 'cur') { const list = ['EUR', 'TRY', 'USD', 'CHF', 'GBP', 'BAM', 'ALL', 'IDR', 'PKR', 'IRR', 'AFN', 'SAR']; z.cur = list[(list.indexOf(z.cur) + 1) % list.length]; }
+      else if (arg2) z[arg] = Math.max(0, (z[arg] || 0) + Number(arg2));
+      else if (arg in z) {
+        let v = null;
+        try { v = window.prompt(t('zakat.ask', ['persons', 'perPerson'].includes(arg) ? t(`zakat.${arg}`) : t(`zakat.fields.${arg}`)), String(z[arg] || '')); } catch { /* kein Dialog */ }
+        const n = v == null ? NaN : Number(String(v).replace(/\s/g, '').replace(',', '.'));
+        if (Number.isFinite(n) && n >= 0) z[arg] = n;
+      }
+      store.set('zakat', z);
+      break;
+    }
+    case 'cuma': state.view = 'cuma'; break;
+    case 'remcuma': state.remind.cuma = state.remind.cuma === false; store.set('remind', state.remind); break;
+    case 'siyer': state.view = 'siyer'; if (arg) state.siyer = Number(arg) || 0; break;
+    case 'sinext': case 'siprev': { const n = t('siyer.events').length; state.siyer = (state.siyer + (key === 'sinext' ? 1 : n - 1)) % n; break; }
+    case 'sisay': { const e = t('siyer.events')[state.siyer]; voices.say([{ text: `${e[1]}. ${state.kids ? e[3] : e[2]}`, lang: langInfo().speech }]); break; }
     case 'adapt': state.view = 'adapt'; break;
     case 'sitting': state.sitting = arg === 'off' ? '' : arg; store.set('sitting', state.sitting); break;
     case 'travel': state.travel = !state.travel; store.set('travel', state.travel); break;
@@ -1030,7 +1067,10 @@ function act(action) {
     }
     case 'hajjinfo': state.view = 'hajjinfo'; state.hajjPart = arg || 'basics'; break;
     case 'holy': state.view = 'holy'; state.holySel = arg || null; state.holyDua = null; state.remMsg = ''; break;
-    case 'hdua': state.holyDua = state.holyDua === arg ? null : arg; break;
+    case 'hdua':
+      state.holyDua = state.holyDua === arg && state.view === 'holy' ? null : arg;
+      if (state.holyDua) voices.say([{ text: prayerText(arg).ar.join(' '), lang: 'ar', rate: 0.8 }]);
+      break;
     case 'holycal':
       downloadIcs(buildHolyIcs(new Date(), state.location.timeZone || deviceZone), 'namazvr-heilige-tage.ics');
       state.remMsg = t('rem.calDone');
@@ -1775,6 +1815,17 @@ function checkHoly() {
   notify(title, body);
 }
 setInterval(checkHoly, 60000);
+// Freitags-Erinnerung um 10 Uhr (solange die App offen ist)
+function checkCuma() {
+  if (!state.remind.on || state.remind.cuma === false || !canNotify() || Notification.permission !== 'granted') return;
+  const now = new Date();
+  if (now.getDay() !== 5 || now.getHours() < 10) return;
+  const key = `cuma|${dayKey(now)}`;
+  if (store.get('cumaSent', '') === key) return;
+  store.set('cumaSent', key);
+  notify(t('cuma.notifyTitle'), t('cuma.notifyBody'));
+}
+setInterval(checkCuma, 60000);
 // Auch wenn der Bildschirm still steht (keine Animation, z. B. Tab im Hintergrund)
 setInterval(checkReminder, 30000);
 
