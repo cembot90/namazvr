@@ -8,8 +8,9 @@ export function menuGroups(v, { mobile = false } = {}) {
   const item = (icon, label, action, opt = {}) => ({ icon, label: plain(label), action, ...opt });
   return [
     { label: t('ui.grp.pray'), items: [
+      item('🌱', t('path.menu'), 'path', { primary: !!v.beginner }),
       item('🕐', t('ui.menuTimes'), 'times'),
-      item('💧', t('pure.menu'), 'purify', { primary: !v.wuduDone }),
+      item('💧', t('pure.menu'), 'purify', { primary: !v.wuduDone && !v.beginner }),
       item('🧭', mobile ? t('ui.menuQiblaMobile') : t('ui.menuQibla'), 'qibla'),
       item('🤲', t('ui.menuMore'), 'more'),
       item('🌠', t('nfl.menu'), 'nafile'),

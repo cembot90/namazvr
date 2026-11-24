@@ -77,6 +77,7 @@ export class MobileUI {
         const row = v.times.rows.find((t) => t.id === p.id);
         return btn(p.name, `prayer:${p.id}`, { cls: p.id === v.times.current ? 'active' : '', sub: `${row.time} · ${p.rakat}` });
       }).join('')}</div>
+      ${v.thought ? `<button class="next" data-a="path:why"><span class="ico" aria-hidden="true">💡</span><div><b>${esc(t('path.thought'))}: ${esc(v.thought.title)}</b><small>${esc(v.thought.text)}</small></div></button>` : ''}
       ${menuGroups(v, { mobile: true }).map((g) => `<h4>${esc(g.label)}</h4><div class="tiles">${g.items.map(tile).join('')}</div>`).join('')}`;
   }
 
@@ -616,6 +617,27 @@ export class MobileUI {
       ${btn(t('hoca.result'), 'tresult', { cls: 'primary wide' })}
       ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
       <div class="grid2">${btn(t('hoca.clear'), 'tclear')}${btn(t('ui.menu'), 'menu')}</div>`;
+  }
+
+  // Mein Weg: Schritte für Anfänger, Gründe zum Beten, Garten der letzten zwei Wochen
+  v_path(v) {
+    const tabs = Object.entries(t('path.tabs')).map(([id, l]) => btn(l, `path:${id}`, { cls: v.part === id ? 'active' : '' })).join('');
+    let body = '';
+    if (v.part === 'steps') {
+      const c = v.steps[v.cur];
+      body = `<p class="small">${esc(t('path.intro'))}</p>
+        ${v.restart ? `<p class="gold">${esc(t('path.restart'))}</p>` : v.streak ? `<p class="center gold"><b>🔥 ${esc(t('path.streak', v.streak))}</b></p>` : ''}
+        ${c ? `<div class="pcard"><h3>${esc(t('path.next'))} · ${esc(t('path.stepOf', v.cur + 1, v.steps.length))}</h3><p><b>${esc(c.title)}</b></p><p class="small">${esc(c.text)}</p>${btn(t('path.go'), c.action, { cls: 'primary wide' })}</div>` : `<p class="gold">${esc(t('path.allDone'))}</p>`}
+        ${btn(t('path.oneNow', v.now.name), `prayer:${v.now.id}`, { cls: 'wide' })}
+        <div class="list">${v.steps.map((s, i) => btn(`${s.ok ? '✅' : i === v.cur ? '👉' : '⬜'} ${s.title}`, s.action, { cls: s.ok ? 'active' : '' })).join('')}</div>`;
+    } else if (v.part === 'why') {
+      body = v.why.map(([title, text, kid]) => `<div class="pcard"><h3>${esc(title)}</h3><p class="small">${esc(v.kids ? kid : text)}</p></div>`).join('');
+    } else {
+      body = `<p class="center" style="font-size:34px;letter-spacing:4px">${v.garden.slice(0, 7).join('')}<br>${v.garden.slice(7).join('')}</p>
+        <p class="small">${esc(v.gardenEmpty ? t('path.gardenEmpty') : t('path.garden'))}</p>
+        ${btn(t('track.title'), 'tracker', { cls: 'primary wide' })}`;
+    }
+    return `${head(t('path.title'), t('path.sub'))}<div class="grid3">${tabs}</div>${body}${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
   // Gebet anpassen: im Sitzen (Boden/Stuhl) und unterwegs (Seferî)

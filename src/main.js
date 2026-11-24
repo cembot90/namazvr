@@ -249,6 +249,13 @@ function shareText(text, url) {
   if (navigator.share) { navigator.share(url ? { text, url } : { text }).catch(() => {}); return; }
   navigator.clipboard?.writeText(text).then(done, () => {});
 }
+// Gedanke für heute: jeden Tag ein anderer Grund zu beten
+function dailyThought() {
+  const list = t('path.why');
+  const d = new Date(), day = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5);
+  const [title, text, kid] = list[day % list.length];
+  return { title, text: state.kids ? kid : text };
+}
 // Angesehene Namen Allahs zählen (für Eltern-Übersicht und Urkunden)
 function markEsma() {
   const seen = new Set(state.progress.esmaSeen || []);
@@ -731,6 +738,24 @@ function view() {
       const list = T ? T.ids.map((id) => taskInfo(id)) : [];
       return { type: 'tasks', from: T?.from || '', list, done: list.filter((x) => x.ok).length, msg: state.hocaMsg || '' };
     }
+    case 'path': {
+      const p = state.progress, log = p.log || {};
+      const daysWith = (n) => Object.values(log).filter((l) => l.length >= n).length;
+      // Tage in Folge mit mindestens einem Gebet (bis heute oder gestern)
+      let streakN = 0;
+      { const d = new Date(); if (!(log[dayKey(d)] || []).length) d.setDate(d.getDate() - 1); while ((log[dayKey(d)] || []).length) { streakN++; d.setDate(d.getDate() - 1); } }
+      const tests = [
+        () => p.wudu > 0, () => !!p.done.fajr, () => !!p.suras?.fatiha, () => !!p.suras?.ikhlas, () => daysWith(1) >= 3,
+        () => PRAYERS.every((x) => p.done[x.id]), () => daysWith(3) >= 1, () => BADGES[9].test(p), () => BADGES[10].test(p),
+      ];
+      const acts = ['wudu', 'prayer:fajr', 'sura:fatiha', 'sura:ikhlas', 'tracker', 'more5', 'tracker', 'tracker', 'tracker'];
+      const steps = t('path.steps').map(([title, text], i) => ({ title, text, ok: tests[i](), action: acts[i] }));
+      const cur = steps.findIndex((x) => !x.ok);
+      const garden = Array.from({ length: 14 }, (_, k) => { const d = new Date(); d.setDate(d.getDate() - (13 - k)); const n = (log[dayKey(d)] || []).length; return n >= 5 ? '🌸' : n >= 3 ? '🌿' : n >= 1 ? '🌱' : '🟫'; });
+      const tinfo = timesInfo(), nowId = tinfo.current && PRAYERS.some((x) => x.id === tinfo.current) ? tinfo.current : tinfo.next.id;
+      return { type: 'path', part: state.pathPart || 'steps', steps, cur, streak: streakN, restart: streakN === 0 && Object.keys(log).length > 0,
+        garden, gardenEmpty: !Object.values(log).some((l) => l.length), why: t('path.why'), kids: state.kids, now: { id: nowId, name: findPrayer(nowId).name }, thought: dailyThought() };
+    }
     case 'adapt':
       return { type: 'adapt', sitting: state.sitting, travel: state.travel, madhab: madhab() };
     case 'kaza': {
@@ -832,7 +857,7 @@ function view() {
       return { type: 'times', ...timesInfo() };
     default:
       return {
-        type: 'menu', adapted: !!state.sitting || state.travel, tasks: !!store.get('tasks', null),
+        type: 'menu', thought: dailyThought(), beginner: !PRAYERS.every((x) => state.progress.done[x.id]), adapted: !!state.sitting || state.travel, tasks: !!store.get('tasks', null),
         prayers: PRAYERS,
         qibla: t('ui.qiblaLine', locationName(), Math.round(bearing())),
         calibrated: isCalibrated(),
@@ -1066,6 +1091,13 @@ function act(action) {
       break;
     }
     case 'tclear': store.set('tasks', null); state.view = 'menu'; break;
+    case 'path': state.view = 'path'; state.pathPart = arg || state.pathPart || 'steps'; break;
+    case 'more5': {
+      // nächstes der fünf Gebete, das noch nie geübt wurde
+      const p = PRAYERS.find((x) => !state.progress.done[x.id]) || PRAYERS[0];
+      start(p);
+      break;
+    }
     case 'adapt': state.view = 'adapt'; break;
     case 'sitting': state.sitting = arg === 'off' ? '' : arg; store.set('sitting', state.sitting); break;
     case 'travel': state.travel = !state.travel; store.set('travel', state.travel); break;

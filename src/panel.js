@@ -1078,6 +1078,46 @@ export class Panel extends CanvasPlane {
     this.btn(t('ui.menu'), 100 + 2 * third, H - 110, third, 84, 'menu');
   }
 
+  // Mein Weg auf der Tafel
+  v_path(v) {
+    const { W, H } = this;
+    this.heading(t('path.title'), t('path.sub'));
+    const tabs = Object.entries(t('path.tabs')), tw = (W - 140) / 3;
+    tabs.forEach(([id, l], i) => this.btn(l, 60 + i * (tw + 10), 125, tw, 62, `path:${id}`, { active: v.part === id, size: 24 }));
+    if (v.part === 'steps') {
+      const c = v.steps[v.cur];
+      let y = 225;
+      if (v.restart) y = this.paragraphs([t('path.restart')], y, { size: 21, color: C.gold, gap: 4 });
+      else if (v.streak) { this.text(`🔥 ${t('path.streak', v.streak)}`, 60, y + 10, { size: 26, weight: 700, color: C.gold }); y += 40; }
+      if (c) {
+        this.text(`${t('path.next')} · ${t('path.stepOf', v.cur + 1, v.steps.length)}`, 60, y + 20, { size: 22, color: C.muted });
+        this.text(c.title, 60, y + 60, { size: 34, weight: 700, color: C.gold });
+        y = this.paragraphs([c.text], y + 92, { size: 23, gap: 0 });
+        this.btn(t('path.go'), 60, y + 4, 380, 70, c.action, { primary: true, size: 28 });
+        this.btn(t('path.oneNow', v.now.name), 460, y + 4, W - 520, 70, `prayer:${v.now.id}`, { size: 24 });
+        y += 90;
+      } else y = this.paragraphs([t('path.allDone')], y + 10, { size: 24, color: C.gold, gap: 6 });
+      const cw = (W - 140) / 3;
+      v.steps.forEach((s, i) => this.btn(`${s.ok ? '✅' : i === v.cur ? '👉' : '⬜'} ${s.title}`, 60 + (i % 3) * (cw + 10), y + Math.floor(i / 3) * 62, cw, 54, s.action, { active: s.ok, size: 19 }));
+    } else if (v.part === 'why') {
+      const cw = (W - 140) / 2;
+      v.why.forEach(([title, text, kid], i) => {
+        const x = 60 + (i % 2) * (cw + 20), y = 205 + Math.floor(i / 2) * 120;
+        this.btn('', x, y, cw, 112, 'noop');
+        this.text(title, x + 18, y + 32, { size: 23, weight: 700, color: C.gold });
+        this.ctx.font = `17px ${UI}`;
+        const lines = wrap(this.ctx, v.kids ? kid : text, cw - 36).slice(0, 3);
+        lines.forEach((l, k) => this.text(l, x + 18, y + 60 + k * 22, { size: 17 }));
+      });
+    } else {
+      this.text(v.garden.slice(0, 7).join(' '), W / 2, 330, { size: 70, align: 'center' });
+      this.text(v.garden.slice(7).join(' '), W / 2, 430, { size: 70, align: 'center' });
+      this.paragraphs([v.gardenEmpty ? t('path.gardenEmpty') : t('path.garden')], 500, { size: 24, gap: 0 });
+      this.btn(t('track.title'), 360, 640, W - 720, 84, 'tracker', { primary: true });
+    }
+    this.btn(t('ui.menu'), 60, H - 100, W - 120, 76, 'menu');
+  }
+
   // Gebet anpassen: Sitzen und Reise
   v_adapt(v) {
     const { W, H } = this;
