@@ -115,7 +115,19 @@ export class Panel extends CanvasPlane {
     let size = opt.size || 32;
     ctx.font = `600 ${size}px ${UI}`;
     while (size > 18 && ctx.measureText(label).width > w - 20) ctx.font = `600 ${(size -= 1)}px ${UI}`;
-    this.text(label, x + w / 2, opt.sub ? cy - 18 : cy + 2, { size, weight: 600, align: 'center', base: 'middle', color: opt.active && !opt.primary ? C.gold : C.text });
+    const color = opt.active && !opt.primary ? C.gold : C.text;
+    // Passt die Beschriftung auch klein nicht in eine Zeile: auf zwei Zeilen umbrechen (statt überlappen)
+    const space = ctx.measureText(label).width > w - 20 && !opt.sub ? label.lastIndexOf(' ', Math.ceil(label.length / 2) + 4) : -1;
+    if (space > 0) {
+      let s2 = Math.min(opt.size || 32, 26);
+      const lines = [label.slice(0, space), label.slice(space + 1)];
+      ctx.font = `600 ${s2}px ${UI}`;
+      while (s2 > 15 && Math.max(...lines.map((l) => ctx.measureText(l).width)) > w - 16) ctx.font = `600 ${(s2 -= 1)}px ${UI}`;
+      lines.forEach((l, k) => this.text(l, x + w / 2, cy + (k - 0.5) * s2 * 1.15 + 2, { size: s2, weight: 600, align: 'center', base: 'middle', color }));
+      this.buttons.push({ x, y, w, h, action });
+      return;
+    }
+    this.text(label, x + w / 2, opt.sub ? cy - 18 : cy + 2, { size, weight: 600, align: 'center', base: 'middle', color });
     if (opt.sub) {
       const font = opt.subFont || UI;
       let sub = opt.subSize || 30;
@@ -126,9 +138,17 @@ export class Panel extends CanvasPlane {
     this.buttons.push({ x, y, w, h, action });
   }
 
+  // Überschrift links, Untertitel rechts – bei langen Texten kleiner, damit sich nichts überlappt
   heading(title, sub) {
-    this.text(title, 60, 96, { size: 50, weight: 700, color: C.gold });
-    if (sub) this.text(sub, this.W - 60, 96, { size: 28, color: C.muted, align: 'right' });
+    const { ctx, W } = this, room = W - 120;
+    let ts = 50, ss = 28;
+    const tw = () => { ctx.font = `700 ${ts}px ${UI}`; return ctx.measureText(title).width; };
+    const sw = () => { if (!sub) return 0; ctx.font = `${ss}px ${UI}`; return ctx.measureText(sub).width; };
+    while (tw() + sw() + 30 > room && (ts > 34 || ss > 18)) { if (ss > 18) ss -= 1; if (ts > 34) ts -= 1; }
+    this.text(title, 60, 96, { size: ts, weight: 700, color: C.gold });
+    if (!sub) return;
+    if (tw() + sw() + 30 > room) this.text(sub, W - 60, 118, { size: 18, color: C.muted, align: 'right' });
+    else this.text(sub, W - 60, 96, { size: ss, color: C.muted, align: 'right' });
   }
 
   paragraphs(list, y, { size = 30, color = C.text, gap = 18, maxW = this.W - 120 } = {}) {
@@ -514,6 +534,7 @@ export class Panel extends CanvasPlane {
     this.btn('→', 60 + (w + gap), by, w, 96, 'peacenext', { size: 44, primary: true });
     this.btn(t('duas.btn'), 60 + 2 * (w + gap), by, w, 96, 'duas', { size: 28, primary: true });
     this.btn(t('ui.calm'), 60 + 3 * (w + gap), by, w, 96, 'calm', { size: 26 });
+    this.btn(t('ui.menuTasbih').replace(/^[^\p{L}]+/u, ''), 60 + 4 * (w + gap), by - 110, w, 96, 'tasbih', { size: 26 });
     this.btn(t('ui.menu'), 60 + 4 * (w + gap), by, w, 96, 'menu', { size: 28 });
   }
 
@@ -678,8 +699,10 @@ export class Panel extends CanvasPlane {
     this.paragraphs([t('holy.sighting')], 690, { size: 19, color: C.muted, gap: 0 });
     this.switchRow(730, t('holy.remind'), t('holy.remindSub'), [[v.remindOn ? t('ui.on') : t('ui.off'), 'remind', v.remindOn]]);
     if (v.msg) this.text(v.msg, 60, 832, { size: 22, color: C.gold });
-    this.btn(t('holy.cal'), 60, H - 120, half, 88, 'holycal', { primary: true, size: 26 });
-    this.btn(t('ui.menu'), 60 + half + gap, H - 120, half, 88, 'menu');
+    const third = (W - 120 - 2 * gap) / 3;
+    this.btn(t('holy.cal'), 60, H - 120, third, 88, 'holycal', { primary: true, size: 24 });
+    this.btn(`🕌 ${t('cuma.menu')}`, 60 + third + gap, H - 120, third, 88, 'cuma', { size: 26 });
+    this.btn(t('ui.menu'), 60 + 2 * (third + gap), H - 120, third, 88, 'menu');
   }
 
   // Eltern-Übersicht: je Familienmitglied eine Spalte mit Zahlen und den nächsten Schritten
@@ -1116,6 +1139,14 @@ export class Panel extends CanvasPlane {
       this.btn(t('track.title'), 360, 640, W - 720, 84, 'tracker', { primary: true });
     }
     this.btn(t('ui.menu'), 60, H - 100, W - 120, 76, 'menu');
+  }
+
+  // Unterseite mit Kacheln (z. B. „Weitere Gebete“)
+  v_hub(v) {
+    const { W, H } = this;
+    this.heading(v.title);
+    v.items.forEach((it, i) => this.btn(`${it.icon} ${it.label}`, 60, 130 + i * 128, W - 120, 116, it.action, { size: 34, sub: it.sub, subSize: 22, active: it.active }));
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
   }
 
   // Gebet anpassen: Sitzen und Reise

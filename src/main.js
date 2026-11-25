@@ -11,6 +11,7 @@ import { classifyHead, matchesPose, moveFor } from './movement.js';
 import { ALEVI, EXTRA_PRAYERS, MADHABS, NAFILE, PILGRIMAGES, PRAYERS, PURIFY, TASBIH, buildSteps, findPrayer, text as prayerText } from './prayer.js';
 import { LETTERS, MARKS, WORDS, elifQuiz } from './alphabet.js';
 import { ESMA, esmaQuiz } from './esma.js';
+import { hubItems } from './menu.js';
 import { downloadCertificate, today as certDate } from './certificate.js';
 import { HOLY_LINKS, buildHolyIcs, dueHoly, holyList, holyText } from './holy.js';
 import { LANGS, deviceLang, getLang, isLoaded, isRTL, langInfo, loadLang, setLang, t } from './i18n.js';
@@ -756,6 +757,8 @@ function view() {
       return { type: 'path', part: state.pathPart || 'steps', steps, cur, streak: streakN, restart: streakN === 0 && Object.keys(log).length > 0,
         garden, gardenEmpty: !Object.values(log).some((l) => l.length), why: t('path.why'), kids: state.kids, now: { id: nowId, name: findPrayer(nowId).name }, thought: dailyThought() };
     }
+    case 'hub':
+      return { type: 'hub', id: state.hubId, title: t('ui.grp.pray'), items: hubItems(state.hubId, { adapted: !!state.sitting || state.travel }) };
     case 'adapt':
       return { type: 'adapt', sitting: state.sitting, travel: state.travel, madhab: madhab() };
     case 'kaza': {
@@ -1098,6 +1101,7 @@ function act(action) {
       start(p);
       break;
     }
+    case 'hub': state.view = 'hub'; state.hubId = arg || 'prayers'; break;
     case 'adapt': state.view = 'adapt'; break;
     case 'sitting': state.sitting = arg === 'off' ? '' : arg; store.set('sitting', state.sitting); break;
     case 'travel': state.travel = !state.travel; store.set('travel', state.travel); break;

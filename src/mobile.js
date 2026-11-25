@@ -258,7 +258,7 @@ export class MobileUI {
       <p class="gold center">${esc(v.item.source)}</p>
       <div class="grid2">${btn('←', 'peaceprev')}${btn('→', 'peacenext', { cls: 'primary' })}</div>
       ${btn(t('duas.btn'), 'duas', { cls: 'primary wide' })}
-      <div class="grid2">${btn(t('ui.calm'), 'calm')}${btn(t('ui.menu'), 'menu')}</div>`;
+      <div class="grid3">${btn(t('ui.menuTasbih').replace(/^[^\p{L}]+/u, ''), 'tasbih')}${btn(t('ui.calm'), 'calm')}${btn(t('ui.menu'), 'menu')}</div>`;
   }
 
   v_duas(v) {
@@ -322,6 +322,7 @@ export class MobileUI {
       <div class="list">${v.list.map((e) => btn(`${e.icon} ${e.name}`, `holy:${e.id}`, { sub: `${e.dateText} · ${e.when}`, cls: e.days <= 0 ? 'active' : '' })).join('')}</div>
       <p class="muted small">${esc(t('holy.sighting'))}</p>
       <div class="setting"><div><b>${esc(t('holy.remind'))}</b><small>${esc(t('holy.remindSub'))}</small></div>${btn(v.remindOn ? t('ui.on') : t('ui.off'), 'remind', { cls: v.remindOn ? 'active' : '' })}</div>
+      ${btn(`🕌 ${t('cuma.title')}`, 'cuma', { cls: 'wide' })}
       ${btn(t('holy.cal'), 'holycal', { cls: 'primary wide' })}
       ${v.msg ? `<p class="gold">${esc(v.msg)}</p>` : ''}
       ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
@@ -638,6 +639,13 @@ export class MobileUI {
         ${btn(t('track.title'), 'tracker', { cls: 'primary wide' })}`;
     }
     return `${head(t('path.title'), t('path.sub'))}<div class="grid3">${tabs}</div>${body}${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Unterseite mit Kacheln (z. B. „Weitere Gebete“)
+  v_hub(v) {
+    return `${head(v.title)}
+      <div class="list">${v.items.map((it) => btn(`${it.icon} ${it.label}`, it.action, { cls: it.active ? 'active' : '', sub: it.sub })).join('')}</div>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
   // Gebet anpassen: im Sitzen (Boden/Stuhl) und unterwegs (Seferî)
