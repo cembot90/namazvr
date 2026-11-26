@@ -599,7 +599,7 @@ function lightRing(scene, x, z, r, y, n, top = H + 1) {
   inst(scene, new THREE.CylinderGeometry(0.008, 0.008, len, 4), new THREE.MeshBasicMaterial({ color: 0x5a4a2a }), ropes);
 }
 
-const gold = () => new THREE.MeshStandardMaterial({ color: 0xc9a85c, roughness: 0.35, metalness: 0.7 });
+const gold = () => new THREE.MeshStandardMaterial({ color: 0xc9a85c, roughness: 0.28, metalness: 0.85 });
 const woodMat = () => new THREE.MeshStandardMaterial({ color: 0x6b4426, roughness: 0.7 });
 
 // Gebetsplatz (Weltursprung) in Raumkoordinaten
