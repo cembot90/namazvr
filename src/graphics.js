@@ -67,8 +67,8 @@ export class Graphics {
       ao.updateGtaoMaterial({ radius: 0.45, distanceExponent: 1.5, thickness: 1.2, scale: 1, samples: 12 });
       c.addPass(ao);
     }
-    // Nur wirklich helle Stellen (Lampen, Sonnenflecken) leuchten; weiße Schrift auf den Tafeln bleibt scharf
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.38, 0.55, 1.0);
+    // Nur Lampen leuchten (Schwelle über allem, was nur beleuchtet ist – weiße Gewänder in der Sonne, Tafeln)
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), 0.32, 0.45, 2.2);
     c.addPass(this.bloom);
     c.addPass(new OutputPass());
     this.composer = c;

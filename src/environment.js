@@ -573,7 +573,7 @@ function minbar(scene, s, mat, accent, x) {
 
 // Hängelampen: [x, z, y?]
 function lanterns(scene, spots, color = 0xffd48a) {
-  const glow = new THREE.MeshStandardMaterial({ color, emissive: 0xffb24a, emissiveIntensity: NIGHT ? 2 : 1.2 });
+  const glow = new THREE.MeshStandardMaterial({ color, emissive: 0xffb24a, emissiveIntensity: NIGHT ? 4 : 3.2 });
   const chain = new THREE.MeshBasicMaterial({ color: 0x5a4a2a });
   const byY = new Map();
   for (const [x, z, y = 3.4] of spots) byY.set(y, [...(byY.get(y) || []), [x, y, z]]);
@@ -590,7 +590,7 @@ function lightRing(scene, x, z, r, y, n, top = H + 1) {
   ring.rotation.x = Math.PI / 2;
   ring.position.set(x, y, z);
   scene.add(ring);
-  const glow = new THREE.MeshStandardMaterial({ color: 0xfff0c8, emissive: 0xffc870, emissiveIntensity: NIGHT ? 2.2 : 1.5 });
+  const glow = new THREE.MeshStandardMaterial({ color: 0xfff0c8, emissive: 0xffc870, emissiveIntensity: NIGHT ? 4.2 : 3.4 });
   const lamps = [];
   for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2; lamps.push([x + Math.sin(a) * r, y - 0.08, z + Math.cos(a) * r]); }
   inst(scene, new THREE.SphereGeometry(0.06 + r * 0.004, 10, 8), glow, lamps);
