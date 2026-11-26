@@ -66,24 +66,25 @@ function grain(ctx, w, h, amount, seed = 3) {
 let marbleTex = null;
 function marbleMap() {
   if (marbleTex) return marbleTex;
-  marbleTex = canvasTexture(256, 512, (ctx, w, h) => {
+  marbleTex = canvasTexture(512, 1024, (ctx, w, h) => {
     ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
     let s = 11;
     const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
     // weiche Wolken
     for (let i = 0; i < 40; i++) {
-      const x = rnd() * w, y = rnd() * h, r = 20 + rnd() * 60, g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      const x = rnd() * w, y = rnd() * h, r = (20 + rnd() * 60) * (w / 256), g = ctx.createRadialGradient(x, y, 0, x, y, r);
       g.addColorStop(0, `rgba(120,110,100,${0.03 + rnd() * 0.04})`); g.addColorStop(1, 'rgba(120,110,100,0)');
       ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
     }
     // Adern
     for (let i = 0; i < 9; i++) {
       ctx.strokeStyle = `rgba(90,82,74,${0.12 + rnd() * 0.18})`;
-      ctx.lineWidth = 0.6 + rnd() * 1.6;
+      ctx.lineWidth = (0.6 + rnd() * 1.6) * (w / 256);
       ctx.beginPath();
       let x = rnd() * w, y = 0;
       ctx.moveTo(x, y);
-      while (y < h) { const nx = x + (rnd() - 0.5) * 60, ny = y + 20 + rnd() * 50; ctx.quadraticCurveTo(x + (rnd() - 0.5) * 40, (y + ny) / 2, nx, ny); x = nx; y = ny; }
+      const k = w / 256;
+      while (y < h) { const nx = x + (rnd() - 0.5) * 60 * k, ny = y + (20 + rnd() * 50) * k; ctx.quadraticCurveTo(x + (rnd() - 0.5) * 40 * k, (y + ny) / 2, nx, ny); x = nx; y = ny; }
       ctx.stroke();
     }
     grain(ctx, w, h, 8, 5);
@@ -91,7 +92,29 @@ function marbleMap() {
   marbleTex.wrapS = marbleTex.wrapT = THREE.RepeatWrapping;
   return marbleTex;
 }
-const stoneMat = (color, roughness) => new THREE.MeshStandardMaterial({ color, roughness, map: marbleMap() });
+// Feine Oberflächenstruktur (Teppichflor, Putz) als Relief: kostet kaum Leistung, gibt dem Licht Halt
+const reliefTex = {};
+function relief(kind) {
+  if (reliefTex[kind]) return reliefTex[kind];
+  const tex = canvasTexture(256, 256, (ctx, w, h) => {
+    const img = ctx.createImageData(w, h);
+    let s = kind === 'pile' ? 7 : 19;
+    const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      // Flor: feine, leicht längliche Fasern; Putz: weiche Unebenheiten
+      const v = kind === 'pile' ? 128 + (rnd() - 0.5) * 120 + Math.sin(y * 1.7) * 14 : 128 + (rnd() - 0.5) * 40;
+      const i = (y * w + x) * 4; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+    if (kind !== 'pile') { ctx.filter = 'blur(2px)'; ctx.drawImage(ctx.canvas, 0, 0); }
+  });
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.NoColorSpace;
+  reliefTex[kind] = tex;
+  return tex;
+}
+// Marmor: Adern als Glanzkarte – die Adern glänzen etwas mehr als die Fläche
+const stoneMat = (color, roughness) => new THREE.MeshStandardMaterial({ color, roughness: Math.min(1, roughness + 0.15), map: marbleMap(), roughnessMap: marbleMap() });
 
 // Weiche Schatten (Ersatz für Umgebungsverdeckung, auch ohne Schatten auf der Quest)
 let blobTex = null;
@@ -388,10 +411,18 @@ function lights(scene, warm = 1) {
   scene.add(sun);
 }
 
+// Teppich mit Flor: Relief in feiner Wiederholung über die ganze Fläche
+function carpetMat(map) {
+  const pile = relief('pile').clone();
+  pile.repeat.set(W / 1.2, D / 1.2);
+  pile.needsUpdate = true;
+  return new THREE.MeshStandardMaterial({ map, roughness: 1, bumpMap: pile, bumpScale: 1.2 });
+}
+
 function floorAndWalls(scene, style) {
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(W, D),
-    new THREE.MeshStandardMaterial({ map: carpetTexture(PALETTE[style].carpet), roughness: 1 }),
+    carpetMat(carpetTexture(PALETTE[style].carpet)),
   );
   floor.rotation.x = -Math.PI / 2;
   scene.add(floor);
@@ -402,7 +433,8 @@ function floorAndWalls(scene, style) {
     const map = len === W ? tex : tex.clone();
     map.repeat.set(len / (H * 16 / 7), 1);
     map.needsUpdate = true;
-    return new THREE.MeshStandardMaterial({ map, roughness: 0.95 });
+    const pl = relief('plaster').clone(); pl.repeat.set(len / 3, H / 3); pl.needsUpdate = true;
+    return new THREE.MeshStandardMaterial({ map, roughness: 0.95, bumpMap: pl, bumpScale: 0.6 });
   });
   for (let i = 0; i < 4; i++) {
     const len = i % 2 ? D : W;

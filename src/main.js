@@ -1757,6 +1757,7 @@ function layout() {
   camera.fov = mobileUI ? 55 : 70;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, h);
+  graphics.resize();
   if (mobileUI) aimAtGuide();
 }
 // Schreibrichtung und Hilfetext der Seite zur gewählten Sprache
@@ -1784,6 +1785,8 @@ if (mobileUI) {
   card.mesh.visible = false;
 }
 window.addEventListener('resize', layout);
+// Nachbearbeitung: am Handy nur das Leuchten, am Computer auch Kontaktschatten
+graphics.usePost(camera, { ao: !mobileUI });
 
 // Kopf in VR (bzw. Desktop-Kamera): Höhe über dem Boden, Neigung, Drehung gegenüber der Qibla.
 const headPos = new THREE.Vector3(), headDir = new THREE.Vector3();
@@ -2014,7 +2017,7 @@ renderer.setAnimationLoop(() => {
     if (state.atStools) setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [], arrived(guide) ? [0] : []);
     else setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : [])]);
   }
-  renderer.render(scene, camera);
+  graphics.render(camera);
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
