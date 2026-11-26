@@ -488,6 +488,7 @@ function cemevi(scene, night) {
   // Lampen
   const lamp = new THREE.MeshStandardMaterial({ color: 0xfff0c8, emissive: 0xffd48a, emissiveIntensity: night ? 2 : 1.2 });
   for (const [x, z] of [[-4, -6], [4, -6], [-4, 2], [4, 2], [0, -1]]) { const l = new THREE.Mesh(new THREE.SphereGeometry(0.25, 12, 8), lamp); l.position.set(x, H - 0.8, z); scene.add(l); }
+  furnishCemevi(scene, W, D, H, wood);
   // Gemeinde: Männer und Frauen gemeinsam im Kreis um den Meydan, Blick zur Mitte; Dede und Zakir vorn
   const list = [{ mode: 'sit', x: 0, z: MEYDAN.z - 4.2, face: true, dede: true }, { mode: 'sit', x: -1.6, z: MEYDAN.z - 4.0, face: true, zakir: true }];
   // Dienste (Hizmet): erscheinen nur in ihrem Schritt
@@ -538,6 +539,98 @@ function cemevi(scene, night) {
     }
     crowd.push({ g, ...p, t: rand(0, 10) });
   }
+}
+
+
+// Einrichtung des Cemevi: Postlar (Schaffelle) im Kreis, Sitzpolster an den Wänden, Kilims, Zülfikar und Schrifttafeln
+// („Yâ Hak“, „Yâ Ali“), Bağlamas an der Wand, Lokma-Tisch und Çay-Ecke, Bücherregal (Buyruk, Deyişler), Schuhregal am Eingang.
+function furnishCemevi(scene, W, D, H, wood) {
+  const box = (w, h, d, mat, x, y, z, ry = 0) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.rotation.y = ry; scene.add(m); return m; };
+  const fleeceMats = [0xf3efe6, 0xe2d6c0, 0xb99a78].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 1 }));
+  // Postlar unter den Plätzen im Kreis
+  for (let i = 0; i < 18; i++) {
+    const a = Math.PI * 0.62 + (i / 17) * Math.PI * 1.76;
+    const f = new THREE.Mesh(new THREE.SphereGeometry(0.42, 14, 6), fleeceMats[i % 3]);
+    f.scale.set(1, 0.06, 0.75);
+    f.position.set(MEYDAN.x + Math.cos(a) * 4.6, 0.02, MEYDAN.z - Math.sin(a) * 4.6);
+    f.rotation.y = -a;
+    scene.add(f);
+  }
+  // Sitzpolster mit Rückenkissen an beiden Längswänden
+  const cushion = new THREE.MeshStandardMaterial({ color: 0x7a2e2e, roughness: 1 }), back = new THREE.MeshStandardMaterial({ color: 0x2f4f6b, roughness: 1 });
+  for (const side of [-1, 1]) {
+    box(0.8, 0.16, D - 4, cushion, side * (W / 2 - 0.42), 0.08, 0);
+    for (let z = -D / 2 + 2.6; z <= D / 2 - 2.6; z += 1.2) box(0.2, 0.45, 1.05, back, side * (W / 2 - 0.12), 0.38, z);
+  }
+  // Kilims an den Längswänden
+  const kilimTex = canvasTex(256, 512, (ctx, w, h) => {
+    ctx.fillStyle = '#8c2a22'; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#f1e2c0'; ctx.lineWidth = 10; ctx.strokeRect(10, 10, w - 20, h - 20);
+    for (let y = 60; y < h - 40; y += 90) {
+      ctx.fillStyle = '#c9853a'; ctx.beginPath(); ctx.moveTo(w / 2, y - 36); ctx.lineTo(w / 2 + 70, y); ctx.lineTo(w / 2, y + 36); ctx.lineTo(w / 2 - 70, y); ctx.fill();
+      ctx.fillStyle = '#2f4f6b'; ctx.beginPath(); ctx.moveTo(w / 2, y - 16); ctx.lineTo(w / 2 + 30, y); ctx.lineTo(w / 2, y + 16); ctx.lineTo(w / 2 - 30, y); ctx.fill();
+    }
+  });
+  const kilimMat = new THREE.MeshStandardMaterial({ map: kilimTex, roughness: 1 });
+  for (const side of [-1, 1]) for (const z of [-5, 4]) {
+    const k = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.3), kilimMat);
+    k.position.set(side * (W / 2 - 0.03), 2.35, z);
+    k.rotation.y = -side * Math.PI / 2;
+    scene.add(k);
+  }
+  // Runde Schrifttafeln an den Längswänden und Zülfikar an der Stirnwand
+  const disc = (txt, x, z, ry) => {
+    const m = new THREE.Mesh(new THREE.CircleGeometry(0.6, 40), new THREE.MeshBasicMaterial({ map: canvasTex(256, 256, (ctx, w) => {
+      ctx.fillStyle = '#c9a85c'; ctx.beginPath(); ctx.arc(w / 2, w / 2, w / 2 - 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#123f36'; ctx.beginPath(); ctx.arc(w / 2, w / 2, w / 2 - 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#e6c77f'; ctx.font = '84px Amiri, "Noto Naskh Arabic", serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = 'rtl';
+      ctx.fillText(txt, w / 2, w / 2 + 8);
+    }) }));
+    m.position.set(x, 3.4, z); m.rotation.y = ry; scene.add(m);
+  };
+  disc('يا حق', -(W / 2 - 0.03), -0.5, Math.PI / 2);
+  disc('يا علي', W / 2 - 0.03, -0.5, -Math.PI / 2);
+  const zulfikar = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 2.2), new THREE.MeshBasicMaterial({ transparent: true, map: canvasTex(256, 640, (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, w, 0); g.addColorStop(0, '#a8873e'); g.addColorStop(0.5, '#f1dc9a'); g.addColorStop(1, '#a8873e');
+    ctx.fillStyle = g;
+    // zweispitzige Klinge, Parierstange, Griff
+    ctx.beginPath(); ctx.moveTo(w * 0.36, 40); ctx.lineTo(w * 0.47, 120); ctx.lineTo(w * 0.53, 120); ctx.lineTo(w * 0.64, 40); ctx.lineTo(w * 0.62, 470); ctx.lineTo(w * 0.38, 470); ctx.closePath(); ctx.fill();
+    ctx.fillRect(w * 0.18, 470, w * 0.64, 26);
+    ctx.fillStyle = '#5a3a22'; ctx.fillRect(w * 0.44, 496, w * 0.12, 110);
+    ctx.fillStyle = '#c9a85c'; ctx.beginPath(); ctx.arc(w / 2, 618, 16, 0, Math.PI * 2); ctx.fill();
+  }) }));
+  for (const x of [-3.6, 3.6]) { const z = zulfikar.clone(); z.position.set(x, 3.0, -D / 2 + 0.03); scene.add(z); }
+  // Bağlamas an der rechten Wand
+  const sazWood = new THREE.MeshStandardMaterial({ color: 0x8a5a2b, roughness: 0.5 });
+  for (const z of [6.2, 7.0, 7.8]) {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 10), sazWood); body.scale.set(1, 0.55, 1.4);
+    const neck = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.75), sazWood); neck.position.z = 0.55;
+    g.add(body, neck);
+    g.position.set(W / 2 - 0.15, 1.7, z);
+    g.rotation.set(-Math.PI / 2 + 0.1, 0, Math.PI / 2);
+    scene.add(g);
+  }
+  // Lokma-Tisch und Çay-Ecke hinten links
+  const cloth = new THREE.MeshStandardMaterial({ color: 0xf1e8d6, roughness: 1 }), brass = new THREE.MeshStandardMaterial({ color: 0xc9a85c, metalness: 0.75, roughness: 0.3 });
+  box(2.4, 0.06, 0.9, cloth, -4.2, 0.78, D / 2 - 1.2);
+  for (const [x, z] of [[-5.3, D / 2 - 1.55], [-3.1, D / 2 - 1.55], [-5.3, D / 2 - 0.85], [-3.1, D / 2 - 0.85]]) box(0.06, 0.76, 0.06, wood, x, 0.38, z);
+  for (const x of [-5, -4.2, -3.4]) {
+    const tray = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.02, 24), brass); tray.position.set(x, 0.82, D / 2 - 1.2); scene.add(tray);
+    for (let k = 0; k < 6; k++) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd9a35a, roughness: 0.9 })); b.position.set(x + Math.cos(k) * 0.14, 0.86, D / 2 - 1.2 + Math.sin(k) * 0.14); scene.add(b); }
+  }
+  const samovar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.5, 16), brass); samovar.position.set(-6.6, 1.06, D / 2 - 1.2); scene.add(samovar);
+  box(1.2, 0.06, 0.7, wood, -6.6, 0.78, D / 2 - 1.2);
+  const glass = new THREE.MeshStandardMaterial({ color: 0x9a3a1a, roughness: 0.2, transparent: true, opacity: 0.8 });
+  for (let k = 0; k < 5; k++) { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.025, 0.08, 10), glass); c.position.set(-7 + k * 0.12, 0.85, D / 2 - 0.95); scene.add(c); }
+  // Bücherregal (Buyruk, Deyiş-Bücher) hinten rechts
+  box(1.8, 1.8, 0.35, wood, 5.6, 0.9, D / 2 - 0.2);
+  const bookCols = [0x1d5c6e, 0x7c2a2a, 0x2f5d3a, 0x8a6a2a];
+  for (const y of [0.5, 1.05, 1.6]) for (let k = 0; k < 12; k++) box(0.1, 0.38, 0.22, new THREE.MeshStandardMaterial({ color: bookCols[(k + Math.round(y * 3)) % 4], roughness: 0.8 }), 4.85 + k * 0.13, y, D / 2 - 0.42);
+  // Schuhregal und Garderobe am Eingang (Rückwand Mitte)
+  for (const y of [0.2, 0.55, 0.9]) box(2.6, 0.04, 0.35, wood, 1.6, y, D / 2 - 0.2);
+  for (let k = 0; k < 6; k++) box(0.12, 0.08, 0.26, new THREE.MeshStandardMaterial({ color: [0x2a2a2a, 0x6b4426, 0xdddddd][k % 3], roughness: 0.6 }), 0.6 + k * 0.4, 0.26 + (k % 2) * 0.35, D / 2 - 0.22);
+  for (let k = 0; k < 6; k++) { const h = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), brass); h.position.set(-1.2 + k * 0.4, 1.8, D / 2 - 0.05); scene.add(h); }
 }
 
 export const HAJJ_SCENES = { haram, masa, mina, arafat, muzdalifa, jamarat, cemevi };
