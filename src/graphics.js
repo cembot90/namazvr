@@ -25,6 +25,7 @@ export class Graphics {
   constructor(renderer, scene, world, high) {
     this.renderer = renderer;
     this.scene = scene;
+    this.world = world;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -117,13 +118,34 @@ export class Graphics {
     if (this.name === name) this.scene.environment = tex;
   }
 
-  // Nach dem Bau eines Ortes: Lampen etwas zurücknehmen (die Umgebung leuchtet mit), Böden empfangen Schatten
-  afterBuild(group) {
+  // Nach dem Bau eines Ortes: Lichtstimmung abstimmen. Innen am Tag: Licht kommt gerichtet durch die Fenster,
+  // die Umgebung hellt nur auf (weniger flach); nachts: dunkler Raum, warme Lichtinseln unter den Lampen.
+  // Ein leichter Dunst gibt großen Hallen Tiefe. Alles ohne Nachbearbeitung – gilt also auch in der Brille.
+  afterBuild(group, { night = false, indoor = true } = {}) {
     group.traverse((o) => {
-      if (o.isHemisphereLight) o.intensity *= 0.42;
-      else if (o.isDirectionalLight) o.intensity *= 0.6;
-      if (o.isMesh) o.receiveShadow = true;
+      if (o.isHemisphereLight) o.intensity *= indoor ? (night ? 0.09 : 0.3) : 0.42;
+      else if (o.isDirectionalLight) o.intensity *= indoor ? (night ? 0.12 : 0.75) : 0.6;
+      if (o.isMesh) {
+        o.receiveShadow = true;
+        for (const m of [].concat(o.material || [])) if ('envMapIntensity' in m && !o.userData.figure) m.envMapIntensity = indoor ? (night ? 0.14 : 0.55) : 1;
+      }
     });
+    // Sonne (Schattenlicht): am Tag warm und kräftig von der Fensterseite, nachts nur ein Hauch Mondlicht
+    this.sun.color.set(night ? 0x9fb4e0 : 0xffe0b0);
+    this.sun.intensity = night ? 0.15 : indoor ? 2.4 : 1.6;
+    this.renderer.toneMappingExposure = night ? 0.95 : 0.88;
+    // Nachts zwei warme Lichtinseln (über dem Gebetsplatz und vor dem Mihrab)
+    for (const l of this.nightLamps || []) l.parent?.remove(l);
+    this.nightLamps = [];
+    if (night && indoor) {
+      for (const [x, y, z, i] of [[0, 3.4, -1.5, 4.5], [0, 3.8, 5, 3.5]]) {
+        const l = new THREE.PointLight(0xffc27a, i, 16, 1.6);
+        l.position.set(x, y, z);
+        this.world.add(l);
+        this.nightLamps.push(l);
+      }
+    }
+    this.scene.fog = indoor ? new THREE.FogExp2(night ? 0x171310 : 0xeadcc4, night ? 0.022 : 0.012) : null;
   }
 
   // Figuren werfen Schatten 

@@ -411,7 +411,7 @@ function rebuildEnv() {
   const sc = state.scene;
   const night = sc === 'arafat' ? false : sc === 'muzdalifa' ? true : state.night;
   buildEnvironment(env, state.wuduRoom ? 'wudu' : sc && sc !== 'miqat' ? sc : sc === 'miqat' ? 'klassisch' : state.style, { night });
-  graphics.afterBuild(env);
+  graphics.afterBuild(env, { night, indoor: !sc || ['miqat', 'cemevi'].includes(sc) || state.wuduRoom });
   graphics.casters(env);
   graphics.setEnv(envFor(state.wuduRoom ? 'wudu' : sc, night));
   if (sc) placePilgrim(true);
