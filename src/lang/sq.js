@@ -1030,6 +1030,13 @@ export default {
       ['Mirënjohja', 'Sytë, duart, fryma, familja – gjithçka është dhuratë. Namazi është mënyra për të thënë faleminderit pesë herë në ditë.', 'Me namaz thua faleminderit për gjithçka të bukur në jetën tënde.'],
     ],
   },
+  watch: {
+    menu: 'Shiko', title: 'Shiko', sub: 'thjesht shiko dhe dëgjo',
+    intro: 'Rri rehat: imami tregon gjithçka, aplikacioni lexon me zë çdo hap dhe vazhdon vetë. Nuk ke nevojë të bësh asgjë – vetëm shiko dhe dëgjo. Nëse dëshiron, më pas mund të ushtrohesh vetë.',
+    wudufajr: 'Abdesti + namazi i sabahut',
+    done: 'Mbarove së shikuari', doneText: 'Mashallah – tani e pe si bëhet. Dëshiron ta provosh vetë? Aplikacioni të udhëheq hap pas hapi.',
+    self: 'Tani ushtrohem vetë ▶', more: 'Shiko diçka tjetër',
+  },
   hinfo: {
     btn: '📘 Dije për haxhin & umren', title: 'Dije: haxhi & umreja',
     next: (d, n) => `Haxhi i ardhshëm: nga ${d} · pas ${n} ${n === 1 ? 'dite' : 'ditësh'}`,

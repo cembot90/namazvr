@@ -1008,6 +1008,13 @@ export default {
       ['Spasdarî', 'Çav, dest, bêhn, malbat – her tişt diyariyek e. Nimêj awayê gotina spasê ye, roj pênc caran.', 'Bi nimêjê tu ji bo her tiştê xweş di jiyana xwe de spas dikî.'],
     ],
   },
+  watch: {
+    menu: 'Temaşe bike', title: 'Temaşe bike', sub: 'tenê temaşe bike û guhdarî bike',
+    intro: 'Rehet rûne: îmam her tiştî nîşan dide, sepan her gavê bi deng dixwîne û bi serê xwe didome. Ne hewce ye tu tiştekî bikî – tenê temaşe bike û guhdarî bike. Heke tu bixwazî, paşê dikarî bi xwe jî biceribînî.',
+    wudufajr: 'Destnimêj + nimêja sibê',
+    done: 'Temaşe qediya', doneText: 'Maşallah – niha te dît ka çawa tê kirin. Tu dixwazî bi xwe biceribînî? Sepan gav bi gav rêberiya te dike.',
+    self: 'Niha bi xwe biceribîne ▶', more: 'Tiştekî din bibîne',
+  },
   hinfo: {
     btn: '📘 Zanîn: Hec & Umre', title: 'Zanîn: Hec & Umre',
     next: (d, n) => `Heca bê: ji ${d} ve · piştî ${n} ${n === 1 ? 'rojê' : 'rojan'}`,

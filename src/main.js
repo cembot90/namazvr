@@ -382,6 +382,9 @@ function applyQibla() {
 
 // Nacht zwischen Maghrib und Sonnenaufgang: dunkle Fenster, hellere Lampen
 function isNight() {
+  // ?night=1 / ?night=0 erzwingt Nacht oder Tag (zum Prüfen der Beleuchtung)
+  const force = new URLSearchParams(location.search).get('night');
+  if (force === '1' || force === '0') return force === '1';
   const loc = { ...state.location, timeZone: state.location.timeZone || deviceZone };
   const now = new Date();
   const { times } = prayerStatus(loc, now, state.method, state.asr);

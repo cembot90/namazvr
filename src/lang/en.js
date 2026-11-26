@@ -999,6 +999,13 @@ export default {
       ['Gratitude', 'Eyes, hands, breath, family – everything is a gift. Prayer is the way to say thank you five times a day.', 'With prayer you say thank you for everything beautiful in your life.'],
     ],
   },
+  watch: {
+    menu: 'Watch', title: 'Just watch', sub: 'simply watch and listen',
+    intro: 'Sit back and relax: the imam shows everything, the app reads each step aloud and moves on by itself. You don’t have to do anything – just watch and listen. If you like, you can practise yourself afterwards.',
+    wudufajr: 'Wuḍūʾ + Fajr prayer',
+    done: 'All watched', doneText: 'Māshāʾ Allāh – now you’ve seen how it’s done. Would you like to try it yourself? The app will guide you step by step.',
+    self: 'Practise myself now ▶', more: 'Watch something else',
+  },
   hinfo: {
     btn: '📘 About Hajj & Umrah', title: 'Learn: Hajj & Umrah',
     next: (d, n) => `Next Hajj: from ${d} · in ${n} ${n === 1 ? 'day' : 'days'}`,

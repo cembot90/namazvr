@@ -1012,6 +1012,13 @@ export default {
       ['La gratitude', 'Les yeux, les mains, le souffle, la famille – tout est un cadeau. La prière est la façon de dire merci cinq fois par jour.', 'Avec la prière, tu dis merci pour tout ce qui est beau dans ta vie.'],
     ],
   },
+  watch: {
+    menu: 'Regarder', title: 'Regarder', sub: 'simplement regarder et écouter',
+    intro: 'Installe-toi confortablement : l’imam montre tout, l’application lit chaque étape à voix haute et avance toute seule. Tu n’as rien à faire – juste regarder et écouter. Si tu veux, tu pourras t’entraîner toi-même ensuite.',
+    wudufajr: 'Woudou + prière du Fajr',
+    done: 'C’est fini', doneText: 'Māshāʾ Allāh – maintenant tu as vu comment on fait. Tu veux essayer toi-même ? L’application te guide pas à pas.',
+    self: 'M’entraîner maintenant ▶', more: 'Regarder autre chose',
+  },
   hinfo: {
     btn: '📘 Savoir : hajj & ʿoumra', title: 'Savoir : hajj & ʿoumra',
     next: (d, n) => `Prochain hajj : à partir du ${d} · dans ${n} jour${n > 1 ? 's' : ''}`,

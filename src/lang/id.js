@@ -1008,6 +1008,13 @@ export default {
       ['Rasa syukur', 'Mata, tangan, napas, keluarga – semuanya adalah hadiah. Salat adalah cara mengucapkan terima kasih lima kali sehari.', 'Dengan salat kamu berterima kasih untuk semua hal indah dalam hidupmu.'],
     ],
   },
+  watch: {
+    menu: 'Tonton', title: 'Tonton', sub: 'cukup lihat dan dengarkan',
+    intro: 'Duduk santai saja: imam mencontohkan semuanya, aplikasi membacakan setiap langkah dan lanjut sendiri. Kamu tidak perlu melakukan apa-apa – cukup lihat dan dengarkan. Kalau mau, sesudahnya kamu bisa berlatih sendiri.',
+    wudufajr: 'Wudu + salat Subuh',
+    done: 'Selesai menonton', doneText: 'Māsyā Allāh – sekarang kamu sudah melihat caranya. Mau coba sendiri? Aplikasi akan membimbingmu langkah demi langkah.',
+    self: 'Latihan sendiri sekarang ▶', more: 'Tonton yang lain',
+  },
   hinfo: {
     btn: '📘 Seputar Haji & Umrah', title: 'Seputar Haji & Umrah',
     next: (d, n) => `Haji berikutnya: mulai ${d} · ${n} hari lagi`,

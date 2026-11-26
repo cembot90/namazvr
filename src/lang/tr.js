@@ -1076,6 +1076,13 @@ export default {
       ['Şükür', 'Gözler, eller, nefes, aile – hepsi birer hediye. Namaz, günde beş kez teşekkür etmenin yoludur.', 'Namazla hayatındaki bütün güzellikler için teşekkür edersin.'],
     ],
   },
+  watch: {
+    menu: 'İzle', title: 'İzle', sub: 'sadece izle ve dinle',
+    intro: 'Arkana yaslan: İmam her şeyi gösteriyor, uygulama her adımı sesli okuyor ve kendiliğinden devam ediyor. Hiçbir şey yapmana gerek yok – sadece izle ve dinle. İstersen sonra kendin de çalışabilirsin.',
+    wudufajr: 'Abdest + sabah namazı',
+    done: 'İzleme bitti', doneText: 'Māşāallah – artık nasıl yapıldığını gördün. Şimdi kendin denemek ister misin? Uygulama sana adım adım yol gösterecek.',
+    self: 'Şimdi kendim çalışayım ▶', more: 'Başka bir şey izle',
+  },
   hinfo: {
     btn: '📘 Hac ve Umre bilgisi', title: 'Bilgi: Hac ve Umre',
     next: (d, n) => `Sonraki hac: ${d} itibarıyla · ${n} gün sonra`,

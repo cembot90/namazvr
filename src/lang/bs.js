@@ -1038,6 +1038,13 @@ export default {
       ['Zahvalnost', 'Oči, ruke, dah, porodica – sve je to dar. Namaz je način da pet puta dnevno kažeš hvala.', 'Namazom kažeš hvala za sve lijepo u svom životu.'],
     ],
   },
+  watch: {
+    menu: 'Gledaj', title: 'Gledaj', sub: 'samo gledaj i slušaj',
+    intro: 'Opusti se: imam sve pokazuje, aplikacija naglas čita svaki korak i sama ide dalje. Ne moraš ništa raditi – samo gledaj i slušaj. Ako želiš, poslije možeš i sam vježbati.',
+    wudufajr: 'Abdest + sabah-namaz',
+    done: 'Gledanje završeno', doneText: 'Mašallah – sad si vidio kako se to radi. Želiš li sam probati? Aplikacija će te voditi korak po korak.',
+    self: 'Sad ću sam vježbati ▶', more: 'Pogledaj još nešto',
+  },
   hinfo: {
     btn: '📘 Znanje o hadžu i umri', title: 'Znanje: hadž i umra',
     next: (d, n) => `Sljedeći hadž: od ${d} · za ${n} ${pl(n, 'dan', 'dana', 'dana')}`,
