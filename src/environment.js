@@ -1359,6 +1359,20 @@ function buildWudu(scene) {
     scene.add(win);
   }
   inst(scene, new THREE.SphereGeometry(0.025, 8, 6), brass, range(-0.4, 3.6, 0.5).map((z) => [-HW + 0.04, 1.5, z]));
+  // Handtücher an den Haken, Spiegelband über den Becken, Seifenspender, Bank mit gefalteten Handtüchern
+  const towelCols = [0xf3ead2, 0x8fb8c8, 0xe7c9a0, 0xc9d8b6];
+  [-0.4, 1.6, 3.6].forEach((z, k) => {
+    const towel = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.5, 0.28), new THREE.MeshStandardMaterial({ color: towelCols[k % towelCols.length], roughness: 1 }));
+    towel.position.set(-HW + 0.06, 1.24, z);
+    scene.add(towel);
+  });
+  const mirror = new THREE.Mesh(new THREE.PlaneGeometry(W - 2.4, 0.42), new THREE.MeshStandardMaterial({ color: 0xcfd8dd, roughness: 0.05, metalness: 0.9 }));
+  mirror.position.set(-0.3, 1.92, zWall + 0.015);
+  scene.add(mirror);
+  inst(scene, new THREE.BoxGeometry(0.08, 0.16, 0.06), new THREE.MeshStandardMaterial({ color: 0xf1f1f1, roughness: 0.4 }), WUDU_BASINS.slice(0, -1).map((x) => [x + 0.55, 1.45, zWall + 0.04]));
+  const bench = new THREE.MeshStandardMaterial({ color: 0x8a6a46, roughness: 0.7 });
+  scene.add(box(1.6, 0.06, 0.4, bench, -HW + 0.35, 0.45, 3.2, Math.PI / 2), box(0.06, 0.45, 0.36, bench, -HW + 0.35, 0.225, 2.5), box(0.06, 0.45, 0.36, bench, -HW + 0.35, 0.225, 3.9));
+  [0, 1, 2].forEach((k) => scene.add(box(0.32, 0.06, 0.28, new THREE.MeshStandardMaterial({ color: towelCols[k], roughness: 1 }), -HW + 0.35, 0.51 + k * 0.06, 3.5)));
   const door = new THREE.Mesh(new THREE.ShapeGeometry(archShape(1.6, 2.4)), new THREE.MeshBasicMaterial({ color: NIGHT ? 0x8a6a3a : 0xf3d9a0 }));
   door.position.set(-1.6, 0, zBack - 0.02);
   door.rotation.y = Math.PI;
