@@ -385,6 +385,15 @@ export class Panel extends CanvasPlane {
 
   v_done(v) {
     const { W, H } = this;
+    if (v.watched) {
+      this.heading(`👀 ${t('watch.done')}`, v.prayer.name);
+      this.paragraphs([t('watch.doneText')], 260, { size: 32, gap: 0 });
+      const self = v.prayer.id === 'wudu' ? 'wudu' : `prayer:${v.prayer.id}`, third = (W - 160) / 3;
+      this.btn(t('watch.self'), 60, H - 130, third, 96, self, { primary: true, size: 28 });
+      this.btn(t('watch.more'), 80 + third, H - 130, third, 96, 'watch', { size: 28 });
+      this.btn(t('ui.menu'), 100 + 2 * third, H - 130, third, 96, 'menu');
+      return;
+    }
     if (v.story) {
       // Geschichte zu Ende: Lehre und Frage „Was lernen wir?“
       const q = v.story.q;
@@ -1139,6 +1148,16 @@ export class Panel extends CanvasPlane {
       this.btn(t('track.title'), 360, 640, W - 720, 84, 'tracker', { primary: true });
     }
     this.btn(t('ui.menu'), 60, H - 100, W - 120, 76, 'menu');
+  }
+
+  // Zuschauen: Liste der Abläufe
+  v_watch(v) {
+    const { W, H } = this;
+    this.heading(`👀 ${t('watch.title')}`, t('watch.sub'));
+    const y0 = this.paragraphs([t('watch.intro')], 150, { size: 22, color: C.muted, gap: 0 });
+    const cw = (W - 140) / 3;
+    v.list.forEach((w, i) => this.btn(`${i ? '▶' : '⭐'} ${w.label}`, 60 + (i % 3) * (cw + 10), y0 + 10 + Math.floor(i / 3) * 96, cw, 86, `watchgo:${w.id}`, { primary: i === 0, size: 26, sub: w.sub, subSize: 17 }));
+    this.btn(t('ui.menu'), 60, H - 110, W - 120, 84, 'menu');
   }
 
   // Unterseite mit Kacheln (z. B. „Weitere Gebete“)

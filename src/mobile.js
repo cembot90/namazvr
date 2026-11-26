@@ -187,6 +187,13 @@ export class MobileUI {
   }
 
   v_done(v) {
+    if (v.watched) {
+      const self = v.prayer.id === 'wudu' || v.prayer.kind === 'wudu' ? (v.prayer.id === 'wudu' ? 'wudu' : `prayer:${v.prayer.id}`) : `prayer:${v.prayer.id}`;
+      return `${head(`👀 ${t('watch.done')}`, v.prayer.name)}
+        <p class="center">${esc(t('watch.doneText'))}</p>
+        ${btn(t('watch.self'), self, { cls: 'primary wide' })}
+        <div class="grid2">${btn(t('watch.more'), 'watch')}${btn(t('ui.menu'), 'menu')}</div>`;
+    }
     if (v.story) {
       const q = v.story.q;
       const fb = q.answer == null ? '' : `<p class="${q.answer === q.correct ? 'ok' : 'gold'}">${esc(q.answer === q.correct ? (q.star ? t('story.rightStar', v.stars) : t('story.right')) : t('story.wrong'))}</p>`;
@@ -639,6 +646,14 @@ export class MobileUI {
         ${btn(t('track.title'), 'tracker', { cls: 'primary wide' })}`;
     }
     return `${head(t('path.title'), t('path.sub'))}<div class="grid3">${tabs}</div>${body}${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
+  }
+
+  // Zuschauen: Abläufe zum Ansehen und Anhören
+  v_watch(v) {
+    return `${head(`👀 ${t('watch.title')}`, t('watch.sub'))}
+      <p class="small">${esc(t('watch.intro'))}</p>
+      <div class="list">${v.list.map((w, i) => btn(`${i ? '▶' : '⭐'} ${w.label}`, `watchgo:${w.id}`, { cls: i ? '' : 'primary', sub: w.sub })).join('')}</div>
+      ${btn(t('ui.menu'), 'menu', { cls: 'wide' })}`;
   }
 
   // Unterseite mit Kacheln (z. B. „Weitere Gebete“)

@@ -1008,6 +1008,13 @@ export default {
       ['Dankbarkeit', 'Augen, Hände, Atem, Familie – alles ist ein Geschenk. Das Gebet ist die Art, fünfmal am Tag Danke zu sagen.', 'Mit dem Gebet sagst du Danke für alles Schöne in deinem Leben.'],
     ],
   },
+  watch: {
+    menu: 'Zuschauen', title: 'Zuschauen', sub: 'einfach zusehen und zuhören',
+    intro: 'Lehn dich zurück: Der Vorbeter macht alles vor, die App liest jeden Schritt vor und geht von selbst weiter. Du musst nichts tun – nur zuschauen und zuhören. Wenn du willst, kannst du danach selbst üben.',
+    wudufajr: 'Waschung + Morgengebet',
+    done: 'Fertig zugeschaut', doneText: 'Māshāʾ Allāh – jetzt hast du gesehen, wie es geht. Möchtest du es selbst versuchen? Die App führt dich Schritt für Schritt.',
+    self: 'Jetzt selbst üben ▶', more: 'Noch etwas ansehen',
+  },
   hinfo: {
     btn: '📘 Wissen zu Hac & Umre', title: 'Wissen: Hac & Umre',
     next: (d, n) => `Nächster Hac: ab ${d} · in ${n} Tagen`,

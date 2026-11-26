@@ -218,6 +218,12 @@ const state = {
 const voices = new Voices({ enabled: store.get('piper', true), onChange: () => refresh() });
 
 const saveProgress = () => store.set(progKey(profileId), state.progress);
+// Zuschauen: der Vorbeter macht alles vor, die App liest vor und geht von selbst weiter (auch mehrere Abläufe hintereinander)
+const WATCH = [
+  { id: 'wudufajr', seq: ['wudu', 'fajr'] }, { id: 'wudu', seq: ['wudu'] }, { id: 'fajr', seq: ['fajr'] }, { id: 'dhuhr', seq: ['dhuhr'] },
+  { id: 'asr', seq: ['asr'] }, { id: 'maghrib', seq: ['maghrib'] }, { id: 'isha', seq: ['isha'] }, { id: 'witr', seq: ['witr'] },
+  { id: 'jumua', seq: ['jumua'] }, { id: 'eid', seq: ['eid'] }, { id: 'janaza', seq: ['janaza'] }, { id: 'ghusl', seq: ['ghusl'] },
+];
 // Hoca-Modus: Aufgaben, die ein Lehrer per Link schickt (?tasks=fajr,sura:ikhlas,elif&from=Klasse)
 const HOCA_SURAS = ['fatiha', 'ikhlas', 'kawthar', 'asr', 'falaq', 'nas', 'fil', 'quraysh', 'maun', 'kafirun', 'nasr', 'masad'];
 const TASK_IDS = ['wudu', 'fajr', 'dhuhr', 'asr', 'maghrib', 'isha', 'witr', ...HOCA_SURAS.map((x) => `sura:${x}`), 'elif', 'esma', 'story', 'fullDay', 'quiz'];
@@ -757,6 +763,8 @@ function view() {
       return { type: 'path', part: state.pathPart || 'steps', steps, cur, streak: streakN, restart: streakN === 0 && Object.keys(log).length > 0,
         garden, gardenEmpty: !Object.values(log).some((l) => l.length), why: t('path.why'), kids: state.kids, now: { id: nowId, name: findPrayer(nowId).name }, thought: dailyThought() };
     }
+    case 'watch':
+      return { type: 'watch', list: WATCH.map((w) => ({ id: w.id, label: w.id === 'wudufajr' ? t('watch.wudufajr') : findPrayer(w.id).name, sub: w.seq.length > 1 ? '' : findPrayer(w.id).de })) };
     case 'hub':
       return { type: 'hub', id: state.hubId, title: t('ui.grp.pray'), items: hubItems(state.hubId, { adapted: !!state.sitting || state.travel }) };
     case 'adapt':
@@ -820,7 +828,7 @@ function view() {
     case 'quiz':
       return { type: 'quiz', quiz: state.quiz, progress: state.progress };
     case 'done':
-      return { type: 'done', prayer: state.prayer, kids: state.kids, stars: state.progress.stars || 0, story: state.prayer.kind === 'story' ? { ...findStory(state.prayer.id), lesson: t(`story.list.${state.prayer.id}.lesson`), q: state.storyQ } : null };
+      return { type: 'done', watched: !!state.watch, prayer: state.prayer, kids: state.kids, stars: state.progress.stars || 0, story: state.prayer.kind === 'story' ? { ...findStory(state.prayer.id), lesson: t(`story.list.${state.prayer.id}.lesson`), q: state.storyQ } : null };
     case 'stories':
       return { type: 'stories', list: STORY_LIST.map((s) => ({ id: s.id, icon: s.icon, name: s.name, sub: s.de, done: !!state.progress.stories?.[s.id] })), sounds: state.sounds };
     case 'sky': {
@@ -933,7 +941,7 @@ function onStep() {
   state.pilgrim = { d: 0, thrown: 0, tt: 0, snap: null };
   // Mit Cemaat spricht der Imam; sonst wird der Schritt vorgelesen (Anfänger-Modus immer)
   const imamLeads = state.cemaat && state.prayer?.kind !== 'wudu';
-  if (state.beginner || (state.voice && !imamLeads)) speak();
+  if (state.watch || state.beginner || (state.voice && !imamLeads)) speak();
   else imamCall(step, state.steps[state.i - 1]);
   if (m.arrow || step.wudu || step.hajj) {
     banner.render(m);
@@ -1099,6 +1107,16 @@ function act(action) {
       // nächstes der fünf Gebete, das noch nie geübt wurde
       const p = PRAYERS.find((x) => !state.progress.done[x.id]) || PRAYERS[0];
       start(p);
+      break;
+    }
+    case 'watch': state.view = 'watch'; state.watch = null; break;
+    case 'watchgo': {
+      const w = WATCH.find((x) => x.id === arg);
+      if (!w) break;
+      state.watch = { queue: w.seq.slice(1), id: w.id };
+      start(findPrayer(w.seq[0]));
+      state.auto = true;
+      if (mobileUI) setView('front');
       break;
     }
     case 'hub': state.view = 'hub'; state.hubId = arg || 'prayers'; break;
@@ -1393,6 +1411,14 @@ function act(action) {
         saveProgress();
         state.storyQ = storyQuestion(state.prayer.id);
         voices.cancel();
+      } else if (state.watch?.queue.length) {
+        // Zuschauen: gleich der nächste Ablauf (z. B. nach der Waschung das Morgengebet)
+        start(findPrayer(state.watch.queue.shift()));
+        state.auto = true;
+      } else if (state.watch) {
+        state.view = 'done';
+        state.auto = false;
+        if (cong.group.visible) cong.finish();
       } else {
         state.view = 'done';
         state.auto = false;
@@ -1449,7 +1475,7 @@ function act(action) {
       store.set('cemaat', true);
       rebuildCong();
       break;
-    case 'menu': state.view = 'menu'; state.auto = false; cong.reset(); voices.cancel(); break;
+    case 'menu': state.view = 'menu'; state.auto = false; state.watch = null; cong.reset(); voices.cancel(); break;
     case 'qibla': state.view = 'qibla'; state.msg = ''; break;
     case 'info': state.view = 'info'; break;
     case 'times': state.view = 'times'; break;
@@ -1958,7 +1984,7 @@ renderer.setAnimationLoop(() => {
   const wudu = state.view === 'step' && (!!state.steps[state.i].wudu || !!state.steps[state.i].hajj);
   if (state.view === 'step' && renderer.xr.isPresenting && !wudu) updatePosture(dt);
   // Auto-Modus wartet in VR, bis die Haltung eingenommen ist; im Anfänger-Modus langsamer.
-  if (state.view === 'step' && state.auto && (state.posture.ok || !renderer.xr.isPresenting || wudu)) {
+  if (state.view === 'step' && state.auto && (state.posture.ok || !renderer.xr.isPresenting || wudu || state.watch)) {
     state.autoT += dt;
     const cur = state.steps[state.i];
     // Geschichten: die Dauer passt sich der Länge des Textes an, Kinder bekommen nur etwas mehr Zeit

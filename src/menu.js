@@ -10,6 +10,7 @@ export function menuGroups(v, { mobile = false } = {}) {
   return [
     { label: t('ui.grp.pray'), items: [
       item('🌱', t('path.menu'), 'path', { primary: !!v.beginner }),
+      item('👀', t('watch.menu'), 'watch'),
       item('🕐', t('ui.menuTimes'), 'times'),
       item('💧', t('pure.menu'), 'purify', { primary: !v.wuduDone && !v.beginner }),
       item('🤲', t('ui.menuMore'), 'hub:prayers', { active: !!v.adapted }),
