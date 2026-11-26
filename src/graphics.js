@@ -29,6 +29,12 @@ export class Graphics {
     renderer.toneMappingExposure = 0.92;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.pmrem = new THREE.PMREMGenerator(renderer);
+    // Ohne Grafikkarte (Software-Darstellung) keine Nachbearbeitung – sonst wird es zäh; ?post erzwingt sie
+    try {
+      const gl = renderer.getContext(), info = gl.getExtension('WEBGL_debug_renderer_info');
+      const name = info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+      this.software = /swiftshader|llvmpipe|software|softpipe/i.test(String(name)) && !/[?&]post\b/.test(location.search);
+    } catch { this.software = false; }
     this.cache = new Map();
     this.loader = new EXRLoader();
     // Sonne für die Schatten: folgt dem Gebetsplatz, deckt etwa 16 × 16 m ab
@@ -78,7 +84,7 @@ export class Graphics {
   render(camera) {
     const r = this.renderer;
     this.camera ||= camera;
-    if (!this.high || r.xr.isPresenting) { r.render(this.scene, camera); return; }
+    if (!this.high || this.software || r.xr.isPresenting) { r.render(this.scene, camera); return; }
     if (!this.composer && !this.postFailed) {
       try { this.buildPost(); } catch { this.postFailed = true; }
     }
