@@ -3,7 +3,7 @@ import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { ARButton } from 'three/addons/webxr/ARButton.js';
 import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-import { STYLES, WUDU_BASINS, buildEnvironment, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked, setWater, wuduStools } from './environment.js';
+import { STYLES, WUDU_BASINS, buildEnvironment, setPrayerBoard, clearEnvironment, galleryInfo, makeFloorCompass, makeRug, roomBounds, blocked, setWater, wuduStools } from './environment.js';
 import { Guide, setFaces } from './figure.js';
 import { Congregation } from './congregation.js';
 import { Panel, FloorCard, CueBanner } from './panel.js';
@@ -410,6 +410,7 @@ function rebuildEnv() {
   env.position.set(0, 0, 0);
   const sc = state.scene;
   const night = sc === 'arafat' ? false : sc === 'muzdalifa' ? true : state.night;
+  { const ti = timesInfo(); setPrayerBoard(ti.rows.filter((r) => r.prayer || r.id === 'sunrise').map((r) => [r.name, r.time]), locationName()); }
   buildEnvironment(env, state.wuduRoom ? 'wudu' : sc && sc !== 'miqat' ? sc : sc === 'miqat' ? 'klassisch' : state.style, { night });
   graphics.afterBuild(env, { night, indoor: !sc || ['miqat', 'cemevi'].includes(sc) || state.wuduRoom });
   graphics.casters(env);

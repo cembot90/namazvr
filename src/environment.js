@@ -18,6 +18,11 @@ const SIZES = {
 };
 // Maße des aktuell gebauten Raums; NIGHT: Fenster dunkel, Lampen heller
 let W, D, H, HW, HD, NIGHT = false;
+// Lage von Mihrab und Minbar im zuletzt gebauten Raum (für die Einrichtung)
+let MIHRAB_S = 1, MINBAR = { x: 6.5, s: 1 };
+// Gebetszeiten für die Tafel an der Qibla-Wand: [[Name, Uhrzeit], …], Überschrift
+let BOARD = { rows: [], title: '' };
+export function setPrayerBoard(rows, title = '') { BOARD = { rows, title }; }
 // Säulen und Pfeiler als Kreise [x, z, r] in Weltkoordinaten – dort stellt sich niemand hin
 let OBSTACLES = [];
 // Wasserstrahlen im Waschraum (vorn der eigene Hahn) und begehbarer Bereich, falls vom Standard abweichend
@@ -510,6 +515,7 @@ function ottomanDomeMaterial(rings = 4) {
 }
 
 function mihrab(scene, frameMat, nicheMap, horseshoe = false, s = 1) {
+  MIHRAB_S = s;
   const g = new THREE.Group();
   g.position.set(0, 0, -HD + 0.02);
   g.scale.setScalar(s);
@@ -528,6 +534,7 @@ function mihrab(scene, frameMat, nicheMap, horseshoe = false, s = 1) {
 
 // Minbar (Kanzel) rechts neben dem Mihrab: Treppe steigt zur Qibla-Wand hin an, oben ein kleines Dach.
 function minbar(scene, s, mat, accent, x) {
+  MINBAR = { x, s };
   const g = new THREE.Group();
   const n = 9, stepH = 0.24, stepD = 0.42, w = 0.95, top = n * stepH;
   for (let i = 0; i < n; i++) {
@@ -1034,6 +1041,220 @@ function roundArch(w, h) {
   return sh;
 }
 
+
+// ---------- Einrichtung: was in jeder Moschee steht ----------
+// Kürsü (Predigtstuhl) links vom Mihrab, Rahle-Pulte mit aufgeschlagenem Koran, Koranregale an den Seiten,
+// Gebetszeiten-Tafel und Uhr an der Qibla-Wand, Schuhregale und Spendenbox hinten, Stühle für Ältere,
+// Kalligraphie-Tafeln, Müezzin-Mahfili, gefaltete Gebetsteppiche, Blumen am Minbar.
+// Alles in Raumkoordinaten (Mitte des Raums); was im Weg stünde (Säulen, Emporen), wird ausgelassen.
+const toWorldZ = (z) => z + HD - FRONT;
+const free = (x, z, r) => Math.abs(x) < HW - r && Math.abs(z) < HD - r * 0.5 && !OBSTACLES.some(([ox, oz, or]) => Math.hypot(x - ox, toWorldZ(z) - oz) < or + r);
+const box = (w, h, d, mat, x, y, z, ry = 0) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.rotation.y = ry; return m; };
+
+function bookTexture() {
+  return canvasTexture(512, 256, (ctx, w, h) => {
+    ctx.fillStyle = '#3b2616'; ctx.fillRect(0, 0, w, h);
+    const cols = ['#1d5c6e', '#7c2a2a', '#2f5d3a', '#123f36', '#5a2d6e', '#8a6a2a', '#1f3f7a'];
+    let s = 5; const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+    for (const [y0, y1] of [[8, 120], [136, 248]]) {
+      for (let x = 6; x < w - 6;) {
+        const bw = 10 + rnd() * 14, bh = (y1 - y0) * (0.78 + rnd() * 0.2);
+        ctx.fillStyle = cols[Math.floor(rnd() * cols.length)];
+        ctx.fillRect(x, y1 - bh, bw - 2, bh);
+        ctx.fillStyle = '#c9a85c'; ctx.fillRect(x + 2, y1 - bh + 8, bw - 6, 3); ctx.fillRect(x + 2, y1 - 14, bw - 6, 3);
+        x += bw;
+      }
+    }
+  });
+}
+
+function boardTexture() {
+  return canvasTexture(512, 384, (ctx, w, h) => {
+    ctx.fillStyle = '#101c28'; ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = '#c9a85c'; ctx.lineWidth = 8; ctx.strokeRect(6, 6, w - 12, h - 12);
+    ctx.fillStyle = '#e6c77f'; ctx.textAlign = 'center';
+    ctx.font = '600 38px Inter, sans-serif'; ctx.fillText(BOARD.title || 'الصلاة', w / 2, 56);
+    const rows = BOARD.rows.length ? BOARD.rows : [['الفجر', '–'], ['الظهر', '–'], ['العصر', '–'], ['المغرب', '–'], ['العشاء', '–']];
+    rows.slice(0, 6).forEach(([name, time], i) => {
+      const y = 108 + i * 46;
+      ctx.textAlign = 'left'; ctx.fillStyle = '#e8edf3'; ctx.font = '500 32px Inter, sans-serif'; ctx.fillText(name, 40, y);
+      ctx.textAlign = 'right'; ctx.fillStyle = '#7fe0b0'; ctx.font = '700 36px "Courier New", monospace'; ctx.fillText(time, w - 40, y);
+    });
+  });
+}
+
+function clockMesh() {
+  const g = new THREE.Group();
+  const face = new THREE.Mesh(new THREE.CircleGeometry(0.42, 48), new THREE.MeshStandardMaterial({ roughness: 0.6, map: canvasTexture(256, 256, (ctx, w) => {
+    ctx.fillStyle = '#f7f1e3'; ctx.beginPath(); ctx.arc(w / 2, w / 2, w / 2 - 2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#1f2a3a';
+    for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; ctx.fillRect(w / 2 + Math.sin(a) * 100 - 3, w / 2 - Math.cos(a) * 100 - 3, 6, 6); }
+    const d = new Date(), hh = (d.getHours() % 12) / 12 + d.getMinutes() / 720, mm = d.getMinutes() / 60;
+    ctx.lineCap = 'round'; ctx.strokeStyle = '#1f2a3a';
+    ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(w / 2, w / 2); ctx.lineTo(w / 2 + Math.sin(hh * Math.PI * 2) * 60, w / 2 - Math.cos(hh * Math.PI * 2) * 60); ctx.stroke();
+    ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(w / 2, w / 2); ctx.lineTo(w / 2 + Math.sin(mm * Math.PI * 2) * 90, w / 2 - Math.cos(mm * Math.PI * 2) * 90); ctx.stroke();
+  }) }));
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.43, 0.035, 8, 48), gold());
+  g.add(face, rim);
+  return g;
+}
+
+function furnish(scene, style) {
+  const wood = woodMat(), dark = new THREE.MeshStandardMaterial({ color: 0x4a2f1c, roughness: 0.65 }), gm = gold();
+  const cloth = new THREE.MeshStandardMaterial({ color: 0x7c1f2a, roughness: 1 });
+  const front = -HD, back = HD, mx = 1.3 * MIHRAB_S + 0.6;
+
+  // Kürsü: Podest mit Stufe, Sitz mit hoher Lehne, Blick zur Gemeinde
+  const kx = -(mx + 1.6), kz = front + 1.6;
+  if (free(kx, kz, 0.9)) {
+    const k = new THREE.Group();
+    k.add(box(1.3, 0.35, 1.3, wood, 0, 0.175, 0), box(1.3, 0.18, 0.4, wood, 0, 0.09, 0.85));
+    k.add(box(0.9, 0.12, 0.8, dark, 0, 0.82, 0.05), box(0.9, 1.6, 0.1, dark, 0, 1.45, -0.4));
+    for (const sx of [-0.45, 0.45]) k.add(box(0.08, 0.5, 0.8, dark, sx, 1.05, 0.05));
+    for (const [x, z] of [[-0.4, 0.4], [0.4, 0.4], [-0.4, -0.3], [0.4, -0.3]]) k.add(box(0.08, 0.5, 0.08, dark, x, 0.55, z));
+    k.add(box(0.75, 0.06, 0.7, cloth, 0, 0.9, 0.05), box(0.95, 0.06, 0.12, gm, 0, 2.26, -0.4));
+    k.position.set(kx, 0, kz);
+    scene.add(k);
+    block([[kx, 0, kz]], 0.9);
+  }
+
+  // Rahle-Pulte mit aufgeschlagenem Koran
+  const page = new THREE.MeshStandardMaterial({ color: 0xf3ead2, roughness: 0.9 });
+  const spots = [[kx - 1.5, front + 1.4], [kx - 2.3, front + 1.4], [kx - 1.9, front + 2.4]].filter(([x, z]) => free(x, z, 0.35));
+  for (const [x, z] of spots) {
+    const r = new THREE.Group();
+    for (const sx of [-1, 1]) { const b = box(0.04, 0.42, 0.34, wood, sx * 0.1, 0.21, 0); b.rotation.z = sx * 0.6; r.add(b); }
+    for (const sx of [-1, 1]) { const pg = box(0.2, 0.012, 0.28, page, sx * 0.105, 0.43, 0); pg.rotation.z = -sx * 0.32; r.add(pg); }
+    const cover = box(0.44, 0.02, 0.3, new THREE.MeshStandardMaterial({ color: 0x1d5c6e, roughness: 0.6 }), 0, 0.41, 0);
+    r.add(cover);
+    r.position.set(x, 0, z);
+    r.rotation.y = 0.2;
+    scene.add(r);
+  }
+  block(spots.map(([x, z]) => [x, 0, z]), 0.3);
+
+  // Koranregale an beiden Seitenwänden, vorn
+  const books = bookTexture(), shelfFront = new THREE.MeshStandardMaterial({ map: books, roughness: 0.85 });
+  for (const side of [-1, 1]) {
+    const x = side * (HW - 0.22), z = front + 5.5;
+    if (!free(x - side * 0.3, z, 0.5)) continue;
+    const g = new THREE.Group();
+    g.add(box(2.4, 1.9, 0.4, wood, 0, 0.95, 0));
+    const fr = new THREE.Mesh(new THREE.PlaneGeometry(2.24, 1.74), shelfFront);
+    fr.position.set(0, 0.95, 0.205);
+    g.add(fr, box(2.5, 0.08, 0.46, dark, 0, 1.94, 0));
+    // gefaltete Gebetsteppiche obendrauf
+    ['#7c1f2a', '#1d5c6e', '#2f5d3a'].forEach((c, i) => g.add(box(0.7, 0.07, 0.4, new THREE.MeshStandardMaterial({ color: c, roughness: 1 }), -0.6, 2.02 + i * 0.07, 0)));
+    g.position.set(x, 0, z);
+    g.rotation.y = -side * Math.PI / 2;
+    scene.add(g);
+  }
+
+  // Gebetszeiten-Tafel und Uhr an der Qibla-Wand
+  const board = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.2), new THREE.MeshBasicMaterial({ map: boardTexture(), toneMapped: false }));
+  board.position.set(-(mx + 1.6), Math.min(H - 1.2, 3.4), front + 0.06);
+  const frame = box(1.7, 1.3, 0.05, gm, board.position.x, board.position.y, front + 0.01);
+  scene.add(frame, board);
+  const clock = clockMesh();
+  clock.position.set(mx + 0.9, Math.min(H - 0.8, 4.2), front + 0.04);
+  scene.add(clock);
+
+  // Kalligraphie-Tafeln an den Seitenwänden
+  const ly = Math.min(H * 0.55, 5.2);
+  [['ٱللَّٰه', -1], ['مُحَمَّد', 1]].forEach(([txt, side]) => {
+    const disc = new THREE.Mesh(new THREE.CircleGeometry(0.85, 48), new THREE.MeshBasicMaterial({ map: medallionTexture(txt) }));
+    disc.position.set(side * (HW - 0.04), ly, userZ() + 1);
+    disc.rotation.y = -side * Math.PI / 2;
+    scene.add(disc);
+  });
+  // Kalima über den Schuhregalen an der Rückwand
+  const kal = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.66), new THREE.MeshBasicMaterial({ map: canvasTexture(1024, 160, (ctx, w, h) => {
+    ctx.fillStyle = '#123f36'; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = '#c9a85c'; ctx.lineWidth = 8; ctx.strokeRect(8, 8, w - 16, h - 16);
+    ctx.fillStyle = '#e6c77f'; ctx.font = '84px Amiri, "Noto Naskh Arabic", "Geeza Pro", serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.direction = 'rtl';
+    ctx.fillText('لَا إِلَٰهَ إِلَّا اللَّهُ مُحَمَّدٌ رَسُولُ اللَّهِ', w / 2, h / 2 + 6);
+  }) }));
+  kal.position.set(0, Math.min(H - 0.8, 3.1), back - 0.04);
+  kal.rotation.y = Math.PI;
+  scene.add(kal);
+
+  // Schuhregale an der Rückwand, mit ein paar Paar Schuhen
+  const shoeCols = [0x2a2a2a, 0x6b4426, 0x1f3f7a, 0x8a1c24, 0xdddddd];
+  const racks = [-5.4, -2.7, 2.7, 5.4].filter((x) => Math.abs(x) < HW - 1.2 && free(x, back - 0.4, 0.6));
+  racks.forEach((x, i) => {
+    const g = new THREE.Group();
+    g.add(box(2.2, 0.05, 0.38, wood, 0, 0.02, 0));
+    for (const y of [0.35, 0.7, 1.05]) g.add(box(2.2, 0.04, 0.38, wood, 0, y, 0));
+    for (const sx of [-1.08, -0.36, 0.36, 1.08]) g.add(box(0.04, 1.07, 0.38, wood, sx, 0.535, 0));
+    for (let k = 0; k < 4; k++) {
+      const c = new THREE.MeshStandardMaterial({ color: shoeCols[(i + k) % shoeCols.length], roughness: 0.6 });
+      const sx = -0.72 + (k % 3) * 0.72, sy = 0.06 + Math.floor(k / 2) * 0.35;
+      g.add(box(0.12, 0.08, 0.28, c, sx - 0.08, sy, 0), box(0.12, 0.08, 0.28, c, sx + 0.08, sy, 0));
+    }
+    g.position.set(x, 0, back - 0.22);
+    g.rotation.y = Math.PI;
+    scene.add(g);
+  });
+  block(racks.map((x) => [x, 0, back - 0.3]), 0.7);
+
+  // Spendenbox
+  const dx = -(HW - 1.4), dz = back - 1.2;
+  if (free(dx, dz, 0.4)) {
+    const g = new THREE.Group();
+    g.add(box(0.08, 0.9, 0.08, dark, 0, 0.45, 0), box(0.45, 0.4, 0.35, wood, 0, 1.1, 0), box(0.3, 0.02, 0.04, new THREE.MeshBasicMaterial({ color: 0x111111 }), 0, 1.31, 0), box(0.47, 0.04, 0.37, gm, 0, 0.9, 0));
+    g.position.set(dx, 0, dz);
+    scene.add(g);
+    block([[dx, 0, dz]], 0.35);
+  }
+
+  // Stühle für Ältere: eine kleine Reihe hinten rechts, Blick zur Qibla
+  const chairs = [0, 1, 2, 3].map((k) => [HW - 1.6 - k * 0.75, back - 3]).filter(([x, z]) => free(x, z, 0.35));
+  const seatMat = new THREE.MeshStandardMaterial({ color: 0x1d5c6e, roughness: 0.8 });
+  for (const [x, z] of chairs) {
+    const g = new THREE.Group();
+    g.add(box(0.46, 0.06, 0.44, seatMat, 0, 0.46, 0), box(0.46, 0.45, 0.05, seatMat, 0, 0.72, 0.2));
+    for (const [lx, lz] of [[-0.2, -0.19], [0.2, -0.19], [-0.2, 0.19], [0.2, 0.19]]) g.add(box(0.03, 0.46, 0.03, gm, lx, 0.23, lz));
+    g.position.set(x, 0, z);
+    scene.add(g);
+  }
+  block(chairs.map(([x, z]) => [x, 0, z]), 0.35);
+
+  // Müezzin-Mahfili: erhöhtes Podest mit Brüstung, vorn links (nicht in der Großmoschee – dort gibt es Emporen)
+  if (style !== 'gross') {
+    const mzx = -(HW - 2.2), mzz = userZ() + 4;
+    if (free(mzx, mzz, 1.5)) {
+      const g = new THREE.Group(), lift = 1.4;
+      g.add(box(3, 0.15, 2.4, wood, 0, lift, 0));
+      for (const [x, z] of [[-1.4, -1.1], [1.4, -1.1], [-1.4, 1.1], [1.4, 1.1]]) g.add(box(0.12, lift, 0.12, dark, x, lift / 2, z));
+      g.add(box(3, 0.08, 0.06, gm, 0, lift + 0.75, -1.18), box(3, 0.08, 0.06, gm, 0, lift + 0.75, 1.18), box(0.06, 0.08, 2.4, gm, 1.48, lift + 0.75, 0));
+      for (let k = 0; k < 9; k++) g.add(box(0.03, 0.7, 0.03, dark, -1.4 + k * 0.35, lift + 0.42, -1.18));
+      for (let k = 0; k < 4; k++) g.add(box(0.7, 0.12, 0.3, wood, -0.6 - k * 0.0, (k + 1) * lift / 5, 1.35 + k * 0.28));
+      g.add(box(2.8, 0.04, 2.2, new THREE.MeshStandardMaterial({ color: 0x7c1f2a, roughness: 1 }), 0, lift + 0.1, 0));
+      g.position.set(mzx, 0, mzz);
+      scene.add(g);
+      block([[mzx - 1, 0, mzz], [mzx + 1, 0, mzz]], 1.4);
+    }
+  }
+
+  // Blumen in einer Vase neben dem Minbar
+  const vx = MINBAR.x + 1.1 * MINBAR.s, vz = front + 0.7;
+  if (free(vx, vz, 0.3)) {
+    const g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.1, 0.5, 16), new THREE.MeshStandardMaterial({ color: 0x1f4fa0, roughness: 0.3 })));
+    g.children[0].position.y = 0.25;
+    const leaf = new THREE.MeshStandardMaterial({ color: 0x3f7a3a, roughness: 0.8 });
+    const petal = [0xffffff, 0xd94f6a, 0xf2c14e];
+    for (let k = 0; k < 7; k++) {
+      const a = (k / 7) * Math.PI * 2, h = 0.75 + (k % 3) * 0.12;
+      const stem = box(0.015, h - 0.45, 0.015, leaf, Math.sin(a) * 0.06, 0.45 + (h - 0.45) / 2, Math.cos(a) * 0.06);
+      const fl = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), new THREE.MeshStandardMaterial({ color: petal[k % 3], roughness: 0.7 }));
+      fl.position.set(Math.sin(a) * 0.09, h, Math.cos(a) * 0.09);
+      g.add(stem, fl);
+    }
+    g.position.set(vx, 0, vz);
+    scene.add(g);
+  }
+}
+
 // Waschraum (Abdesthane) neben dem Gebetssaal: Reihe von Waschbecken mit Hähnen an der Wand vor dir,
 // rechts niedrige Hähne mit Hockern für die Füße, hinten der Durchgang zum Gebetssaal.
 // Gebaut in Weltkoordinaten: Platz am Ursprung, Becken vor dir (−Z).
@@ -1192,6 +1413,7 @@ export function buildEnvironment(group, style = 'klassisch', { night = false } =
   const room = new THREE.Group();
   room.position.z = HD - FRONT;
   BUILDERS[style](room);
+  furnish(room, style);
   group.add(room);
 }
 
