@@ -146,6 +146,7 @@ const state = {
   auto: false,
   autoT: 0,
   big: store.get('big', false), // große Schrift
+  near: store.get('near', true), // Nahaufnahme bei der Waschung
   zakat: { cash: 0, gold: 0, silver: 0, other: 0, debts: 0, goldPrice: 0, silverPrice: 0, by: 'gold', persons: 1, perPerson: 0, cur: 'EUR', ...store.get('zakat', {}) },
   siyer: 0,
   sitting: store.get('sitting', ''), // im Sitzen beten: '' | 'floor' | 'chair'
@@ -922,7 +923,8 @@ function refresh() {
   if (state.wuduRoom) {
     const feet = atStools();
     placeWuduFigures();
-    if (feet !== state.atStools && mobileUI) { state.atStools = feet; aimAtGuide(); }
+    const shot = `${shotKind()}|${state.i}`;
+    if ((feet !== state.atStools || shot !== state.shotKey) && mobileUI) { state.atStools = feet; state.shotKey = shot; aimAtGuide(); }
     state.atStools = feet;
   }
   updateCast();
@@ -1123,6 +1125,7 @@ function act(action) {
       if (mobileUI) setView('front');
       break;
     }
+    case 'near': state.near = !state.near; store.set('near', state.near); state.shotKey = ''; if (mobileUI) aimAtGuide(); break;
     case 'hub': state.view = 'hub'; state.hubId = arg || 'prayers'; break;
     case 'adapt': state.view = 'adapt'; break;
     case 'sitting': state.sitting = arg === 'off' ? '' : arg; store.set('sitting', state.sitting); break;
@@ -1701,9 +1704,9 @@ const VIEWS = { back: { yaw: 0, pitch: 0, zoom: 1 }, front: { yaw: Math.PI, pitc
 const orbitUI = mobileUI ? (() => {
   const box = document.createElement('div');
   box.id = 'orbit';
-  box.innerHTML = Object.keys(VIEWS).map((k) => `<button type="button" data-view="${k}"></button>`).join('');
+  box.innerHTML = `${Object.keys(VIEWS).map((k) => `<button type="button" data-view="${k}"></button>`).join('')}<button type="button" data-near aria-label="Nahaufnahme">🔍</button>`;
   document.body.appendChild(box);
-  box.addEventListener('click', (e) => { const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
+  box.addEventListener('click', (e) => { if (e.target.closest('[data-near]')) { act('near'); return; } const b = e.target.closest('[data-view]'); if (b) setView(b.dataset.view); });
   return { box };
 })() : null;
 function setView(name) {
@@ -1717,12 +1720,42 @@ function markView() {
   const noFront = state.wuduRoom;
   if (noFront && mobileCam.view === 'front') setView('back');
   for (const b of orbitUI.box.children) {
+    // Lupe: nur im Waschraum, an = Nahaufnahme
+    if ('near' in b.dataset) { b.hidden = !state.wuduRoom; b.classList.toggle('on', state.near); continue; }
     b.classList.toggle('on', b.dataset.view === mobileCam.view);
     b.hidden = noFront && b.dataset.view === 'front';
   }
 }
 
 // Auf dem Handy blickt die Kamera auf die Vorbeter-Figur; mit Cemaat von schräg hinten über die Reihen.
+// Nahaufnahme bei der Waschung: Kamera dicht am Vorbeter, je nach Körperteil auf Hände, Gesicht oder Füße.
+// Am Handy fährt die Hauptkamera heran; am Computer und in der Brille zeigt ein Bildschirm neben der Tafel die Nahaufnahme.
+const SHOT_OF = { hands: 'low', armR: 'low', armL: 'lowL', private: 'low', sideR: 'low', sideL: 'lowL', body: 'low', tArmR: 'low', tArmL: 'lowL', strike: 'low', strike2: 'low', dust: 'low',
+  mouth: 'face', nose: 'face', face: 'face', head: 'face', ears: 'face', tFace: 'face', headPour: 'face', wuduAll: 'face', footR: 'foot', footL: 'footL' };
+// [Auge, Blickziel] in Koordinaten der Figur (x < 0 = ihre rechte Seite, z > 0 = vor ihr)
+const SHOTS = {
+  low: [[-0.85, 1.32, 0.62], [0, 1.03, 0.36]], lowL: [[0.85, 1.32, 0.62], [0, 1.03, 0.36]],
+  face: [[-0.7, 1.5, 0.78], [0, 1.4, 0.26]],
+  foot: [[-1.0, 0.85, 0.95], [-0.08, 0.36, 0.42]], footL: [[-1.0, 0.95, 0.85], [0.08, 0.36, 0.42]],
+};
+const shotKind = () => {
+  const st = state.view === 'step' && state.near && state.wuduRoom ? state.steps[state.i] : null;
+  return (st?.wudu && SHOT_OF[st.wudu]) || null;
+};
+const shotM = new THREE.Matrix4(), shotQ = new THREE.Quaternion(), shotOne = new THREE.Vector3(1, 1, 1);
+// Auge und Ziel in Raumkoordinaten (world-lokal); live = dort, wo die Figur gerade ist, sonst an ihrem Zielplatz
+function closeShot(kind, live = false) {
+  const [e, tg] = SHOTS[kind];
+  let pos, rot;
+  if (live) { pos = guide.group.position; rot = guide.group.rotation.y; } else {
+    const stl = wuduStools(), feet = atStools() && stl.length > 1;
+    pos = feet ? new THREE.Vector3(stl[0][0], 0, stl[0][1]) : new THREE.Vector3(1.1, 0, 0);
+    rot = feet ? Math.PI / 2 : Math.PI;
+  }
+  shotM.compose(pos, shotQ.setFromAxisAngle(UPV, rot), shotOne);
+  return { eye: new THREE.Vector3(...e).applyMatrix4(shotM), target: new THREE.Vector3(...tg).applyMatrix4(shotM) };
+}
+
 function aimAtGuide() {
   // Waschraum: von hinten auf die Becken und den Vorbeter
   // Im Gebetsraum: hinter dir, Blick zur Qibla (Mihrab) – der Vorbeter steht vor dir
@@ -1745,6 +1778,10 @@ function aimAtGuide() {
     const tawaf = state.view === 'step' && state.steps[state.i]?.motion?.type === 'tawaf';
     camera.position.copy(world.localToWorld(new THREE.Vector3(0.3, 2.0, 2.6)));
     world.localToWorld(target.set(tawaf ? -5 : 0, 1.4, -8));
+  } else if (shotKind()) {
+    const sh = closeShot(shotKind());
+    camera.position.copy(world.localToWorld(sh.eye));
+    world.localToWorld(target.copy(sh.target));
   } else if (state.wuduRoom && state.atStools) {
     // Beim Füßewaschen: auf die Hocker rechts
     camera.position.copy(world.localToWorld(new THREE.Vector3(1.0, 1.8, 3.0)));
@@ -1795,7 +1832,7 @@ function applyLang() {
   document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
   const hint = document.getElementById('hint');
   if (orbitUI) {
-    for (const b of orbitUI.box.children) b.textContent = t(`ui.view.${b.dataset.view}`);
+    for (const b of orbitUI.box.children) if (b.dataset.view) b.textContent = t(`ui.view.${b.dataset.view}`);
     markView();
   }
   if (hint) {
@@ -1961,6 +1998,79 @@ setInterval(checkCuma, 60000);
 // Auch wenn der Bildschirm still steht (keine Animation, z. B. Tab im Hintergrund)
 setInterval(checkReminder, 30000);
 
+// Nahaufnahme-Bildschirm (Computer und Brille): eine zweite Kamera filmt den Vorbeter, das Bild hängt links neben der Tafel
+const closeup = { rt: null, cam: null, mesh: null, frame: 0 };
+function updateCloseup() {
+  const kind = mobileUI ? null : shotKind();
+  if (!kind) { if (closeup.mesh) closeup.mesh.visible = false; return; }
+  if (!closeup.mesh) {
+    // HDR-Zwischenbild: die Tonwertkorrektur passiert erst beim Zeichnen des Bildschirms (sonst wirkt es ausgebleicht)
+    closeup.rt = new THREE.WebGLRenderTarget(640, 480, { samples: 4, type: THREE.HalfFloatType });
+    closeup.cam = new THREE.PerspectiveCamera(40, 4 / 3, 0.1, 30);
+    const g = new THREE.Group();
+    const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.64, 0.48), new THREE.MeshBasicMaterial({ map: closeup.rt.texture }));
+    const frame = new THREE.Mesh(new THREE.PlaneGeometry(0.69, 0.53), new THREE.MeshBasicMaterial({ color: 0xc9a85c }));
+    frame.position.z = -0.004;
+    g.add(frame, screen);
+    g.position.set(-0.83, 1.62, -0.8);
+    g.rotation.y = 0.38;
+    world.add(g);
+    world.add(closeup.cam);
+    closeup.mesh = g;
+  }
+  // Bildschirm im Raum nur in der Brille; am Computer kommt die Nahaufnahme als kleines Bild in die Ecke (drawInset)
+  closeup.mesh.visible = renderer.xr.isPresenting;
+  if (!renderer.xr.isPresenting) {
+    const sh = closeShot(kind);
+    closeup.cam.position.lerp(sh.eye, closeup.kind === kind ? 0.12 : 1);
+    closeup.kind = kind;
+    closeup.cam.lookAt(world.localToWorld(sh.target.clone()));
+    closeup.inset = true;
+    return;
+  }
+  // In der Brille nur jedes zweite Bild neu aufnehmen (spart Leistung)
+  if (closeup.frame++ % 2) return;
+  const sh = closeShot(kind);
+  closeup.cam.position.lerp(sh.eye, closeup.kind === kind ? 0.12 : 1);
+  closeup.kind = kind;
+  closeup.cam.lookAt(world.localToWorld(sh.target.clone()));
+  // Aufnahme ohne Tafeln und ohne den Bildschirm selbst; XR und Schatten-Neuberechnung dabei aus (wie beim Spiegel in three.js)
+  const hide = [closeup.mesh, panel.mesh, card.mesh, banner.mesh].map((m) => [m, m.visible]);
+  for (const [m] of hide) m.visible = false;
+  const rt0 = renderer.getRenderTarget(), xr0 = renderer.xr.enabled, sh0 = renderer.shadowMap.autoUpdate, tm0 = renderer.toneMapping;
+  renderer.xr.enabled = false; renderer.shadowMap.autoUpdate = false;
+  renderer.setRenderTarget(closeup.rt);
+  renderer.clear();
+  renderer.render(scene, closeup.cam);
+  renderer.setRenderTarget(rt0);
+  renderer.xr.enabled = xr0; renderer.shadowMap.autoUpdate = sh0; renderer.toneMapping = tm0;
+  for (const [m, v] of hide) m.visible = v;
+}
+
+// Computer: Nahaufnahme oben links ins Bild zeichnen (nach dem Hauptbild), mit goldenem Rand
+const insetSize = new THREE.Vector2(), insetCol = new THREE.Color();
+function drawInset() {
+  if (!closeup.inset) return;
+  closeup.inset = false;
+  renderer.getSize(insetSize);
+  const w = Math.round(Math.min(380, insetSize.x * 0.3)), h = Math.round(w * 0.75), x = 16, y = insetSize.y - h - 16;
+  const hide = [panel.mesh, card.mesh, banner.mesh].map((m) => [m, m.visible]);
+  for (const [m] of hide) m.visible = false;
+  renderer.getClearColor(insetCol);
+  const a0 = renderer.getClearAlpha();
+  renderer.setScissorTest(true);
+  renderer.setScissor(x - 3, y - 3, w + 6, h + 6);
+  renderer.setClearColor(0xc9a85c, 1);
+  renderer.clear();
+  renderer.setClearColor(insetCol, a0);
+  renderer.setScissor(x, y, w, h);
+  renderer.setViewport(x, y, w, h);
+  renderer.render(scene, closeup.cam);
+  renderer.setScissorTest(false);
+  renderer.setViewport(0, 0, insetSize.x, insetSize.y);
+  for (const [m, v] of hide) m.visible = v;
+}
+
 // --- Loop ---
 const clock = new THREE.Clock();
 let lastMinute = Math.floor(Date.now() / 60000);
@@ -2047,11 +2157,13 @@ renderer.setAnimationLoop(() => {
     if (state.atStools) setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [], arrived(guide) ? [0] : []);
     else setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : [])]);
   }
+  updateCloseup();
   graphics.render(camera);
+  drawInset();
 });
 
 // ?debug stellt Hilfsobjekte für Tests in der Konsole bereit.
-if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, world, env, setAR, view, voices, ambience };
+if (new URLSearchParams(location.search).has('debug')) window.salah = { act, guide, cong, camera, state, panel, card, banner, world, env, setAR, view, voices, ambience };
 
 camera.rotation.set(pitch, yaw, 0, 'YXZ');
 guide.setGender(state.gender);

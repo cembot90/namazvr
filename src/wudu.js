@@ -44,6 +44,8 @@ const TAYAMMUM_PARTS = [
   ['tArmL', 'wash', 1, () => true],
   ['heart', 'stand', 1, () => false],
 ];
+// Eigene, detaillierte Bewegung je Körperteil (figure.js: POSES und CYCLES)
+const DETAIL = { hands: 'wHands', mouth: 'wMouth', nose: 'wNose', face: 'wFace', armR: 'wArmR', armL: 'wArmL', head: 'wHead', ears: 'wEars', footR: 'wFootR', footL: 'wFootL', tFace: 'wFace', tArmR: 'wArmR', tArmL: 'wArmL' };
 const PARTS_OF = { wudu: WUDU_PARTS, ghusl: GHUSL_PARTS, tayammum: TAYAMMUM_PARTS };
 
 export function buildWuduSteps(madhab = 'hanafi', variant = 'wudu') {
@@ -51,7 +53,7 @@ export function buildWuduSteps(madhab = 'hanafi', variant = 'wudu') {
   const texts = t(variant === 'wudu' ? 'wudu.steps' : `pure.${variant}.steps`);
   return PARTS.map(([part, pose, count, fard], i) => {
     const [title, cue, instr] = texts[i];
-    const step = { title, cue, instr, pose, wudu: part, variant, count, fard: fard(madhab), rakah: 0, dur: count * 4 + 4, ar: [], tr: [], de: [] };
+    const step = { title, cue, instr, pose: DETAIL[part] || pose, wudu: part, variant, count, fard: fard(madhab), rakah: 0, dur: count * 4 + 4, ar: [], tr: [], de: [] };
     if (i === 0) {
       const b = text('basmala');
       Object.assign(step, b, { de: [...b.de, t(variant === 'wudu' ? `wudu.general.${madhab}` : `pure.${variant}.when`)] });

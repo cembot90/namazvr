@@ -57,6 +57,24 @@ export const POSES = {
   feet:    { y: 0.82, spine: 1.15, headX: -0.2, headY: 0,    shX: -1.0,  shZ: 0.1,  elX: -0.2,  elZ: 0,    hip: -0.35, knee: 0.6 },
 };
 // Zwischenhaltungen für natürliche Übergänge (werden nicht als Schritt angezeigt):
+// Gebetswaschung im Detail: je Körperteil eine eigene Haltung (Grundhaltung = erstes Bild des Bewegungsablaufs in CYCLES).
+// Stehend am Becken, leicht vorgebeugt; die Füße wäscht man sitzend auf dem Hocker.
+const BASIN = { y: 0.95, spine: 0.22, headX: 0.38, headY: 0, hip: 0, knee: 0 };
+const STOOL = { y: 0.5, spine: 0.8, headX: 0.3, headY: 0, hip: -1.55, knee: 1.55 };
+const TAP = { shX: -0.62, shZ: -0.04, elX: -1.0, elZ: -0.62 }; // Hände unter dem Wasserstrahl
+const REST = { shX: -0.15, shZ: 0.06, elX: -0.35, elZ: -0.15 }; // Arm locker neben dem Körper
+Object.assign(POSES, {
+  wHands: { ...BASIN, ...TAP },
+  wMouth: { ...BASIN, ...REST, right: TAP },
+  wNose: { ...BASIN, ...REST, right: TAP },
+  wFace: { ...BASIN, ...TAP },
+  wArmR: { ...BASIN, spine: 0.3, shX: -0.78, shZ: -0.42, elX: -0.62, elZ: -1.05, right: { shX: -0.95, shZ: -0.05, elX: -0.5, elZ: -0.3 } },
+  wArmL: { ...BASIN, spine: 0.3, shX: -0.95, shZ: -0.05, elX: -0.5, elZ: -0.3, right: { shX: -0.78, shZ: -0.42, elX: -0.62, elZ: -1.05 } },
+  wHead: { ...BASIN, ...TAP },
+  wEars: { ...BASIN, spine: 0.1, headX: 0.25, shX: -1.45, shZ: 0.7, elX: -2.3, elZ: -0.35 },
+  wFootR: { ...STOOL, shX: -1.05, shZ: -0.28, elX: -0.3, elZ: -0.1, right: { shX: -1.2, shZ: 0.0, elX: -0.2, elZ: 0, hip: -1.82, knee: 1.25 } },
+  wFootL: { ...STOOL, shX: -1.2, shZ: 0.0, elX: -0.2, elZ: 0, hip: -1.82, knee: 1.25, right: { shX: -1.05, shZ: -0.28, elX: -0.3, elZ: -0.1, hip: -1.55, knee: 1.55 } },
+});
 // crouch = in die Knie gehen, kneel = Knie auf dem Boden, Oberkörper aufrecht, handsDown = kniend, Hände am Boden
 const VIA = {
   crouch:    { y: 0.76, spine: 0.32, headX: 0.3,  headY: 0, shX: -0.4,  shZ: 0.1,  elX: -0.3,  elZ: 0, hip: -0.75, knee: 1.45 },
@@ -64,7 +82,8 @@ const VIA = {
   handsDown: { y: 0.5,  spine: 1.1,  headX: 0.25, headY: 0, shX: -1.3,  shZ: 0.12, elX: -0.05, elZ: 0, hip: -0.45, knee: 2.0 },
 };
 // Rechter Arm (side −1) hat eigene Schlüssel, damit Haltungen wie „Werfen“ weich ein- und ausgeblendet werden
-const full = (p) => { const { right, ...rest } = p; return { ...rest, rshX: right?.shX ?? p.shX, relX: right?.elX ?? p.elX }; };
+const RIGHT = { shX: 'rshX', elX: 'relX', shZ: 'rshZ', elZ: 'relZ', hip: 'rhip', knee: 'rknee' };
+const full = (p) => { const { right, ...rest } = p; for (const [k, rk] of Object.entries(RIGHT)) rest[rk] = right?.[k] ?? p[k]; return rest; };
 for (const k of Object.keys(POSES)) POSES[k] = full(POSES[k]);
 for (const k of Object.keys(VIA)) VIA[k] = full(VIA[k]);
 const KEYS = Object.keys(POSES.stand);
@@ -227,6 +246,31 @@ const MOTION = {
   semahFast: [['shZ', 0.3, 3.6], ['shX', 0.25, 3.6], ['spine', 0.06, 3.6]],
 };
 
+// Bewegungsabläufe der Gebetswaschung: Bilder, die in einer Schleife weich ineinander übergehen.
+// [Dauer bis zum nächsten Bild in s, Abweichungen von der Grundhaltung]; r… = rechter Arm bzw. rechtes Bein.
+const toMouth = { rshX: -0.62, relX: -2.55, relZ: -0.55, rshZ: 0.02 };
+export const CYCLES = {
+  // Hände: aneinander reiben, auch zwischen den Fingern
+  wHands: [[0.45, { elX: -1.12, relX: -0.9, elZ: -0.7, relZ: -0.55 }], [0.45, { elX: -0.9, relX: -1.12, elZ: -0.55, relZ: -0.7 }]],
+  // Mund: Wasser schöpfen – zum Mund – spülen – ausspucken
+  wMouth: [[0.9, {}], [0.7, { ...toMouth, headX: 0.2 }], [0.8, { ...toMouth, headX: -0.02, spine: 0.12 }], [0.9, { headX: 0.62, spine: 0.42 }]],
+  // Nase: Wasser mit rechts einziehen, mit links ausschnäuzen
+  wNose: [[0.9, {}], [0.8, { rshX: -0.68, relX: -2.6, relZ: -0.5, headX: 0.12, spine: 0.15 }], [0.9, { shX: -0.85, elX: -2.42, elZ: -0.45, shZ: 0.02, headX: 0.6, spine: 0.4 }]],
+  // Gesicht: Wasser schöpfen – von der Stirn – bis unter das Kinn
+  wFace: [[0.8, {}], [0.6, { shX: -0.95, rshX: -0.95, elX: -2.5, relX: -2.5, elZ: -0.38, relZ: -0.38, headX: 0.3 }], [0.8, { shX: -0.62, rshX: -0.62, elX: -2.3, relX: -2.3, elZ: -0.42, relZ: -0.42, headX: 0.42, spine: 0.3 }]],
+  // Arme: die andere Hand streicht vom Handgelenk bis über den Ellbogen
+  wArmR: [[0.7, {}], [0.7, { shX: -0.55, elX: -1.15, elZ: -1.15, shZ: -0.4 }]],
+  wArmL: [[0.7, {}], [0.7, { rshX: -0.55, relX: -1.15, relZ: -1.15, rshZ: -0.4 }]],
+  // Kopf: Hände befeuchten – von der Stirn – bis in den Nacken
+  wHead: [[0.8, {}], [0.7, { shX: -1.9, rshX: -1.9, shZ: 0.32, rshZ: 0.32, elX: -2.05, relX: -2.05, elZ: -0.5, relZ: -0.5, spine: 0.1, headX: 0.32 }], [0.9, { shX: -2.55, rshX: -2.55, shZ: 0.4, rshZ: 0.4, elX: -1.75, relX: -1.75, elZ: -0.4, relZ: -0.4, spine: 0.1, headX: 0.4 }]],
+  // Ohren: Zeigefinger innen, Daumen hinten – kleine Drehbewegung
+  wEars: [[0.5, {}], [0.5, { elX: -2.42, relX: -2.42, shX: -1.38, rshX: -1.38 }]],
+  // Füße: von den Zehen bis über den Knöchel
+  wFootR: [[0.7, {}], [0.7, { rshX: -1.02, relX: -0.5, shX: -0.9, elX: -0.55 }]],
+  wFootL: [[0.7, {}], [0.7, { shX: -1.02, elX: -0.5, rshX: -0.9, relX: -0.55 }]],
+};
+const smoothstep = (k) => k * k * (3 - 2 * k);
+
 // Geometrien und Materialien werden zwischen allen Figuren geteilt (eine ganze Gemeinde bleibt so leicht).
 const GEO = new Map(), MAT = new Map();
 const geo = (key, make) => GEO.get(key) || GEO.set(key, make()).get(key);
@@ -387,7 +431,7 @@ export class Guide {
       knee.add(foot);
       hip.add(knee);
       this.root.add(hip);
-      return { hip, knee };
+      return { side, hip, knee };
     });
 
     // Haut an das Skelett binden (Grundhaltung: alle Gelenke gerade, Arme hängen)
@@ -456,7 +500,7 @@ export class Guide {
     const add = (p) => {
       if (!this.vary) return p;
       const q = { ...p };
-      for (const [k, d] of Object.entries(this.vary)) { q[k] += d; if (k === 'shX') q.rshX += d; if (k === 'elX') q.relX += d; }
+      for (const [k, d] of Object.entries(this.vary)) { q[k] += d; if (RIGHT[k]) q[RIGHT[k]] += d; }
       return q;
     };
     const from = kind(this.pose, this.cur), to = kind(name, base);
@@ -487,12 +531,23 @@ export class Guide {
       for (const key of KEYS) this.cur[key] = a[key] + (b[key] - a[key]) * k;
       if (P.t >= P.total) { this.path = null; this.settled = true; }
     }
+    const cycle = CYCLES[this.pose];
+    if (cycle && !this.path) {
+      // Schleife durch die Bilder: jedes Bild = Grundhaltung + Abweichungen, dazwischen weich überblenden
+      if (this.cycleOf !== this.pose) { this.cycleOf = this.pose; this.cycleT = 0; }
+      const total = cycle.reduce((a, [d]) => a + d, 0);
+      let d = (this.cycleT += dt) % total, i = 0;
+      while (d > cycle[i][0]) { d -= cycle[i][0]; i++; }
+      const k = smoothstep(d / cycle[i][0]), a = cycle[i][1], b = cycle[(i + 1) % cycle.length][1];
+      for (const key of KEYS) { const va = a[key] ?? this.cur[key], vb = b[key] ?? this.cur[key]; this.shown[key] = va + (vb - va) * k; }
+      this.apply(this.shown);
+      return;
+    }
+    this.cycleOf = null;
     const motion = MOTION[this.pose];
     if (!motion || this.path) { this.apply(this.cur); return; }
     Object.assign(this.shown, this.cur);
-    for (const [key, amp, speed] of motion) this.shown[key] += Math.sin(this.t * speed) * amp;
-    if (motion.some(([key]) => key === 'shX')) this.shown.rshX = this.shown.shX;
-    if (motion.some(([key]) => key === 'elX')) this.shown.relX = this.shown.elX;
+    for (const [key, amp, speed] of motion) { this.shown[key] += Math.sin(this.t * speed) * amp; if (RIGHT[key]) this.shown[RIGHT[key]] = this.shown[key]; }
     this.apply(this.shown);
   }
 
@@ -529,12 +584,13 @@ export class Guide {
     // Der rechte Arm (side −1, die Figur blickt nach +Z) hat eigene Schlüssel (z. B. beim Werfen)
     for (const a of this.arms) {
       const r = a.side < 0;
-      a.sh.rotation.set(r ? p.rshX : p.shX, 0, p.shZ * a.side);
-      a.el.rotation.set(r ? p.relX : p.elX, 0, p.elZ * a.side);
+      a.sh.rotation.set(r ? p.rshX : p.shX, 0, (r ? p.rshZ : p.shZ) * a.side);
+      a.el.rotation.set(r ? p.relX : p.elX, 0, (r ? p.relZ : p.elZ) * a.side);
     }
     for (const l of this.legs) {
-      l.hip.rotation.x = p.hip;
-      l.knee.rotation.x = p.knee;
+      const r = l.side < 0;
+      l.hip.rotation.x = r ? p.rhip : p.hip;
+      l.knee.rotation.x = r ? p.rknee : p.knee;
     }
   }
 }
