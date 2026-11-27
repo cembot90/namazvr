@@ -918,7 +918,7 @@ function refresh() {
   if (state.scene) { placePilgrim(true); if (mobileUI) aimAtGuide(); }
   const cur = state.view === 'step' && state.steps[state.i];
   ambience.set({ scene: state.wuduRoom ? 'wudu' : state.scene, enabled: state.sounds && !state.quiet, chorus: pilgrimActive() && !!cur && CHORUS.has(cur.id), chorusText: TALBIYA_AR, voices });
-  const pose = v.type === 'step' ? v.step.pose : 'stand';
+  const pose = v.type === 'step' ? v.step.fig || v.step.pose : 'stand';
   posePerson(guide, pose);
   if (state.wuduRoom) {
     const feet = atStools();
@@ -928,7 +928,7 @@ function refresh() {
     state.atStools = feet;
   }
   updateCast();
-  if (cong.group.visible && v.type === 'step') cong.lead(v.step.basePose || v.step.pose, v.step.rakah);
+  if (cong.group.visible && v.type === 'step') cong.lead(v.step.seated ? v.step.baseFig || v.step.basePose : v.step.fig || v.step.pose, v.step.rakah);
   setChair(v.type === 'step' && v.step.seated === 'chair' && !state.wuduRoom && !state.scene);
   syncRemote();
   // Geschichten und Sternenhimmel: keine Figur (Propheten werden nicht gezeigt); Szene zeigt den Abschnitt des Schritts

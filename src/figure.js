@@ -75,6 +75,40 @@ Object.assign(POSES, {
   wFootR: { ...STOOL, shX: -1.05, shZ: -0.28, elX: -0.3, elZ: -0.1, right: { shX: -1.2, shZ: 0.0, elX: -0.2, elZ: 0, hip: -1.82, knee: 1.25 } },
   wFootL: { ...STOOL, shX: -1.2, shZ: 0.0, elX: -0.2, elZ: 0, hip: -1.82, knee: 1.25, right: { shX: -1.05, shZ: -0.28, elX: -0.3, elZ: -0.1, hip: -1.55, knee: 1.55 } },
 });
+// Gebetshaltungen mit berechneten Armwinkeln: die Hände liegen dort, wo sie hingehören (auf wenige Zentimeter genau) –
+// Takbīr an den Ohren bzw. auf Schulterhöhe, Hände übereinander unter dem Nabel / über dem Nabel / auf der Brust,
+// im Rukūʿ auf den Knien, im Sitzen auf den Oberschenkeln, in der Niederwerfung flach neben dem Kopf.
+// …Sh = Schulterhöhe, …Mid = zwischen Brust und Nabel, …Chest = auf der Brust, …W = Frauen (kompakter).
+Object.assign(POSES, {
+  takbir: { y: 0.95, spine: 0, headX: 0.15, headY: 0, shX: -1.39, shZ: 0.94, elX: -2.49, elZ: -0.11, hip: 0, knee: 0 },
+  takbirSh: { y: 0.95, spine: 0, headX: 0.15, headY: 0, shX: -0.26, shZ: 0.45, elX: -2.74, elZ: 0, hip: 0, knee: 0 },
+  qiyam: { y: 0.95, spine: 0, headX: 0.28, headY: 0, shX: -0.4, shZ: 0.09, elX: 0.1, elZ: -1.13, hip: 0, knee: 0, right: { shZ: 0.11, elX: -0.12, elZ: -1.17 } },
+  qiyamMid: { y: 0.95, spine: 0, headX: 0.28, headY: 0, shX: -0.13, shZ: 0.14, elX: -1.82, elZ: -1.12, hip: 0, knee: 0, right: { shX: -0.19, shZ: 0.12, elZ: -1.07 } },
+  qiyamChest: { y: 0.95, spine: 0, headX: 0.28, headY: 0, shX: -0.77, shZ: 0.21, elX: -2.94, elZ: -1.12, hip: 0, knee: 0, right: { shX: -0.54, shZ: 0.14, elX: -2.43, elZ: -1 } },
+  ruku: { y: 0.95, spine: 1.48, headX: -0.05, headY: 0, shX: -0.7, shZ: -0.33, elX: -0.28, elZ: 0.31, hip: -0.12, knee: 0 },
+  rukuW: { y: 0.95, spine: 1.15, headX: 0.1, headY: 0, shX: -0.7, shZ: -0.25, elX: 0.23, elZ: 0.14, hip: -0.1, knee: 0 },
+  sujud: { y: 0.46, spine: 2.05, headX: 0.1, headY: 0, shX: -3.46, shZ: 0.45, elX: 2.37, elZ: -0.15, hip: -0.3, knee: 1.87 },
+  sujudW: { y: 0.46, spine: 2.07, headX: 0.1, headY: 0, shX: -3.26, shZ: 0.02, elX: 2.32, elZ: -0.18, hip: -0.3, knee: 1.87 },
+  sit: { y: 0.24, spine: 0.05, headX: 0.25, headY: 0, shX: -0.14, shZ: -0.24, elX: -0.84, elZ: 0.06, hip: -1.25, knee: 2.82 },
+  dua: { y: 0.95, spine: 0, headX: 0.32, headY: 0, shX: -0.24, shZ: 0.09, elX: -1.95, elZ: -0.47, hip: 0, knee: 0 },
+  sitDua: { y: 0.24, spine: 0.05, headX: 0.35, headY: 0, shX: -0.25, shZ: 0.1, elX: -2.05, elZ: -0.46, hip: -1.25, knee: 2.82 },
+  floorRuku: { y: 0.24, spine: 0.55, headX: 0.15, headY: 0, shX: -0.06, shZ: 0.02, elX: -1.43, elZ: -0.38, hip: -1.25, knee: 2.82 },
+  floorSujud: { y: 0.24, spine: 0.95, headX: 0.1, headY: 0, shX: -0.1, shZ: 0.04, elX: -1.98, elZ: -0.38, hip: -1.25, knee: 2.82 },
+  chair: { y: 0.5, spine: 0.05, headX: 0.25, headY: 0, shX: 0.02, shZ: -0.32, elX: -1.27, elZ: 0.05, hip: -1.57, knee: 1.57 },
+  chairRuku: { y: 0.5, spine: 0.5, headX: 0.15, headY: 0, shX: -0.06, shZ: 0.02, elX: -1.77, elZ: -0.37, hip: -1.57, knee: 1.57 },
+  chairSujud: { y: 0.5, spine: 0.95, headX: 0.1, headY: 0, shX: -0.21, shZ: 0.04, elX: -2.37, elZ: -0.37, hip: -1.57, knee: 1.57 },
+});
+// Abgeleitete Haltungen: gleiche Arme, andere Beine bzw. Kopfdrehung (bleiben so automatisch im Einklang)
+{
+  const legs = (p) => ({ y: p.y, hip: p.hip, knee: p.knee });
+  const P = POSES, floor = { ...legs(P.sit), spine: 0.02 }, onChair = { ...legs(P.chair), spine: 0.02 };
+  Object.assign(POSES, {
+    taslimR: { ...P.sit, headX: 0.1, headY: -1.1 }, taslimL: { ...P.sit, headX: 0.1, headY: 1.1 },
+    floorTakbir: { ...P.takbir, ...floor }, floorQiyam: { ...P.qiyam, ...floor },
+    chairTakbir: { ...P.takbir, ...onChair }, chairQiyam: { ...P.qiyam, ...onChair }, chairDua: { ...P.dua, ...onChair, spine: 0.05, headX: 0.35 },
+    chairTaslimR: { ...P.chair, headX: 0.1, headY: -1.1 }, chairTaslimL: { ...P.chair, headX: 0.1, headY: 1.1 },
+  });
+}
 // crouch = in die Knie gehen, kneel = Knie auf dem Boden, Oberkörper aufrecht, handsDown = kniend, Hände am Boden
 const VIA = {
   crouch:    { y: 0.76, spine: 0.32, headX: 0.3,  headY: 0, shX: -0.4,  shZ: 0.1,  elX: -0.3,  elZ: 0, hip: -0.75, knee: 1.45 },
@@ -88,7 +122,7 @@ for (const k of Object.keys(POSES)) POSES[k] = full(POSES[k]);
 for (const k of Object.keys(VIA)) VIA[k] = full(VIA[k]);
 const KEYS = Object.keys(POSES.stand);
 const SIT = new Set(['sit', 'taslimR', 'taslimL', 'sitDua', 'sitNiyaz', 'sitPlay']);
-const kind = (name, p) => (name === 'sujud' ? 'sujud' : SIT.has(name) ? 'sit' : p.y > 0.8 && p.hip > -0.4 ? 'stand' : 'other');
+const kind = (name, p) => (name === 'sujud' || name === 'sujudW' ? 'sujud' : SIT.has(name) ? 'sit' : p.y > 0.8 && p.hip > -0.4 ? 'stand' : 'other');
 // Reihenfolge wie beim Beten: zur Niederwerfung erst die Knie, dann die Hände, dann die Stirn – beim Aufstehen umgekehrt
 const PATHS = {
   'stand>sujud': ['crouch', 'kneel', 'handsDown'],
@@ -565,6 +599,18 @@ export class Guide {
   }
 
   setGhostColor(color) { this.ghostMat?.color.setHex(color); this.ghostMat?.emissive.setHex(color); }
+
+  // Messpunkte in Koordinaten der Figur (x > 0 = ihre linke Seite, z > 0 = vor ihr) – zum Abstimmen der Haltungen
+  probe() {
+    this.group.updateMatrixWorld(true);
+    const P = (o, x, y, z) => this.group.worldToLocal(o.localToWorld(new THREE.Vector3(x, y, z))).toArray().map((v) => Math.round(v * 1000) / 1000);
+    const [L, R] = this.arms, [lL, lR] = this.legs;
+    return {
+      handL: P(L.el, 0, -0.31, 0), handR: P(R.el, 0, -0.31, 0), elbowL: P(L.el, 0, 0, 0), elbowR: P(R.el, 0, 0, 0), shL: P(L.sh, 0, 0, 0), shR: P(R.sh, 0, 0, 0),
+      kneeL: P(lL.knee, 0, 0, 0), kneeR: P(lR.knee, 0, 0, 0), footL: P(lL.knee, 0, -0.455, 0), footR: P(lR.knee, 0, -0.455, 0), toeL: P(lL.knee, 0, -0.455, 0.16),
+      head: P(this.head, 0, 0.135, 0), forehead: P(this.head, 0, 0.17, 0.095), earL: P(this.head, 0.1, 0.125, 0), chin: P(this.head, 0, 0.05, 0.09), hip: P(this.root, 0, 0, 0),
+    };
+  }
 
   apply(p) {
     this.root.position.y = p.y;

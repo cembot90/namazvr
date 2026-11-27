@@ -466,6 +466,20 @@ export const TASBIH = TASBIH_AR.map(([ar, tr, target], i) => ({
 // Zusätzliche Takbīre im Festgebet: [erste Rakʿa, zweite Rakʿa]
 const EID_TAKBIRS = { hanafi: [3, 3], shafii: [7, 5], maliki: [6, 5], hanbali: [6, 5] };
 
+// Die Figur zeigt, was der Text beschreibt: Höhe der Hände beim Takbīr und im Stehen je Rechtsschule, Frauen kompakter.
+// fig liest nur die Figur – step.pose bleibt für Erkennung, Piktogramm und Ansage unverändert.
+function withFigs(steps, m, f) {
+  const earTakbir = m.id === 'hanafi' && !f;
+  const fold = f && m.id === 'hanafi' ? 'qiyamChest' : m.id === 'shafii' ? 'qiyamMid' : 'qiyam';
+  for (const s of steps) {
+    if (s.pose === 'takbir' && !earTakbir) s.fig = 'takbirSh';
+    else if (s.pose === 'qiyam' && fold !== 'qiyam') s.fig = fold;
+    else if (s.pose === 'ruku' && f && m.id === 'hanafi') s.fig = 'rukuW';
+    else if (s.pose === 'sujud' && f) s.fig = 'sujudW';
+  }
+  return steps;
+}
+
 // Totengebet (Ṣalāt al-Janāza): im Stehen, vier Takbīre, ohne Rukūʿ und Sujūd, dann Salām.
 function buildJanaza(m, gender) {
   const steps = [];
@@ -495,7 +509,8 @@ function seated(steps, mode, m) {
   const map = SEAT[mode];
   return steps.map((s, i) => {
     const pose = map[s.pose] || s.pose;
-    const out = { ...s, basePose: s.pose, pose, seated: mode };
+    const out = { ...s, basePose: s.pose, baseFig: s.fig, pose, seated: mode };
+    delete out.fig;
     if (s.key === 'niyya' && i === 0) out.de = [t(`sit.note.${m.id}`), t(`sit.mode.${mode}`), ...s.de];
     if (s.pose === 'ruku') { out.how = t('sit.how.ruku'); out.instr = `${t('sit.lead.ruku')} ${s.instr}`; }
     else if (s.pose === 'sujud') { out.how = t('sit.how.sujud'); out.instr = `${t('sit.lead.sujud')} ${s.instr}`; }
@@ -514,7 +529,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
     return seated(buildSteps(prayer, madhabId, gender, suraKey), opts.sitting, m);
   }
   const m = MADHABS.find((x) => x.id === madhabId) || MADHABS[0];
-  if (prayer.kind === 'janaza') return buildJanaza(m, gender);
+  if (prayer.kind === 'janaza') return withFigs(buildJanaza(m, gender), m, gender === 'f');
   const f = gender === 'f';
   const pick = (table) => (table && (table[m.id] ?? table.default)) || '';
   // Für Frauen: Hände, Takbīr und Sitzen je nach Schule anpassen.
@@ -566,7 +581,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
     }
     add({ ...base, key: 'salam', title: t('title.salamR'), pose: 'taslimR', dur: 5, instr: t('instr.salamR'), ...text('salam') });
     add({ ...base, key: 'salam', title: t('title.salamL'), pose: 'taslimL', dur: 5, instr: t('instr.salamL'), ...text('salam') });
-    return steps;
+    return withFigs(steps, m, f);
   }
   for (const [ui, unit] of units.entries()) {
     const { n, label } = unit;
@@ -651,6 +666,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
     const last = steps[steps.length - 1];
     add({ unit: last.unit, of: last.of, rakah: last.rakah, key: 'dua', title: t(`nfl.duaTitle.${prayer.id}`), pose: 'sitDua', how: sitText(true, prayer.rakat), dur: prayer.duaAfter === 'istikhara' ? 40 : 16, instr: t(`nfl.duaInstr.${prayer.id}`), ...text(prayer.duaAfter) });
   }
+  withFigs(steps, m, f);
   return prayer.tasbih ? withTasbih(steps, m) : steps;
 }
 
@@ -661,7 +677,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
 function withTasbih(steps, m) {
   const hanafi = m.id === 'hanafi', out = [];
   const add = (s, n, where, pose = s.pose, how = s.how) => out.push({
-    unit: s.unit, of: s.of, rakah: s.rakah, key: 'tasbihp', title: t('tsp.title', n), pose, how, dur: Math.round(n * 2.6), instr: t(`tsp.at.${where}`, n), ...text('tsp'),
+    unit: s.unit, of: s.of, rakah: s.rakah, key: 'tasbihp', title: t('tsp.title', n), pose, ...(pose === s.pose && s.fig ? { fig: s.fig } : {}), how, dur: Math.round(n * 2.6), instr: t(`tsp.at.${where}`, n), ...text('tsp'),
   });
   const seenFatiha = new Set();
   for (const s of steps) {
