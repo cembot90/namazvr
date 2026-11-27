@@ -471,11 +471,14 @@ const EID_TAKBIRS = { hanafi: [3, 3], shafii: [7, 5], maliki: [6, 5], hanbali: [
 function withFigs(steps, m, f) {
   const earTakbir = m.id === 'hanafi' && !f;
   const fold = f && m.id === 'hanafi' ? 'qiyamChest' : m.id === 'shafii' ? 'qiyamMid' : 'qiyam';
+  // cfig: was Imam und Gemeinde zeigen – immer die Haltung der Männer dieser Rechtsschule, auch wenn eine Frau übt
+  const cFold = m.id === 'shafii' ? 'qiyamMid' : 'qiyam';
   for (const s of steps) {
     if (s.pose === 'takbir' && !earTakbir) s.fig = 'takbirSh';
     else if (s.pose === 'qiyam' && fold !== 'qiyam') s.fig = fold;
     else if (s.pose === 'ruku' && f && m.id === 'hanafi') s.fig = 'rukuW';
     else if (s.pose === 'sujud' && f) s.fig = 'sujudW';
+    s.cfig = s.pose === 'takbir' ? (m.id === 'hanafi' ? 'takbir' : 'takbirSh') : s.pose === 'qiyam' ? cFold : s.pose;
   }
   return steps;
 }
@@ -509,7 +512,7 @@ function seated(steps, mode, m) {
   const map = SEAT[mode];
   return steps.map((s, i) => {
     const pose = map[s.pose] || s.pose;
-    const out = { ...s, basePose: s.pose, baseFig: s.fig, pose, seated: mode };
+    const out = { ...s, basePose: s.pose, pose, seated: mode };
     delete out.fig;
     if (s.key === 'niyya' && i === 0) out.de = [t(`sit.note.${m.id}`), t(`sit.mode.${mode}`), ...s.de];
     if (s.pose === 'ruku') { out.how = t('sit.how.ruku'); out.instr = `${t('sit.lead.ruku')} ${s.instr}`; }
@@ -677,7 +680,7 @@ export function buildSteps(prayer, madhabId = 'hanafi', gender = 'm', suraKey = 
 function withTasbih(steps, m) {
   const hanafi = m.id === 'hanafi', out = [];
   const add = (s, n, where, pose = s.pose, how = s.how) => out.push({
-    unit: s.unit, of: s.of, rakah: s.rakah, key: 'tasbihp', title: t('tsp.title', n), pose, ...(pose === s.pose && s.fig ? { fig: s.fig } : {}), how, dur: Math.round(n * 2.6), instr: t(`tsp.at.${where}`, n), ...text('tsp'),
+    unit: s.unit, of: s.of, rakah: s.rakah, key: 'tasbihp', title: t('tsp.title', n), pose, ...(pose === s.pose && s.fig ? { fig: s.fig } : {}), ...(pose === s.pose && s.cfig ? { cfig: s.cfig } : {}), how, dur: Math.round(n * 2.6), instr: t(`tsp.at.${where}`, n), ...text('tsp'),
   });
   const seenFatiha = new Set();
   for (const s of steps) {

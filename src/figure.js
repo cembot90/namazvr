@@ -120,6 +120,15 @@ Object.assign(POSES, {
   sweep: { y: 0.9, spine: 0.55, headX: 0.35, headY: 0, shX: -0.1, shZ: 0.02, elX: -1.36, elZ: -0.64, hip: -0.15, knee: 0.25, right: { shX: -0.77, shZ: -0.3, elX: -0.11, elZ: 0.06 } },
   throw: { y: 0.95, spine: -0.08, headX: 0, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: 1.55, shZ: 1.29, elX: 2.34, elZ: 0.1 } },
 });
+// Tayammum (beide Handflächen auf die Erde bzw. den Stein auf der Ablage), Çerağ anzünden (zur Lampe gebeugt), Ghusl (Wasser über den Körper streichen),
+// Steinwurf des Vorbeters in zwei festen Bildern (ausholen, werfen) – im Takt mit dem fliegenden Stein
+Object.assign(POSES, {
+  strike: { y: 0.95, spine: 0.32, headX: 0.4, headY: 0, shX: -0.41, shZ: 0.1, elX: -0.97, elZ: -0.4, hip: 0, knee: 0 },
+  lamp: { y: 0.95, spine: 0.75, headX: 0.3, headY: 0, shX: -0.3, shZ: 0.08, elX: -0.6, elZ: 0, hip: -0.12, knee: 0, right: { shX: -0.76, shZ: -0.28, elX: -0.73, elZ: 0.06 } },
+  wBody: { y: 0.95, spine: 0.08, headX: 0.3, headY: 0, shX: 0.06, shZ: 0.25, elX: -2.49, elZ: -0.44, hip: 0, knee: 0 },
+  throwUp: { y: 0.95, spine: -0.08, headX: 0, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: 1.55, shZ: 1.29, elX: 2.34, elZ: 0.1 } },
+  throwFwd: { y: 0.95, spine: 0.14, headX: 0.05, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: -1.44, shZ: 0.14, elX: -0.91, elZ: -0.25 } },
+});
 // crouch = in die Knie gehen, kneel = Knie auf dem Boden, Oberkörper aufrecht, handsDown = kniend, Hände am Boden
 const VIA = {
   crouch:    { y: 0.76, spine: 0.32, headX: 0.3,  headY: 0, shX: -0.4,  shZ: 0.1,  elX: -0.3,  elZ: 0, hip: -0.75, knee: 1.45 },
@@ -295,6 +304,10 @@ const MOTION = {
 // [Dauer bis zum nächsten Bild in s, Abweichungen von der Grundhaltung]; r… = rechter Arm bzw. rechtes Bein.
 const toMouth = { rshX: -0.62, relX: -2.55, relZ: -0.55, rshZ: 0.02 };
 export const CYCLES = {
+  // Ghusl: Wasser von der Brust bis zum Bauch über den Körper streichen
+  wBody: [[0.8, {}], [0.8, { shX: 0.14, shZ: 0.3, elX: -1.41, elZ: -0.7, rshX: 0.14, rshZ: 0.3, relX: -1.41, relZ: -0.7 }]],
+  // Tayammum: Hände auf die Erde legen – leicht anheben
+  strike: [[0.7, {}], [0.5, { elX: -1.2, relX: -1.2 }]],
   // Steinwurf: ausholen – werfen – nachschwingen
   throw: [[0.6, {}], [0.22, { spine: 0.14, headX: 0.05, rshX: -1.44, rshZ: 0.14, relX: -0.91, relZ: -0.25 }], [0.7, { spine: 0.14, headX: 0.05, rshX: -1.44, rshZ: 0.14, relX: -0.91, relZ: -0.25 }]],
   // Zamzam trinken: Becher vor der Brust – zum Mund, Kopf leicht zurück
@@ -547,6 +560,9 @@ export class Guide {
   // Neue Haltung: Weg über passende Zwischenhaltungen, mit weichem Anfang und Ende und gleichmäßigem Tempo dazwischen
   setPose(name) {
     if (name === this.pose && (this.path || this.settled)) return;
+    // Aus einem laufenden Bewegungsablauf heraus: dort weitermachen, wo die Figur gerade ist (kein Ruck zurück zum ersten Bild)
+    if (this.cycleOf && !this.path) Object.assign(this.cur, this.shown);
+    this.cycleOf = null;
     const base = POSES[name] || POSES.stand;
     const add = (p) => {
       if (!this.vary) return p;

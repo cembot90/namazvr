@@ -45,7 +45,8 @@ const TAYAMMUM_PARTS = [
   ['heart', 'stand', 1, () => false],
 ];
 // Eigene, detaillierte Bewegung je Körperteil (figure.js: POSES und CYCLES)
-const DETAIL = { hands: 'wHands', mouth: 'wMouth', nose: 'wNose', face: 'wFace', armR: 'wArmR', armL: 'wArmL', head: 'wHead', ears: 'wEars', footR: 'wFootR', footL: 'wFootL', tFace: 'wFace', tArmR: 'wArmR', tArmL: 'wArmL' };
+const DETAIL = { hands: 'wHands', mouth: 'wMouth', nose: 'wNose', face: 'wFace', armR: 'wArmR', armL: 'wArmL', head: 'wHead', ears: 'wEars', footR: 'wFootR', footL: 'wFootL', tFace: 'wFace', tArmR: 'wArmR', tArmL: 'wArmL',
+  strike: 'strike', strike2: 'strike', private: 'wHands', wuduAll: 'wFace', headPour: 'wHead', sideR: 'wArmR', sideL: 'wArmL', body: 'wBody' };
 const PARTS_OF = { wudu: WUDU_PARTS, ghusl: GHUSL_PARTS, tayammum: TAYAMMUM_PARTS };
 
 export function buildWuduSteps(madhab = 'hanafi', variant = 'wudu') {

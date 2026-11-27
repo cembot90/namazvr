@@ -745,7 +745,7 @@ function cemRole(p, g, dt) {
     // Der Çerağcı beugt sich zur Lampe und zündet sie an, dann Niyaz
     g.group.position.set(p.x, 0, p.z);
     g.group.rotation.y = -Math.PI / 2 - 0.4;
-    g.setPose(cemT < 1.4 ? 'stand' : cemT < 3.4 ? 'pick' : 'niyaz');
+    g.setPose(cemT < 1.4 ? 'stand' : cemT < 3.4 ? 'lamp' : 'niyaz');
     g.update(dt);
     return;
   }

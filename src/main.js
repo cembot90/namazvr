@@ -515,8 +515,9 @@ function updatePilgrim(dt) {
     // Alle 2,4 Sekunden ein Wurf: Hand hoch, Stein fliegt
     const due = Math.min(m.count, Math.floor(pg.tt / 2.4));
     if (due > pg.thrown) { pg.thrown = due; throwPebble(m.target); }
-    const up = pg.tt % 2.4 < 0.9 && pg.thrown < m.count;
-    posePerson(guide, up ? 'throw' : 'stand');
+    // Vor jedem Wurf ausholen, beim Wurf (Fenstergrenze) nach vorn schwingen, dann kurz stehen
+    const ph = pg.tt % 2.4, n = Math.floor(pg.tt / 2.4);
+    posePerson(guide, ph < 0.45 && n >= 1 && n <= m.count ? 'throwFwd' : ph > 1.3 && n < m.count ? 'throwUp' : 'stand');
   }
   if (throwAnim.t >= 0) {
     throwAnim.t += dt / 0.8;
@@ -928,7 +929,7 @@ function refresh() {
     state.atStools = feet;
   }
   updateCast();
-  if (cong.group.visible && v.type === 'step') cong.lead(v.step.seated ? v.step.baseFig || v.step.basePose : v.step.fig || v.step.pose, v.step.rakah);
+  if (cong.group.visible && v.type === 'step') cong.lead(v.step.cfig || v.step.basePose || v.step.pose, v.step.rakah);
   setChair(v.type === 'step' && v.step.seated === 'chair' && !state.wuduRoom && !state.scene);
   syncRemote();
   // Geschichten und Sternenhimmel: keine Figur (Propheten werden nicht gezeigt); Szene zeigt den Abschnitt des Schritts
@@ -1735,7 +1736,7 @@ const SHOT_OF = { hands: 'low', armR: 'low', armL: 'lowL', private: 'low', sideR
 // [Auge, Blickziel] in Koordinaten der Figur (x < 0 = ihre rechte Seite, z > 0 = vor ihr)
 const SHOTS = {
   low: [[-0.85, 1.32, 0.62], [0, 1.03, 0.36]], lowL: [[0.85, 1.32, 0.62], [0, 1.03, 0.36]],
-  face: [[-0.7, 1.5, 0.78], [0, 1.4, 0.26]],
+  face: [[-0.7, 1.5, 0.78], [0, 1.4, 0.26]], floor: [[-1.1, 0.75, 1.0], [0, 0.28, 0.4]],
   foot: [[-1.0, 0.85, 0.95], [-0.08, 0.36, 0.42]], footL: [[-1.0, 0.95, 0.85], [0.08, 0.36, 0.42]],
 };
 const shotKind = () => {
@@ -2145,7 +2146,7 @@ renderer.setAnimationLoop(() => {
   {
     const st = state.view === 'step' && state.steps[state.i];
     const ph = st?.story ? st.phase : null;
-    const water = (state.wuduRoom && !!st && st.wudu !== 'heart') || (!!st && st.id === 'zamzam')
+    const water = (state.wuduRoom && !!st && st.wudu !== 'heart' && st.variant !== 'tayammum') || (!!st && st.id === 'zamzam')
       || state.scene === 'nile' || (state.scene === 'sea' && ph !== 'dark') || (state.scene === 'ark' && ['rain', 'sea', 'cudi'].includes(ph));
     ambience.update(dt, { walking: !!(state.scene && state.pilgrim.moving), speed: state.pilgrim.speed || 2, water });
   }
@@ -2154,8 +2155,8 @@ renderer.setAnimationLoop(() => {
   if (state.wuduRoom) {
     const st = state.view === 'step' && state.steps[state.i];
     const arrived = (f) => !movers.has(f);
-    if (state.atStools) setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [], arrived(guide) ? [0] : []);
-    else setWater(!!st && st.wudu !== 'heart', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : [])]);
+    if (state.atStools) setWater(!!st && st.wudu !== 'heart' && st.variant !== 'tayammum', clock.elapsedTime, [], arrived(guide) ? [0] : []);
+    else setWater(!!st && st.wudu !== 'heart' && st.variant !== 'tayammum', clock.elapsedTime, [0, ...(arrived(guide) ? [1.1] : [])]);
   }
   updateCloseup();
   graphics.render(camera);
