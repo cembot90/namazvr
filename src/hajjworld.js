@@ -729,7 +729,7 @@ export function updateCrowd(dt) {
     } else {
       g.group.position.set(p.x, 0, p.z);
       g.group.rotation.y = Math.PI;
-      if (p.mode === 'throw') g.setPose(Math.floor(p.t / 2.2) % 2 ? 'throw' : 'stand');
+      if (p.mode === 'throw') g.setPose(Math.floor(p.t / 4.6) % 2 ? 'throw' : 'stand');
       g.update(dt);
     }
   }
@@ -766,7 +766,7 @@ function cemRole(p, g, dt) {
   const x = MEYDAN.x + Math.cos(p.a) * r, z = MEYDAN.z - Math.sin(p.a) * r;
   g.group.position.set(x, 0, z);
   g.group.rotation.y = Math.atan2(-Math.sin(p.a), -Math.cos(p.a)) + (pause ? Math.PI / 2 : 0);
-  g.setPose(p.role === 'sweep' ? 'sweep' : p.role === 'lokma' ? 'tray' : 'drink');
+  g.setPose(p.role === 'sweep' ? 'sweep' : 'tray');
   g.update(dt);
   if (!pause) {
     const swing = Math.sin(p.t * 6) * 0.3;

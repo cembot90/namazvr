@@ -109,6 +109,17 @@ Object.assign(POSES, {
     chairTaslimR: { ...P.chair, headX: 0.1, headY: -1.1 }, chairTaslimL: { ...P.chair, headX: 0.1, headY: 1.1 },
   });
 }
+// Umre, Hac und Cem: ebenfalls berechnet – die Hand am Mund beim Trinken, am Herzen beim Niyaz, am Boden beim Aufheben
+Object.assign(POSES, {
+  drink: { y: 0.95, spine: 0, headX: 0.25, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: -0.03, shZ: 0.15, elX: -1.9, elZ: -0.46 } },
+  istilam: { y: 0.95, spine: 0, headX: 0.05, headY: 0, shX: -0.92, shZ: 0.28, elX: -1.79, elZ: -0.23, hip: 0, knee: 0 },
+  pick: { y: 0.56, spine: 1.4, headX: 0.3, headY: 0, shX: -0.6, shZ: 0.05, elX: -0.9, elZ: -0.2, hip: -1.25, knee: 1.95, right: { shX: -1.28, shZ: -0.06, elX: -0.43, elZ: -0.17 } },
+  niyaz: { y: 0.95, spine: 0.35, headX: 0.35, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: -0.9, shZ: -0.05, elX: -2.72, elZ: -1.2 } },
+  sitNiyaz: { y: 0.24, spine: 0.5, headX: 0.45, headY: 0, shX: -0.4, shZ: 0, elX: -1, elZ: -0.25, hip: -1.25, knee: 2.82, right: { shX: -0.85, shZ: -0.1, elX: -2.47, elZ: -1.15 } },
+  tray: { y: 0.95, spine: 0.05, headX: 0.3, headY: 0, shX: 0.06, shZ: -0.1, elX: -1.66, elZ: 0, hip: 0, knee: 0 },
+  sweep: { y: 0.9, spine: 0.55, headX: 0.35, headY: 0, shX: -0.1, shZ: 0.02, elX: -1.36, elZ: -0.64, hip: -0.15, knee: 0.25, right: { shX: -0.77, shZ: -0.3, elX: -0.11, elZ: 0.06 } },
+  throw: { y: 0.95, spine: -0.08, headX: 0, headY: 0, shX: 0, shZ: 0.08, elX: -0.1, elZ: 0, hip: 0, knee: 0, right: { shX: 1.55, shZ: 1.29, elX: 2.34, elZ: 0.1 } },
+});
 // crouch = in die Knie gehen, kneel = Knie auf dem Boden, Oberkörper aufrecht, handsDown = kniend, Hände am Boden
 const VIA = {
   crouch:    { y: 0.76, spine: 0.32, headX: 0.3,  headY: 0, shX: -0.4,  shZ: 0.1,  elX: -0.3,  elZ: 0, hip: -0.75, knee: 1.45 },
@@ -284,6 +295,12 @@ const MOTION = {
 // [Dauer bis zum nächsten Bild in s, Abweichungen von der Grundhaltung]; r… = rechter Arm bzw. rechtes Bein.
 const toMouth = { rshX: -0.62, relX: -2.55, relZ: -0.55, rshZ: 0.02 };
 export const CYCLES = {
+  // Steinwurf: ausholen – werfen – nachschwingen
+  throw: [[0.6, {}], [0.22, { spine: 0.14, headX: 0.05, rshX: -1.44, rshZ: 0.14, relX: -0.91, relZ: -0.25 }], [0.7, { spine: 0.14, headX: 0.05, rshX: -1.44, rshZ: 0.14, relX: -0.91, relZ: -0.25 }]],
+  // Zamzam trinken: Becher vor der Brust – zum Mund, Kopf leicht zurück
+  drink: [[1.0, {}], [0.6, { headX: -0.12, rshX: -1.64, rshZ: 0.25, relX: -2.62, relZ: -0.79 }], [1.1, { headX: -0.12, rshX: -1.64, rshZ: 0.25, relX: -2.62, relZ: -0.79 }]],
+  // Istilām: beide Hände zum Schwarzen Stein heben – die Handflächen küssen
+  istilam: [[1.3, {}], [0.6, { headX: 0.2, shX: -1.24, shZ: 0.19, elX: -2.51, elZ: -0.61, rshX: -1.24, rshZ: 0.19, relX: -2.51, relZ: -0.61 }], [0.9, { headX: 0.2, shX: -1.24, shZ: 0.19, elX: -2.51, elZ: -0.61, rshX: -1.24, rshZ: 0.19, relX: -2.51, relZ: -0.61 }]],
   // Hände: aneinander reiben, auch zwischen den Fingern
   wHands: [[0.45, { elX: -1.12, relX: -0.9, elZ: -0.7, relZ: -0.55 }], [0.45, { elX: -0.9, relX: -1.12, elZ: -0.55, relZ: -0.7 }]],
   // Mund: Wasser schöpfen – zum Mund – spülen – ausspucken
